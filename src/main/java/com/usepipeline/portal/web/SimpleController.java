@@ -1,4 +1,4 @@
-package com.usepipeline.portal;
+package com.usepipeline.portal.web;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
