@@ -7,14 +7,23 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 
 public class PortalSecurityAdapter extends WebSecurityConfigurerAdapter {
+    private CsrfTokenRepository csrfTokenRepository;
 
     @Override
     protected void configure(HttpSecurity security) throws Exception {
         // TODO add security configurations
         security
-                .authorizeRequests().withObjectPostProcessor(createRoleProcessor());
+                .formLogin().disable()
+                .httpBasic().disable()
+                .authorizeRequests()
+                .antMatchers("/").permitAll()
+                .and()
+                .formLogin()
+                .and().csrf().csrfTokenRepository(csrfTokenRepository);
+//                .authorizeRequests().withObjectPostProcessor(createRoleProcessor());
     }
 
     private ObjectPostProcessor<AffirmativeBased> createRoleProcessor() {
