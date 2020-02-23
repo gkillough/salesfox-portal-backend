@@ -1,20 +1,21 @@
 package com.usepipeline.portal.web.security.authentication;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UserDetailsImpl implements UserDetails {
+public class PortalUserDetails implements UserDetails {
     private List<String> roles;
     private String username;
     private String password;
     private boolean isAccountLocked;
     private boolean isActive;
 
-    public UserDetailsImpl(List<String> roles, String username, String password, boolean isAccountLocked, boolean isActive) {
+    public PortalUserDetails(List<String> roles, String username, String password, boolean isAccountLocked, boolean isActive) {
         this.roles = roles;
         this.username = username;
         this.password = password;
@@ -24,10 +25,9 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // FIXME replace with real authority
         return roles
                 .stream()
-                .map(role -> (GrantedAuthority) () -> role)
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
     }
 

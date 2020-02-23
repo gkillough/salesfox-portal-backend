@@ -37,12 +37,12 @@ public class AuthenticationUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // FIXME replace with reasonable joins
         // FIXME replace with better exceptions
-        LoginEntity userLogin = loginRepository.findByEmail(username)
+        UserEntity user = userRepository.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("No user"));
+        LoginEntity userLogin = loginRepository.findByUserId(user.getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("No login"));
         MembershipEntity membership = membershipRepository.findByUserId(userLogin.getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("No membership"));
-        UserEntity user = userRepository.findById(membership.getUserId())
-                .orElseThrow(() -> new UsernameNotFoundException("No user"));
 
         ArrayList<String> userRoles = new ArrayList<>();
         roleRepository.findById(membership.getRoleId())
@@ -51,7 +51,7 @@ public class AuthenticationUserDetailsService implements UserDetailsService {
 
         boolean userLocked = userLogin.getNumFailedLogins() > MAX_LOGIN_ATTEMPTS;
 
-        return new UserDetailsImpl(userRoles, user.getEmail(), userLogin.getPasswordHash(), userLocked, membership.getIsActive());
+        return new PortalUserDetails(userRoles, user.getEmail(), userLogin.getPasswordHash(), userLocked, membership.getIsActive());
     }
 
 }

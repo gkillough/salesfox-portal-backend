@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-public class PlaceholderController implements ErrorController {
+public class DefaultLocationsController implements ErrorController {
     @GetMapping("/")
     public String landingPage() {
         return "Hello";

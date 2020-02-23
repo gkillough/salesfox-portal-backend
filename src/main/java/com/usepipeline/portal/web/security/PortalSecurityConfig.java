@@ -6,37 +6,45 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
 
 @Component
 @EnableWebSecurity
-public class PortalSecurityAdapter extends WebSecurityConfigurerAdapter {
+public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthenticationUserDetailsService userDetailsService;
+    private PasswordEncoder passwordEncoder;
     private CsrfTokenRepository csrfTokenRepository;
 
     @Autowired
-    public PortalSecurityAdapter(AuthenticationUserDetailsService userDetailsService, CsrfTokenRepository csrfTokenRepository) {
+    public PortalSecurityConfig(AuthenticationUserDetailsService userDetailsService, PasswordEncoder passwordEncoder, CsrfTokenRepository csrfTokenRepository) {
         this.userDetailsService = userDetailsService;
+        this.passwordEncoder = passwordEncoder;
         this.csrfTokenRepository = csrfTokenRepository;
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService);
+    protected void configure(AuthenticationManagerBuilder authManagerBuilder) throws Exception {
+        authManagerBuilder
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder);
     }
 
     @Override
     protected void configure(HttpSecurity security) throws Exception {
         // TODO extract strings
         security.authorizeRequests()
-                .antMatchers("/", "/error", "static/css/**").permitAll()
+                .antMatchers("/", "/login", "/error", "static/css/**").permitAll()
                 .antMatchers("/admin", "/admin/**").hasRole("PIPELINE_ADMIN")
                 .antMatchers("/manager", "/manager/**").hasRole("PIPELINE_MANAGER")
                 .antMatchers("/portal", "/portal/**").hasAnyRole("PIPELINE_MANAGER", "PIPELINE_USER")
                 .and()
-                .formLogin().disable()
-                .logout().logoutSuccessUrl("/");
+                .logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .deleteCookies("PORTAL_SESSION_ID")
+                .logoutSuccessUrl("/");
     }
 
 }
