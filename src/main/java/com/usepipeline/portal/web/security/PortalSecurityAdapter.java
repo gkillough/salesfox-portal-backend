@@ -1,51 +1,42 @@
 package com.usepipeline.portal.web.security;
 
-import org.springframework.security.access.vote.AffirmativeBased;
-import org.springframework.security.config.annotation.ObjectPostProcessor;
+import com.usepipeline.portal.web.security.authentication.AuthenticationUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler;
-import org.springframework.security.web.access.expression.WebExpressionVoter;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.stereotype.Component;
 
+@Component
+@EnableWebSecurity
 public class PortalSecurityAdapter extends WebSecurityConfigurerAdapter {
+    private AuthenticationUserDetailsService userDetailsService;
     private CsrfTokenRepository csrfTokenRepository;
+
+    @Autowired
+    public PortalSecurityAdapter(AuthenticationUserDetailsService userDetailsService, CsrfTokenRepository csrfTokenRepository) {
+        this.userDetailsService = userDetailsService;
+        this.csrfTokenRepository = csrfTokenRepository;
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService);
+    }
 
     @Override
     protected void configure(HttpSecurity security) throws Exception {
-        // TODO add security configurations
-        security
-                .formLogin().disable()
-                .httpBasic().disable()
-                .authorizeRequests()
-                .antMatchers("/").permitAll()
+        // TODO extract strings
+        security.authorizeRequests()
+                .antMatchers("/", "/error", "static/css/**").permitAll()
+                .antMatchers("/admin", "/admin/**").hasRole("PIPELINE_ADMIN")
+                .antMatchers("/manager", "/manager/**").hasRole("PIPELINE_MANAGER")
+                .antMatchers("/portal", "/portal/**").hasAnyRole("PIPELINE_MANAGER", "PIPELINE_USER")
                 .and()
-                .formLogin()
-                .and().csrf().csrfTokenRepository(csrfTokenRepository);
-//                .authorizeRequests().withObjectPostProcessor(createRoleProcessor());
-    }
-
-    private ObjectPostProcessor<AffirmativeBased> createRoleProcessor() {
-        return new ObjectPostProcessor<AffirmativeBased>() {
-            @Override
-            public AffirmativeBased postProcess(AffirmativeBased affirmativeBased) {
-                WebExpressionVoter webExpressionVoter = new WebExpressionVoter();
-                DefaultWebSecurityExpressionHandler expressionHandler = new DefaultWebSecurityExpressionHandler();
-                expressionHandler.setRoleHierarchy(authorities -> {
-                    String[] allowedRoles = retrieveAllowedRoles();
-                    return AuthorityUtils.createAuthorityList(allowedRoles);
-                });
-                webExpressionVoter.setExpressionHandler(expressionHandler);
-                affirmativeBased.getDecisionVoters().add(webExpressionVoter);
-                return affirmativeBased;
-            }
-        };
-    }
-
-    private String[] retrieveAllowedRoles() {
-        // TODO implement
-        return new String[]{"PIPELINE_ADMIN", "PIPELINE_MANAGER"};
+                .formLogin().disable()
+                .logout().logoutSuccessUrl("/");
     }
 
 }

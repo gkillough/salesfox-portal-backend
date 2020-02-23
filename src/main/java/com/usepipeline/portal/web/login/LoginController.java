@@ -6,6 +6,7 @@ import com.usepipeline.portal.web.security.SecuritySessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,6 +48,10 @@ public class LoginController {
     public ResponseEntity<?> userRegister(@RequestParam RegistrationModel registrationRequest) {
         // TODO implement
         return null;
+    }
+
+    private UsernamePasswordAuthenticationToken createUsernamePasswordAuthToken(LoginModel loginModel) {
+        return new UsernamePasswordAuthenticationToken(loginModel.getUsername(), loginModel.getPassword());
     }
 
 }
