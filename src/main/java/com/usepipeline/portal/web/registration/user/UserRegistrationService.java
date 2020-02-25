@@ -1,6 +1,6 @@
 package com.usepipeline.portal.web.registration.user;
 
-import com.usepipeline.portal.common.enumeration.PortalRoles;
+import com.usepipeline.portal.common.enumeration.PortalRole;
 import com.usepipeline.portal.common.exception.PortalException;
 import com.usepipeline.portal.database.authentication.entity.*;
 import com.usepipeline.portal.database.authentication.repository.*;
@@ -52,8 +52,9 @@ public class UserRegistrationService {
             UserEntity userEntity = saveUserInfo(registrationModel.getFirstName(), registrationModel.getLastName(), registrationModel.getEmail());
             OrganizationAccountEntity organizationAccountEntity = savePlanInfo(registrationModel.getPlanType());
 
+            RoleEntity roleEntity = getRoleInfo(registrationModel.getPlanType());
             saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
-            saveMembershipInfo(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId());
+            saveMembershipInfo(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId(), roleEntity.getRoleId());
         } catch (PortalException e) {
             logger.error("There was a problem registering the user", e);
             return false;
@@ -72,8 +73,19 @@ public class UserRegistrationService {
     }
 
     private OrganizationAccountEntity savePlanInfo(String planName) throws PortalException {
-        return organizationAccountRepository.findByOrganizationAccountName(planName)
+        return organizationAccountRepository.findFirstByOrganizationAccountName(planName)
                 .orElseThrow(() -> new PortalException("No plan with the name '" + planName + "' exists"));
+    }
+
+    private RoleEntity getRoleInfo(String planName) throws PortalException {
+        PortalRole portalRole = PortalRole.PIPELINE_BASIC_USER;
+        // TODO think of a better way to map this
+        if (planName.toLowerCase().contains("premium")) {
+            portalRole = PortalRole.PIPELINE_PREMIUM_USER;
+        }
+
+        return roleRepository.findRoleByRoleLevel(portalRole.name())
+                .orElseThrow(() -> new PortalException("No role for the plan '" + planName + "' exists"));
     }
 
     private void saveLoginInfo(Long userId, String password) {
@@ -82,12 +94,8 @@ public class UserRegistrationService {
         loginRepository.save(newLoginToSave);
     }
 
-    private void saveMembershipInfo(Long userId, Long organizationAccountId) throws PortalException {
-        Long roleId = roleRepository.findRoleByRoleLevel(PortalRoles.ORGANIZATION_SALES_REP.name())
-                .map(RoleEntity::getRoleId)
-                .orElseThrow(() -> new PortalException("Plan not supported"));
-        MembershipEntity
-                newMembershipToSave = new MembershipEntity(null, userId, organizationAccountId, roleId, true);
+    private void saveMembershipInfo(Long userId, Long organizationAccountId, Long roleId) {
+        MembershipEntity newMembershipToSave = new MembershipEntity(null, userId, organizationAccountId, roleId, true);
         membershipRepository.save(newMembershipToSave);
     }
 

@@ -11,12 +11,17 @@ import javax.servlet.http.HttpServletResponse;
 
 @RestController
 public class DefaultLocationsController implements ErrorController {
-    @GetMapping("/")
+    public static final String ROOT_ENDPOINT = "/";
+    public static final String ERROR_ENDPOINT = "/error";
+    public static final String ACCESS_DENIED_ENDPOINT = ERROR_ENDPOINT;
+
+    @GetMapping(ROOT_ENDPOINT)
     public String landingPage() {
-        return "Hello";
+        // TODO point this to the react home location
+        return "Pipeline Portal";
     }
 
-    @RequestMapping("/error")
+    @RequestMapping(ERROR_ENDPOINT)
     public String errorPage(HttpServletRequest request, HttpServletResponse response) {
         Object errorStatusCodeObject = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
         if (null != errorStatusCodeObject) {

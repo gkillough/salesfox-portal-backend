@@ -4,12 +4,15 @@ import com.usepipeline.portal.web.registration.organization.OrganizationAccountR
 import com.usepipeline.portal.web.registration.user.UserRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping(RegistrationController.BASE_ENDPOINT)
 public class RegistrationController {
+    public static final String BASE_ENDPOINT = "/register";
     private UserRegistrationService userRegistrationService;
 
     @Autowired
@@ -17,13 +20,13 @@ public class RegistrationController {
         this.userRegistrationService = userRegistrationService;
     }
 
-    @GetMapping("/registerUser")
-    public boolean registerUser(@RequestParam UserRegistrationModel registrationRequest) {
+    @PostMapping("/user")
+    public boolean registerUser(@RequestBody UserRegistrationModel registrationRequest) {
         return userRegistrationService.registerUser(registrationRequest);
     }
 
-    @GetMapping("/registerOrganization")
-    public boolean registerOrganizationAccount(@RequestParam OrganizationAccountRegistrationModel registrationRequest) {
+    @PostMapping("/organization")
+    public boolean registerOrganizationAccount(@RequestBody OrganizationAccountRegistrationModel registrationRequest) {
         // TODO implement
         return false;
     }

@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Component
 public interface OrganizationAccountRepository extends JpaRepository<OrganizationAccountEntity, Long> {
-    Optional<OrganizationAccountEntity> findByOrganizationAccountName(String organizationAccountName);
+    Optional<OrganizationAccountEntity> findFirstByOrganizationAccountName(String organizationAccountName);
 
 }

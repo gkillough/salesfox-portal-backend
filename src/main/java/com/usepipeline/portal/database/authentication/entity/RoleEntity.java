@@ -21,7 +21,7 @@ public class RoleEntity implements Serializable {
     @Column(name = "role_level")
     private String roleLevel;
 
-    @Column(name = "description")
+    @Column(name = "role_description")
     private String description;
 
     @Column(name = "is_role_restricted")

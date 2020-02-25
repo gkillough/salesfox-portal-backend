@@ -1,0 +1,159 @@
+databaseChangeLog:
+  - preConditions:
+      - runningAs:
+          username: root
+
+  - changeSet:
+      id: insert-default-org-acc-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organizations
+            columns:
+              - column:
+                  name: organization_name
+                  value: Pipeline Organization
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: insert-default-org-acc-2
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: licenses
+            columns:
+              - column:
+                  name: license_hash
+                  value: dbf2c289-7ffb-4b66-9162-457bc5743023
+              - column:
+                  name: expiration_date
+                  valueDate: 2099-12-31
+              - column:
+                  name: type
+                  value: PIPELINE_BASIC
+              - column:
+                  name: license_seats
+                  valueNumeric: 999999999999
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 0.0
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: insert-default-org-acc-3
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: licenses
+            columns:
+              - column:
+                  name: license_hash
+                  value: e65000ad-c9c2-49ad-9622-a033c7b7d74a
+              - column:
+                  name: expiration_date
+                  valueDate: 2099-12-31
+              - column:
+                  name: type
+                  value: PIPELINE_PREMIUM
+              - column:
+                  name: license_seats
+                  valueNumeric: 999999999999
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 15.0
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: insert-default-org-acc-4
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_accounts
+            columns:
+              - column:
+                  name: organization_account_name
+                  value: Pipeline Basic
+              - column:
+                  name: license_id
+                  valueComputed: GET_LICENSE_ID_BY_HASH('dbf2c289-7ffb-4b66-9162-457bc5743023')
+              - column:
+                  name: organization_id
+                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pipeline Organization')
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: insert-default-org-acc-5
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_accounts
+            columns:
+              - column:
+                  name: organization_account_name
+                  value: Pipeline Premium
+              - column:
+                  name: license_id
+                  valueComputed: GET_LICENSE_ID_BY_HASH('e65000ad-c9c2-49ad-9622-a033c7b7d74a')
+              - column:
+                  name: organization_id
+                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pipeline Organization')
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: insert-default-org-acc-6
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: roles
+            columns:
+              - column:
+                  name: role_level
+                  value: ROLE_PIPELINE_ADMIN
+              - column:
+                  name: role_description
+                  value: A Pipeline Organization member who can manage the application.
+              - column:
+                  name: is_role_restricted
+                  valueBoolean: true
+        - insert:
+            schemaName: portal
+            tableName: roles
+            columns:
+              - column:
+                  name: role_level
+                  value: ROLE_PIPELINE_BASIC_USER
+              - column:
+                  name: role_description
+                  value: A free user with a gift inventory size of 20.
+              - column:
+                  name: is_role_restricted
+                  valueBoolean: false
+        - insert:
+            schemaName: portal
+            tableName: roles
+            columns:
+              - column:
+                  name: role_level
+                  value: ROLE_PIPELINE_PREMIUM_USER
+              - column:
+                  name: role_description
+                  value: A paid user with a gift inventory size of 50.
+              - column:
+                  name: is_role_restricted
+                  valueBoolean: false
