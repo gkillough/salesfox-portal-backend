@@ -147,3 +147,14 @@ ALTER TABLE ONLY portal.users
 
 ALTER TABLE ONLY portal.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (user_id);
+
+CREATE TABLE portal.password_reset_tokens (
+    email character varying NOT NULL,
+    token character varying NOT NULL,
+    date_generated date NOT NULL
+);
+
+ALTER TABLE portal.password_reset_tokens OWNER TO root;
+
+ALTER TABLE ONLY portal.password_reset_tokens
+    ADD CONSTRAINT password_reset_tokens_pkey PRIMARY KEY (email, token);

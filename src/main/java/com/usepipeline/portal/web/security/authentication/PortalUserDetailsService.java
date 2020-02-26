@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 
 @Component
-public class AuthenticationUserDetailsService implements UserDetailsService {
+public class PortalUserDetailsService implements UserDetailsService {
     private static final int MAX_LOGIN_ATTEMPTS = 10;
 
     private MembershipRepository membershipRepository;
@@ -26,7 +26,7 @@ public class AuthenticationUserDetailsService implements UserDetailsService {
     private RoleRepository roleRepository;
 
     @Autowired
-    public AuthenticationUserDetailsService(MembershipRepository membershipRepository, LoginRepository loginRepository, UserRepository userRepository, RoleRepository roleRepository) {
+    public PortalUserDetailsService(MembershipRepository membershipRepository, LoginRepository loginRepository, UserRepository userRepository, RoleRepository roleRepository) {
         this.membershipRepository = membershipRepository;
         this.loginRepository = loginRepository;
         this.userRepository = userRepository;

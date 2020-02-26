@@ -4,9 +4,8 @@ import com.usepipeline.portal.common.enumeration.PortalRole;
 import com.usepipeline.portal.common.exception.PortalException;
 import com.usepipeline.portal.database.authentication.entity.*;
 import com.usepipeline.portal.database.authentication.repository.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -15,9 +14,8 @@ import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Component
+@Slf4j
 public class UserRegistrationService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private UserRepository userRepository;
     private LoginRepository loginRepository;
     private RoleRepository roleRepository;
@@ -43,7 +41,7 @@ public class UserRegistrationService {
         if (valid) {
             return registerValidUser(registrationModel);
         }
-        logger.error("The registration request was invalid");
+        log.error("The registration request was invalid");
         return false;
     }
 
@@ -56,7 +54,7 @@ public class UserRegistrationService {
             saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
             saveMembershipInfo(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId(), roleEntity.getRoleId());
         } catch (PortalException e) {
-            logger.error("There was a problem registering the user", e);
+            log.error("There was a problem registering the user", e);
             return false;
         }
         return true;
@@ -111,7 +109,7 @@ public class UserRegistrationService {
 
     private boolean isBlankLogError(String fieldName, String fieldValue) {
         if (StringUtils.isBlank(fieldValue)) {
-            logger.error("The field '{}' cannot be blank", fieldName);
+            log.error("The field '{}' cannot be blank", fieldName);
             return false;
         }
         return true;
