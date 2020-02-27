@@ -89,6 +89,7 @@ public class PasswordService {
             if (duration.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
                 passwordResetTokenRepository.deleteById(passwordResetTokenPK);
                 grantTemporaryAuthorityToUser(email);
+                response.setHeader("Location", PasswordController.UPDATE_ENDPOINT);
                 return true;
             } else {
                 log.error("The password reset token has expired");
@@ -114,7 +115,9 @@ public class PasswordService {
 
     private EmailMessage createEmailMessage(String email, String passwordResetToken) {
         // TODO implement
+        String url = String.format("localhost:8080/password/reset/validate?token=%s&email=%s", passwordResetToken, email);
         log.info("*** REMOVE ME *** Password Reset Token: " + passwordResetToken);
+        log.info("*** REMOVE ME *** Password Reset URL: " + url);
         return null;
     }
 

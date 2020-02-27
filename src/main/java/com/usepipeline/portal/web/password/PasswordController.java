@@ -4,10 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.websocket.server.PathParam;
 
 @RestController
-@RequestMapping(PasswordController.BASE_ENDPOINT)
 public class PasswordController {
     public static final String BASE_ENDPOINT = "/password";
     public static final String RESET_ENDPOINT = BASE_ENDPOINT + "/reset";
@@ -27,7 +25,7 @@ public class PasswordController {
     }
 
     @GetMapping(GRANT_UPDATE_PERMISSION_ENDPOINT)
-    public boolean grantUpdatePasswordPermission(HttpServletResponse response, @PathParam("email") String emailRequestParam, @PathParam("token") String tokenRequestParam) {
+    public boolean grantUpdatePasswordPermission(HttpServletResponse response, @RequestParam("email") String emailRequestParam, @RequestParam("token") String tokenRequestParam) {
         return passwordService.validateToken(response, emailRequestParam, tokenRequestParam);
     }
 

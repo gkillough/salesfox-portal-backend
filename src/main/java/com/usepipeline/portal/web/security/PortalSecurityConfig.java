@@ -60,6 +60,10 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
                 // Configure "Public" Endpoints:
                 .authorizeRequests()
                 .antMatchers(createDefaultAllowedEndpoints()).permitAll()
+                .and()
+                .authorizeRequests()
+                .anyRequest()
+                .authenticated()
                 // TODO determine if endpoint based authorization should be used
 //                .antMatchers(baseAndSubDirectories("/admin")).hasRole(PortalRole.PIPELINE_ADMIN.name())
 //                .antMatchers(baseAndSubDirectories("/organization")).hasRole(PortalRole.ORGANIZATION_ACCOUNT_MANAGER.name())
@@ -81,8 +85,7 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     private String[] createCsrfIgnoreAntMatchers() {
         return new String[]{
                 withSubDirectories(RegistrationController.BASE_ENDPOINT),
-                PasswordController.RESET_ENDPOINT,
-                PasswordController.GRANT_UPDATE_PERMISSION_ENDPOINT
+                PasswordController.RESET_ENDPOINT
         };
     }
 
