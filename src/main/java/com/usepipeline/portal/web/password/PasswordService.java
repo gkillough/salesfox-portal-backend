@@ -2,9 +2,11 @@ package com.usepipeline.portal.web.password;
 
 import com.usepipeline.portal.common.service.email.EmailMessage;
 import com.usepipeline.portal.common.service.email.EmailMessagingService;
+import com.usepipeline.portal.database.authentication.entity.LoginEntity;
 import com.usepipeline.portal.database.authentication.entity.PasswordResetTokenEntity;
 import com.usepipeline.portal.database.authentication.entity.UserEntity;
 import com.usepipeline.portal.database.authentication.key.PasswordResetTokenPK;
+import com.usepipeline.portal.database.authentication.repository.LoginRepository;
 import com.usepipeline.portal.database.authentication.repository.PasswordResetTokenRepository;
 import com.usepipeline.portal.database.authentication.repository.UserRepository;
 import com.usepipeline.portal.web.security.authentication.PortalUserDetailsService;
@@ -13,9 +15,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletResponse;
@@ -33,14 +37,21 @@ public class PasswordService {
 
     private PasswordResetTokenRepository passwordResetTokenRepository;
     private UserRepository userRepository;
+    private LoginRepository loginRepository;
     private PortalUserDetailsService userDetailsService;
+    private PasswordEncoder passwordEncoder;
     private EmailMessagingService emailMessagingService;
 
     @Autowired
-    public PasswordService(PasswordResetTokenRepository passwordResetTokenRepository, UserRepository userRepository, PortalUserDetailsService userDetailsService, EmailMessagingService emailMessagingService) {
+    public PasswordService(PasswordResetTokenRepository passwordResetTokenRepository,
+                           UserRepository userRepository, LoginRepository loginRepository,
+                           PortalUserDetailsService userDetailsService, PasswordEncoder passwordEncoder,
+                           EmailMessagingService emailMessagingService) {
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.userRepository = userRepository;
+        this.loginRepository = loginRepository;
         this.userDetailsService = userDetailsService;
+        this.passwordEncoder = passwordEncoder;
         this.emailMessagingService = emailMessagingService;
     }
 
@@ -87,7 +98,6 @@ public class PasswordService {
 
             Duration duration = Duration.ofMillis(timeSinceTokenGenerated);
             if (duration.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
-                passwordResetTokenRepository.deleteById(passwordResetTokenPK);
                 grantTemporaryAuthorityToUser(email);
                 response.setHeader("Location", PasswordController.UPDATE_ENDPOINT);
                 return true;
@@ -100,6 +110,22 @@ public class PasswordService {
         return false;
     }
 
+    public boolean updatePassword(UpdatePasswordModel updatePasswordModel) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (UsernamePasswordAuthenticationToken.class.isInstance(auth)) {
+            UsernamePasswordAuthenticationToken usernamePasswordAuth = (UsernamePasswordAuthenticationToken) auth;
+            if (canUpdatePassword(usernamePasswordAuth)) {
+                // If we have a UsernamePasswordAuthenticationToken, then the principal must be a UserDetails object.
+                UserDetails userDetails = (UserDetails) usernamePasswordAuth.getPrincipal();
+                String authenticatedUserEmail = userDetails.getUsername();
+                return savePassword(authenticatedUserEmail, updatePasswordModel.getNewPassword());
+            }
+        }
+
+        log.error("The password could not be updated");
+        return false;
+    }
+
     private void grantTemporaryAuthorityToUser(String email) {
         UserDetails user = userDetailsService.loadUserByUsername(email);
 
@@ -108,8 +134,37 @@ public class PasswordService {
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
-    public boolean updatePassword(UpdatePasswordModel updatePasswordModel) {
-        // TODO implement
+    private boolean canUpdatePassword(UsernamePasswordAuthenticationToken auth) {
+        return auth.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(UPDATE_PASSWORD_AUTHORITY_NAME::equals);
+    }
+
+    private boolean savePassword(String email, String password) {
+        if (StringUtils.isBlank(email) || StringUtils.isBlank(password)) {
+            log.error("Blank credential provided");
+            return false;
+        }
+
+        Optional<LoginEntity> optionalLoginEntity = userRepository.findByEmail(email)
+                .map(UserEntity::getUserId)
+                .map(loginRepository::findByUserId)
+                .filter(Optional::isPresent)
+                .map(Optional::get);
+        if (optionalLoginEntity.isPresent()) {
+            String encodedPassword = passwordEncoder.encode(password);
+
+            LoginEntity loginEntity = optionalLoginEntity.get();
+            loginEntity.setPasswordHash(encodedPassword);
+            loginEntity.setNumFailedLogins(0);
+            loginRepository.save(loginEntity);
+
+            // Once the password has been reset, all tokens for that user can be cleared.
+            passwordResetTokenRepository.deleteByEmail(email);
+            return true;
+        }
+        log.error("No login found");
         return false;
     }
 

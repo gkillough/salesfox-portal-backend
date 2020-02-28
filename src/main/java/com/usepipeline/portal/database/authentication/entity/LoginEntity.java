@@ -23,9 +23,6 @@ public class LoginEntity implements Serializable {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "password_salt")
-    private String passwordSalt;
-
     @Column(name = "password_hash")
     private String passwordHash;
 

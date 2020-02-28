@@ -88,7 +88,7 @@ public class UserRegistrationService {
 
     private void saveLoginInfo(Long userId, String password) {
         String encodedPassword = passwordEncoder.encode(password);
-        LoginEntity newLoginToSave = new LoginEntity(null, userId, "", encodedPassword, null, 0);
+        LoginEntity newLoginToSave = new LoginEntity(null, userId, encodedPassword, null, 0);
         loginRepository.save(newLoginToSave);
     }
 

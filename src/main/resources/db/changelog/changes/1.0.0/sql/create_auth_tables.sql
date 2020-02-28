@@ -20,7 +20,6 @@ ALTER TABLE ONLY portal.licenses
 CREATE TABLE portal.logins (
     login_id bigserial NOT NULL,
     user_id bigint,
-    password_salt character varying,
     password_hash character varying,
     last_successful_login date,
     num_failed_logins integer

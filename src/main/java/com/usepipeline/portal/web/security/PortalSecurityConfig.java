@@ -47,38 +47,59 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity security) throws Exception {
-        security
-                // Configure CSRF:
-                .csrf()
+        HttpSecurity csrfSecured = configureCsrf(security);
+        HttpSecurity passwordResetSecured = configurePasswordReset(csrfSecured);
+        HttpSecurity defaultPermissionsSecured = configureDefaultPermissions(passwordResetSecured);
+        HttpSecurity errorHandlingSecured = configureErrorHandling(defaultPermissionsSecured);
+        HttpSecurity loginSecured = configureLogin(errorHandlingSecured);
+        configureLogout(loginSecured);
+
+        // TODO determine if endpoint based authorization should be used
+        //  .antMatchers(baseAndSubDirectories("/admin")).hasRole(PortalRole.PIPELINE_ADMIN.name())
+        //  .antMatchers(baseAndSubDirectories("/organization")).hasRole(PortalRole.ORGANIZATION_ACCOUNT_MANAGER.name())
+        //  .antMatchers(baseAndSubDirectories("/manager")).hasRole(PortalRole.ORGANIZATION_SALES_REP_MANAGER.name())
+        //  .antMatchers(baseAndSubDirectories("/portal")).hasAnyRole(PortalRole.ORGANIZATION_SALES_REP_MANAGER.name(), PortalRole.ORGANIZATION_SALES_REP.name())
+    }
+
+    private HttpSecurity configureCsrf(HttpSecurity security) throws Exception {
+        return security.csrf()
                 .csrfTokenRepository(csrfTokenRepository)
                 .ignoringAntMatchers(createCsrfIgnoreAntMatchers())
-                .and()
-                // Configure Password Reset:
-                .authorizeRequests()
-                .antMatchers(PasswordController.UPDATE_ENDPOINT).hasAuthority(PasswordService.UPDATE_PASSWORD_AUTHORITY_NAME) // TODO or authenticated?
-                .and()
-                // Configure "Public" Endpoints:
-                .authorizeRequests()
-                .antMatchers(createDefaultAllowedEndpoints()).permitAll()
-                .and()
-                .authorizeRequests()
+                .and();
+    }
+
+    private HttpSecurity configurePasswordReset(HttpSecurity security) throws Exception {
+        return security.authorizeRequests()
+                .antMatchers(PasswordController.UPDATE_ENDPOINT)
+                .hasAuthority(PasswordService.UPDATE_PASSWORD_AUTHORITY_NAME)
+                .and();
+    }
+
+    private HttpSecurity configureDefaultPermissions(HttpSecurity security) throws Exception {
+        return security.authorizeRequests()
+                .antMatchers(createDefaultAllowedEndpoints())
+                .permitAll()
                 .anyRequest()
                 .authenticated()
-                // TODO determine if endpoint based authorization should be used
-//                .antMatchers(baseAndSubDirectories("/admin")).hasRole(PortalRole.PIPELINE_ADMIN.name())
-//                .antMatchers(baseAndSubDirectories("/organization")).hasRole(PortalRole.ORGANIZATION_ACCOUNT_MANAGER.name())
-//                .antMatchers(baseAndSubDirectories("/manager")).hasRole(PortalRole.ORGANIZATION_SALES_REP_MANAGER.name())
-//                .antMatchers(baseAndSubDirectories("/portal")).hasAnyRole(PortalRole.ORGANIZATION_SALES_REP_MANAGER.name(), PortalRole.ORGANIZATION_SALES_REP.name())
-                .and()
-                // Configure Error Endpoints:
-                .exceptionHandling().accessDeniedPage(DefaultLocationsController.ACCESS_DENIED_ENDPOINT)
-                .and()
-                // Configure Login/Logout Endpoints:
-                .formLogin().successForwardUrl("/portal")
-                .and()
-                .logout()
+                .and();
+    }
+
+    private HttpSecurity configureErrorHandling(HttpSecurity security) throws Exception {
+        return security.exceptionHandling()
+                .accessDeniedPage(DefaultLocationsController.ACCESS_DENIED_ENDPOINT)
+                .and();
+    }
+
+    private HttpSecurity configureLogin(HttpSecurity security) throws Exception {
+        return security.formLogin()
+                // TODO .successForwardUrl("/portal")
+                .and();
+    }
+
+    private void configureLogout(HttpSecurity security) throws Exception {
+        security.logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher(LOGOUT_ENDPOINT))
-                .deleteCookies(PORTAL_COOKIE_NAME) // TODO we may not need this cookie since JSESSIONID exists
+                .deleteCookies(PORTAL_COOKIE_NAME) // TODO we may not need this cookie with JSESSIONID
                 .logoutSuccessUrl(DefaultLocationsController.ROOT_ENDPOINT);
     }
 
@@ -100,8 +121,7 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
                 RegistrationController.BASE_ENDPOINT,
                 withSubDirectories(RegistrationController.BASE_ENDPOINT),
                 PasswordController.RESET_ENDPOINT,
-                PasswordController.GRANT_UPDATE_PERMISSION_ENDPOINT,
-                PasswordController.UPDATE_ENDPOINT
+                PasswordController.GRANT_UPDATE_PERMISSION_ENDPOINT
         };
     }
 
