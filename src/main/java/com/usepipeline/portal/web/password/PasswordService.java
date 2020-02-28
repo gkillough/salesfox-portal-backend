@@ -23,8 +23,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletResponse;
-import java.sql.Date;
+import javax.transaction.Transactional;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
@@ -69,8 +70,7 @@ public class PasswordService {
         }
 
         String passwordResetToken = UUID.randomUUID().toString();
-        Date dateGenerated = new Date(System.currentTimeMillis());
-        PasswordResetTokenEntity passwordResetTokenToSave = new PasswordResetTokenEntity(email, passwordResetToken, dateGenerated);
+        PasswordResetTokenEntity passwordResetTokenToSave = new PasswordResetTokenEntity(email, passwordResetToken, LocalDateTime.now());
         passwordResetTokenRepository.save(passwordResetTokenToSave);
 
         EmailMessage emailMessage = createEmailMessage(email, passwordResetToken);
@@ -88,17 +88,13 @@ public class PasswordService {
             return false;
         }
         PasswordResetTokenPK passwordResetTokenPK = new PasswordResetTokenPK(email, token);
-        Optional<Long> optionalTimeGenerated = passwordResetTokenRepository.findById(passwordResetTokenPK)
-                .map(PasswordResetTokenEntity::getDateGenerated)
-                .map(Date::getTime);
+        Optional<LocalDateTime> optionalTimeGenerated = passwordResetTokenRepository.findById(passwordResetTokenPK)
+                .map(PasswordResetTokenEntity::getDateGenerated);
 
         if (optionalTimeGenerated.isPresent()) {
-            long currentTime = System.currentTimeMillis();
-            long timeSinceTokenGenerated = currentTime - optionalTimeGenerated.get();
-
-            Duration duration = Duration.ofMillis(timeSinceTokenGenerated);
-            if (duration.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
-                grantTemporaryAuthorityToUser(email);
+            Duration timeSinceTokenGenerated = Duration.between(optionalTimeGenerated.get(), LocalDateTime.now());
+            if (timeSinceTokenGenerated.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
+                grantResetPasswordAuthorityToUser(email);
                 response.setHeader("Location", PasswordController.UPDATE_ENDPOINT);
                 return true;
             } else {
@@ -110,28 +106,30 @@ public class PasswordService {
         return false;
     }
 
-    public boolean updatePassword(UpdatePasswordModel updatePasswordModel) {
+    @Transactional
+    public boolean updatePassword(HttpServletResponse response, UpdatePasswordModel updatePasswordModel) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        log.info("auth: " + auth);
+        log.info("principal: " + auth.getPrincipal());
+
         if (UsernamePasswordAuthenticationToken.class.isInstance(auth)) {
             UsernamePasswordAuthenticationToken usernamePasswordAuth = (UsernamePasswordAuthenticationToken) auth;
             if (canUpdatePassword(usernamePasswordAuth)) {
                 // If we have a UsernamePasswordAuthenticationToken, then the principal must be a UserDetails object.
                 UserDetails userDetails = (UserDetails) usernamePasswordAuth.getPrincipal();
                 String authenticatedUserEmail = userDetails.getUsername();
-                return savePassword(authenticatedUserEmail, updatePasswordModel.getNewPassword());
+                boolean wasSaveSuccessful = persistPasswordUpdate(authenticatedUserEmail, updatePasswordModel.getNewPassword());
+                if (wasSaveSuccessful) {
+                    response.setHeader("Location", "/");
+                    clearResetPasswordAuthorityFromSecurityContext();
+                    return true;
+                }
             }
         }
 
         log.error("The password could not be updated");
         return false;
-    }
-
-    private void grantTemporaryAuthorityToUser(String email) {
-        UserDetails user = userDetailsService.loadUserByUsername(email);
-
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                user, null, Collections.singletonList(new SimpleGrantedAuthority(UPDATE_PASSWORD_AUTHORITY_NAME)));
-        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     private boolean canUpdatePassword(UsernamePasswordAuthenticationToken auth) {
@@ -141,9 +139,9 @@ public class PasswordService {
                 .anyMatch(UPDATE_PASSWORD_AUTHORITY_NAME::equals);
     }
 
-    private boolean savePassword(String email, String password) {
+    private boolean persistPasswordUpdate(String email, String password) {
         if (StringUtils.isBlank(email) || StringUtils.isBlank(password)) {
-            log.error("Blank credential provided");
+            log.error("Blank credential(s) provided");
             return false;
         }
 
@@ -166,6 +164,18 @@ public class PasswordService {
         }
         log.error("No login found");
         return false;
+    }
+
+    private void grantResetPasswordAuthorityToUser(String email) {
+        UserDetails user = userDetailsService.loadUserByUsername(email);
+
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                user, null, Collections.singletonList(new SimpleGrantedAuthority(UPDATE_PASSWORD_AUTHORITY_NAME)));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
+
+    private void clearResetPasswordAuthorityFromSecurityContext() {
+        SecurityContextHolder.getContext().setAuthentication(null);
     }
 
     private EmailMessage createEmailMessage(String email, String passwordResetToken) {

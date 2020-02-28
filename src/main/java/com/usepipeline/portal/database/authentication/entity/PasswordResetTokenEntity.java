@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -23,6 +23,6 @@ public class PasswordResetTokenEntity implements Serializable {
     @Column(name = "token")
     private String token;
     @Column(name = "date_generated")
-    private Date dateGenerated;
+    private LocalDateTime dateGenerated;
 
 }

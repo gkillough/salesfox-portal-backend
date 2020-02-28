@@ -30,8 +30,8 @@ public class PasswordController {
     }
 
     @PostMapping(UPDATE_ENDPOINT)
-    public boolean updatePassword(@RequestBody UpdatePasswordModel updatePasswordModel) {
-        return passwordService.updatePassword(updatePasswordModel);
+    public boolean updatePassword(HttpServletResponse response, @RequestBody UpdatePasswordModel updatePasswordModel) {
+        return passwordService.updatePassword(response, updatePasswordModel);
     }
 
 }

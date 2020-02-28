@@ -150,7 +150,7 @@ ALTER TABLE ONLY portal.users
 CREATE TABLE portal.password_reset_tokens (
     email character varying NOT NULL,
     token character varying NOT NULL,
-    date_generated date NOT NULL
+    date_generated timestamp NOT NULL
 );
 
 ALTER TABLE portal.password_reset_tokens OWNER TO root;

@@ -106,7 +106,8 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     private String[] createCsrfIgnoreAntMatchers() {
         return new String[]{
                 withSubDirectories(RegistrationController.BASE_ENDPOINT),
-                PasswordController.RESET_ENDPOINT
+                PasswordController.RESET_ENDPOINT,
+                PasswordController.UPDATE_ENDPOINT
         };
     }
 
