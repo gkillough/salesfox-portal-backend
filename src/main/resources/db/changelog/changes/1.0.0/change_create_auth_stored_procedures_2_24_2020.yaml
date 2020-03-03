@@ -3,6 +3,7 @@ databaseChangeLog:
       - runningAs:
           username: root
 
+  # This procedure takes in a license hash (of type UUID) and returns the license_id of the row containing that hash.
   - changeSet:
       id: create-auth-function-1
       author: gavinkillough
@@ -23,6 +24,7 @@ databaseChangeLog:
                           $result$
                           LANGUAGE plpgsql;
 
+  # This procedure takes in an organization name (text) and returns the organization_id of the row containing that name.
   - changeSet:
       id: create-auth-function-2
       author: gavinkillough

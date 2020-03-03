@@ -110,9 +110,6 @@ public class PasswordService {
     public boolean updatePassword(HttpServletResponse response, UpdatePasswordModel updatePasswordModel) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        log.info("auth: " + auth);
-        log.info("principal: " + auth.getPrincipal());
-
         if (UsernamePasswordAuthenticationToken.class.isInstance(auth)) {
             UsernamePasswordAuthenticationToken usernamePasswordAuth = (UsernamePasswordAuthenticationToken) auth;
             if (canUpdatePassword(usernamePasswordAuth)) {
