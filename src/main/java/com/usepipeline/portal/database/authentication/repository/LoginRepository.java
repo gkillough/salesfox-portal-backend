@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Component
 public interface LoginRepository extends JpaRepository<LoginEntity, Long> {
-    Optional<LoginEntity> findByUserId(Long userId);
+    Optional<LoginEntity> findFirstByUserId(Long userId);
 
 }

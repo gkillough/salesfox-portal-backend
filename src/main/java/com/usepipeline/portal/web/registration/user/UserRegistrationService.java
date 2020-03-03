@@ -61,9 +61,9 @@ public class UserRegistrationService {
     }
 
     private UserEntity saveUserInfo(String firstName, String lastName, String email) throws PortalException {
-        Optional<UserEntity> existingUser = userRepository.findByEmail(email);
+        Optional<UserEntity> existingUser = userRepository.findFirstByEmail(email);
         if (existingUser.isPresent()) {
-            throw new PortalException("A user with the email '" + email + "' already exists");
+            throw new PortalException("A user with the email '[" + email + "]' already exists");
         }
 
         UserEntity newUserToSave = new UserEntity(null, email, firstName, lastName, true);
@@ -72,7 +72,7 @@ public class UserRegistrationService {
 
     private OrganizationAccountEntity savePlanInfo(String planName) throws PortalException {
         return organizationAccountRepository.findFirstByOrganizationAccountName(planName)
-                .orElseThrow(() -> new PortalException("No plan with the name '" + planName + "' exists"));
+                .orElseThrow(() -> new PortalException("No plan with the name '[" + planName + "]' exists"));
     }
 
     private RoleEntity getRoleInfo(String planName) throws PortalException {
@@ -82,8 +82,8 @@ public class UserRegistrationService {
             portalRole = PortalRole.PIPELINE_PREMIUM_USER;
         }
 
-        return roleRepository.findRoleByRoleLevel(portalRole.name())
-                .orElseThrow(() -> new PortalException("No role for the plan '" + planName + "' exists"));
+        return roleRepository.findFirstRoleByRoleLevel(portalRole.name())
+                .orElseThrow(() -> new PortalException("No role for the plan '[" + planName + "]' exists"));
     }
 
     private void saveLoginInfo(Long userId, String password) {
@@ -109,7 +109,7 @@ public class UserRegistrationService {
 
     private boolean isBlankLogError(String fieldName, String fieldValue) {
         if (StringUtils.isBlank(fieldValue)) {
-            log.error("The field '{}' cannot be blank", fieldName);
+            log.error("The field '[{}]' cannot be blank", fieldName);
             return false;
         }
         return true;

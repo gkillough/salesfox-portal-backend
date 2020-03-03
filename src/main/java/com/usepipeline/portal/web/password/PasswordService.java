@@ -63,7 +63,7 @@ public class PasswordService {
             return false;
         }
 
-        Optional<UserEntity> optionalUser = userRepository.findByEmail(email);
+        Optional<UserEntity> optionalUser = userRepository.findFirstByEmail(email);
         if (!optionalUser.isPresent()) {
             log.error("No user with that email exists");
             return false;
@@ -110,9 +110,6 @@ public class PasswordService {
     public boolean updatePassword(HttpServletResponse response, UpdatePasswordModel updatePasswordModel) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        log.info("auth: " + auth);
-        log.info("principal: " + auth.getPrincipal());
-
         if (UsernamePasswordAuthenticationToken.class.isInstance(auth)) {
             UsernamePasswordAuthenticationToken usernamePasswordAuth = (UsernamePasswordAuthenticationToken) auth;
             if (canUpdatePassword(usernamePasswordAuth)) {
@@ -145,9 +142,9 @@ public class PasswordService {
             return false;
         }
 
-        Optional<LoginEntity> optionalLoginEntity = userRepository.findByEmail(email)
+        Optional<LoginEntity> optionalLoginEntity = userRepository.findFirstByEmail(email)
                 .map(UserEntity::getUserId)
-                .map(loginRepository::findByUserId)
+                .map(loginRepository::findFirstByUserId)
                 .filter(Optional::isPresent)
                 .map(Optional::get);
         if (optionalLoginEntity.isPresent()) {

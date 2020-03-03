@@ -37,11 +37,11 @@ public class PortalUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // FIXME replace with reasonable joins
         // FIXME replace with better exceptions
-        UserEntity user = userRepository.findByEmail(username)
+        UserEntity user = userRepository.findFirstByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("No user"));
-        LoginEntity userLogin = loginRepository.findByUserId(user.getUserId())
+        LoginEntity userLogin = loginRepository.findFirstByUserId(user.getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("No login"));
-        MembershipEntity membership = membershipRepository.findByUserId(userLogin.getUserId())
+        MembershipEntity membership = membershipRepository.findFirstByUserId(userLogin.getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("No membership"));
 
         ArrayList<String> userRoles = new ArrayList<>();
@@ -49,6 +49,8 @@ public class PortalUserDetailsService implements UserDetailsService {
                 .map(RoleEntity::getRoleLevel)
                 .ifPresent(userRoles::add);
 
+        // FIXME find a way to hook into failed login attempts for resolving this
+        //  maybe adding a locked_date on the logins table will allow us to determine if enough time has passed
         boolean userLocked = userLogin.getNumFailedLogins() > MAX_LOGIN_ATTEMPTS;
 
         return new PortalUserDetails(userRoles, user.getEmail(), userLogin.getPasswordHash(), userLocked, membership.getIsActive());
