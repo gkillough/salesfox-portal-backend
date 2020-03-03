@@ -29,10 +29,6 @@ public class OrganizationAccountEntity implements Serializable {
     @Column(name = "organization_id")
     private Long organizationId;
 
-    @PrimaryKeyJoinColumn
-    @Column(name = "organization_account_address_id")
-    private Long organizationAccountAddressId;
-
     @Column(name = "is_active")
     private Boolean isActive;
 

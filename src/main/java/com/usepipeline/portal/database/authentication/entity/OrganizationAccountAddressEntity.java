@@ -18,6 +18,10 @@ public class OrganizationAccountAddressEntity implements Serializable {
     @Column(name = "organization_account_address_id")
     private Long organizationAccountAddressId;
 
+    @PrimaryKeyJoinColumn
+    @Column(name = "organization_account_id")
+    private Long organizationAccountId;
+
     @Column(name = "street_number")
     private Integer streetNumber;
 

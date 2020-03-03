@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - preConditions:
+      - runningAs:
+          username: root
+
+  # This procedure takes in a license hash (of type UUID) and returns the license_id of the row containing that hash.
+  - changeSet:
+      id: create-auth-function-1
+      author: gavinkillough
+      changes:
+        - createProcedure:
+            dbms: postgresql
+            schemaName: portal
+            procedureBody: |-
+              CREATE OR REPLACE FUNCTION GET_LICENSE_ID_BY_HASH(uuid)
+                          RETURNS BIGINT AS $result$
+                              DECLARE result BIGINT;
+                              BEGIN
+                                  select license_id
+                                  into result
+                                  from portal.licenses where license_hash = $1;
+                                  RETURN result;
+                              END;
+                          $result$
+                          LANGUAGE plpgsql;
+
+  # This procedure takes in an organization name (text) and returns the organization_id of the row containing that name.
+  - changeSet:
+      id: create-auth-function-2
+      author: gavinkillough
+      changes:
+        - createProcedure:
+            dbms: postgresql
+            schemaName: portal
+            procedureBody: |-
+              CREATE OR REPLACE FUNCTION GET_ORGANIZATION_ID_BY_NAME(text)
+                          RETURNS BIGINT AS $result$
+                              DECLARE result BIGINT;
+                              BEGIN
+                                  select organization_id
+                                  into result
+                                  from portal.organizations where organization_name = $1;
+                                  RETURN result;
+                              END;
+                          $result$
+                          LANGUAGE plpgsql;
