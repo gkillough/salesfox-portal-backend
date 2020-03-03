@@ -37,11 +37,11 @@ public class PortalUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // FIXME replace with reasonable joins
         // FIXME replace with better exceptions
-        UserEntity user = userRepository.findByEmail(username)
+        UserEntity user = userRepository.findFirstByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("No user"));
-        LoginEntity userLogin = loginRepository.findByUserId(user.getUserId())
+        LoginEntity userLogin = loginRepository.findFirstByUserId(user.getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("No login"));
-        MembershipEntity membership = membershipRepository.findByUserId(userLogin.getUserId())
+        MembershipEntity membership = membershipRepository.findFirstByUserId(userLogin.getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("No membership"));
 
         ArrayList<String> userRoles = new ArrayList<>();

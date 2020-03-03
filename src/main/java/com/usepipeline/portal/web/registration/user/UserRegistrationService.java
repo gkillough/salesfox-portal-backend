@@ -61,7 +61,7 @@ public class UserRegistrationService {
     }
 
     private UserEntity saveUserInfo(String firstName, String lastName, String email) throws PortalException {
-        Optional<UserEntity> existingUser = userRepository.findByEmail(email);
+        Optional<UserEntity> existingUser = userRepository.findFirstByEmail(email);
         if (existingUser.isPresent()) {
             throw new PortalException("A user with the email '[" + email + "]' already exists");
         }
@@ -82,7 +82,7 @@ public class UserRegistrationService {
             portalRole = PortalRole.PIPELINE_PREMIUM_USER;
         }
 
-        return roleRepository.findRoleByRoleLevel(portalRole.name())
+        return roleRepository.findFirstRoleByRoleLevel(portalRole.name())
                 .orElseThrow(() -> new PortalException("No role for the plan '[" + planName + "]' exists"));
     }
 
