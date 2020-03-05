@@ -26,6 +26,6 @@ public final class PortalAuthorityConstants {
     // Application Authorities
     // Note: https://stackoverflow.com/questions/42146110/when-should-i-prefix-role-with-spring-security
     public static final String UPDATE_PASSWORD_PERMISSION = "UPDATE_PASSWORD_PERMISSION";
-    public static final String UPDATE_PASSWORD_PERMISSION_ROLE_CHECK = "hasRole('" + UPDATE_PASSWORD_PERMISSION + "')";
+    public static final String UPDATE_PASSWORD_PERMISSION_ROLE_CHECK = "hasAuthority('" + UPDATE_PASSWORD_PERMISSION + "')";
 
 }

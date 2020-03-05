@@ -26,7 +26,7 @@ import java.util.function.Function;
 
 @Component
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true)
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String PORTAL_COOKIE_NAME = "PORTAL_SESSION_ID";
 
