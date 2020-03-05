@@ -1,9 +1,9 @@
 package com.usepipeline.portal.web.registration.user;
 
-import com.usepipeline.portal.common.enumeration.PortalRole;
 import com.usepipeline.portal.common.exception.PortalException;
 import com.usepipeline.portal.database.authentication.entity.*;
 import com.usepipeline.portal.database.authentication.repository.*;
+import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,13 +76,13 @@ public class UserRegistrationService {
     }
 
     private RoleEntity getRoleInfo(String planName) throws PortalException {
-        PortalRole portalRole = PortalRole.PIPELINE_BASIC_USER;
+        String portalRole = PortalAuthorityConstants.PIPELINE_BASIC_USER;
         // TODO think of a better way to map this
         if (planName.toLowerCase().contains("premium")) {
-            portalRole = PortalRole.PIPELINE_PREMIUM_USER;
+            portalRole = PortalAuthorityConstants.PIPELINE_PREMIUM_USER;
         }
 
-        return roleRepository.findFirstRoleByRoleLevel(portalRole.name())
+        return roleRepository.findFirstRoleByRoleLevel(portalRole)
                 .orElseThrow(() -> new PortalException("No role for the plan '[" + planName + "]' exists"));
     }
 

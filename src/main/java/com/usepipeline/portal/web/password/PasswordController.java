@@ -1,12 +1,16 @@
 package com.usepipeline.portal.web.password;
 
+import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
+import com.usepipeline.portal.web.security.authorization.CsrfIgnorable;
+import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-public class PasswordController {
+public class PasswordController implements CsrfIgnorable, AnonymousAccessible {
     public static final String BASE_ENDPOINT = "/password";
     public static final String RESET_ENDPOINT = BASE_ENDPOINT + "/reset";
     public static final String GRANT_UPDATE_PERMISSION_ENDPOINT = RESET_ENDPOINT + "/validate";
@@ -30,8 +34,25 @@ public class PasswordController {
     }
 
     @PostMapping(UPDATE_ENDPOINT)
+    @PreAuthorize(PortalAuthorityConstants.UPDATE_PASSWORD_PERMISSION_ROLE_CHECK)
     public boolean updatePassword(HttpServletResponse response, @RequestBody UpdatePasswordModel updatePasswordModel) {
         return passwordService.updatePassword(response, updatePasswordModel);
+    }
+
+    @Override
+    public String[] ignoredEndpointAntMatchers() {
+        return new String[]{
+                PasswordController.RESET_ENDPOINT,
+                PasswordController.UPDATE_ENDPOINT
+        };
+    }
+
+    @Override
+    public String[] allowedEndpointAntMatchers() {
+        return new String[]{
+                PasswordController.RESET_ENDPOINT,
+                PasswordController.GRANT_UPDATE_PERMISSION_ENDPOINT
+        };
     }
 
 }

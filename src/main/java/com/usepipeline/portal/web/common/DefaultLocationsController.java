@@ -1,5 +1,6 @@
 package com.usepipeline.portal.web.common;
 
+import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-public class DefaultLocationsController implements ErrorController {
+public class DefaultLocationsController implements ErrorController, AnonymousAccessible {
     public static final String ROOT_ENDPOINT = "/";
     public static final String ERROR_ENDPOINT = "/error";
     public static final String ACCESS_DENIED_ENDPOINT = ERROR_ENDPOINT;
@@ -43,6 +44,15 @@ public class DefaultLocationsController implements ErrorController {
     @Override
     public String getErrorPath() {
         return "/error";
+    }
+
+    @Override
+    public String[] allowedEndpointAntMatchers() {
+        return new String[]{
+                DefaultLocationsController.ROOT_ENDPOINT,
+                DefaultLocationsController.ERROR_ENDPOINT,
+                DefaultLocationsController.ACCESS_DENIED_ENDPOINT
+        };
     }
 
 }
