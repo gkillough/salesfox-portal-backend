@@ -22,11 +22,6 @@ public class DefaultLocationsController implements ErrorController, AnonymousAcc
         return "Pipeline Portal";
     }
 
-    @GetMapping("/portal")
-    public String postLoginPage() {
-        return "Pipeline Portal. Status: Logged in.";
-    }
-
     @RequestMapping(ERROR_ENDPOINT)
     public String errorPage(HttpServletRequest request, HttpServletResponse response) {
         Object errorStatusCodeObject = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
