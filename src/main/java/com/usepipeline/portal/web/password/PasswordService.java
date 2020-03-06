@@ -10,6 +10,7 @@ import com.usepipeline.portal.database.authentication.repository.LoginRepository
 import com.usepipeline.portal.database.authentication.repository.PasswordResetTokenRepository;
 import com.usepipeline.portal.database.authentication.repository.UserRepository;
 import com.usepipeline.portal.web.security.authentication.PortalUserDetailsService;
+import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,6 @@ import java.util.UUID;
 @Slf4j
 public class PasswordService {
     public static final Duration DURATION_OF_TOKEN_VALIDITY = Duration.ofMinutes(30);
-    public static final String UPDATE_PASSWORD_AUTHORITY_NAME = "UPDATE_PASSWORD_PERMISSION";
 
     private PasswordResetTokenRepository passwordResetTokenRepository;
     private UserRepository userRepository;
@@ -133,7 +133,7 @@ public class PasswordService {
         return auth.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
-                .anyMatch(UPDATE_PASSWORD_AUTHORITY_NAME::equals);
+                .anyMatch(PortalAuthorityConstants.UPDATE_PASSWORD_PERMISSION::equals);
     }
 
     private boolean persistPasswordUpdate(String email, String password) {
@@ -167,7 +167,7 @@ public class PasswordService {
         UserDetails user = userDetailsService.loadUserByUsername(email);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                user, null, Collections.singletonList(new SimpleGrantedAuthority(UPDATE_PASSWORD_AUTHORITY_NAME)));
+                user, null, Collections.singletonList(new SimpleGrantedAuthority(PortalAuthorityConstants.UPDATE_PASSWORD_PERMISSION)));
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
