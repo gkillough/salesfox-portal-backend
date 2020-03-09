@@ -12,19 +12,23 @@ import java.sql.Date;
 import java.util.Optional;
 
 @Component
-public class PortalLoginAttemptService {
+public class PortalUserLoginAttemptService {
     public static final int MAX_LOGIN_ATTEMPTS = 10;
 
     public UserRepository userRepository;
     public LoginRepository loginRepository;
 
     @Autowired
-    public PortalLoginAttemptService(UserRepository userRepository, LoginRepository loginRepository) {
+    public PortalUserLoginAttemptService(UserRepository userRepository, LoginRepository loginRepository) {
         this.userRepository = userRepository;
         this.loginRepository = loginRepository;
     }
 
-    public void addAttempt(UserDetails userDetails) {
+    /**
+     * @param userDetails the UserDetails instance of the user who attempted to log in
+     * @return true if the maximum number of login attempts has been exceeded
+     */
+    public boolean addAttempt(UserDetails userDetails) {
         Optional<LoginEntity> optionalLogin = getLoginFromDetails(userDetails);
         if (optionalLogin.isPresent()) {
             LoginEntity userLogin = optionalLogin.get();
@@ -32,7 +36,9 @@ public class PortalLoginAttemptService {
             userLogin.setNumFailedLogins(numFailedLogins);
 
             loginRepository.save(userLogin);
+            return numFailedLogins >= MAX_LOGIN_ATTEMPTS;
         }
+        return false;
     }
 
     /**

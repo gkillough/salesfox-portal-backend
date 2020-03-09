@@ -47,7 +47,7 @@ public class PortalUserDetailsService implements UserDetailsService {
                 .map(RoleEntity::getRoleLevel)
                 .ifPresent(userRoles::add);
 
-        boolean userLocked = userLogin.getNumFailedLogins() > PortalLoginAttemptService.MAX_LOGIN_ATTEMPTS;
+        boolean userLocked = userLogin.getNumFailedLogins() > PortalUserLoginAttemptService.MAX_LOGIN_ATTEMPTS;
         return new PortalUserDetails(userRoles, user.getEmail(), userLogin.getPasswordHash(), userLocked, membership.getIsActive());
     }
 

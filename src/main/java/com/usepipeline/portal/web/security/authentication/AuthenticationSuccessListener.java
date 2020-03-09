@@ -1,6 +1,6 @@
 package com.usepipeline.portal.web.security.authentication;
 
-import com.usepipeline.portal.web.security.authentication.user.PortalLoginAttemptService;
+import com.usepipeline.portal.web.security.authentication.user.PortalUserLoginAttemptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
@@ -9,17 +9,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AuthenticationSuccessListener implements ApplicationListener<AuthenticationSuccessEvent> {
-    private PortalLoginAttemptService portalLoginAttemptService;
+    private PortalUserLoginAttemptService portalUserLoginAttemptService;
 
     @Autowired
-    public AuthenticationSuccessListener(PortalLoginAttemptService portalLoginAttemptService) {
-        this.portalLoginAttemptService = portalLoginAttemptService;
+    public AuthenticationSuccessListener(PortalUserLoginAttemptService portalUserLoginAttemptService) {
+        this.portalUserLoginAttemptService = portalUserLoginAttemptService;
     }
 
     @Override
     public void onApplicationEvent(AuthenticationSuccessEvent event) {
         UserDetails userDetails = (UserDetails) event.getAuthentication().getPrincipal();
-        portalLoginAttemptService.resetAttempts(userDetails);
+        // TODO unschedule any tasks related to failed attempts
+        portalUserLoginAttemptService.resetAttempts(userDetails);
     }
 
 }
