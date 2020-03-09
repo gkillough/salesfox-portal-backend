@@ -3,7 +3,7 @@ package com.usepipeline.portal.web.security;
 import com.usepipeline.portal.web.common.DefaultLocationsController;
 import com.usepipeline.portal.web.password.PasswordController;
 import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
-import com.usepipeline.portal.web.security.authentication.PortalUserDetailsService;
+import com.usepipeline.portal.web.security.authentication.user.PortalUserDetailsService;
 import com.usepipeline.portal.web.security.authorization.CsrfIgnorable;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.security.common.DefaultAllowedEndpoints;
