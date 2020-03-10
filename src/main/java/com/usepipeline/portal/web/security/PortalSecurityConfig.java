@@ -7,6 +7,7 @@ import com.usepipeline.portal.web.security.authentication.user.PortalUserDetails
 import com.usepipeline.portal.web.security.authorization.CsrfIgnorable;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.security.common.DefaultAllowedEndpoints;
+import com.usepipeline.portal.web.security.common.DefaultEndpointRoutes;
 import com.usepipeline.portal.web.security.common.SecurityInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -96,6 +97,7 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private HttpSecurity configureLogin(HttpSecurity security) throws Exception {
         return security.formLogin()
+                .loginPage(DefaultEndpointRoutes.LOGIN_PAGE)
                 .and();
     }
 
