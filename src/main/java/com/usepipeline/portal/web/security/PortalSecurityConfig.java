@@ -10,6 +10,7 @@ import com.usepipeline.portal.web.security.common.DefaultAllowedEndpoints;
 import com.usepipeline.portal.web.security.common.DefaultEndpointRoutes;
 import com.usepipeline.portal.web.security.common.SecurityInterface;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -38,8 +39,8 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public PortalSecurityConfig(CsrfTokenRepository csrfTokenRepository, List<CsrfIgnorable> csrfIgnorables,
-                                List<AnonymousAccessible> anonymousAccessibles,
+    public PortalSecurityConfig(CsrfTokenRepository csrfTokenRepository,
+                                List<CsrfIgnorable> csrfIgnorables, List<AnonymousAccessible> anonymousAccessibles,
                                 PortalUserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         this.csrfTokenRepository = csrfTokenRepository;
         this.csrfIgnorables = csrfIgnorables;
@@ -58,11 +59,19 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity security) throws Exception {
         HttpSecurity csrfSecured = configureCsrf(security);
-        HttpSecurity passwordResetSecured = configurePasswordReset(csrfSecured);
+        HttpSecurity corsAllowed = configureCors(csrfSecured);
+        HttpSecurity passwordResetSecured = configurePasswordReset(corsAllowed);
         HttpSecurity defaultPermissionsSecured = configureDefaultPermissions(passwordResetSecured);
         HttpSecurity errorHandlingSecured = configureErrorHandling(defaultPermissionsSecured);
         HttpSecurity loginSecured = configureLogin(errorHandlingSecured);
         configureLogout(loginSecured);
+    }
+
+    private HttpSecurity configureCors(HttpSecurity security) throws Exception {
+        return security.authorizeRequests()
+                .antMatchers(HttpMethod.OPTIONS, "**")
+                .permitAll()
+                .and();
     }
 
     private HttpSecurity configureCsrf(HttpSecurity security) throws Exception {
