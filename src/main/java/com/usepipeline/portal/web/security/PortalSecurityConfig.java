@@ -10,7 +10,6 @@ import com.usepipeline.portal.web.security.common.DefaultAllowedEndpoints;
 import com.usepipeline.portal.web.security.common.DefaultEndpointRoutes;
 import com.usepipeline.portal.web.security.common.SecurityInterface;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
+import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -68,9 +68,8 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private HttpSecurity configureCors(HttpSecurity security) throws Exception {
-        return security.authorizeRequests()
-                .antMatchers(HttpMethod.OPTIONS, "**")
-                .permitAll()
+        return security.cors()
+                .configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
                 .and();
     }
 
