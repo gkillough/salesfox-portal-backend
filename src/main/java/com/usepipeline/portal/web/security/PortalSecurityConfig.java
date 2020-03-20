@@ -7,7 +7,6 @@ import com.usepipeline.portal.web.security.authentication.PortalUserDetailsServi
 import com.usepipeline.portal.web.security.authorization.CsrfIgnorable;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.security.common.DefaultAllowedEndpoints;
-import com.usepipeline.portal.web.security.common.DefaultEndpointRoutes;
 import com.usepipeline.portal.web.security.common.SecurityInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -68,8 +67,10 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private HttpSecurity configureCors(HttpSecurity security) throws Exception {
+        CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
+        corsConfiguration.setAllowCredentials(Boolean.TRUE);
         return security.cors()
-                .configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues())
+                .configurationSource(request -> corsConfiguration)
                 .and();
     }
 
@@ -105,7 +106,8 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private HttpSecurity configureLogin(HttpSecurity security) throws Exception {
         return security.formLogin()
-                .loginPage(DefaultEndpointRoutes.LOGIN_PAGE)
+                // TODO determine if this causes issues
+                // .loginPage(DefaultEndpointRoutes.LOGIN_PAGE)
                 .and();
     }
 
