@@ -7,7 +7,6 @@ import com.usepipeline.portal.web.security.authentication.user.PortalUserDetails
 import com.usepipeline.portal.web.security.authorization.CsrfIgnorable;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.security.common.DefaultAllowedEndpoints;
-import com.usepipeline.portal.web.security.common.DefaultEndpointRoutes;
 import com.usepipeline.portal.web.security.common.SecurityInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -19,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
+import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,8 +38,8 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public PortalSecurityConfig(CsrfTokenRepository csrfTokenRepository, List<CsrfIgnorable> csrfIgnorables,
-                                List<AnonymousAccessible> anonymousAccessibles,
+    public PortalSecurityConfig(CsrfTokenRepository csrfTokenRepository,
+                                List<CsrfIgnorable> csrfIgnorables, List<AnonymousAccessible> anonymousAccessibles,
                                 PortalUserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         this.csrfTokenRepository = csrfTokenRepository;
         this.csrfIgnorables = csrfIgnorables;
@@ -58,11 +58,20 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity security) throws Exception {
         HttpSecurity csrfSecured = configureCsrf(security);
-        HttpSecurity passwordResetSecured = configurePasswordReset(csrfSecured);
+        HttpSecurity corsAllowed = configureCors(csrfSecured);
+        HttpSecurity passwordResetSecured = configurePasswordReset(corsAllowed);
         HttpSecurity defaultPermissionsSecured = configureDefaultPermissions(passwordResetSecured);
         HttpSecurity errorHandlingSecured = configureErrorHandling(defaultPermissionsSecured);
         HttpSecurity loginSecured = configureLogin(errorHandlingSecured);
         configureLogout(loginSecured);
+    }
+
+    private HttpSecurity configureCors(HttpSecurity security) throws Exception {
+        CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
+        corsConfiguration.setAllowCredentials(Boolean.TRUE);
+        return security.cors()
+                .configurationSource(request -> corsConfiguration)
+                .and();
     }
 
     private HttpSecurity configureCsrf(HttpSecurity security) throws Exception {
@@ -97,7 +106,11 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private HttpSecurity configureLogin(HttpSecurity security) throws Exception {
         return security.formLogin()
-                .loginPage(DefaultEndpointRoutes.LOGIN_PAGE)
+                // TODO enable these once the UI has a login-error page
+                //  be careful not to create a redirect loop
+                // .loginPage(DefaultEndpointRoutes.LOGIN_PAGE)
+                // .successForwardUrl("/")
+                // .failureForwardUrl("/login?error")
                 .and();
     }
 
