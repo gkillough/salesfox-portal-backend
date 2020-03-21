@@ -106,7 +106,7 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private HttpSecurity configureLogin(HttpSecurity security) throws Exception {
         return security.formLogin()
-                // TODO enable these once the UI has an login-error page
+                // TODO enable these once the UI has a login-error page
                 //  be careful not to create a redirect loop
                 // .loginPage(DefaultEndpointRoutes.LOGIN_PAGE)
                 // .successForwardUrl("/")
