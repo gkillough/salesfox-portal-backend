@@ -28,7 +28,7 @@ public class PortalUserLoginAttemptService {
         this.loginRepository = loginRepository;
     }
 
-    public void addAttempt(String username) {
+    public void recordFailedAttempt(String username) {
         Optional<LoginEntity> optionalLogin = getLoginFromDetails(username);
         if (optionalLogin.isPresent()) {
             LoginEntity userLogin = optionalLogin.get();
@@ -44,7 +44,7 @@ public class PortalUserLoginAttemptService {
         }
     }
 
-    public void resetAttempts(String username) {
+    public void recordSuccessfulAttempt(String username) {
         Optional<LoginEntity> optionalLogin = getLoginFromDetails(username);
         if (optionalLogin.isPresent()) {
             LoginEntity userLogin = optionalLogin.get();
