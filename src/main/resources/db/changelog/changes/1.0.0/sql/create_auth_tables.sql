@@ -21,7 +21,8 @@ create table portal.logins (
     login_id bigserial UNIQUE NOT NULL,
     user_id bigint,
     password_hash character varying,
-    last_successful_login date,
+    last_successful_login timestamp without time zone,
+    last_locked timestamp without time zone,
     num_failed_logins integer
 );
 

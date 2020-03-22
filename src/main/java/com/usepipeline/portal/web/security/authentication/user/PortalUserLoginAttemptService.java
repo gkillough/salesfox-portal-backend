@@ -4,16 +4,20 @@ import com.usepipeline.portal.database.authentication.entity.LoginEntity;
 import com.usepipeline.portal.database.authentication.entity.UserEntity;
 import com.usepipeline.portal.database.authentication.repository.LoginRepository;
 import com.usepipeline.portal.database.authentication.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.sql.Date;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
+@Slf4j
 public class PortalUserLoginAttemptService {
-    public static final int MAX_LOGIN_ATTEMPTS = 10;
+    public static final Duration DURATION_UNTIL_ACCOUNT_UNLOCKED = Duration.ofMinutes(2L);
+    public static final int MAX_LOGIN_ATTEMPTS = 5;
 
     public UserRepository userRepository;
     public LoginRepository loginRepository;
@@ -24,60 +28,44 @@ public class PortalUserLoginAttemptService {
         this.loginRepository = loginRepository;
     }
 
-    /**
-     * @param userDetails the UserDetails instance of the user who attempted to log in
-     * @return true if the maximum number of login attempts has been exceeded
-     */
-    public boolean addAttempt(UserDetails userDetails) {
-        Optional<LoginEntity> optionalLogin = getLoginFromDetails(userDetails);
+    public void addAttempt(String username) {
+        Optional<LoginEntity> optionalLogin = getLoginFromDetails(username);
         if (optionalLogin.isPresent()) {
             LoginEntity userLogin = optionalLogin.get();
             int numFailedLogins = userLogin.getNumFailedLogins() + 1;
             userLogin.setNumFailedLogins(numFailedLogins);
+            if (numFailedLogins == MAX_LOGIN_ATTEMPTS) {
+                // Set last locked time only when they reach exactly the max number of attempts
+                log.warn("Maximum login attempts reached for user [{}]. Locking account.", username);
+                userLogin.setLastLocked(LocalDateTime.now());
+            }
 
             loginRepository.save(userLogin);
-            return numFailedLogins >= MAX_LOGIN_ATTEMPTS;
         }
-        return false;
     }
 
-    /**
-     * @param userDetails the UserDetails instance of the user who attempted to log in
-     * @return the number of attempts on the account after decrementing
-     */
-    public int decrementAttempts(UserDetails userDetails) {
-        Optional<LoginEntity> optionalLogin = getLoginFromDetails(userDetails);
-        if (optionalLogin.isPresent()) {
-            LoginEntity userLogin = optionalLogin.get();
-            if (userLogin.getNumFailedLogins() > 0) {
-                int numFailedLogins = userLogin.getNumFailedLogins() - 1;
-                userLogin.setNumFailedLogins(numFailedLogins);
-
-                loginRepository.save(userLogin);
-                return numFailedLogins;
-            }
-        }
-        return 0;
-    }
-
-    public void resetAttempts(UserDetails userDetails) {
-        Optional<LoginEntity> optionalLogin = getLoginFromDetails(userDetails);
+    public void resetAttempts(String username, boolean isLoginSuccess) {
+        Optional<LoginEntity> optionalLogin = getLoginFromDetails(username);
         if (optionalLogin.isPresent()) {
             LoginEntity userLogin = optionalLogin.get();
             userLogin.setNumFailedLogins(0);
-            userLogin.setLastSuccessfulLogin(new Date(System.currentTimeMillis()));
+            userLogin.setLastLocked(null);
+            if (isLoginSuccess) {
+                userLogin.setLastSuccessfulLogin(LocalDateTime.now());
+            }
 
             loginRepository.save(userLogin);
+            log.info("Login attempts have been reset for user [{}]", username);
         }
     }
 
-    public Optional<LoginEntity> getLoginFromDetails(UserDetails userDetails) {
-        if (null == userDetails.getUsername()) {
+    public Optional<LoginEntity> getLoginFromDetails(String username) {
+        if (StringUtils.isBlank(username)) {
             return Optional.empty();
         }
 
         return userRepository
-                .findFirstByEmail(userDetails.getUsername())
+                .findFirstByEmail(username)
                 .map(UserEntity::getUserId)
                 .flatMap(loginRepository::findFirstByUserId);
     }

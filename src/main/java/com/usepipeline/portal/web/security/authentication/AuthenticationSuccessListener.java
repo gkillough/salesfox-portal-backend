@@ -19,8 +19,7 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     @Override
     public void onApplicationEvent(AuthenticationSuccessEvent event) {
         UserDetails userDetails = (UserDetails) event.getAuthentication().getPrincipal();
-        // TODO unschedule any tasks related to failed attempts
-        portalUserLoginAttemptService.resetAttempts(userDetails);
+        portalUserLoginAttemptService.resetAttempts(userDetails.getUsername(), true);
     }
 
 }

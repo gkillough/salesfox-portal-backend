@@ -109,6 +109,7 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
                 // TODO enable these once the UI has a login-error page
                 //  be careful not to create a redirect loop
                 // .loginPage(DefaultEndpointRoutes.LOGIN_PAGE)
+                // .permitAll()
                 // .successForwardUrl("/")
                 // .failureForwardUrl("/login?error")
                 .and();

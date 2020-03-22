@@ -8,27 +8,34 @@ import com.usepipeline.portal.database.authentication.repository.LoginRepository
 import com.usepipeline.portal.database.authentication.repository.MembershipRepository;
 import com.usepipeline.portal.database.authentication.repository.RoleRepository;
 import com.usepipeline.portal.database.authentication.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 @Component
+@Slf4j
 public class PortalUserDetailsService implements UserDetailsService {
     private MembershipRepository membershipRepository;
     private LoginRepository loginRepository;
     private UserRepository userRepository;
     private RoleRepository roleRepository;
+    private PortalUserLoginAttemptService portalUserLoginAttemptService;
 
     @Autowired
-    public PortalUserDetailsService(MembershipRepository membershipRepository, LoginRepository loginRepository, UserRepository userRepository, RoleRepository roleRepository) {
+    public PortalUserDetailsService(MembershipRepository membershipRepository, LoginRepository loginRepository, UserRepository userRepository, RoleRepository roleRepository,
+                                    PortalUserLoginAttemptService portalUserLoginAttemptService) {
         this.membershipRepository = membershipRepository;
         this.loginRepository = loginRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.portalUserLoginAttemptService = portalUserLoginAttemptService;
     }
 
     @Override
@@ -47,8 +54,26 @@ public class PortalUserDetailsService implements UserDetailsService {
                 .map(RoleEntity::getRoleLevel)
                 .ifPresent(userRoles::add);
 
-        boolean userLocked = userLogin.getNumFailedLogins() > PortalUserLoginAttemptService.MAX_LOGIN_ATTEMPTS;
+
+        boolean userLocked = isUserLocked(username, userLogin);
         return new PortalUserDetails(userRoles, user.getEmail(), userLogin.getPasswordHash(), userLocked, membership.getIsActive());
+    }
+
+    private boolean isUserLocked(String username, LoginEntity userLogin) {
+        LocalDateTime lastLockedTime = userLogin.getLastLocked();
+        if (lastLockedTime != null) {
+            log.debug("User: [{}]. Time since last locked: [{}].", username, lastLockedTime);
+            Duration timeSinceLocked = Duration.between(lastLockedTime, LocalDateTime.now());
+            if (timeSinceLocked.compareTo(PortalUserLoginAttemptService.DURATION_UNTIL_ACCOUNT_UNLOCKED) < 0) {
+                // If the time since the account was locked is strictly less than the time needed to unlock the account,
+                // then the account is still locked.
+                return true;
+            } else {
+                // The account is unlocked, but this attempt is not necessarily a success.
+                portalUserLoginAttemptService.resetAttempts(username, false);
+            }
+        }
+        return false;
     }
 
 }
