@@ -34,7 +34,7 @@ public class PortalUserLoginAttemptService {
             LoginEntity userLogin = optionalLogin.get();
             int numFailedLogins = userLogin.getNumFailedLogins() + 1;
             userLogin.setNumFailedLogins(numFailedLogins);
-            if (numFailedLogins == MAX_LOGIN_ATTEMPTS) {
+            if (numFailedLogins % MAX_LOGIN_ATTEMPTS == 0) {
                 // Set last locked time only when they reach exactly the max number of attempts
                 log.warn("Maximum login attempts reached for user [{}]. Locking account.", username);
                 userLogin.setLastLocked(LocalDateTime.now());
@@ -44,15 +44,13 @@ public class PortalUserLoginAttemptService {
         }
     }
 
-    public void resetAttempts(String username, boolean isLoginSuccess) {
+    public void resetAttempts(String username) {
         Optional<LoginEntity> optionalLogin = getLoginFromDetails(username);
         if (optionalLogin.isPresent()) {
             LoginEntity userLogin = optionalLogin.get();
             userLogin.setNumFailedLogins(0);
             userLogin.setLastLocked(null);
-            if (isLoginSuccess) {
-                userLogin.setLastSuccessfulLogin(LocalDateTime.now());
-            }
+            userLogin.setLastSuccessfulLogin(LocalDateTime.now());
 
             loginRepository.save(userLogin);
             log.info("Login attempts have been reset for user [{}]", username);

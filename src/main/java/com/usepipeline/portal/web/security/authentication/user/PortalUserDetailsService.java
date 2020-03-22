@@ -68,9 +68,6 @@ public class PortalUserDetailsService implements UserDetailsService {
                 // If the time since the account was locked is strictly less than the time needed to unlock the account,
                 // then the account is still locked.
                 return true;
-            } else {
-                // The account is unlocked, but this attempt is not necessarily a success.
-                portalUserLoginAttemptService.resetAttempts(username, false);
             }
         }
         return false;
