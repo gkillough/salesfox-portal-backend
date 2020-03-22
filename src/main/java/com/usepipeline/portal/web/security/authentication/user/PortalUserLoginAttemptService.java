@@ -16,7 +16,7 @@ import java.util.Optional;
 @Component
 @Slf4j
 public class PortalUserLoginAttemptService {
-    public static final Duration DURATION_UNTIL_ACCOUNT_UNLOCKED = Duration.ofMinutes(2L);
+    public static final Duration DURATION_UNTIL_ACCOUNT_UNLOCKED = Duration.ofMinutes(30L);
     public static final int MAX_LOGIN_ATTEMPTS = 5;
 
     public UserRepository userRepository;
