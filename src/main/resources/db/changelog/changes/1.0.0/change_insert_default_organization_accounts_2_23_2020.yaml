@@ -1,8 +1,4 @@
 databaseChangeLog:
-  - preConditions:
-      - runningAs:
-          username: root
-
   - changeSet:
       id: insert-default-org-acc-1
       author: gavinkillough
