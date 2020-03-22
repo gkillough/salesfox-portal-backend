@@ -1,4 +1,4 @@
-package com.usepipeline.portal.web.security.authentication;
+package com.usepipeline.portal.web.security.authentication.user;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

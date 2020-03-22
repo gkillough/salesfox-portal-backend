@@ -9,7 +9,7 @@ import com.usepipeline.portal.database.authentication.key.PasswordResetTokenPK;
 import com.usepipeline.portal.database.authentication.repository.LoginRepository;
 import com.usepipeline.portal.database.authentication.repository.PasswordResetTokenRepository;
 import com.usepipeline.portal.database.authentication.repository.UserRepository;
-import com.usepipeline.portal.web.security.authentication.PortalUserDetailsService;
+import com.usepipeline.portal.web.security.authentication.user.PortalUserDetailsService;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
