@@ -2,11 +2,10 @@ package com.usepipeline.portal.web.user.common;
 
 import com.usepipeline.portal.database.authentication.entity.UserEntity;
 import com.usepipeline.portal.database.authentication.repository.UserRepository;
+import com.usepipeline.portal.web.security.authentication.SecurityContextUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -23,13 +22,9 @@ public class LoggedInUserService {
     }
 
     public LoggedInUserModel getLoggedInUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        // TODO abstract this security context handling functionality into its own service
-        //  this controller as well as PasswordService use many of these steps
-        if (UsernamePasswordAuthenticationToken.class.isInstance(auth)) {
-            UsernamePasswordAuthenticationToken usernamePasswordAuth = (UsernamePasswordAuthenticationToken) auth;
-            // If we have a UsernamePasswordAuthenticationToken, then the principal must be a UserDetails object.
-            UserDetails userDetails = (UserDetails) usernamePasswordAuth.getPrincipal();
+        Optional<UsernamePasswordAuthenticationToken> optionalUserAuthToken = SecurityContextUtil.retrieveUserAuthToken();
+        if (optionalUserAuthToken.isPresent()) {
+            UserDetails userDetails = SecurityContextUtil.extractUserDetails(optionalUserAuthToken.get());
 
             Optional<UserEntity> optionalUser = userRepository.findFirstByEmail(userDetails.getUsername());
             if (optionalUser.isPresent()) {
