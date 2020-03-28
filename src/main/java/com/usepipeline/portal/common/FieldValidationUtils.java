@@ -12,11 +12,16 @@ public class FieldValidationUtils {
         return isValidBlank(emailAddress, allowBlank) || emailAddress.matches(VALID_EMAIL_PATTERN);
     }
 
+    public static boolean isValidUSPhoneNumber(String phoneNumber, boolean allowBlank) {
+        String phoneNumberPattern = "^[0-9]{10}$";
+        return isValidBlank(phoneNumber, allowBlank) || phoneNumber.matches(phoneNumberPattern);
+    }
+
     public static boolean isValidNumber(String number, boolean allowBlank) {
         return isValidBlank(number, allowBlank) || NumberUtils.isDigits(number);
     }
 
-    public static boolean isValidAddress(PortalAddressModel addressModel, boolean allowBlank) {
+    public static boolean isValidUSAddress(PortalAddressModel addressModel, boolean allowBlank) {
         return isValidUSState(addressModel.getState(), allowBlank) && isValidUSZipCode(addressModel.getZipCode(), allowBlank);
     }
 

@@ -165,9 +165,9 @@ public class UserProfileService {
     private void validateUpdateRequest(UserProfileUpdateModel updateModel) throws PortalRestException {
         if (
                 !FieldValidationUtils.isValidEmailAddress(updateModel.getEmail(), false)
-                        || !FieldValidationUtils.isValidNumber(updateModel.getMobileNumber(), true)
-                        || !FieldValidationUtils.isValidNumber(updateModel.getBusinessNumber(), true)
-                        || !FieldValidationUtils.isValidAddress(updateModel.getAddress(), true)
+                        || !FieldValidationUtils.isValidUSPhoneNumber(updateModel.getMobileNumber(), true)
+                        || !FieldValidationUtils.isValidUSPhoneNumber(updateModel.getBusinessNumber(), true)
+                        || !FieldValidationUtils.isValidUSAddress(updateModel.getAddress(), true)
         ) {
             throw new PortalRestException(HttpStatus.BAD_REQUEST);
         }
