@@ -35,7 +35,7 @@ public class UserRoleService {
         }
 
         MembershipEntity membershipEntity = membershipRepository.findFirstByUserId(userId)
-                .orElseThrow(() -> createBadRequest(String.format("A membership with the id ['%s'] does not exist", userId)));
+                .orElseThrow(() -> createBadRequest(String.format("A membership with the user id ['%s'] does not exist", userId)));
 
         RoleEntity roleEntity = roleRepository.findFirstByRoleLevel(updateModel.getLevel())
                 .orElseThrow(() -> createBadRequest(String.format("The role ['%s'] does not exist", updateModel.getLevel())));
