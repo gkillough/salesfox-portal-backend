@@ -1,6 +1,5 @@
 package com.usepipeline.portal.web.user.common;
 
-import com.usepipeline.portal.common.exception.PortalRestException;
 import com.usepipeline.portal.web.user.UserEndpointConstants;
 import com.usepipeline.portal.web.user.common.model.CurrentUserModel;
 import com.usepipeline.portal.web.user.common.model.UserAccountModel;
@@ -29,12 +28,7 @@ public class UserController {
 
     @GetMapping("/{user_id}")
     public UserAccountModel getUserById(HttpServletResponse response, @PathVariable(name = "user_id") Long userId) {
-        try {
-            return userService.getUser(userId);
-        } catch (PortalRestException e) {
-            response.setStatus(e.getStatus().value());
-        }
-        return null;
+        return userService.getUser(userId);
     }
 
 

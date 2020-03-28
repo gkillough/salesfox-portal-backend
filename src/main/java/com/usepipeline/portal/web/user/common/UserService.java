@@ -1,18 +1,18 @@
 package com.usepipeline.portal.web.user.common;
 
-import com.usepipeline.portal.common.exception.PortalRestException;
 import com.usepipeline.portal.database.authentication.entity.UserEntity;
 import com.usepipeline.portal.database.authentication.repository.UserRepository;
 import com.usepipeline.portal.web.security.authentication.SecurityContextUtils;
 import com.usepipeline.portal.web.user.common.model.CurrentUserModel;
 import com.usepipeline.portal.web.user.common.model.UserAccountModel;
-import com.usepipeline.portal.web.user.role.UserRoleModel;
+import com.usepipeline.portal.web.user.role.model.UserRoleModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -46,14 +46,14 @@ public class UserService {
         return CurrentUserModel.ANONYMOUS_USER;
     }
 
-    public UserAccountModel getUser(Long userId) throws PortalRestException {
+    public UserAccountModel getUser(Long userId) {
         if (userId == null) {
-            throw new PortalRestException(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
         if (!userAccessService.canCurrentUserAccessDataForUser(userId)) {
             log.warn("There was an attempt to access the user with id [{}], from an unauthorized account", userId);
-            throw new PortalRestException(HttpStatus.FORBIDDEN);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
         Optional<UserEntity> optionalUser = userRepository.findById(userId);
@@ -62,7 +62,7 @@ public class UserService {
             UserRoleModel role = userAccessService.findRoleByUserId(user.getUserId());
             return new UserAccountModel(user.getFirstName(), user.getLastName(), user.getEmail(), role, user.getIsActive());
         }
-        throw new PortalRestException(HttpStatus.NOT_FOUND);
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
 }

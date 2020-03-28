@@ -7,7 +7,7 @@ import com.usepipeline.portal.database.authentication.repository.RoleRepository;
 import com.usepipeline.portal.database.authentication.repository.UserRepository;
 import com.usepipeline.portal.web.security.authentication.SecurityContextUtils;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
-import com.usepipeline.portal.web.user.role.UserRoleModel;
+import com.usepipeline.portal.web.user.role.model.UserRoleModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;

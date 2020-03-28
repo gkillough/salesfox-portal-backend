@@ -1,6 +1,6 @@
 package com.usepipeline.portal.web.user.common.model;
 
-import com.usepipeline.portal.web.user.role.UserRoleModel;
+import com.usepipeline.portal.web.user.role.model.UserRoleModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

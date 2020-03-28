@@ -1,7 +1,6 @@
 package com.usepipeline.portal.web.user.profile;
 
 import com.usepipeline.portal.common.FieldValidationUtils;
-import com.usepipeline.portal.common.exception.PortalRestException;
 import com.usepipeline.portal.common.model.PortalAddressModel;
 import com.usepipeline.portal.database.authentication.entity.ProfileEntity;
 import com.usepipeline.portal.database.authentication.entity.UserAddressEntity;
@@ -12,12 +11,13 @@ import com.usepipeline.portal.database.authentication.repository.UserRepository;
 import com.usepipeline.portal.web.user.common.UserAccessService;
 import com.usepipeline.portal.web.user.profile.model.UserProfileModel;
 import com.usepipeline.portal.web.user.profile.model.UserProfileUpdateModel;
-import com.usepipeline.portal.web.user.role.UserRoleModel;
+import com.usepipeline.portal.web.user.role.model.UserRoleModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
@@ -51,11 +51,11 @@ public class UserProfileService {
                 .map(ProfileEntity::getProfileId);
     }
 
-    public UserProfileModel getProfile(Long userId) throws PortalRestException {
+    public UserProfileModel getProfile(Long userId) {
         validateUserId(userId);
 
         // Any failed lookups after the above validation are fatal.
-        Supplier<PortalRestException> internalServerError = () -> new PortalRestException(HttpStatus.INTERNAL_SERVER_ERROR);
+        Supplier<ResponseStatusException> internalServerError = () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
 
         ProfileEntity profileEntity = profileRepository.findByUserId(userId).orElse(null);
         if (profileEntity == null) {
@@ -85,20 +85,19 @@ public class UserProfileService {
     }
 
     @Transactional
-    public void updateProfile(Long userId, UserProfileUpdateModel updateModel) throws PortalRestException {
+    public void updateProfile(Long userId, UserProfileUpdateModel updateModel) {
         validateUserId(userId);
         validateUpdateRequest(updateModel);
 
         // Any failed lookups after the above validation are fatal.
-        Supplier<PortalRestException> internalServerError = () -> new PortalRestException(HttpStatus.INTERNAL_SERVER_ERROR);
+        Supplier<ResponseStatusException> internalServerError = () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
 
         UserEntity oldUser = userRepository.findById(userId)
                 .orElseThrow(internalServerError);
         if (!oldUser.getEmail().equals(updateModel.getEmail())) {
             Optional<UserEntity> existingEmailAddress = userRepository.findFirstByEmail(updateModel.getEmail());
             if (existingEmailAddress.isPresent()) {
-                // That email address is in use by a different user
-                throw new PortalRestException(HttpStatus.BAD_REQUEST);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This email address is already in use");
             }
             // TODO consider sending a confirmation link
         }
@@ -151,25 +150,26 @@ public class UserProfileService {
         return Optional.of(savedProfile);
     }
 
-    private void validateUserId(Long userId) throws PortalRestException {
+    private void validateUserId(Long userId) {
         if (userId == null) {
-            throw new PortalRestException(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
         if (!userAccessService.canCurrentUserAccessDataForUser(userId)) {
             log.warn("There was an attempt to access the user with id [{}], from an unauthorized account", userId);
-            throw new PortalRestException(HttpStatus.FORBIDDEN);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
     }
 
-    private void validateUpdateRequest(UserProfileUpdateModel updateModel) throws PortalRestException {
-        if (
-                !FieldValidationUtils.isValidEmailAddress(updateModel.getEmail(), false)
-                        || !FieldValidationUtils.isValidUSPhoneNumber(updateModel.getMobileNumber(), true)
-                        || !FieldValidationUtils.isValidUSPhoneNumber(updateModel.getBusinessNumber(), true)
-                        || !FieldValidationUtils.isValidUSAddress(updateModel.getAddress(), true)
-        ) {
-            throw new PortalRestException(HttpStatus.BAD_REQUEST);
+    private void validateUpdateRequest(UserProfileUpdateModel updateModel) {
+        if (!FieldValidationUtils.isValidEmailAddress(updateModel.getEmail(), false)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid email");
+        } else if (!FieldValidationUtils.isValidUSPhoneNumber(updateModel.getMobileNumber(), true)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid mobile number");
+        } else if (!FieldValidationUtils.isValidUSPhoneNumber(updateModel.getBusinessNumber(), true)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid business number");
+        } else if (!FieldValidationUtils.isValidUSAddress(updateModel.getAddress(), true)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid address");
         }
     }
 

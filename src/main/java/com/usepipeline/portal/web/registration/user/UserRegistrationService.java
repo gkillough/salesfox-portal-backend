@@ -1,6 +1,5 @@
 package com.usepipeline.portal.web.registration.user;
 
-import com.usepipeline.portal.common.exception.PortalException;
 import com.usepipeline.portal.database.authentication.entity.*;
 import com.usepipeline.portal.database.authentication.repository.*;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
@@ -8,10 +7,14 @@ import com.usepipeline.portal.web.user.profile.UserProfileService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -28,65 +31,61 @@ public class UserRegistrationService {
     @Autowired
     public UserRegistrationService(UserRepository userRepository, LoginRepository loginRepository,
                                    RoleRepository roleRepository, OrganizationAccountRepository organizationAccountRepository,
-                                   MembershipRepository membershipRepository, PasswordEncoder passwordEncoder) {
+                                   MembershipRepository membershipRepository, UserProfileService profileRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.loginRepository = loginRepository;
         this.roleRepository = roleRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.membershipRepository = membershipRepository;
+        this.profileRepository = profileRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
     public boolean registerUser(UserRegistrationModel registrationModel) {
-        boolean valid = validateRegistrationModel(registrationModel);
-        if (valid) {
-            return registerValidUser(registrationModel);
-        }
-        log.error("The registration request was invalid");
-        return false;
+        validateRegistrationModel(registrationModel);
+        return registerValidUser(registrationModel);
     }
 
     private boolean registerValidUser(UserRegistrationModel registrationModel) {
-        try {
-            UserEntity userEntity = saveUserInfo(registrationModel.getFirstName(), registrationModel.getLastName(), registrationModel.getEmail());
-            OrganizationAccountEntity organizationAccountEntity = savePlanInfo(registrationModel.getPlanType());
+        UserEntity userEntity = saveUserInfo(registrationModel.getFirstName(), registrationModel.getLastName(), registrationModel.getEmail());
+        OrganizationAccountEntity organizationAccountEntity = savePlanInfo(registrationModel.getPlanType());
 
-            RoleEntity roleEntity = getRoleInfo(registrationModel.getPlanType());
-            saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
-            saveMembershipInfo(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId(), roleEntity.getRoleId());
-            profileRepository.initializeProfile(userEntity.getUserId());
-        } catch (PortalException e) {
-            log.error("There was a problem registering the user", e);
-            return false;
-        }
+        RoleEntity roleEntity = getRoleInfo(registrationModel.getPlanType());
+        saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
+        saveMembershipInfo(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId(), roleEntity.getRoleId());
+        profileRepository.initializeProfile(userEntity.getUserId());
         return true;
     }
 
-    private UserEntity saveUserInfo(String firstName, String lastName, String email) throws PortalException {
+    private UserEntity saveUserInfo(String firstName, String lastName, String email) {
         Optional<UserEntity> existingUser = userRepository.findFirstByEmail(email);
         if (existingUser.isPresent()) {
-            throw new PortalException("A user with the email '[" + email + "]' already exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A user with the email '[" + email + "]' already exists");
         }
 
         UserEntity newUserToSave = new UserEntity(null, email, firstName, lastName, true);
         return userRepository.save(newUserToSave);
     }
 
-    private OrganizationAccountEntity savePlanInfo(String planName) throws PortalException {
+    private OrganizationAccountEntity savePlanInfo(String planName) {
         return organizationAccountRepository.findFirstByOrganizationAccountName(planName)
-                .orElseThrow(() -> new PortalException("No plan with the name '[" + planName + "]' exists"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No plan with the name '[" + planName + "]' exists"));
     }
 
-    private RoleEntity getRoleInfo(String planName) throws PortalException {
+    private RoleEntity getRoleInfo(String planName) {
         String portalRole = PortalAuthorityConstants.PIPELINE_BASIC_USER;
         // TODO think of a better way to map this
         if (planName.toLowerCase().contains("premium")) {
             portalRole = PortalAuthorityConstants.PIPELINE_PREMIUM_USER;
         }
 
-        return roleRepository.findFirstRoleByRoleLevel(portalRole)
-                .orElseThrow(() -> new PortalException("No role for the plan '[" + planName + "]' exists"));
+
+        return roleRepository.findFirstByRoleLevel(portalRole)
+                .orElseThrow(() -> {
+                    log.warn("No role for the plan '[" + planName + "]' exists");
+                    return new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                });
     }
 
     private void saveLoginInfo(Long userId, String password) {
@@ -100,22 +99,24 @@ public class UserRegistrationService {
         membershipRepository.save(newMembershipToSave);
     }
 
-    private boolean validateRegistrationModel(UserRegistrationModel registrationModel) {
-        boolean valid = true;
-        valid &= isBlankLogError("firstName", registrationModel.getFirstName());
-        valid &= isBlankLogError("lastName", registrationModel.getLastName());
-        valid &= isBlankLogError("email", registrationModel.getEmail());
-        valid &= isBlankLogError("password", registrationModel.getPassword());
-        valid &= isBlankLogError("planType", registrationModel.getPlanType());
-        return valid;
+    private void validateRegistrationModel(UserRegistrationModel registrationModel) {
+        List<String> errorFields = new ArrayList<>();
+        isBlankBadRequest(errorFields, "First Name", registrationModel.getFirstName());
+        isBlankBadRequest(errorFields, "Last Name", registrationModel.getLastName());
+        isBlankBadRequest(errorFields, "Email", registrationModel.getEmail());
+        isBlankBadRequest(errorFields, "Password", registrationModel.getPassword());
+        isBlankBadRequest(errorFields, "Plan Type", registrationModel.getPlanType());
+
+        if (!errorFields.isEmpty()) {
+            String commaSeparatedErrors = String.join(", ", errorFields);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The field(s) [%s] cannot be blank", commaSeparatedErrors));
+        }
     }
 
-    private boolean isBlankLogError(String fieldName, String fieldValue) {
+    private void isBlankBadRequest(List<String> errorFields, String fieldName, String fieldValue) {
         if (StringUtils.isBlank(fieldValue)) {
-            log.error("The field '[{}]' cannot be blank", fieldName);
-            return false;
+            errorFields.add(String.format("'%s'", fieldName));
         }
-        return true;
     }
 
 }

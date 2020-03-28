@@ -30,7 +30,8 @@ public class DefaultLocationsController implements ErrorController, AnonymousAcc
             if (responseStatus < 400) {
                 return "Error endpoint";
             }
-            return "Error: " + responseStatus;
+            String errorMessage = (String) request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
+            return String.format("Error: %s. Message: %s", responseStatus, errorMessage);
         }
         response.setHeader("Location: ", "/");
         return "Error endpoint";

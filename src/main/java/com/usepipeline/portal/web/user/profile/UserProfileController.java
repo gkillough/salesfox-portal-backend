@@ -1,12 +1,9 @@
 package com.usepipeline.portal.web.user.profile;
 
-import com.usepipeline.portal.common.exception.PortalRestException;
 import com.usepipeline.portal.web.user.profile.model.UserProfileModel;
 import com.usepipeline.portal.web.user.profile.model.UserProfileUpdateModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(UserProfileController.BASE_ENDPOINT)
@@ -20,22 +17,13 @@ public class UserProfileController {
     }
 
     @GetMapping("/{user_id}")
-    public UserProfileModel getUserProfile(HttpServletResponse response, @PathVariable(name = "user_id") Long userId) {
-        try {
-            return userProfileService.getProfile(userId);
-        } catch (PortalRestException e) {
-            response.setStatus(e.getStatus().value());
-        }
-        return null;
+    public UserProfileModel getUserProfile(@PathVariable(name = "user_id") Long userId) {
+        return userProfileService.getProfile(userId);
     }
 
     @PutMapping("/{user_id}")
-    public void updateUserProfile(HttpServletResponse response, @PathVariable(name = "user_id") Long userId, @RequestBody UserProfileUpdateModel updateRequestModel) {
-        try {
-            userProfileService.updateProfile(userId, updateRequestModel);
-        } catch (PortalRestException e) {
-            response.setStatus(e.getStatus().value());
-        }
+    public void updateUserProfile(@PathVariable(name = "user_id") Long userId, @RequestBody UserProfileUpdateModel updateRequestModel) {
+        userProfileService.updateProfile(userId, updateRequestModel);
     }
 
 }

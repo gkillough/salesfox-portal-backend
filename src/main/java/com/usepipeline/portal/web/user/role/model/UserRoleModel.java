@@ -1,4 +1,4 @@
-package com.usepipeline.portal.web.user.role;
+package com.usepipeline.portal.web.user.role.model;
 
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import lombok.AllArgsConstructor;
