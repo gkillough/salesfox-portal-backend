@@ -4,6 +4,7 @@ import com.usepipeline.portal.common.exception.PortalException;
 import com.usepipeline.portal.database.authentication.entity.*;
 import com.usepipeline.portal.database.authentication.repository.*;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
+import com.usepipeline.portal.web.user.profile.UserProfileService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ public class UserRegistrationService {
     private RoleRepository roleRepository;
     private OrganizationAccountRepository organizationAccountRepository;
     private MembershipRepository membershipRepository;
+    private UserProfileService profileRepository;
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -53,6 +55,7 @@ public class UserRegistrationService {
             RoleEntity roleEntity = getRoleInfo(registrationModel.getPlanType());
             saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
             saveMembershipInfo(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId(), roleEntity.getRoleId());
+            profileRepository.initializeProfile(userEntity.getUserId());
         } catch (PortalException e) {
             log.error("There was a problem registering the user", e);
             return false;
