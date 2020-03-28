@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Optional;
 
-public class SecurityContextUtil {
+public class SecurityContextUtils {
     public static Optional<UsernamePasswordAuthenticationToken> retrieveUserAuthToken() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (UsernamePasswordAuthenticationToken.class.isInstance(auth)) {

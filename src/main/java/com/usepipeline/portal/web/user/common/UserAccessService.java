@@ -5,7 +5,7 @@ import com.usepipeline.portal.database.authentication.entity.UserEntity;
 import com.usepipeline.portal.database.authentication.repository.MembershipRepository;
 import com.usepipeline.portal.database.authentication.repository.RoleRepository;
 import com.usepipeline.portal.database.authentication.repository.UserRepository;
-import com.usepipeline.portal.web.security.authentication.SecurityContextUtil;
+import com.usepipeline.portal.web.security.authentication.SecurityContextUtils;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.user.role.UserRoleModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +30,9 @@ public class UserAccessService {
     }
 
     public boolean canCurrentUserAccessDataForUser(Long userId) {
-        Optional<UsernamePasswordAuthenticationToken> optionalAuthToken = SecurityContextUtil.retrieveUserAuthToken();
+        Optional<UsernamePasswordAuthenticationToken> optionalAuthToken = SecurityContextUtils.retrieveUserAuthToken();
         if (optionalAuthToken.isPresent()) {
-            UserDetails userDetails = SecurityContextUtil.extractUserDetails(optionalAuthToken.get());
+            UserDetails userDetails = SecurityContextUtils.extractUserDetails(optionalAuthToken.get());
             String email = userDetails.getUsername();
             Optional<UserEntity> optionalUser = userRepository.findFirstByEmail(email);
             if (optionalUser.isPresent()) {
@@ -56,16 +56,6 @@ public class UserAccessService {
     }
 
     public UserRoleModel findRoleByUserId(Long userId) {
-        // TODO remove debugging code
-//        Optional<MembershipEntity> optionalMembership = membershipRepository.findFirstByUserId(userId);
-//        if (optionalMembership.isPresent()) {
-//            Optional<RoleEntity> optionalRole = roleRepository.findById(optionalMembership.get().getRoleId());
-//            if (optionalRole.isPresent()) {
-//                return new UserRoleModel(optionalRole.get().getRoleLevel(), optionalRole.get().getDescription());
-//            }
-//        }
-//        return UserRoleModel.ANONYMOUS_ROLE;
-
         return membershipRepository.findFirstByUserId(userId)
                 .map(MembershipEntity::getRoleId)
                 .flatMap(roleRepository::findById)

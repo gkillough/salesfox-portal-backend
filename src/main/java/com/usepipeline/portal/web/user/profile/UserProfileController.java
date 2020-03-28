@@ -1,6 +1,8 @@
 package com.usepipeline.portal.web.user.profile;
 
 import com.usepipeline.portal.common.exception.PortalRestException;
+import com.usepipeline.portal.web.user.profile.model.UserProfileModel;
+import com.usepipeline.portal.web.user.profile.model.UserProfileUpdateModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +30,7 @@ public class UserProfileController {
     }
 
     @PutMapping("/{user_id}")
-    public void updateUserProfile(HttpServletResponse response, @PathVariable(name = "user_id") Long userId, @RequestBody UserProfileModel updateRequestModel) {
+    public void updateUserProfile(HttpServletResponse response, @PathVariable(name = "user_id") Long userId, @RequestBody UserProfileUpdateModel updateRequestModel) {
         try {
             userProfileService.updateProfile(userId, updateRequestModel);
         } catch (PortalRestException e) {

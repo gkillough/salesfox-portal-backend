@@ -3,7 +3,7 @@ package com.usepipeline.portal.web.user.common;
 import com.usepipeline.portal.common.exception.PortalRestException;
 import com.usepipeline.portal.database.authentication.entity.UserEntity;
 import com.usepipeline.portal.database.authentication.repository.UserRepository;
-import com.usepipeline.portal.web.security.authentication.SecurityContextUtil;
+import com.usepipeline.portal.web.security.authentication.SecurityContextUtils;
 import com.usepipeline.portal.web.user.common.model.CurrentUserModel;
 import com.usepipeline.portal.web.user.common.model.UserAccountModel;
 import com.usepipeline.portal.web.user.role.UserRoleModel;
@@ -29,9 +29,9 @@ public class UserService {
     }
 
     public CurrentUserModel getCurrentUserFromSession() {
-        Optional<UsernamePasswordAuthenticationToken> optionalUserAuthToken = SecurityContextUtil.retrieveUserAuthToken();
+        Optional<UsernamePasswordAuthenticationToken> optionalUserAuthToken = SecurityContextUtils.retrieveUserAuthToken();
         if (optionalUserAuthToken.isPresent()) {
-            UserDetails userDetails = SecurityContextUtil.extractUserDetails(optionalUserAuthToken.get());
+            UserDetails userDetails = SecurityContextUtils.extractUserDetails(optionalUserAuthToken.get());
 
             Optional<UserEntity> optionalUser = userRepository.findFirstByEmail(userDetails.getUsername());
             if (optionalUser.isPresent()) {

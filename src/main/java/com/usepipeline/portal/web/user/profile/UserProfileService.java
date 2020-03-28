@@ -1,5 +1,6 @@
 package com.usepipeline.portal.web.user.profile;
 
+import com.usepipeline.portal.common.FieldValidationUtils;
 import com.usepipeline.portal.common.exception.PortalRestException;
 import com.usepipeline.portal.common.model.PortalAddressModel;
 import com.usepipeline.portal.database.authentication.entity.ProfileEntity;
@@ -9,10 +10,11 @@ import com.usepipeline.portal.database.authentication.repository.ProfileReposito
 import com.usepipeline.portal.database.authentication.repository.UserAddressRepository;
 import com.usepipeline.portal.database.authentication.repository.UserRepository;
 import com.usepipeline.portal.web.user.common.UserAccessService;
+import com.usepipeline.portal.web.user.profile.model.UserProfileModel;
+import com.usepipeline.portal.web.user.profile.model.UserProfileUpdateModel;
 import com.usepipeline.portal.web.user.role.UserRoleModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -53,20 +55,20 @@ public class UserProfileService {
         validateUserId(userId);
 
         // Any failed lookups after the above validation are fatal.
-        Supplier<PortalRestException> exceptionSupplier = () -> new PortalRestException(HttpStatus.INTERNAL_SERVER_ERROR);
+        Supplier<PortalRestException> internalServerError = () -> new PortalRestException(HttpStatus.INTERNAL_SERVER_ERROR);
 
         ProfileEntity profileEntity = profileRepository.findByUserId(userId).orElse(null);
         if (profileEntity == null) {
             profileEntity = doInitializeProfile(userId)
-                    .orElseThrow(exceptionSupplier);
+                    .orElseThrow(internalServerError);
         }
 
         UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(exceptionSupplier);
+                .orElseThrow(internalServerError);
 
         PortalAddressModel portalAddressModel = userAddressRepository.findById(profileEntity.getMailingAddressId())
                 .map(PortalAddressModel::fromEntity)
-                .orElseThrow(exceptionSupplier);
+                .orElseThrow(internalServerError);
 
         UserRoleModel role = userAccessService.findRoleByUserId(userId);
 
@@ -82,11 +84,50 @@ public class UserProfileService {
         );
     }
 
-    public void updateProfile(Long userId, UserProfileModel updateModel) throws PortalRestException {
+    @Transactional
+    public void updateProfile(Long userId, UserProfileUpdateModel updateModel) throws PortalRestException {
         validateUserId(userId);
         validateUpdateRequest(updateModel);
 
+        // Any failed lookups after the above validation are fatal.
+        Supplier<PortalRestException> internalServerError = () -> new PortalRestException(HttpStatus.INTERNAL_SERVER_ERROR);
 
+        UserEntity oldUser = userRepository.findById(userId)
+                .orElseThrow(internalServerError);
+        if (!oldUser.getEmail().equals(updateModel.getEmail())) {
+            Optional<UserEntity> existingEmailAddress = userRepository.findFirstByEmail(updateModel.getEmail());
+            if (existingEmailAddress.isPresent()) {
+                // That email address is in use by a different user
+                throw new PortalRestException(HttpStatus.BAD_REQUEST);
+            }
+            // TODO consider sending a confirmation link
+        }
+
+        UserEntity userToSave = new UserEntity(oldUser.getUserId(), updateModel.getEmail(), updateModel.getFirstName(), updateModel.getLastName(), oldUser.getIsActive());
+        userRepository.save(userToSave);
+
+        ProfileEntity oldProfile = profileRepository.findByUserId(userId)
+                .orElseThrow(internalServerError);
+
+        ProfileEntity profileEntityToSave = new ProfileEntity(
+                oldProfile.getProfileId(),
+                oldUser.getUserId(),
+                updateModel.getMobileNumber(),
+                updateModel.getBusinessNumber(),
+                oldProfile.getMailingAddressId()
+        );
+        profileRepository.save(profileEntityToSave);
+
+        PortalAddressModel addressModel = updateModel.getAddress();
+        UserAddressEntity userAddressToSave = new UserAddressEntity(oldProfile.getMailingAddressId(), oldUser.getUserId());
+        userAddressToSave.setStreetNumber(addressModel.getStreetNumber());
+        userAddressToSave.setStreetName(addressModel.getStreetName());
+        userAddressToSave.setAptSuite(addressModel.getAptSuite());
+        userAddressToSave.setCity(addressModel.getCity());
+        userAddressToSave.setState(StringUtils.upperCase(addressModel.getState()));
+        userAddressToSave.setZipCode(addressModel.getZipCode());
+        userAddressToSave.setIsBusiness(addressModel.getIsBusiness());
+        userAddressRepository.save(userAddressToSave);
     }
 
     private Optional<ProfileEntity> doInitializeProfile(Long userId) {
@@ -95,7 +136,7 @@ public class UserProfileService {
             return Optional.empty();
         }
 
-        UserAddressEntity newAddress = new UserAddressEntity(null);
+        UserAddressEntity newAddress = new UserAddressEntity(null, userId);
         newAddress.setStreetNumber(0);
         newAddress.setStreetName("");
         newAddress.setAptSuite("");
@@ -121,32 +162,15 @@ public class UserProfileService {
         }
     }
 
-    private void validateUpdateRequest(UserProfileModel userProfileModel) throws PortalRestException {
+    private void validateUpdateRequest(UserProfileUpdateModel updateModel) throws PortalRestException {
         if (
-                !isValidEmailAddress(userProfileModel.getEmail())
-                        || !isValidNumber(userProfileModel.getMobileNumber())
-                        || !isValidNumber(userProfileModel.getBusinessNumber())
-                        || !isValidAddress(userProfileModel.getAddress())
+                !FieldValidationUtils.isValidEmailAddress(updateModel.getEmail(), false)
+                        || !FieldValidationUtils.isValidNumber(updateModel.getMobileNumber(), true)
+                        || !FieldValidationUtils.isValidNumber(updateModel.getBusinessNumber(), true)
+                        || !FieldValidationUtils.isValidAddress(updateModel.getAddress(), true)
         ) {
             throw new PortalRestException(HttpStatus.BAD_REQUEST);
         }
-    }
-
-    // TODO abstract these validators somewhere common:
-
-    private boolean isValidEmailAddress(String emailAddress) {
-        // Pattern from: https://howtodoinjava.com/regex/java-regex-validate-email-address/
-        String validEmailPattern = "^[\\\\w!#$%&'*+/=?`{|}~^-]+(?:\\\\.[\\\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\\\.)+[a-zA-Z]{2,6}$";
-        return StringUtils.isNotBlank(emailAddress) && emailAddress.matches(validEmailPattern);
-    }
-
-    private boolean isValidNumber(String phoneNumber) {
-        return StringUtils.isBlank(phoneNumber) || NumberUtils.isDigits(phoneNumber);
-    }
-
-    private boolean isValidAddress(PortalAddressModel addressModel) {
-        // TODO determine validation strategy
-        return true;
     }
 
 }

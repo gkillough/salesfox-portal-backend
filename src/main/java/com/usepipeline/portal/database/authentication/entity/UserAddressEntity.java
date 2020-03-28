@@ -20,4 +20,8 @@ public class UserAddressEntity extends AbstractAddressEntity {
     @Column(name = "user_address_id")
     private Long userAddressId;
 
+    @PrimaryKeyJoinColumn
+    @Column(name = "user_id")
+    private Long userId;
+
 }
