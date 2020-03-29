@@ -90,7 +90,7 @@ databaseChangeLog:
                   valueNumeric: 50
               - column:
                   name: monthly_cost
-                  valueNumeric: 15.0
+                  valueNumeric: 0.0
               - column:
                   name: is_active
                   valueBoolean: true
