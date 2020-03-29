@@ -1,8 +1,4 @@
 databaseChangeLog:
-  - preConditions:
-      - runningAs:
-          username: root
-
   # This procedure takes in a license hash (of type UUID) and returns the license_id of the row containing that hash.
   - changeSet:
       id: create-auth-function-1
@@ -40,6 +36,69 @@ databaseChangeLog:
                                   select organization_id
                                   into result
                                   from portal.organizations where organization_name = $1;
+                                  RETURN result;
+                              END;
+                          $result$
+                          LANGUAGE plpgsql;
+
+  # This procedure takes in an organization account name (text) and returns the organization_account_id of the row containing that name.
+  - changeSet:
+      id: create-auth-function-3
+      author: gavinkillough
+      changes:
+        - createProcedure:
+            dbms: postgresql
+            schemaName: portal
+            procedureBody: |-
+              CREATE OR REPLACE FUNCTION GET_ORGANIZATION_ACCOUNT_ID_BY_NAME(text)
+                          RETURNS BIGINT AS $result$
+                              DECLARE result BIGINT;
+                              BEGIN
+                                  select organization_account_id
+                                  into result
+                                  from portal.organization_accounts where organization_account_name = $1;
+                                  RETURN result;
+                              END;
+                          $result$
+                          LANGUAGE plpgsql;
+
+  # This procedure takes in a role level (text) and returns the role_id of the row containing that role level.
+  - changeSet:
+      id: create-auth-function-4
+      author: gavinkillough
+      changes:
+        - createProcedure:
+            dbms: postgresql
+            schemaName: portal
+            procedureBody: |-
+              CREATE OR REPLACE FUNCTION GET_ROLE_ID_BY_ROLE_LEVEL(text)
+                          RETURNS BIGINT AS $result$
+                              DECLARE result BIGINT;
+                              BEGIN
+                                  select role_id
+                                  into result
+                                  from portal.roles where role_level = $1;
+                                  RETURN result;
+                              END;
+                          $result$
+                          LANGUAGE plpgsql;
+
+  # This procedure takes in an email (text) and returns the user_id of the row containing that email.
+  - changeSet:
+      id: create-auth-function-5
+      author: gavinkillough
+      changes:
+        - createProcedure:
+            dbms: postgresql
+            schemaName: portal
+            procedureBody: |-
+              CREATE OR REPLACE FUNCTION GET_USER_ID_BY_EMAIL(text)
+                          RETURNS BIGINT AS $result$
+                              DECLARE result BIGINT;
+                              BEGIN
+                                  select user_id
+                                  into result
+                                  from portal.users where email = $1;
                                   RETURN result;
                               END;
                           $result$

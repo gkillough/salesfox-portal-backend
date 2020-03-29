@@ -4,17 +4,5 @@ databaseChangeLog:
           username: root
 
   - include:
-      file: changes/1.0.0/change_create_portal_schema_2_19_2020.yaml
-      relativeToChangelogFile: true
-
-  - include:
-      file: changes/1.0.0/change_create_auth_tables_2_19_2020.yaml
-      relativeToChangelogFile: true
-
-  - include:
-      file: changes/1.0.0/change_create_auth_stored_procedures_2_24_2020.yaml
-      relativeToChangelogFile: true
-
-  - include:
-      file: changes/1.0.0/change_insert_default_organization_accounts_2_23_2020.yaml
+      file: changes/1.0.0/changelog-1.0.0-master.yaml
       relativeToChangelogFile: true
