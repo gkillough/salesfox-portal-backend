@@ -1,4 +1,4 @@
-package com.usepipeline.portal.web.security.authentication;
+package com.usepipeline.portal.web.security.authentication.listener;
 
 import com.usepipeline.portal.web.security.authentication.user.PortalUserLoginAttemptService;
 import org.springframework.beans.factory.annotation.Autowired;
