@@ -69,6 +69,33 @@ databaseChangeLog:
                   valueBoolean: true
 
   - changeSet:
+      id: insert-default-org-acc-3a
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: licenses
+            columns:
+              - column:
+                  name: license_hash
+                  value: d393f36b-23de-4b5e-a27f-96f2dc1bc814
+              - column:
+                  name: expiration_date
+                  valueDate: 2099-12-31
+              - column:
+                  name: type
+                  value: PIPELINE_TEAM
+              - column:
+                  name: license_seats
+                  valueNumeric: 50
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 15.0
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
       id: insert-default-org-acc-4
       author: gavinkillough
       changes:
@@ -103,6 +130,27 @@ databaseChangeLog:
               - column:
                   name: license_id
                   valueComputed: GET_LICENSE_ID_BY_HASH('e65000ad-c9c2-49ad-9622-a033c7b7d74a')
+              - column:
+                  name: organization_id
+                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pipeline Organization')
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: insert-default-org-acc-5a
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_accounts
+            columns:
+              - column:
+                  name: organization_account_name
+                  value: Pipeline Team
+              - column:
+                  name: license_id
+                  valueComputed: GET_LICENSE_ID_BY_HASH('d393f36b-23de-4b5e-a27f-96f2dc1bc814')
               - column:
                   name: organization_id
                   valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pipeline Organization')

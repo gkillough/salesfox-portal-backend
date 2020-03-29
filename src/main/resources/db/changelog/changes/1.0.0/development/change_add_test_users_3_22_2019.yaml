@@ -118,3 +118,63 @@ databaseChangeLog:
               - column:
                   name: is_active
                   valueBoolean: true
+
+  - changeSet:
+      id: create-user-3
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: admin@usepipeline.com
+              - column:
+                  name: first_name
+                  value: Admin
+              - column:
+                  name: last_name
+                  value: User
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: create-user-login-3
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: logins
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('admin@usepipeline.com')
+              - column:
+                  name: password_hash
+                  value: $2a$08$j.QARNAT.eorZjsetIb/Ru/9T0aY2jprfoZgHJE09G9WvA/AACBxS
+              - column:
+                  name: num_failed_logins
+                  valueNumeric: 0
+
+  - changeSet:
+      id: create-user-membership-3
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: memberships
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('admin@usepipeline.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_NAME('Pipeline Team')
+              - column:
+                  name: role_id
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PIPELINE_ADMIN')
+              - column:
+                  name: is_active
+                  valueBoolean: true
