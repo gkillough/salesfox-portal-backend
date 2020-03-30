@@ -1,8 +1,4 @@
 databaseChangeLog:
-  - preConditions:
-      - runningAs:
-          username: root
-
   - changeSet:
       id: create-auth-tables-1
       author: gavinkillough

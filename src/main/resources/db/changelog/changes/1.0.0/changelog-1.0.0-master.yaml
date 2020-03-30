@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - include:
+      file: change_create_portal_schema_2_19_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: change_create_auth_tables_2_19_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: change_create_auth_stored_procedures_2_24_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: change_insert_default_organization_accounts_2_23_2020.yaml
+      relativeToChangelogFile: true
+
+  # TODO REMOVE DEVELOPMENT DATA BEFORE RELEASE
+  - include:
+      file: development/change_add_test_users_3_22_2019.yaml
+      relativeToChangelogFile: true
