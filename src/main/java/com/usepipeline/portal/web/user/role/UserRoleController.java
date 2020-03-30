@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(UserRoleController.BASE_ENDPOINT)
 public class UserRoleController {
     public static final String BASE_ENDPOINT = "/role";
-
     private UserRoleService userRoleService;
 
     @Autowired

@@ -12,7 +12,7 @@ public class UserAccountModel {
     private String firstName;
     private String lastName;
     private String email;
-    private UserRoleModel roleModel;
+    private UserRoleModel role;
     private Boolean isActive;
 
 }

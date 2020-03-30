@@ -1,13 +1,12 @@
 package com.usepipeline.portal.web.user.active;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping(UserActiveController.BASE_ENDPOINT)
 public class UserActiveController {
+    public static final String BASE_ENDPOINT = "/active";
     private UserActiveService userActiveService;
 
     @Autowired
@@ -15,7 +14,7 @@ public class UserActiveController {
         this.userActiveService = userActiveService;
     }
 
-    @PutMapping("/active/{user_id}")
+    @PutMapping("/{user_id}")
     public void updateActiveStatus(@PathVariable(name = "user_id") Long userId, @RequestBody UserActiveUpdateModel updateModel) {
         userActiveService.updateUserActiveStatus(userId, updateModel);
     }
