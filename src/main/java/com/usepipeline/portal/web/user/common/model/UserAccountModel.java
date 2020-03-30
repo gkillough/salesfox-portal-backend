@@ -1,5 +1,6 @@
-package com.usepipeline.portal.web.user.common;
+package com.usepipeline.portal.web.user.common.model;
 
+import com.usepipeline.portal.web.user.role.model.UserRoleModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,11 +8,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoggedInUserModel {
+public class UserAccountModel {
     private String firstName;
     private String lastName;
     private String email;
-
-    public static final LoggedInUserModel ANONYMOUS_USER = new LoggedInUserModel("Anonymous", "Anonymous", "None");
+    private UserRoleModel role;
+    private Boolean isActive;
 
 }

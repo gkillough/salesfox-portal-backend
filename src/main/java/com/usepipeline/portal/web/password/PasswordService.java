@@ -9,7 +9,7 @@ import com.usepipeline.portal.database.authentication.key.PasswordResetTokenPK;
 import com.usepipeline.portal.database.authentication.repository.LoginRepository;
 import com.usepipeline.portal.database.authentication.repository.PasswordResetTokenRepository;
 import com.usepipeline.portal.database.authentication.repository.UserRepository;
-import com.usepipeline.portal.web.security.authentication.SecurityContextUtil;
+import com.usepipeline.portal.web.security.authentication.SecurityContextUtils;
 import com.usepipeline.portal.web.security.authentication.user.PortalUserDetailsService;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import lombok.extern.slf4j.Slf4j;
@@ -109,11 +109,11 @@ public class PasswordService {
 
     @Transactional
     public boolean updatePassword(HttpServletResponse response, UpdatePasswordModel updatePasswordModel) {
-        Optional<UsernamePasswordAuthenticationToken> optionalUserAuthToken = SecurityContextUtil.retrieveUserAuthToken();
+        Optional<UsernamePasswordAuthenticationToken> optionalUserAuthToken = SecurityContextUtils.retrieveUserAuthToken();
         if (optionalUserAuthToken.isPresent()) {
             UsernamePasswordAuthenticationToken userAuthToken = optionalUserAuthToken.get();
             if (canUpdatePassword(userAuthToken)) {
-                UserDetails userDetails = SecurityContextUtil.extractUserDetails(userAuthToken);
+                UserDetails userDetails = SecurityContextUtils.extractUserDetails(userAuthToken);
 
                 String authenticatedUserEmail = userDetails.getUsername();
                 boolean wasSaveSuccessful = persistPasswordUpdate(authenticatedUserEmail, updatePasswordModel.getNewPassword());

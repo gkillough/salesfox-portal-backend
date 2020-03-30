@@ -5,6 +5,8 @@ public final class PortalAuthorityConstants {
     // Even a String returned by a static method is not allowed here.
 
     // User Roles
+    public static final String ANONYMOUS = "ANONYMOUS";
+
     public static final String PIPELINE_ADMIN = "PIPELINE_ADMIN";
     public static final String PIPELINE_ADMIN_ROLE_CHECK = "hasRole('" + PIPELINE_ADMIN + "')";
 
