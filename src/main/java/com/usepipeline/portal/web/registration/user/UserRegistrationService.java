@@ -69,6 +69,9 @@ public class UserRegistrationService {
     }
 
     private OrganizationAccountEntity savePlanInfo(String planName) {
+        // FIXME validate the plan name
+        //  right now, there is no security issue because access is role based, but if a user
+        //  found a valid plan name, that plan name would show up despite the role being correct
         return organizationAccountRepository.findFirstByOrganizationAccountName(planName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No plan with the name '[" + planName + "]' exists"));
     }
