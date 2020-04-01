@@ -13,7 +13,6 @@ import com.usepipeline.portal.web.user.profile.model.UserProfileModel;
 import com.usepipeline.portal.web.user.profile.model.UserProfileUpdateModel;
 import com.usepipeline.portal.web.user.role.model.UserRoleModel;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -119,13 +118,7 @@ public class UserProfileService {
 
         PortalAddressModel addressModel = updateModel.getAddress();
         UserAddressEntity userAddressToSave = new UserAddressEntity(oldProfile.getMailingAddressId(), oldUser.getUserId());
-        userAddressToSave.setStreetNumber(addressModel.getStreetNumber());
-        userAddressToSave.setStreetName(addressModel.getStreetName());
-        userAddressToSave.setAptSuite(addressModel.getAptSuite());
-        userAddressToSave.setCity(addressModel.getCity());
-        userAddressToSave.setState(StringUtils.upperCase(addressModel.getState()));
-        userAddressToSave.setZipCode(addressModel.getZipCode());
-        userAddressToSave.setIsBusiness(addressModel.getIsBusiness());
+        addressModel.copyFieldsToEntity(userAddressToSave);
         userAddressRepository.save(userAddressToSave);
     }
 

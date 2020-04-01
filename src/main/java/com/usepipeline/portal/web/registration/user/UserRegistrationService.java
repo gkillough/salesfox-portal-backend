@@ -41,21 +41,26 @@ public class UserRegistrationService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * @param registrationModel  a model containing the fields required to register a user
+     * @param isOrganizationUser a flag to indicate whether the user being created is for an organization
+     * @return the id of the registered user
+     */
     @Transactional
-    public boolean registerUser(UserRegistrationModel registrationModel) {
+    public Long registerUser(UserRegistrationModel registrationModel, boolean isOrganizationUser) {
         validateRegistrationModel(registrationModel);
-        return registerValidUser(registrationModel);
+        return registerValidUser(registrationModel, isOrganizationUser);
     }
 
-    private boolean registerValidUser(UserRegistrationModel registrationModel) {
+    private Long registerValidUser(UserRegistrationModel registrationModel, boolean isOrganizationUser) {
         UserEntity userEntity = saveUserInfo(registrationModel.getFirstName(), registrationModel.getLastName(), registrationModel.getEmail());
-        OrganizationAccountEntity organizationAccountEntity = savePlanInfo(registrationModel.getPlanType());
+        OrganizationAccountEntity organizationAccountEntity = savePlanInfo(registrationModel.getPlanType(), isOrganizationUser);
 
-        RoleEntity roleEntity = getRoleInfo(registrationModel.getPlanType());
+        RoleEntity roleEntity = getRoleInfo(registrationModel.getPlanType(), isOrganizationUser);
         saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
         saveMembershipInfo(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId(), roleEntity.getRoleId());
         profileRepository.initializeProfile(userEntity.getUserId());
-        return true;
+        return userEntity.getUserId();
     }
 
     private UserEntity saveUserInfo(String firstName, String lastName, String email) {
@@ -68,21 +73,26 @@ public class UserRegistrationService {
         return userRepository.save(newUserToSave);
     }
 
-    private OrganizationAccountEntity savePlanInfo(String planName) {
-        // FIXME validate the plan name
-        //  right now, there is no security issue because access is role based, but if a user
-        //  found a valid plan name, that plan name would show up despite the role being correct
+    private OrganizationAccountEntity savePlanInfo(String planName, boolean isOrganizationUser) {
+        if (!isOrganizationUser) {
+            // TODO make this consistent with the UI, then use constants
+            if (!planName.toLowerCase().contains("basic") && !planName.toLowerCase().contains("premium")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid plan selected. To create a business account please contact us.");
+            }
+        }
         return organizationAccountRepository.findFirstByOrganizationAccountName(planName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No plan with the name '[" + planName + "]' exists"));
     }
 
-    private RoleEntity getRoleInfo(String planName) {
+    private RoleEntity getRoleInfo(String planName, boolean isOrganizationUser) {
         String portalRole = PortalAuthorityConstants.PIPELINE_BASIC_USER;
-        // TODO think of a better way to map this
-        if (planName.toLowerCase().contains("premium")) {
+        if (isOrganizationUser) {
+            portalRole = PortalAuthorityConstants.ORGANIZATION_ACCOUNT_MANAGER;
+        }
+        // TODO make this consistent with the UI, then use constants
+        else if (planName.toLowerCase().contains("premium")) {
             portalRole = PortalAuthorityConstants.PIPELINE_PREMIUM_USER;
         }
-
 
         return roleRepository.findFirstByRoleLevel(portalRole)
                 .orElseThrow(() -> {
