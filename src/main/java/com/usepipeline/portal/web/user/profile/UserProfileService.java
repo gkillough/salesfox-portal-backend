@@ -2,12 +2,12 @@ package com.usepipeline.portal.web.user.profile;
 
 import com.usepipeline.portal.common.FieldValidationUtils;
 import com.usepipeline.portal.common.model.PortalAddressModel;
-import com.usepipeline.portal.database.authentication.entity.ProfileEntity;
-import com.usepipeline.portal.database.authentication.entity.UserAddressEntity;
-import com.usepipeline.portal.database.authentication.entity.UserEntity;
-import com.usepipeline.portal.database.authentication.repository.ProfileRepository;
-import com.usepipeline.portal.database.authentication.repository.UserAddressRepository;
-import com.usepipeline.portal.database.authentication.repository.UserRepository;
+import com.usepipeline.portal.database.account.entity.ProfileEntity;
+import com.usepipeline.portal.database.account.entity.UserAddressEntity;
+import com.usepipeline.portal.database.account.entity.UserEntity;
+import com.usepipeline.portal.database.account.repository.ProfileRepository;
+import com.usepipeline.portal.database.account.repository.UserAddressRepository;
+import com.usepipeline.portal.database.account.repository.UserRepository;
 import com.usepipeline.portal.web.user.common.UserAccessService;
 import com.usepipeline.portal.web.user.profile.model.UserProfileModel;
 import com.usepipeline.portal.web.user.profile.model.UserProfileUpdateModel;

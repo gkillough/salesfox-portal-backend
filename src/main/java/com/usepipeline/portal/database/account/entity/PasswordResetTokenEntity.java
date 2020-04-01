@@ -1,6 +1,6 @@
-package com.usepipeline.portal.database.authentication.entity;
+package com.usepipeline.portal.database.account.entity;
 
-import com.usepipeline.portal.database.authentication.key.PasswordResetTokenPK;
+import com.usepipeline.portal.database.account.key.PasswordResetTokenPK;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

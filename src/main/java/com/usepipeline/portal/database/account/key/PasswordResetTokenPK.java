@@ -1,4 +1,4 @@
-package com.usepipeline.portal.database.authentication.key;
+package com.usepipeline.portal.database.account.key;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

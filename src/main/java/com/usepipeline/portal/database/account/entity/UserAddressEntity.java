@@ -1,4 +1,4 @@
-package com.usepipeline.portal.database.authentication.entity;
+package com.usepipeline.portal.database.account.entity;
 
 import com.usepipeline.portal.database.common.AbstractAddressEntity;
 import lombok.AllArgsConstructor;

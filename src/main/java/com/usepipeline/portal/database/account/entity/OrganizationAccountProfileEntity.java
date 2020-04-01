@@ -1,35 +1,31 @@
-package com.usepipeline.portal.database.authentication.entity;
+package com.usepipeline.portal.database.account.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "portal", name = "profiles")
-public class ProfileEntity implements Serializable {
+@Table(schema = "portal", name = "organization_account_profiles")
+public class OrganizationAccountProfileEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "profile_id")
     private Long profileId;
 
     @PrimaryKeyJoinColumn
-    @Column(name = "user_id")
-    private Long userId;
-
-    @Column(name = "mobile_number")
-    private String mobileNumber;
-
-    @Column(name = "business_number")
-    private String businessNumber;
+    @Column(name = "organization_account_id")
+    private Long organizationAccountId;
 
     @PrimaryKeyJoinColumn
     @Column(name = "mailing_address_id")
     private Long mailingAddressId;
+
+    @Column(name = "business_number")
+    private String businessNumber;
 
 }

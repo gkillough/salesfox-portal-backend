@@ -1,7 +1,7 @@
-package com.usepipeline.portal.database.authentication.repository;
+package com.usepipeline.portal.database.account.repository;
 
-import com.usepipeline.portal.database.authentication.entity.PasswordResetTokenEntity;
-import com.usepipeline.portal.database.authentication.key.PasswordResetTokenPK;
+import com.usepipeline.portal.database.account.entity.PasswordResetTokenEntity;
+import com.usepipeline.portal.database.account.key.PasswordResetTokenPK;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 

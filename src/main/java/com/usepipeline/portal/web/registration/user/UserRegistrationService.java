@@ -1,7 +1,7 @@
 package com.usepipeline.portal.web.registration.user;
 
-import com.usepipeline.portal.database.authentication.entity.*;
-import com.usepipeline.portal.database.authentication.repository.*;
+import com.usepipeline.portal.database.account.entity.*;
+import com.usepipeline.portal.database.account.repository.*;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.user.profile.UserProfileService;
 import lombok.extern.slf4j.Slf4j;

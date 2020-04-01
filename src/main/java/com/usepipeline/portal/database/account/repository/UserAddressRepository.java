@@ -1,6 +1,6 @@
-package com.usepipeline.portal.database.authentication.repository;
+package com.usepipeline.portal.database.account.repository;
 
-import com.usepipeline.portal.database.authentication.entity.UserAddressEntity;
+import com.usepipeline.portal.database.account.entity.UserAddressEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
