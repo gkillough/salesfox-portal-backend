@@ -94,8 +94,7 @@ public class UserProfileService {
         UserEntity oldUser = userRepository.findById(userId)
                 .orElseThrow(internalServerError);
         if (!oldUser.getEmail().equals(updateModel.getEmail())) {
-            Optional<UserEntity> existingEmailAddress = userRepository.findFirstByEmail(updateModel.getEmail());
-            if (existingEmailAddress.isPresent()) {
+            if (isEmailAlreadyInUse(updateModel.getEmail())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This email address is already in use");
             }
             // TODO consider sending a confirmation link
@@ -120,6 +119,10 @@ public class UserProfileService {
         UserAddressEntity userAddressToSave = new UserAddressEntity(oldProfile.getMailingAddressId(), oldUser.getUserId());
         addressModel.copyFieldsToEntity(userAddressToSave);
         userAddressRepository.save(userAddressToSave);
+    }
+
+    public boolean isEmailAlreadyInUse(String emailAddress) {
+        return userRepository.findFirstByEmail(emailAddress).isPresent();
     }
 
     private Optional<ProfileEntity> doInitializeProfile(Long userId) {

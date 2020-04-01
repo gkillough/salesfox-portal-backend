@@ -114,11 +114,11 @@ public class UserRegistrationService {
 
     private void validateRegistrationModel(UserRegistrationModel registrationModel) {
         List<String> errorFields = new ArrayList<>();
-        isBlankBadRequest(errorFields, "First Name", registrationModel.getFirstName());
-        isBlankBadRequest(errorFields, "Last Name", registrationModel.getLastName());
-        isBlankBadRequest(errorFields, "Email", registrationModel.getEmail());
-        isBlankBadRequest(errorFields, "Password", registrationModel.getPassword());
-        isBlankBadRequest(errorFields, "Plan Type", registrationModel.getPlanType());
+        isBlankAddError(errorFields, "First Name", registrationModel.getFirstName());
+        isBlankAddError(errorFields, "Last Name", registrationModel.getLastName());
+        isBlankAddError(errorFields, "Email", registrationModel.getEmail());
+        isBlankAddError(errorFields, "Password", registrationModel.getPassword());
+        isBlankAddError(errorFields, "Plan Type", registrationModel.getPlanType());
 
         if (!errorFields.isEmpty()) {
             String commaSeparatedErrors = String.join(", ", errorFields);
@@ -126,7 +126,7 @@ public class UserRegistrationService {
         }
     }
 
-    private void isBlankBadRequest(List<String> errorFields, String fieldName, String fieldValue) {
+    private void isBlankAddError(List<String> errorFields, String fieldName, String fieldValue) {
         if (StringUtils.isBlank(fieldValue)) {
             errorFields.add(String.format("'%s'", fieldName));
         }

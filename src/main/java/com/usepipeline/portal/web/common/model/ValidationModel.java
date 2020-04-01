@@ -11,4 +11,12 @@ public class ValidationModel {
     private Boolean isValid;
     private String message;
 
+    public static ValidationModel valid() {
+        return new ValidationModel(true, "Valid");
+    }
+
+    public static ValidationModel invalid(String message) {
+        return new ValidationModel(false, message);
+    }
+
 }
