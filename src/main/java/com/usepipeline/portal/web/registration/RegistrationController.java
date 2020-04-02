@@ -29,7 +29,7 @@ public class RegistrationController implements CsrfIgnorable, AnonymousAccessibl
 
     @PostMapping("/user")
     public boolean registerUser(@RequestBody UserRegistrationModel registrationRequest) {
-        userRegistrationService.registerUser(registrationRequest, false);
+        userRegistrationService.registerUser(registrationRequest);
         return true;
     }
 

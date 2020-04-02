@@ -1,5 +1,5 @@
 create table portal.licenses (
-    license_id bigserial UNIQUE NOT NULL,
+    license_id bigserial NOT NULL,
     license_hash uuid,
     expiration_date date,
     type character varying,
@@ -18,7 +18,7 @@ alter table ONLY portal.licenses
 
 
 create table portal.logins (
-    login_id bigserial UNIQUE NOT NULL,
+    login_id bigserial NOT NULL,
     user_id bigint,
     password_hash character varying,
     last_successful_login timestamp without time zone,
@@ -32,7 +32,7 @@ alter table ONLY portal.logins
     ADD CONSTRAINT logins_pkey PRIMARY KEY (login_id);
 
 create table portal.memberships (
-    membership_id bigserial UNIQUE NOT NULL,
+    membership_id bigserial NOT NULL,
     user_id bigint,
     organization_account_id bigint,
     role_id bigint,
@@ -45,7 +45,7 @@ alter table ONLY portal.memberships
     ADD CONSTRAINT memberships_pkey PRIMARY KEY (membership_id);
 
 create table portal.organization_account_addresses (
-    organization_account_address_id bigserial UNIQUE NOT NULL,
+    organization_account_address_id bigserial NOT NULL,
     organization_account_id bigint UNIQUE NOT NULL,
     street_number integer,
     street_name character varying,
@@ -62,7 +62,7 @@ alter table ONLY portal.organization_account_addresses
     ADD CONSTRAINT organization_account_addresses_pkey PRIMARY KEY (organization_account_address_id);
 
 create table portal.organization_accounts (
-    organization_account_id bigserial UNIQUE NOT NULL,
+    organization_account_id bigserial NOT NULL,
     organization_account_name character varying,
     license_id bigint,
     organization_id bigint,
@@ -72,13 +72,14 @@ create table portal.organization_accounts (
 alter table portal.organization_accounts OWNER TO root;
 
 alter table ONLY portal.organization_accounts
-    ADD CONSTRAINT organization_accounts_organization_account_name_key UNIQUE (organization_account_name);
+    ADD CONSTRAINT organization_accounts_pkey PRIMARY KEY (organization_account_id);
+
+alter table ONLY portal.organization_accounts
+    ADD CONSTRAINT organization_accounts_organization_account_name_with_id_key UNIQUE (organization_id, organization_account_name);
 
 alter table portal.organization_account_addresses
     add CONSTRAINT organization_account_id_fk FOREIGN KEY (organization_account_id) REFERENCES portal.organization_accounts(organization_account_id);
 
-alter table ONLY portal.organization_accounts
-    ADD CONSTRAINT organization_accounts_pkey PRIMARY KEY (organization_account_id);
 
 create table portal.organizations (
     organization_id bigserial NOT NULL,
@@ -92,8 +93,8 @@ alter table ONLY portal.organizations
     ADD CONSTRAINT organizations_pkey PRIMARY KEY (organization_id);
 
 create table portal.profiles (
-    profile_id bigserial UNIQUE NOT NULL,
-    user_id bigint,
+    profile_id bigserial NOT NULL,
+    user_id bigint UNIQUE NOT NULL,
     mobile_number character varying,
     business_number character varying,
     mailing_address_id bigint
@@ -105,7 +106,7 @@ alter table ONLY portal.profiles
     ADD CONSTRAINT profiles_pkey PRIMARY KEY (profile_id);
 
 create table portal.roles (
-    role_id bigserial UNIQUE NOT NULL,
+    role_id bigserial NOT NULL,
     role_level character varying,
     role_description character varying,
     is_role_restricted boolean
@@ -120,7 +121,7 @@ alter table ONLY portal.roles
     ADD CONSTRAINT roles_role_level_key UNIQUE (role_level);
 
 create table portal.user_addresses (
-    user_address_id bigserial UNIQUE NOT NULL,
+    user_address_id bigserial NOT NULL,
     user_id bigint UNIQUE NOT NULL,
     street_number integer,
     street_name character varying,
@@ -137,7 +138,7 @@ alter table ONLY portal.user_addresses
     ADD CONSTRAINT user_addresses_pkey PRIMARY KEY (user_address_id);
 
 create table portal.users (
-    user_id bigserial UNIQUE NOT NULL,
+    user_id bigserial NOT NULL,
     email character varying NOT NULL,
     first_name character varying,
     last_name character varying,

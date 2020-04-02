@@ -46,17 +46,18 @@ public class OrganizationAccountRegistrationService {
         this.userProfileService = userProfileService;
     }
 
+    // TODO implement
     public ValidationModel isAccountManagerEmailValid(Object model) {
-        // TODO implement
         if (userProfileService.isEmailAlreadyInUse("TODO")) {
             return ValidationModel.invalid("A user with that email already exists");
         }
         return ValidationModel.valid();
     }
 
+    // TODO implement
     public ValidationModel isAccountNameValid(Object model) {
-        // TODO implement
-        if (isOrganizationAccountNameInUse("TODO")) {
+
+        if (isOrganizationAccountNameInUse("TODO orgName", "TODO")) {
             return ValidationModel.invalid("An organization account with that name exists");
         }
         return ValidationModel.valid();
@@ -71,14 +72,17 @@ public class OrganizationAccountRegistrationService {
         OrganizationAccountEntity orgAccountEntity = createOrganizationAccount(registrationModel, orgAccountLicense, orgEntity);
         OrganizationAccountAddressEntity orgAccountAddressEntity = createOrganizationAccountAddress(registrationModel.getOrganizationAddress(), orgAccountEntity);
 
-        registerOrganizationAccountManager(registrationModel.getAccountManager());
+        registerOrganizationAccountManager(registrationModel.getAccountManager(), orgAccountEntity);
 
         createOrganizationAccountProfile(
                 orgAccountEntity, orgAccountAddressEntity, registrationModel.getBusinessPhoneNumber());
     }
 
-    private boolean isOrganizationAccountNameInUse(String organizationAccountName) {
-        return organizationAccountRepository.findFirstByOrganizationAccountName(organizationAccountName).isPresent();
+    private boolean isOrganizationAccountNameInUse(String organizationName, String organizationAccountName) {
+        return organizationRepository.findFirstByOrganizationName(organizationName)
+                .map(OrganizationEntity::getOrganizationId)
+                .filter(orgId -> organizationAccountRepository.findFirstByOrganizationIdAndOrganizationAccountName(orgId, organizationAccountName).isPresent())
+                .isPresent();
     }
 
     private LicenseEntity getAndValidateLicenseByHash(UUID licenseHash) {
@@ -113,15 +117,15 @@ public class OrganizationAccountRegistrationService {
         return organizationAccountAddressRepository.save(orgAccountAddressEntityToSave);
     }
 
-    private void registerOrganizationAccountManager(OrganizationAccountManagerRegistrationModel accountManagerModel) {
+    private void registerOrganizationAccountManager(OrganizationAccountManagerRegistrationModel accountManagerModel, OrganizationAccountEntity organizationAccount) {
         UserRegistrationModel organizationAccountManagerToRegister = new UserRegistrationModel(
                 accountManagerModel.getFirstName(), accountManagerModel.getLastName(), accountManagerModel.getEmail(), accountManagerModel.getPassword(), "Pipeline Business");
-        Long registeredUserId = userRegistrationService.registerUser(organizationAccountManagerToRegister, true);
+        Long registeredUserId = userRegistrationService.registerUser(organizationAccountManagerToRegister, organizationAccount.getOrganizationAccountId());
 
         UserProfileUpdateModel accountManagerProfileUpdateModel = new UserProfileUpdateModel(
                 accountManagerModel.getFirstName(), accountManagerModel.getLastName(), accountManagerModel.getEmail(),
                 accountManagerModel.getUserAddress(), accountManagerModel.getMobilePhoneNumber(), accountManagerModel.getBusinessPhoneNumber());
-        userProfileService.updateProfile(registeredUserId, accountManagerProfileUpdateModel);
+        userProfileService.updateProfileWithoutPermissionsCheck(registeredUserId, accountManagerProfileUpdateModel);
     }
 
     private OrganizationAccountProfileEntity createOrganizationAccountProfile(OrganizationAccountEntity organizationAccount, OrganizationAccountAddressEntity organizationAccountAddress, String businessPhoneNumber) {
@@ -136,11 +140,7 @@ public class OrganizationAccountRegistrationService {
         isBlankAddError(errorFields, "Organization Account Name", registrationModel.getOrganizationAccountName());
         isBlankAddError(errorFields, "Business Phone Number", registrationModel.getBusinessPhoneNumber());
 
-        if (registrationModel.getLicenseHash() == null) {
-            errorFields.add("License is blank");
-        }
-
-        if (isOrganizationAccountNameInUse(registrationModel.getOrganizationAccountName())) {
+        if (isOrganizationAccountNameInUse(registrationModel.getOrganizationName(), registrationModel.getOrganizationAccountName())) {
             errorFields.add("Organization Account Name is already in use");
         }
 

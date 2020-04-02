@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -56,7 +57,7 @@ public class UserProfileService {
         // Any failed lookups after the above validation are fatal.
         Supplier<ResponseStatusException> internalServerError = () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
 
-        ProfileEntity profileEntity = profileRepository.findByUserId(userId).orElse(null);
+        ProfileEntity profileEntity = profileRepository.findFirstByUserId(userId).orElse(null);
         if (profileEntity == null) {
             profileEntity = doInitializeProfile(userId)
                     .orElseThrow(internalServerError);
@@ -86,6 +87,15 @@ public class UserProfileService {
     @Transactional
     public void updateProfile(Long userId, UserProfileUpdateModel updateModel) {
         validateUserId(userId);
+        updateProfileWithoutPermissionsCheck(userId, updateModel);
+    }
+
+    /**
+     * For use when permission to perform this action has already been validated, but that
+     * validation is not reflected in the HTTP Session (e.g. during Organization Account creation).
+     */
+    @Transactional
+    public void updateProfileWithoutPermissionsCheck(@NotNull Long userId, UserProfileUpdateModel updateModel) {
         validateUpdateRequest(updateModel);
 
         // Any failed lookups after the above validation are fatal.
@@ -103,7 +113,7 @@ public class UserProfileService {
         UserEntity userToSave = new UserEntity(oldUser.getUserId(), updateModel.getEmail(), updateModel.getFirstName(), updateModel.getLastName(), oldUser.getIsActive());
         userRepository.save(userToSave);
 
-        ProfileEntity oldProfile = profileRepository.findByUserId(userId)
+        ProfileEntity oldProfile = profileRepository.findFirstByUserId(userId)
                 .orElseThrow(internalServerError);
 
         ProfileEntity profileEntityToSave = new ProfileEntity(
@@ -126,7 +136,7 @@ public class UserProfileService {
     }
 
     private Optional<ProfileEntity> doInitializeProfile(Long userId) {
-        Optional<ProfileEntity> existingProfile = profileRepository.findByUserId(userId);
+        Optional<ProfileEntity> existingProfile = profileRepository.findFirstByUserId(userId);
         if (existingProfile.isPresent()) {
             return Optional.empty();
         }

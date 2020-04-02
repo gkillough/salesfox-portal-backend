@@ -13,7 +13,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "portal", name = "organization_account_address_id")
+@Table(schema = "portal", name = "organization_account_addresses")
 public class OrganizationAccountAddressEntity extends AbstractAddressEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

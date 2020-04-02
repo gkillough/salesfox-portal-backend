@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Component
 public interface OrganizationAccountRepository extends JpaRepository<OrganizationAccountEntity, Long> {
-    Optional<OrganizationAccountEntity> findFirstByOrganizationAccountName(String organizationAccountName);
+    Optional<OrganizationAccountEntity> findFirstByOrganizationIdAndOrganizationAccountName(Long organizationId, String organizationAccountName);
 
     Optional<OrganizationAccountEntity> findFirstByLicenseId(Long licenseId);
 

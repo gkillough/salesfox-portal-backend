@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-org-role-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: roles
+            columns:
+              - column:
+                  name: role_level
+                  value: ORGANIZATION_ACCOUNT_MANAGER
+              - column:
+                  name: role_description
+                  value: A user who can manage an orgainzation's profile and users.
+              - column:
+                  name: is_role_restricted
+                  valueBoolean: false
+
+  - changeSet:
+      id: add-org-role-2
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: roles
+            columns:
+              - column:
+                  name: role_level
+                  value: ORGANIZATION_SALES_REP_MANAGER
+              - column:
+                  name: role_description
+                  value: A user of an organization who manages a subset of the organization's users.
+              - column:
+                  name: is_role_restricted
+                  valueBoolean: false
+
+  - changeSet:
+      id: add-org-role-3
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: roles
+            columns:
+              - column:
+                  name: role_level
+                  value: ORGANIZATION_SALES_REP
+              - column:
+                  name: role_description
+                  value: A basic user of an organization.
+              - column:
+                  name: is_role_restricted
+                  valueBoolean: false

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -42,21 +43,31 @@ public class UserRegistrationService {
     }
 
     /**
-     * @param registrationModel  a model containing the fields required to register a user
-     * @param isOrganizationUser a flag to indicate whether the user being created is for an organization
+     * @param registrationModel a model containing the fields required to register a user
      * @return the id of the registered user
      */
     @Transactional
-    public Long registerUser(UserRegistrationModel registrationModel, boolean isOrganizationUser) {
-        validateRegistrationModel(registrationModel);
-        return registerValidUser(registrationModel, isOrganizationUser);
+    public Long registerUser(UserRegistrationModel registrationModel) {
+        return registerUser(registrationModel, null);
     }
 
-    private Long registerValidUser(UserRegistrationModel registrationModel, boolean isOrganizationUser) {
-        UserEntity userEntity = saveUserInfo(registrationModel.getFirstName(), registrationModel.getLastName(), registrationModel.getEmail());
-        OrganizationAccountEntity organizationAccountEntity = savePlanInfo(registrationModel.getPlanType(), isOrganizationUser);
+    /**
+     * @param registrationModel     a model containing the fields required to register a user
+     * @param organizationAccountId a nullable id to indicate which organization account to assign the user to
+     * @return the id of the registered user
+     */
+    @Transactional
+    public Long registerUser(UserRegistrationModel registrationModel, @Nullable Long organizationAccountId) {
+        validateRegistrationModel(registrationModel);
+        return registerValidUser(registrationModel, organizationAccountId);
+    }
 
-        RoleEntity roleEntity = getRoleInfo(registrationModel.getPlanType(), isOrganizationUser);
+    private Long registerValidUser(UserRegistrationModel registrationModel, @Nullable Long organizationAccountId) {
+        UserEntity userEntity = saveUserInfo(registrationModel.getFirstName(), registrationModel.getLastName(), registrationModel.getEmail());
+        OrganizationAccountEntity organizationAccountEntity = savePlanInfo(registrationModel.getPlanType(), organizationAccountId);
+
+        boolean isOrgUser = organizationAccountId != null;
+        RoleEntity roleEntity = getRoleInfo(registrationModel.getPlanType(), isOrgUser);
         saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
         saveMembershipInfo(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId(), roleEntity.getRoleId());
         profileRepository.initializeProfile(userEntity.getUserId());
@@ -73,14 +84,15 @@ public class UserRegistrationService {
         return userRepository.save(newUserToSave);
     }
 
-    private OrganizationAccountEntity savePlanInfo(String planName, boolean isOrganizationUser) {
-        if (!isOrganizationUser) {
+    private OrganizationAccountEntity savePlanInfo(String planName, @Nullable Long organizationAccountId) {
+        if (organizationAccountId == null) {
             // TODO make this consistent with the UI, then use constants
             if (!planName.toLowerCase().contains("basic") && !planName.toLowerCase().contains("premium")) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid plan selected. To create a business account please contact us.");
             }
         }
-        return organizationAccountRepository.findFirstByOrganizationAccountName(planName)
+
+        return organizationAccountRepository.findById(organizationAccountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No plan with the name '[" + planName + "]' exists"));
     }
 

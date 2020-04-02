@@ -1,6 +1,7 @@
 package com.usepipeline.portal.web.common;
 
 import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +11,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@Slf4j
 @RestController
 public class DefaultLocationsController implements ErrorController, AnonymousAccessible {
     public static final String ROOT_ENDPOINT = "/";
@@ -24,6 +26,7 @@ public class DefaultLocationsController implements ErrorController, AnonymousAcc
 
     @RequestMapping(ERROR_ENDPOINT)
     public String errorPage(HttpServletRequest request, HttpServletResponse response) {
+        log.debug("Error endpoint reached");
         Object errorStatusCodeObject = request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
         if (null != errorStatusCodeObject) {
             int responseStatus = Integer.parseInt(errorStatusCodeObject.toString());
