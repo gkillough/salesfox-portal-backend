@@ -1,7 +1,9 @@
 package com.usepipeline.portal.web.registration.user;
 
+import com.usepipeline.portal.common.FieldValidationUtils;
 import com.usepipeline.portal.database.account.entity.*;
 import com.usepipeline.portal.database.account.repository.*;
+import com.usepipeline.portal.web.registration.organization.OrganizationConstants;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.user.profile.UserProfileService;
 import lombok.extern.slf4j.Slf4j;
@@ -24,18 +26,20 @@ public class UserRegistrationService {
     private UserRepository userRepository;
     private LoginRepository loginRepository;
     private RoleRepository roleRepository;
+    private OrganizationRepository organizationRepository;
     private OrganizationAccountRepository organizationAccountRepository;
     private MembershipRepository membershipRepository;
     private UserProfileService profileRepository;
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserRegistrationService(UserRepository userRepository, LoginRepository loginRepository,
-                                   RoleRepository roleRepository, OrganizationAccountRepository organizationAccountRepository,
+    public UserRegistrationService(UserRepository userRepository, LoginRepository loginRepository, RoleRepository roleRepository,
+                                   OrganizationRepository organizationRepository, OrganizationAccountRepository organizationAccountRepository,
                                    MembershipRepository membershipRepository, UserProfileService profileRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.loginRepository = loginRepository;
         this.roleRepository = roleRepository;
+        this.organizationRepository = organizationRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.membershipRepository = membershipRepository;
         this.profileRepository = profileRepository;
@@ -48,26 +52,30 @@ public class UserRegistrationService {
      */
     @Transactional
     public Long registerUser(UserRegistrationModel registrationModel) {
-        return registerUser(registrationModel, null);
+        Long defaultPipelineOrganizationId = organizationRepository.findFirstByOrganizationName(OrganizationConstants.DEFAULT_PIPELINE_ORG_NAME)
+                .map(OrganizationEntity::getOrganizationId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+        return registerOrganizationUser(registrationModel, defaultPipelineOrganizationId, null);
     }
 
     /**
-     * @param registrationModel     a model containing the fields required to register a user
-     * @param organizationAccountId a nullable id to indicate which organization account to assign the user to
+     * @param registrationModel a model containing the fields required to register a user
+     * @param organizationId    an id to indicate which organization to assign to the user
+     * @param role              a nullable role to indicate which role to assign to the user
      * @return the id of the registered user
      */
     @Transactional
-    public Long registerUser(UserRegistrationModel registrationModel, @Nullable Long organizationAccountId) {
+    public Long registerOrganizationUser(UserRegistrationModel registrationModel, Long organizationId, @Nullable String role) {
         validateRegistrationModel(registrationModel);
-        return registerValidUser(registrationModel, organizationAccountId);
+        return registerValidUser(registrationModel, organizationId, role);
     }
 
-    private Long registerValidUser(UserRegistrationModel registrationModel, @Nullable Long organizationAccountId) {
+    private Long registerValidUser(UserRegistrationModel registrationModel, Long organizationId, @Nullable String role) {
         UserEntity userEntity = saveUserInfo(registrationModel.getFirstName(), registrationModel.getLastName(), registrationModel.getEmail());
-        OrganizationAccountEntity organizationAccountEntity = savePlanInfo(registrationModel.getPlanType(), organizationAccountId);
 
-        boolean isOrgUser = organizationAccountId != null;
-        RoleEntity roleEntity = getRoleInfo(registrationModel.getPlanType(), isOrgUser);
+        RoleEntity roleEntity = getRoleInfo(registrationModel.getPlanType(), role);
+        OrganizationAccountEntity organizationAccountEntity = getPlanInfo(registrationModel.getPlanType(), organizationId);
+
         saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
         saveMembershipInfo(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId(), roleEntity.getRoleId());
         profileRepository.initializeProfile(userEntity.getUserId());
@@ -84,33 +92,25 @@ public class UserRegistrationService {
         return userRepository.save(newUserToSave);
     }
 
-    private OrganizationAccountEntity savePlanInfo(String planName, @Nullable Long organizationAccountId) {
-        if (organizationAccountId == null) {
-            // TODO make this consistent with the UI, then use constants
-            if (!planName.toLowerCase().contains("basic") && !planName.toLowerCase().contains("premium")) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid plan selected. To create a business account please contact us.");
-            }
-        }
-
-        return organizationAccountRepository.findById(organizationAccountId)
+    private OrganizationAccountEntity getPlanInfo(String planName, Long organizationId) {
+        return organizationAccountRepository.findFirstByOrganizationIdAndOrganizationAccountName(organizationId, planName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No plan with the name '[" + planName + "]' exists"));
     }
 
-    private RoleEntity getRoleInfo(String planName, boolean isOrganizationUser) {
-        String portalRole = PortalAuthorityConstants.PIPELINE_BASIC_USER;
-        if (isOrganizationUser) {
-            portalRole = PortalAuthorityConstants.ORGANIZATION_ACCOUNT_MANAGER;
-        }
-        // TODO make this consistent with the UI, then use constants
-        else if (planName.toLowerCase().contains("premium")) {
+    private RoleEntity getRoleInfo(String planName, @Nullable String role) {
+        String portalRole;
+        if (role != null) {
+            portalRole = role;
+        } else if (OrganizationConstants.PLAN_PIPELINE_BASIC_DISPLAY_NAME.equals(planName)) {
+            portalRole = PortalAuthorityConstants.PIPELINE_BASIC_USER;
+        } else if (OrganizationConstants.PLAN_PIPELINE_PREMIUM_DISPLAY_NAME.equals(planName)) {
             portalRole = PortalAuthorityConstants.PIPELINE_PREMIUM_USER;
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid plan selected. To create a business account please contact us.");
         }
 
         return roleRepository.findFirstByRoleLevel(portalRole)
-                .orElseThrow(() -> {
-                    log.warn("No role for the plan '[" + planName + "]' exists");
-                    return new ResponseStatusException(HttpStatus.BAD_REQUEST);
-                });
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
     private void saveLoginInfo(Long userId, String password) {
@@ -135,6 +135,10 @@ public class UserRegistrationService {
         if (!errorFields.isEmpty()) {
             String commaSeparatedErrors = String.join(", ", errorFields);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The field(s) [%s] cannot be blank", commaSeparatedErrors));
+        }
+
+        if (!FieldValidationUtils.isValidEmailAddress(registrationModel.getEmail(), false)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The email [%s] is invalid", registrationModel.getEmail()));
         }
     }
 

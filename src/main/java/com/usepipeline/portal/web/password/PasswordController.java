@@ -34,7 +34,7 @@ public class PasswordController implements CsrfIgnorable, AnonymousAccessible {
     }
 
     @PostMapping(UPDATE_ENDPOINT)
-    @PreAuthorize(PortalAuthorityConstants.UPDATE_PASSWORD_PERMISSION_ROLE_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.UPDATE_PASSWORD_PERMISSION_AUTH_CHECK)
     public boolean updatePassword(HttpServletResponse response, @RequestBody UpdatePasswordModel updatePasswordModel) {
         return passwordService.updatePassword(response, updatePasswordModel);
     }

@@ -9,6 +9,7 @@ import com.usepipeline.portal.web.registration.organization.model.OrganizationAc
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationService;
+import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.user.profile.UserProfileService;
 import com.usepipeline.portal.web.user.profile.model.UserProfileUpdateModel;
 import org.apache.commons.lang3.StringUtils;
@@ -72,7 +73,7 @@ public class OrganizationAccountRegistrationService {
         OrganizationAccountEntity orgAccountEntity = createOrganizationAccount(registrationModel, orgAccountLicense, orgEntity);
         OrganizationAccountAddressEntity orgAccountAddressEntity = createOrganizationAccountAddress(registrationModel.getOrganizationAddress(), orgAccountEntity);
 
-        registerOrganizationAccountManager(registrationModel.getAccountManager(), orgAccountEntity);
+        registerOrganizationAccountManager(registrationModel.getAccountManager(), orgEntity, orgAccountEntity);
 
         createOrganizationAccountProfile(
                 orgAccountEntity, orgAccountAddressEntity, registrationModel.getBusinessPhoneNumber());
@@ -117,10 +118,10 @@ public class OrganizationAccountRegistrationService {
         return organizationAccountAddressRepository.save(orgAccountAddressEntityToSave);
     }
 
-    private void registerOrganizationAccountManager(OrganizationAccountManagerRegistrationModel accountManagerModel, OrganizationAccountEntity organizationAccount) {
+    private void registerOrganizationAccountManager(OrganizationAccountManagerRegistrationModel accountManagerModel, OrganizationEntity organization, OrganizationAccountEntity organizationAccount) {
         UserRegistrationModel organizationAccountManagerToRegister = new UserRegistrationModel(
-                accountManagerModel.getFirstName(), accountManagerModel.getLastName(), accountManagerModel.getEmail(), accountManagerModel.getPassword(), "Pipeline Business");
-        Long registeredUserId = userRegistrationService.registerUser(organizationAccountManagerToRegister, organizationAccount.getOrganizationAccountId());
+                accountManagerModel.getFirstName(), accountManagerModel.getLastName(), accountManagerModel.getEmail(), accountManagerModel.getPassword(), organizationAccount.getOrganizationAccountName());
+        Long registeredUserId = userRegistrationService.registerOrganizationUser(organizationAccountManagerToRegister, organization.getOrganizationId(), PortalAuthorityConstants.ORGANIZATION_ACCOUNT_MANAGER);
 
         UserProfileUpdateModel accountManagerProfileUpdateModel = new UserProfileUpdateModel(
                 accountManagerModel.getFirstName(), accountManagerModel.getLastName(), accountManagerModel.getEmail(),
