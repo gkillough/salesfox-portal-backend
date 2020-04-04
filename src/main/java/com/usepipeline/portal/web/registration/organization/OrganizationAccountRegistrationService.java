@@ -5,7 +5,9 @@ import com.usepipeline.portal.common.model.PortalAddressModel;
 import com.usepipeline.portal.database.account.entity.*;
 import com.usepipeline.portal.database.account.repository.*;
 import com.usepipeline.portal.web.common.model.ValidationModel;
+import com.usepipeline.portal.web.registration.organization.model.EmailToValidateModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountManagerRegistrationModel;
+import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountNameToValidateModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationService;
@@ -47,18 +49,23 @@ public class OrganizationAccountRegistrationService {
         this.userProfileService = userProfileService;
     }
 
-    // TODO implement
-    public ValidationModel isAccountManagerEmailValid(Object model) {
-        if (userProfileService.isEmailAlreadyInUse("TODO")) {
+    public ValidationModel isAccountManagerEmailValid(EmailToValidateModel model) {
+        if (userProfileService.isEmailAlreadyInUse(model.getEmail())) {
             return ValidationModel.invalid("A user with that email already exists");
         }
         return ValidationModel.valid();
     }
 
-    // TODO implement
-    public ValidationModel isAccountNameValid(Object model) {
+    public ValidationModel isOrganizationAccountNameValid(OrganizationAccountNameToValidateModel model) {
+        if (StringUtils.isBlank(model.getOrganizationName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Organization Name cannot be blank.");
+        }
 
-        if (isOrganizationAccountNameInUse("TODO orgName", "TODO")) {
+        if (StringUtils.isBlank(model.getOrganizationAccountName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Organization Account Name cannot be blank.");
+        }
+
+        if (isOrganizationAccountNameInUse(model.getOrganizationName(), model.getOrganizationAccountName())) {
             return ValidationModel.invalid("An organization account with that name exists");
         }
         return ValidationModel.valid();
@@ -80,10 +87,13 @@ public class OrganizationAccountRegistrationService {
     }
 
     private boolean isOrganizationAccountNameInUse(String organizationName, String organizationAccountName) {
-        return organizationRepository.findFirstByOrganizationName(organizationName)
-                .map(OrganizationEntity::getOrganizationId)
-                .filter(orgId -> organizationAccountRepository.findFirstByOrganizationIdAndOrganizationAccountName(orgId, organizationAccountName).isPresent())
-                .isPresent();
+        Optional<Long> optionalOrganizationId = organizationRepository.findFirstByOrganizationName(organizationName).map(OrganizationEntity::getOrganizationId);
+        if (optionalOrganizationId.isPresent()) {
+            return organizationAccountRepository.findFirstByOrganizationIdAndOrganizationAccountName(optionalOrganizationId.get(), organizationAccountName).isPresent();
+        } else {
+            // If no organization exists yet, then no account names exist yet.
+            return true;
+        }
     }
 
     private LicenseEntity getAndValidateLicenseByHash(UUID licenseHash) {
