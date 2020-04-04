@@ -58,15 +58,19 @@ public class OrganizationAccountRegistrationService {
 
     public ValidationModel isOrganizationAccountNameValid(OrganizationAccountNameToValidateModel model) {
         if (StringUtils.isBlank(model.getOrganizationName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Organization Name cannot be blank.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Organization Name cannot be blank");
         }
 
         if (StringUtils.isBlank(model.getOrganizationAccountName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Organization Account Name cannot be blank.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Organization Account Name cannot be blank");
+        }
+
+        if (isOrganizationRestricted(model.getOrganizationName())) {
+            return ValidationModel.invalid("That Organization Name is not allowed");
         }
 
         if (isOrganizationAccountNameInUse(model.getOrganizationName(), model.getOrganizationAccountName())) {
-            return ValidationModel.invalid("An organization account with that name exists");
+            return ValidationModel.invalid("An Organization Account with that name exists");
         }
         return ValidationModel.valid();
     }
@@ -84,6 +88,10 @@ public class OrganizationAccountRegistrationService {
 
         createOrganizationAccountProfile(
                 orgAccountEntity, orgAccountAddressEntity, registrationModel.getBusinessPhoneNumber());
+    }
+
+    private boolean isOrganizationRestricted(String organizationName) {
+        return OrganizationConstants.DEFAULT_PIPELINE_ORG_NAME.equals(organizationName);
     }
 
     private boolean isOrganizationAccountNameInUse(String organizationName, String organizationAccountName) {
@@ -151,22 +159,26 @@ public class OrganizationAccountRegistrationService {
         isBlankAddError(errorFields, "Organization Account Name", registrationModel.getOrganizationAccountName());
         isBlankAddError(errorFields, "Business Phone Number", registrationModel.getBusinessPhoneNumber());
 
+        if (isOrganizationRestricted(registrationModel.getOrganizationName())) {
+            errorFields.add("That Organization Name is not allowed");
+        }
+
         if (isOrganizationAccountNameInUse(registrationModel.getOrganizationName(), registrationModel.getOrganizationAccountName())) {
-            errorFields.add("Organization Account Name is already in use");
+            errorFields.add("That Organization Account Name is already in use");
         }
 
         if (!FieldValidationUtils.isValidUSPhoneNumber(registrationModel.getBusinessPhoneNumber(), false)) {
-            errorFields.add("Organization Account Phone Number is in an invalid format");
+            errorFields.add("That Organization Account Phone Number is in an invalid format");
         }
 
         if (!FieldValidationUtils.isValidUSAddress(registrationModel.getOrganizationAddress(), true)) {
-            errorFields.add("Organization Account Address is invalid");
+            errorFields.add("That Organization Account Address is invalid");
         }
 
         validateOrganizationAccountManager(errorFields, registrationModel.getAccountManager());
 
         if (userProfileService.isEmailAlreadyInUse(registrationModel.getAccountManager().getEmail())) {
-            errorFields.add("Account Manager Email is already in use");
+            errorFields.add("That Account Manager Email is already in use");
         }
 
         if (!errorFields.isEmpty()) {
