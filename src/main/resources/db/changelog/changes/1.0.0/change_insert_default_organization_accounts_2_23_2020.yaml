@@ -15,6 +15,21 @@ databaseChangeLog:
                   valueBoolean: true
 
   - changeSet:
+      id: insert-default-org-acc-1a
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organizations
+            columns:
+              - column:
+                  name: organization_name
+                  value: Pipeline for Individuals
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
       id: insert-default-org-acc-2
       author: gavinkillough
       changes:
@@ -111,7 +126,7 @@ databaseChangeLog:
                   valueComputed: GET_LICENSE_ID_BY_HASH('dbf2c289-7ffb-4b66-9162-457bc5743023')
               - column:
                   name: organization_id
-                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pipeline Organization')
+                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pipeline for Individuals')
               - column:
                   name: is_active
                   valueBoolean: true
@@ -132,7 +147,7 @@ databaseChangeLog:
                   valueComputed: GET_LICENSE_ID_BY_HASH('e65000ad-c9c2-49ad-9622-a033c7b7d74a')
               - column:
                   name: organization_id
-                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pipeline Organization')
+                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pipeline for Individuals')
               - column:
                   name: is_active
                   valueBoolean: true

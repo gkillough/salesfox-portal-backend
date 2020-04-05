@@ -1,10 +1,10 @@
 package com.usepipeline.portal.web.user.common;
 
-import com.usepipeline.portal.database.authentication.entity.MembershipEntity;
-import com.usepipeline.portal.database.authentication.entity.UserEntity;
-import com.usepipeline.portal.database.authentication.repository.MembershipRepository;
-import com.usepipeline.portal.database.authentication.repository.RoleRepository;
-import com.usepipeline.portal.database.authentication.repository.UserRepository;
+import com.usepipeline.portal.database.account.entity.MembershipEntity;
+import com.usepipeline.portal.database.account.entity.UserEntity;
+import com.usepipeline.portal.database.account.repository.MembershipRepository;
+import com.usepipeline.portal.database.account.repository.RoleRepository;
+import com.usepipeline.portal.database.account.repository.UserRepository;
 import com.usepipeline.portal.web.security.authentication.SecurityContextUtils;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.user.role.model.UserRoleModel;

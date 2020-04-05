@@ -15,6 +15,14 @@ databaseChangeLog:
       file: change_insert_default_organization_accounts_2_23_2020.yaml
       relativeToChangelogFile: true
 
+  - include:
+      file: change_create_organization_account_profiles_table_3_31_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: change_add_organization_roles_4_1_2020.yaml
+      relativeToChangelogFile: true
+
   # TODO REMOVE DEVELOPMENT DATA BEFORE RELEASE
   - include:
       file: development/change_add_test_users_3_22_2019.yaml

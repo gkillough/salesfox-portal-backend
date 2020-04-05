@@ -1,9 +1,9 @@
 package com.usepipeline.portal.web.security.authentication.user;
 
-import com.usepipeline.portal.database.authentication.entity.LoginEntity;
-import com.usepipeline.portal.database.authentication.entity.UserEntity;
-import com.usepipeline.portal.database.authentication.repository.LoginRepository;
-import com.usepipeline.portal.database.authentication.repository.UserRepository;
+import com.usepipeline.portal.database.account.entity.LoginEntity;
+import com.usepipeline.portal.database.account.entity.UserEntity;
+import com.usepipeline.portal.database.account.repository.LoginRepository;
+import com.usepipeline.portal.database.account.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

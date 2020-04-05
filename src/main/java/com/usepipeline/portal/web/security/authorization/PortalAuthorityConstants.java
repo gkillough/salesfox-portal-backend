@@ -8,26 +8,26 @@ public final class PortalAuthorityConstants {
     public static final String ANONYMOUS = "ANONYMOUS";
 
     public static final String PIPELINE_ADMIN = "PIPELINE_ADMIN";
-    public static final String PIPELINE_ADMIN_ROLE_CHECK = "hasRole('" + PIPELINE_ADMIN + "')";
+    public static final String PIPELINE_ADMIN_ROLE_CHECK = "hasAuthority('" + PIPELINE_ADMIN + "')";
 
     public static final String PIPELINE_BASIC_USER = "PIPELINE_BASIC_USER";
-    public static final String PIPELINE_BASIC_USER_ROLE_CHECK = "hasRole('" + PIPELINE_BASIC_USER + "')";
+    public static final String PIPELINE_BASIC_USER_AUTH_CHECK = "hasAuthority('" + PIPELINE_BASIC_USER + "')";
 
     public static final String PIPELINE_PREMIUM_USER = "PIPELINE_PREMIUM_USER";
-    public static final String PIPELINE_PREMIUM_USER_ROLE_CHECK = "hasRole('" + PIPELINE_PREMIUM_USER + "')";
+    public static final String PIPELINE_PREMIUM_USER_AUTH_CHECK = "hasAuthority('" + PIPELINE_PREMIUM_USER + "')";
+
+    public static final String ORGANIZATION_ACCOUNT_OWNER = "ORGANIZATION_ACCOUNT_OWNER";
+    public static final String ORGANIZATION_ACCOUNT_OWNER_AUTH_CHECK = "hasAuthority('" + ORGANIZATION_ACCOUNT_OWNER + "')";
 
     public static final String ORGANIZATION_ACCOUNT_MANAGER = "ORGANIZATION_ACCOUNT_MANAGER";
-    public static final String ORGANIZATION_ACCOUNT_MANAGER_ROLE_CHECK = "hasRole('" + ORGANIZATION_ACCOUNT_MANAGER + "')";
+    public static final String ORGANIZATION_ACCOUNT_MANAGER_AUTH_CHECK = "hasAuthority('" + ORGANIZATION_ACCOUNT_MANAGER + "')";
 
-    public static final String ORGANIZATION_SALES_REP_MANAGER = "ORGANIZATION_SALES_REP_MANAGER";
-    public static final String ORGANIZATION_SALES_REP_MANAGER_ROLE_CHECK = "hasRole('" + ORGANIZATION_SALES_REP_MANAGER + "')";
-
-    public static final String ORGANIZATION_SALES_REP = "ORGANIZATION_SALES_REP";
-    public static final String ORGANIZATION_SALES_REP_ROLE_CHECK = "hasRole('" + ORGANIZATION_SALES_REP + "')";
+    public static final String ORGANIZATION_ACCOUNT_REP = "ORGANIZATION_ACCOUNT_REP";
+    public static final String ORGANIZATION_ACCOUNT_REP_AUTH_CHECK = "hasAuthority('" + ORGANIZATION_ACCOUNT_REP + "')";
 
     // Application Authorities
     // Note: https://stackoverflow.com/questions/42146110/when-should-i-prefix-role-with-spring-security
     public static final String UPDATE_PASSWORD_PERMISSION = "UPDATE_PASSWORD_PERMISSION";
-    public static final String UPDATE_PASSWORD_PERMISSION_ROLE_CHECK = "hasAuthority('" + UPDATE_PASSWORD_PERMISSION + "')";
+    public static final String UPDATE_PASSWORD_PERMISSION_AUTH_CHECK = "hasAuthority('" + UPDATE_PASSWORD_PERMISSION + "')";
 
 }

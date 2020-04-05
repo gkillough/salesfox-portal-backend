@@ -1,7 +1,7 @@
 package com.usepipeline.portal.web.user.common;
 
-import com.usepipeline.portal.database.authentication.entity.UserEntity;
-import com.usepipeline.portal.database.authentication.repository.UserRepository;
+import com.usepipeline.portal.database.account.entity.UserEntity;
+import com.usepipeline.portal.database.account.repository.UserRepository;
 import com.usepipeline.portal.web.security.authentication.SecurityContextUtils;
 import com.usepipeline.portal.web.user.common.model.CurrentUserModel;
 import com.usepipeline.portal.web.user.common.model.UserAccountModel;

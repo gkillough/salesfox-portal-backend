@@ -1,13 +1,13 @@
 package com.usepipeline.portal.web.security.authentication.user;
 
-import com.usepipeline.portal.database.authentication.entity.LoginEntity;
-import com.usepipeline.portal.database.authentication.entity.MembershipEntity;
-import com.usepipeline.portal.database.authentication.entity.RoleEntity;
-import com.usepipeline.portal.database.authentication.entity.UserEntity;
-import com.usepipeline.portal.database.authentication.repository.LoginRepository;
-import com.usepipeline.portal.database.authentication.repository.MembershipRepository;
-import com.usepipeline.portal.database.authentication.repository.RoleRepository;
-import com.usepipeline.portal.database.authentication.repository.UserRepository;
+import com.usepipeline.portal.database.account.entity.LoginEntity;
+import com.usepipeline.portal.database.account.entity.MembershipEntity;
+import com.usepipeline.portal.database.account.entity.RoleEntity;
+import com.usepipeline.portal.database.account.entity.UserEntity;
+import com.usepipeline.portal.database.account.repository.LoginRepository;
+import com.usepipeline.portal.database.account.repository.MembershipRepository;
+import com.usepipeline.portal.database.account.repository.RoleRepository;
+import com.usepipeline.portal.database.account.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

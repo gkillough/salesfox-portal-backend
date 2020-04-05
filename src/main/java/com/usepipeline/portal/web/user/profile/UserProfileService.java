@@ -2,24 +2,24 @@ package com.usepipeline.portal.web.user.profile;
 
 import com.usepipeline.portal.common.FieldValidationUtils;
 import com.usepipeline.portal.common.model.PortalAddressModel;
-import com.usepipeline.portal.database.authentication.entity.ProfileEntity;
-import com.usepipeline.portal.database.authentication.entity.UserAddressEntity;
-import com.usepipeline.portal.database.authentication.entity.UserEntity;
-import com.usepipeline.portal.database.authentication.repository.ProfileRepository;
-import com.usepipeline.portal.database.authentication.repository.UserAddressRepository;
-import com.usepipeline.portal.database.authentication.repository.UserRepository;
+import com.usepipeline.portal.database.account.entity.ProfileEntity;
+import com.usepipeline.portal.database.account.entity.UserAddressEntity;
+import com.usepipeline.portal.database.account.entity.UserEntity;
+import com.usepipeline.portal.database.account.repository.ProfileRepository;
+import com.usepipeline.portal.database.account.repository.UserAddressRepository;
+import com.usepipeline.portal.database.account.repository.UserRepository;
 import com.usepipeline.portal.web.user.common.UserAccessService;
 import com.usepipeline.portal.web.user.profile.model.UserProfileModel;
 import com.usepipeline.portal.web.user.profile.model.UserProfileUpdateModel;
 import com.usepipeline.portal.web.user.role.model.UserRoleModel;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -47,21 +47,20 @@ public class UserProfileService {
         if (userId == null) {
             return Optional.empty();
         }
-        return doInitializeProfile(userId)
-                .map(ProfileEntity::getProfileId);
+        Long profileId = getOrInitializeProfile(userId).getProfileId();
+        return Optional.of(profileId);
     }
 
-    public UserProfileModel getProfile(Long userId) {
+    public UserProfileModel retrieveProfile(Long userId) {
         validateUserId(userId);
 
         // Any failed lookups after the above validation are fatal.
-        Supplier<ResponseStatusException> internalServerError = () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        Supplier<ResponseStatusException> internalServerError = () -> {
+            log.error("Missing database entity when attempting to retrieve a user profile");
+            return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        };
 
-        ProfileEntity profileEntity = profileRepository.findByUserId(userId).orElse(null);
-        if (profileEntity == null) {
-            profileEntity = doInitializeProfile(userId)
-                    .orElseThrow(internalServerError);
-        }
+        ProfileEntity profileEntity = getOrInitializeProfile(userId);
 
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(internalServerError);
@@ -87,16 +86,27 @@ public class UserProfileService {
     @Transactional
     public void updateProfile(Long userId, UserProfileUpdateModel updateModel) {
         validateUserId(userId);
+        updateProfileWithoutPermissionsCheck(userId, updateModel);
+    }
+
+    /**
+     * For use when permission to perform this action has already been validated, but that
+     * validation is not reflected in the HTTP Session (e.g. during Organization Account creation).
+     */
+    @Transactional
+    public void updateProfileWithoutPermissionsCheck(@NotNull Long userId, UserProfileUpdateModel updateModel) {
         validateUpdateRequest(updateModel);
 
         // Any failed lookups after the above validation are fatal.
-        Supplier<ResponseStatusException> internalServerError = () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        Supplier<ResponseStatusException> internalServerError = () -> {
+            log.error("User id not present in the database: [{}]", userId);
+            return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        };
 
         UserEntity oldUser = userRepository.findById(userId)
                 .orElseThrow(internalServerError);
         if (!oldUser.getEmail().equals(updateModel.getEmail())) {
-            Optional<UserEntity> existingEmailAddress = userRepository.findFirstByEmail(updateModel.getEmail());
-            if (existingEmailAddress.isPresent()) {
+            if (isEmailAlreadyInUse(updateModel.getEmail())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This email address is already in use");
             }
             // TODO consider sending a confirmation link
@@ -105,8 +115,7 @@ public class UserProfileService {
         UserEntity userToSave = new UserEntity(oldUser.getUserId(), updateModel.getEmail(), updateModel.getFirstName(), updateModel.getLastName(), oldUser.getIsActive());
         userRepository.save(userToSave);
 
-        ProfileEntity oldProfile = profileRepository.findByUserId(userId)
-                .orElseThrow(internalServerError);
+        ProfileEntity oldProfile = getOrInitializeProfile(userId);
 
         ProfileEntity profileEntityToSave = new ProfileEntity(
                 oldProfile.getProfileId(),
@@ -119,20 +128,18 @@ public class UserProfileService {
 
         PortalAddressModel addressModel = updateModel.getAddress();
         UserAddressEntity userAddressToSave = new UserAddressEntity(oldProfile.getMailingAddressId(), oldUser.getUserId());
-        userAddressToSave.setStreetNumber(addressModel.getStreetNumber());
-        userAddressToSave.setStreetName(addressModel.getStreetName());
-        userAddressToSave.setAptSuite(addressModel.getAptSuite());
-        userAddressToSave.setCity(addressModel.getCity());
-        userAddressToSave.setState(StringUtils.upperCase(addressModel.getState()));
-        userAddressToSave.setZipCode(addressModel.getZipCode());
-        userAddressToSave.setIsBusiness(addressModel.getIsBusiness());
+        addressModel.copyFieldsToEntity(userAddressToSave);
         userAddressRepository.save(userAddressToSave);
     }
 
-    private Optional<ProfileEntity> doInitializeProfile(Long userId) {
-        Optional<ProfileEntity> existingProfile = profileRepository.findByUserId(userId);
+    public boolean isEmailAlreadyInUse(String emailAddress) {
+        return userRepository.findFirstByEmail(emailAddress).isPresent();
+    }
+
+    private ProfileEntity getOrInitializeProfile(Long userId) {
+        Optional<ProfileEntity> existingProfile = profileRepository.findFirstByUserId(userId);
         if (existingProfile.isPresent()) {
-            return Optional.empty();
+            return existingProfile.get();
         }
 
         UserAddressEntity newAddress = new UserAddressEntity(null, userId);
@@ -147,7 +154,7 @@ public class UserProfileService {
 
         ProfileEntity newProfile = new ProfileEntity(null, userId, "", "", savedAddress.getUserAddressId());
         ProfileEntity savedProfile = profileRepository.save(newProfile);
-        return Optional.of(savedProfile);
+        return savedProfile;
     }
 
     private void validateUserId(Long userId) {

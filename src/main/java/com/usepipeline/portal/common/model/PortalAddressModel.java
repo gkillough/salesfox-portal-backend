@@ -4,6 +4,7 @@ import com.usepipeline.portal.database.common.AbstractAddressEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 @Data
 @NoArgsConstructor
@@ -27,6 +28,16 @@ public class PortalAddressModel {
                 entity.getZipCode(),
                 entity.getIsBusiness()
         );
+    }
+
+    public void copyFieldsToEntity(AbstractAddressEntity entity) {
+        entity.setStreetNumber(getStreetNumber());
+        entity.setStreetName(getStreetName());
+        entity.setAptSuite(getAptSuite());
+        entity.setCity(getCity());
+        entity.setState(StringUtils.upperCase(getState()));
+        entity.setZipCode(getZipCode());
+        entity.setIsBusiness(getIsBusiness());
     }
 
 }

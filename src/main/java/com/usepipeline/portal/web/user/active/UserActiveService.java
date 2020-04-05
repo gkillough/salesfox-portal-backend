@@ -1,9 +1,9 @@
 package com.usepipeline.portal.web.user.active;
 
-import com.usepipeline.portal.database.authentication.entity.MembershipEntity;
-import com.usepipeline.portal.database.authentication.entity.UserEntity;
-import com.usepipeline.portal.database.authentication.repository.MembershipRepository;
-import com.usepipeline.portal.database.authentication.repository.UserRepository;
+import com.usepipeline.portal.database.account.entity.MembershipEntity;
+import com.usepipeline.portal.database.account.entity.UserEntity;
+import com.usepipeline.portal.database.account.repository.MembershipRepository;
+import com.usepipeline.portal.database.account.repository.UserRepository;
 import com.usepipeline.portal.web.user.common.UserAccessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

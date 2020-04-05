@@ -1,9 +1,9 @@
 package com.usepipeline.portal.web.user.role;
 
-import com.usepipeline.portal.database.authentication.entity.MembershipEntity;
-import com.usepipeline.portal.database.authentication.entity.RoleEntity;
-import com.usepipeline.portal.database.authentication.repository.MembershipRepository;
-import com.usepipeline.portal.database.authentication.repository.RoleRepository;
+import com.usepipeline.portal.database.account.entity.MembershipEntity;
+import com.usepipeline.portal.database.account.entity.RoleEntity;
+import com.usepipeline.portal.database.account.repository.MembershipRepository;
+import com.usepipeline.portal.database.account.repository.RoleRepository;
 import com.usepipeline.portal.web.user.role.model.UserRoleUpdateModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
