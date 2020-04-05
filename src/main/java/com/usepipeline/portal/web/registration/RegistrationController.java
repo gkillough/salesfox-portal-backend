@@ -1,6 +1,9 @@
 package com.usepipeline.portal.web.registration;
 
+import com.usepipeline.portal.web.common.model.EmailToValidateModel;
+import com.usepipeline.portal.web.common.model.ValidationResponseModel;
 import com.usepipeline.portal.web.registration.organization.OrganizationAccountRegistrationService;
+import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountNameToValidateModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationService;
@@ -36,6 +39,16 @@ public class RegistrationController implements CsrfIgnorable, AnonymousAccessibl
     @PostMapping("/organization")
     public void registerOrganizationAccount(@RequestBody OrganizationAccountRegistrationModel registrationRequest) {
         organizationAccountRegistrationService.registerOrganizationAccount(registrationRequest);
+    }
+
+    @PostMapping("/organization/validate/account_owner")
+    public ValidationResponseModel validateOrganizationAccountManager(@RequestBody EmailToValidateModel validationRequest) {
+        return organizationAccountRegistrationService.isAccountOwnerEmailValid(validationRequest);
+    }
+
+    @PostMapping("/organization/validate/account_name")
+    public ValidationResponseModel validateOrganizationAccountName(@RequestBody OrganizationAccountNameToValidateModel validationRequest) {
+        return organizationAccountRegistrationService.isOrganizationAccountNameValid(validationRequest);
     }
 
     @Override

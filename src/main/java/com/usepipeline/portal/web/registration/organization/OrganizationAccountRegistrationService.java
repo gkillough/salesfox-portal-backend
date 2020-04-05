@@ -4,7 +4,9 @@ import com.usepipeline.portal.common.FieldValidationUtils;
 import com.usepipeline.portal.common.model.PortalAddressModel;
 import com.usepipeline.portal.database.account.entity.*;
 import com.usepipeline.portal.database.account.repository.*;
-import com.usepipeline.portal.web.common.model.ValidationModel;
+import com.usepipeline.portal.web.common.model.EmailToValidateModel;
+import com.usepipeline.portal.web.common.model.ValidationResponseModel;
+import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountNameToValidateModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountOwnerRegistrationModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationModel;
@@ -47,20 +49,30 @@ public class OrganizationAccountRegistrationService {
         this.userProfileService = userProfileService;
     }
 
-    // TODO implement
-    public ValidationModel isAccountOwnerEmailValid(Object model) {
-        if (userProfileService.isEmailAlreadyInUse("TODO")) {
-            return ValidationModel.invalid("A user with that email already exists");
+    public ValidationResponseModel isAccountOwnerEmailValid(EmailToValidateModel model) {
+        if (userProfileService.isEmailAlreadyInUse(model.getEmail())) {
+            return ValidationResponseModel.invalid("That Email is already in use");
         }
-        return ValidationModel.valid();
+        return ValidationResponseModel.valid();
     }
 
-    // TODO implement
-    public ValidationModel isAccountNameValid(Object model) {
-        if (isOrganizationAccountNameInUse("TODO orgName", "TODO")) {
-            return ValidationModel.invalid("An organization account with that name exists");
+    public ValidationResponseModel isOrganizationAccountNameValid(OrganizationAccountNameToValidateModel model) {
+        if (StringUtils.isBlank(model.getOrganizationName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Organization Name cannot be blank");
         }
-        return ValidationModel.valid();
+
+        if (StringUtils.isBlank(model.getOrganizationAccountName())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Organization Account Name cannot be blank");
+        }
+
+        if (isOrganizationRestricted(model.getOrganizationName())) {
+            return ValidationResponseModel.invalid("That Organization Name is not allowed");
+        }
+
+        if (isOrganizationAccountNameInUse(model.getOrganizationName(), model.getOrganizationAccountName())) {
+            return ValidationResponseModel.invalid("An Organization Account with that name exists");
+        }
+        return ValidationResponseModel.valid();
     }
 
     @Transactional
@@ -147,19 +159,30 @@ public class OrganizationAccountRegistrationService {
         isBlankAddError(errorFields, "Organization Account Name", registrationModel.getOrganizationAccountName());
         isBlankAddError(errorFields, "Business Phone Number", registrationModel.getBusinessPhoneNumber());
 
+        if (isOrganizationRestricted(registrationModel.getOrganizationName())) {
+            errorFields.add("That Organization Name is not allowed");
+        }
+
         if (isOrganizationAccountNameInUse(registrationModel.getOrganizationName(), registrationModel.getOrganizationAccountName())) {
-            errorFields.add("Organization Account Name is already in use");
+            errorFields.add("That Organization Account Name is already in use");
         }
 
         if (!FieldValidationUtils.isValidUSPhoneNumber(registrationModel.getBusinessPhoneNumber(), false)) {
-            errorFields.add("Organization Account Phone Number is in an invalid format");
+            errorFields.add("That Organization Account Phone Number is in an invalid format");
         }
 
-        if (!FieldValidationUtils.isValidUSAddress(registrationModel.getOrganizationAddress(), true)) {
-            errorFields.add("Organization Account Address is invalid");
+        if (registrationModel.getOrganizationAddress() == null) {
+            errorFields.add("Missing Organization Account Address details");
+        } else if (!FieldValidationUtils.isValidUSAddress(registrationModel.getOrganizationAddress(), true)) {
+            errorFields.add("That Organization Account Address is invalid");
         }
 
-        validateOrganizationAccountOwner(errorFields, registrationModel.getAccountOwner());
+
+        if (registrationModel.getAccountOwner() == null) {
+            errorFields.add("Missing Account Owner details");
+        } else {
+            validateOrganizationAccountOwner(errorFields, registrationModel.getAccountOwner());
+        }
 
         if (userProfileService.isEmailAlreadyInUse(registrationModel.getAccountOwner().getEmail())) {
             errorFields.add("That Account Owner Email is already in use");
@@ -172,21 +195,17 @@ public class OrganizationAccountRegistrationService {
     }
 
     private void validateOrganizationAccountOwner(Collection<String> errorFields, OrganizationAccountOwnerRegistrationModel accountOwner) {
-        if (accountOwner == null) {
-            errorFields.add("Missing Account Owner details");
-        } else {
-            if (!FieldValidationUtils.isValidEmailAddress(accountOwner.getEmail(), false)) {
-                errorFields.add("Account Owner Email is invalid");
-            }
-            if (!FieldValidationUtils.isValidUSPhoneNumber(accountOwner.getMobilePhoneNumber(), true)) {
-                errorFields.add("Account Owner Mobile Phone Number is invalid");
-            }
-            if (!FieldValidationUtils.isValidUSPhoneNumber(accountOwner.getBusinessPhoneNumber(), true)) {
-                errorFields.add("Account Owner Business Phone Number is invalid");
-            }
-            if (!FieldValidationUtils.isValidUSAddress(accountOwner.getUserAddress(), true)) {
-                errorFields.add("Account Owner Address is invalid");
-            }
+        if (!FieldValidationUtils.isValidEmailAddress(accountOwner.getEmail(), false)) {
+            errorFields.add("Account Owner Email is invalid");
+        }
+        if (!FieldValidationUtils.isValidUSPhoneNumber(accountOwner.getMobilePhoneNumber(), true)) {
+            errorFields.add("Account Owner Mobile Phone Number is invalid");
+        }
+        if (!FieldValidationUtils.isValidUSPhoneNumber(accountOwner.getBusinessPhoneNumber(), true)) {
+            errorFields.add("Account Owner Business Phone Number is invalid");
+        }
+        if (!FieldValidationUtils.isValidUSAddress(accountOwner.getUserAddress(), true)) {
+            errorFields.add("Account Owner Address is invalid");
         }
     }
 
