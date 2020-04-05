@@ -16,6 +16,6 @@ public class OrganizationAccountRegistrationModel {
     private UUID licenseHash;
     private String businessPhoneNumber;
     private PortalAddressModel organizationAddress;
-    private OrganizationAccountManagerRegistrationModel accountManager;
+    private OrganizationAccountOwnerRegistrationModel accountOwner;
 
 }

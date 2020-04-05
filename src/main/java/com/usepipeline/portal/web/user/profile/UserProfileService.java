@@ -47,21 +47,20 @@ public class UserProfileService {
         if (userId == null) {
             return Optional.empty();
         }
-        return doInitializeProfile(userId)
-                .map(ProfileEntity::getProfileId);
+        Long profileId = getOrInitializeProfile(userId).getProfileId();
+        return Optional.of(profileId);
     }
 
-    public UserProfileModel getProfile(Long userId) {
+    public UserProfileModel retrieveProfile(Long userId) {
         validateUserId(userId);
 
         // Any failed lookups after the above validation are fatal.
-        Supplier<ResponseStatusException> internalServerError = () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        Supplier<ResponseStatusException> internalServerError = () -> {
+            log.error("Missing database entity when attempting to retrieve a user profile");
+            return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        };
 
-        ProfileEntity profileEntity = profileRepository.findFirstByUserId(userId).orElse(null);
-        if (profileEntity == null) {
-            profileEntity = doInitializeProfile(userId)
-                    .orElseThrow(internalServerError);
-        }
+        ProfileEntity profileEntity = getOrInitializeProfile(userId);
 
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(internalServerError);
@@ -99,7 +98,10 @@ public class UserProfileService {
         validateUpdateRequest(updateModel);
 
         // Any failed lookups after the above validation are fatal.
-        Supplier<ResponseStatusException> internalServerError = () -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        Supplier<ResponseStatusException> internalServerError = () -> {
+            log.error("User id not present in the database: [{}]", userId);
+            return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        };
 
         UserEntity oldUser = userRepository.findById(userId)
                 .orElseThrow(internalServerError);
@@ -113,8 +115,7 @@ public class UserProfileService {
         UserEntity userToSave = new UserEntity(oldUser.getUserId(), updateModel.getEmail(), updateModel.getFirstName(), updateModel.getLastName(), oldUser.getIsActive());
         userRepository.save(userToSave);
 
-        ProfileEntity oldProfile = profileRepository.findFirstByUserId(userId)
-                .orElseThrow(internalServerError);
+        ProfileEntity oldProfile = getOrInitializeProfile(userId);
 
         ProfileEntity profileEntityToSave = new ProfileEntity(
                 oldProfile.getProfileId(),
@@ -135,10 +136,10 @@ public class UserProfileService {
         return userRepository.findFirstByEmail(emailAddress).isPresent();
     }
 
-    private Optional<ProfileEntity> doInitializeProfile(Long userId) {
+    private ProfileEntity getOrInitializeProfile(Long userId) {
         Optional<ProfileEntity> existingProfile = profileRepository.findFirstByUserId(userId);
         if (existingProfile.isPresent()) {
-            return Optional.empty();
+            return existingProfile.get();
         }
 
         UserAddressEntity newAddress = new UserAddressEntity(null, userId);
@@ -153,7 +154,7 @@ public class UserProfileService {
 
         ProfileEntity newProfile = new ProfileEntity(null, userId, "", "", savedAddress.getUserAddressId());
         ProfileEntity savedProfile = profileRepository.save(newProfile);
-        return Optional.of(savedProfile);
+        return savedProfile;
     }
 
     private void validateUserId(Long userId) {

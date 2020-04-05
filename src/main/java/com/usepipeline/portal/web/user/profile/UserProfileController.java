@@ -18,7 +18,7 @@ public class UserProfileController {
 
     @GetMapping("/{user_id}")
     public UserProfileModel getUserProfile(@PathVariable(name = "user_id") Long userId) {
-        return userProfileService.getProfile(userId);
+        return userProfileService.retrieveProfile(userId);
     }
 
     @PutMapping("/{user_id}")

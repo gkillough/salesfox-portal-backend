@@ -41,9 +41,9 @@ public class RegistrationController implements CsrfIgnorable, AnonymousAccessibl
         organizationAccountRegistrationService.registerOrganizationAccount(registrationRequest);
     }
 
-    @PostMapping("/organization/validate/account_manager")
+    @PostMapping("/organization/validate/account_owner")
     public ValidationModel validateOrganizationAccountManager(@RequestBody EmailToValidateModel validationRequest) {
-        return organizationAccountRegistrationService.isAccountManagerEmailValid(validationRequest);
+        return organizationAccountRegistrationService.isAccountOwnerEmailValid(validationRequest);
     }
 
     @PostMapping("/organization/validate/account_name")

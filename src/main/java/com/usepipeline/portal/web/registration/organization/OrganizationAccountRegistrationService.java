@@ -6,8 +6,8 @@ import com.usepipeline.portal.database.account.entity.*;
 import com.usepipeline.portal.database.account.repository.*;
 import com.usepipeline.portal.web.common.model.ValidationModel;
 import com.usepipeline.portal.web.registration.organization.model.EmailToValidateModel;
-import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountManagerRegistrationModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountNameToValidateModel;
+import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountOwnerRegistrationModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationService;
@@ -49,9 +49,9 @@ public class OrganizationAccountRegistrationService {
         this.userProfileService = userProfileService;
     }
 
-    public ValidationModel isAccountManagerEmailValid(EmailToValidateModel model) {
+    public ValidationModel isAccountOwnerEmailValid(EmailToValidateModel model) {
         if (userProfileService.isEmailAlreadyInUse(model.getEmail())) {
-            return ValidationModel.invalid("A user with that email already exists");
+            return ValidationModel.invalid("That Email is already in use");
         }
         return ValidationModel.valid();
     }
@@ -84,14 +84,14 @@ public class OrganizationAccountRegistrationService {
         OrganizationAccountEntity orgAccountEntity = createOrganizationAccount(registrationModel, orgAccountLicense, orgEntity);
         OrganizationAccountAddressEntity orgAccountAddressEntity = createOrganizationAccountAddress(registrationModel.getOrganizationAddress(), orgAccountEntity);
 
-        registerOrganizationAccountManager(registrationModel.getAccountManager(), orgEntity, orgAccountEntity);
+        registerOrganizationAccountOwner(registrationModel.getAccountOwner(), orgEntity, orgAccountEntity);
 
         createOrganizationAccountProfile(
                 orgAccountEntity, orgAccountAddressEntity, registrationModel.getBusinessPhoneNumber());
     }
 
     private boolean isOrganizationRestricted(String organizationName) {
-        return OrganizationConstants.DEFAULT_PIPELINE_ORG_NAME.equals(organizationName);
+        return OrganizationConstants.INTERNAL_PIPELINE_ORG_NAME.equals(organizationName) || OrganizationConstants.PLAN_PIPELINE_BASIC_OR_PREMIUM_DEFAULT_ORG_NAME.equals(organizationName);
     }
 
     private boolean isOrganizationAccountNameInUse(String organizationName, String organizationAccountName) {
@@ -100,7 +100,7 @@ public class OrganizationAccountRegistrationService {
             return organizationAccountRepository.findFirstByOrganizationIdAndOrganizationAccountName(optionalOrganizationId.get(), organizationAccountName).isPresent();
         } else {
             // If no organization exists yet, then no account names exist yet.
-            return true;
+            return false;
         }
     }
 
@@ -136,15 +136,15 @@ public class OrganizationAccountRegistrationService {
         return organizationAccountAddressRepository.save(orgAccountAddressEntityToSave);
     }
 
-    private void registerOrganizationAccountManager(OrganizationAccountManagerRegistrationModel accountManagerModel, OrganizationEntity organization, OrganizationAccountEntity organizationAccount) {
-        UserRegistrationModel organizationAccountManagerToRegister = new UserRegistrationModel(
-                accountManagerModel.getFirstName(), accountManagerModel.getLastName(), accountManagerModel.getEmail(), accountManagerModel.getPassword(), organizationAccount.getOrganizationAccountName());
-        Long registeredUserId = userRegistrationService.registerOrganizationUser(organizationAccountManagerToRegister, organization.getOrganizationId(), PortalAuthorityConstants.ORGANIZATION_ACCOUNT_MANAGER);
+    private void registerOrganizationAccountOwner(OrganizationAccountOwnerRegistrationModel accountOwnerModel, OrganizationEntity organization, OrganizationAccountEntity organizationAccount) {
+        UserRegistrationModel organizationAccountOwnerToRegister = new UserRegistrationModel(
+                accountOwnerModel.getFirstName(), accountOwnerModel.getLastName(), accountOwnerModel.getEmail(), accountOwnerModel.getPassword(), organizationAccount.getOrganizationAccountName());
+        Long registeredUserId = userRegistrationService.registerOrganizationUser(organizationAccountOwnerToRegister, organization.getOrganizationId(), PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER);
 
-        UserProfileUpdateModel accountManagerProfileUpdateModel = new UserProfileUpdateModel(
-                accountManagerModel.getFirstName(), accountManagerModel.getLastName(), accountManagerModel.getEmail(),
-                accountManagerModel.getUserAddress(), accountManagerModel.getMobilePhoneNumber(), accountManagerModel.getBusinessPhoneNumber());
-        userProfileService.updateProfileWithoutPermissionsCheck(registeredUserId, accountManagerProfileUpdateModel);
+        UserProfileUpdateModel accountOwnerProfileUpdateModel = new UserProfileUpdateModel(
+                accountOwnerModel.getFirstName(), accountOwnerModel.getLastName(), accountOwnerModel.getEmail(),
+                accountOwnerModel.getUserAddress(), accountOwnerModel.getMobilePhoneNumber(), accountOwnerModel.getBusinessPhoneNumber());
+        userProfileService.updateProfileWithoutPermissionsCheck(registeredUserId, accountOwnerProfileUpdateModel);
     }
 
     private OrganizationAccountProfileEntity createOrganizationAccountProfile(OrganizationAccountEntity organizationAccount, OrganizationAccountAddressEntity organizationAccountAddress, String businessPhoneNumber) {
@@ -175,10 +175,10 @@ public class OrganizationAccountRegistrationService {
             errorFields.add("That Organization Account Address is invalid");
         }
 
-        validateOrganizationAccountManager(errorFields, registrationModel.getAccountManager());
+        validateOrganizationAccountOwner(errorFields, registrationModel.getAccountOwner());
 
-        if (userProfileService.isEmailAlreadyInUse(registrationModel.getAccountManager().getEmail())) {
-            errorFields.add("That Account Manager Email is already in use");
+        if (userProfileService.isEmailAlreadyInUse(registrationModel.getAccountOwner().getEmail())) {
+            errorFields.add("That Account Owner Email is already in use");
         }
 
         if (!errorFields.isEmpty()) {
@@ -187,15 +187,22 @@ public class OrganizationAccountRegistrationService {
         }
     }
 
-    private void validateOrganizationAccountManager(Collection<String> errorFields, OrganizationAccountManagerRegistrationModel accountManager) {
-        if (!FieldValidationUtils.isValidEmailAddress(accountManager.getEmail(), false)) {
-            errorFields.add("Account Manager Email is invalid");
-        } else if (!FieldValidationUtils.isValidUSPhoneNumber(accountManager.getMobilePhoneNumber(), true)) {
-            errorFields.add("Account Manager Mobile Phone Number is invalid");
-        } else if (!FieldValidationUtils.isValidUSPhoneNumber(accountManager.getBusinessPhoneNumber(), true)) {
-            errorFields.add("Account Manager Business Phone Number is invalid");
-        } else if (!FieldValidationUtils.isValidUSAddress(accountManager.getUserAddress(), true)) {
-            errorFields.add("Account Manager Address is invalid");
+    private void validateOrganizationAccountOwner(Collection<String> errorFields, OrganizationAccountOwnerRegistrationModel accountOwner) {
+        if (accountOwner == null) {
+            errorFields.add("Missing Account Owner details");
+        } else {
+            if (!FieldValidationUtils.isValidEmailAddress(accountOwner.getEmail(), false)) {
+                errorFields.add("Account Owner Email is invalid");
+            }
+            if (!FieldValidationUtils.isValidUSPhoneNumber(accountOwner.getMobilePhoneNumber(), true)) {
+                errorFields.add("Account Owner Mobile Phone Number is invalid");
+            }
+            if (!FieldValidationUtils.isValidUSPhoneNumber(accountOwner.getBusinessPhoneNumber(), true)) {
+                errorFields.add("Account Owner Business Phone Number is invalid");
+            }
+            if (!FieldValidationUtils.isValidUSAddress(accountOwner.getUserAddress(), true)) {
+                errorFields.add("Account Owner Address is invalid");
+            }
         }
     }
 
