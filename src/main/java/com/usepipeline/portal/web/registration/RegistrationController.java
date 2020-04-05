@@ -1,8 +1,8 @@
 package com.usepipeline.portal.web.registration;
 
+import com.usepipeline.portal.web.common.model.EmailToValidateModel;
 import com.usepipeline.portal.web.common.model.ValidationResponseModel;
 import com.usepipeline.portal.web.registration.organization.OrganizationAccountRegistrationService;
-import com.usepipeline.portal.web.registration.organization.model.EmailToValidateModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountNameToValidateModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationModel;
