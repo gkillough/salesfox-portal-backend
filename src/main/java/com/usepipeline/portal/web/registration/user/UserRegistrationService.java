@@ -29,20 +29,20 @@ public class UserRegistrationService {
     private OrganizationRepository organizationRepository;
     private OrganizationAccountRepository organizationAccountRepository;
     private MembershipRepository membershipRepository;
-    private UserProfileService profileRepository;
+    private UserProfileService userProfileService;
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserRegistrationService(UserRepository userRepository, LoginRepository loginRepository, RoleRepository roleRepository,
                                    OrganizationRepository organizationRepository, OrganizationAccountRepository organizationAccountRepository,
-                                   MembershipRepository membershipRepository, UserProfileService profileRepository, PasswordEncoder passwordEncoder) {
+                                   MembershipRepository membershipRepository, UserProfileService userProfileService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.loginRepository = loginRepository;
         this.roleRepository = roleRepository;
         this.organizationRepository = organizationRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.membershipRepository = membershipRepository;
-        this.profileRepository = profileRepository;
+        this.userProfileService = userProfileService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -52,7 +52,7 @@ public class UserRegistrationService {
      */
     @Transactional
     public Long registerUser(UserRegistrationModel registrationModel) {
-        Long defaultPipelineOrganizationId = organizationRepository.findFirstByOrganizationName(OrganizationConstants.DEFAULT_PIPELINE_ORG_NAME)
+        Long defaultPipelineOrganizationId = organizationRepository.findFirstByOrganizationName(OrganizationConstants.PLAN_PIPELINE_BASIC_OR_PREMIUM_DEFAULT_ORG_NAME)
                 .map(OrganizationEntity::getOrganizationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
         return registerOrganizationUser(registrationModel, defaultPipelineOrganizationId, null);
@@ -78,7 +78,7 @@ public class UserRegistrationService {
 
         saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
         saveMembershipInfo(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId(), roleEntity.getRoleId());
-        profileRepository.initializeProfile(userEntity.getUserId());
+        userProfileService.initializeProfile(userEntity.getUserId());
         return userEntity.getUserId();
     }
 

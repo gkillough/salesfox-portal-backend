@@ -9,10 +9,10 @@ databaseChangeLog:
             columns:
               - column:
                   name: role_level
-                  value: ORGANIZATION_ACCOUNT_MANAGER
+                  value: ORGANIZATION_ACCOUNT_OWNER
               - column:
                   name: role_description
-                  value: A user who can manage an orgainzation's profile and users.
+                  value: A user who creates organization accounts and manages the organization's profile and users.
               - column:
                   name: is_role_restricted
                   valueBoolean: false
@@ -27,10 +27,10 @@ databaseChangeLog:
             columns:
               - column:
                   name: role_level
-                  value: ORGANIZATION_SALES_REP_MANAGER
+                  value: ORGANIZATION_ACCOUNT_MANAGER
               - column:
                   name: role_description
-                  value: A user of an organization who manages a subset of the organization's users.
+                  value: A user of an organization account that manages a subset of users on the same organization account.
               - column:
                   name: is_role_restricted
                   valueBoolean: false
@@ -45,7 +45,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: role_level
-                  value: ORGANIZATION_SALES_REP
+                  value: ORGANIZATION_ACCOUNT_REP
               - column:
                   name: role_description
                   value: A basic user of an organization.

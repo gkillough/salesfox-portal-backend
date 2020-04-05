@@ -16,14 +16,14 @@ public final class PortalAuthorityConstants {
     public static final String PIPELINE_PREMIUM_USER = "PIPELINE_PREMIUM_USER";
     public static final String PIPELINE_PREMIUM_USER_AUTH_CHECK = "hasAuthority('" + PIPELINE_PREMIUM_USER + "')";
 
+    public static final String ORGANIZATION_ACCOUNT_OWNER = "ORGANIZATION_ACCOUNT_OWNER";
+    public static final String ORGANIZATION_ACCOUNT_OWNER_AUTH_CHECK = "hasAuthority('" + ORGANIZATION_ACCOUNT_OWNER + "')";
+
     public static final String ORGANIZATION_ACCOUNT_MANAGER = "ORGANIZATION_ACCOUNT_MANAGER";
     public static final String ORGANIZATION_ACCOUNT_MANAGER_AUTH_CHECK = "hasAuthority('" + ORGANIZATION_ACCOUNT_MANAGER + "')";
 
-    public static final String ORGANIZATION_SALES_REP_MANAGER = "ORGANIZATION_SALES_REP_MANAGER";
-    public static final String ORGANIZATION_SALES_REP_MANAGER_AUTH_CHECK = "hasAuthority('" + ORGANIZATION_SALES_REP_MANAGER + "')";
-
-    public static final String ORGANIZATION_SALES_REP = "ORGANIZATION_SALES_REP";
-    public static final String ORGANIZATION_SALES_REP_AUTH_CHECK = "hasAuthority('" + ORGANIZATION_SALES_REP + "')";
+    public static final String ORGANIZATION_ACCOUNT_REP = "ORGANIZATION_ACCOUNT_REP";
+    public static final String ORGANIZATION_ACCOUNT_REP_AUTH_CHECK = "hasAuthority('" + ORGANIZATION_ACCOUNT_REP + "')";
 
     // Application Authorities
     // Note: https://stackoverflow.com/questions/42146110/when-should-i-prefix-role-with-spring-security
