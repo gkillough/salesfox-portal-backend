@@ -2,6 +2,7 @@ package com.usepipeline.portal.web.password;
 
 import com.usepipeline.portal.common.service.email.EmailMessage;
 import com.usepipeline.portal.common.service.email.EmailMessagingService;
+import com.usepipeline.portal.common.service.email.PortalEmailException;
 import com.usepipeline.portal.database.account.entity.LoginEntity;
 import com.usepipeline.portal.database.account.entity.PasswordResetTokenEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
@@ -74,8 +75,7 @@ public class PasswordService {
         PasswordResetTokenEntity passwordResetTokenToSave = new PasswordResetTokenEntity(email, passwordResetToken, LocalDateTime.now());
         passwordResetTokenRepository.save(passwordResetTokenToSave);
 
-        EmailMessage emailMessage = createEmailMessage(email, passwordResetToken);
-        return emailMessagingService.sendMessage(emailMessage);
+        return sendPasswordResetEmail(email, passwordResetToken);
     }
 
     public boolean validateToken(HttpServletResponse response, String email, String token) {
@@ -175,12 +175,22 @@ public class PasswordService {
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 
-    private EmailMessage createEmailMessage(String email, String passwordResetToken) {
+    private boolean sendPasswordResetEmail(String email, String passwordResetToken) {
         // TODO implement
-        String url = String.format("localhost:8080/password/reset/validate?token=%s&email=%s", passwordResetToken, email);
+        String url = String.format("localhost:8080/api/password/reset/validate?token=%s&email=%s", passwordResetToken, email);
         log.info("*** REMOVE ME *** Password Reset Token: " + passwordResetToken);
         log.info("*** REMOVE ME *** Password Reset URL: " + url);
-        return null;
+
+        // TODO create email message
+        EmailMessage emailMessage = null;
+
+        try {
+            emailMessagingService.sendMessage(emailMessage);
+            return true;
+        } catch (PortalEmailException e) {
+            log.error("Problem sending password reset email", e);
+        }
+        return false;
     }
 
 }

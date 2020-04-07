@@ -1,6 +1,5 @@
-package com.usepipeline.portal.database.account.repository;
+package com.usepipeline.portal.database.organization;
 
-import com.usepipeline.portal.database.account.entity.OrganizationEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 

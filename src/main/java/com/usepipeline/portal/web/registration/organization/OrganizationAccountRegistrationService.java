@@ -2,8 +2,16 @@ package com.usepipeline.portal.web.registration.organization;
 
 import com.usepipeline.portal.common.FieldValidationUtils;
 import com.usepipeline.portal.common.model.PortalAddressModel;
-import com.usepipeline.portal.database.account.entity.*;
-import com.usepipeline.portal.database.account.repository.*;
+import com.usepipeline.portal.database.account.entity.LicenseEntity;
+import com.usepipeline.portal.database.account.repository.LicenseRepository;
+import com.usepipeline.portal.database.organization.OrganizationEntity;
+import com.usepipeline.portal.database.organization.OrganizationRepository;
+import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
+import com.usepipeline.portal.database.organization.account.OrganizationAccountRepository;
+import com.usepipeline.portal.database.organization.account.address.OrganizationAccountAddressEntity;
+import com.usepipeline.portal.database.organization.account.address.OrganizationAccountAddressRepository;
+import com.usepipeline.portal.database.organization.account.profile.OrganizationAccountProfileEntity;
+import com.usepipeline.portal.database.organization.account.profile.OrganizationAccountProfileRepository;
 import com.usepipeline.portal.web.common.model.EmailToValidateModel;
 import com.usepipeline.portal.web.common.model.ValidationResponseModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountNameToValidateModel;
