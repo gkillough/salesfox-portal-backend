@@ -1,4 +1,4 @@
-package com.usepipeline.portal.web.organization.model;
+package com.usepipeline.portal.web.organization.invitation.model;
 
 import com.usepipeline.portal.web.user.role.model.UserRoleModel;
 import lombok.AllArgsConstructor;

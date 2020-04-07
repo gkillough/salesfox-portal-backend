@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-org-account-invite-tables-1
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: organization_account_invite_tokens
+            columns:
+              - column:
+                  name: email
+                  type: VARCHAR
+              - column:
+                  name: token
+                  type: VARCHAR
+              - column:
+                  name: organization_account_id
+                  type: BIGINT
+              - column:
+                  name: role_level
+                  type: VARCHAR
+              - column:
+                  name: date_generated
+                  type: timestamp without time zone
+
+        - addPrimaryKey:
+            schemaName: portal
+            tableName: organization_account_invite_tokens
+            columnNames: email,token
+
+        - addForeignKeyConstraint:
+            constraintName: organization_account_invite_organization_account_id_fk
+            baseTableSchemaName: portal
+            baseTableName: organization_account_invite_tokens
+            baseColumnNames: organization_account_id
+            referencedTableSchemaName: portal
+            referencedTableName: organization_accounts
+            referencedColumnNames: organization_account_id

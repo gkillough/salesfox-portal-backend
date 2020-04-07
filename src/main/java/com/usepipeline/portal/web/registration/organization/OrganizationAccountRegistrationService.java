@@ -128,7 +128,11 @@ public class OrganizationAccountRegistrationService {
 
     private OrganizationEntity getOrCreateOrganizationWithName(String organizationName) {
         Optional<OrganizationEntity> optionalExistingOrganization = organizationRepository.findFirstByOrganizationName(organizationName);
-        return optionalExistingOrganization.orElseGet(() -> new OrganizationEntity(null, organizationName, true));
+        if (optionalExistingOrganization.isPresent()) {
+            return optionalExistingOrganization.get();
+        }
+        OrganizationEntity newOrganizationEntity = new OrganizationEntity(null, organizationName, true);
+        return organizationRepository.save(newOrganizationEntity);
     }
 
     private OrganizationAccountEntity createOrganizationAccount(OrganizationAccountRegistrationModel registrationModel, LicenseEntity license, OrganizationEntity organization) {
@@ -184,7 +188,6 @@ public class OrganizationAccountRegistrationService {
         } else if (!FieldValidationUtils.isValidUSAddress(registrationModel.getOrganizationAddress(), true)) {
             errorFields.add("That Organization Account Address is invalid");
         }
-
 
         if (registrationModel.getAccountOwner() == null) {
             errorFields.add("Missing Account Owner details");

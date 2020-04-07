@@ -1,11 +1,10 @@
-package com.usepipeline.portal.web.organization;
+package com.usepipeline.portal.web.organization.invitation;
 
 import com.usepipeline.portal.common.FieldValidationUtils;
 import com.usepipeline.portal.common.service.email.EmailMessage;
 import com.usepipeline.portal.common.service.email.EmailMessagingService;
 import com.usepipeline.portal.common.service.email.PortalEmailException;
 import com.usepipeline.portal.database.account.entity.MembershipEntity;
-import com.usepipeline.portal.database.account.entity.RoleEntity;
 import com.usepipeline.portal.database.account.repository.MembershipRepository;
 import com.usepipeline.portal.database.account.repository.RoleRepository;
 import com.usepipeline.portal.database.account.repository.UserRepository;
@@ -13,25 +12,25 @@ import com.usepipeline.portal.database.organization.account.OrganizationAccountE
 import com.usepipeline.portal.database.organization.account.OrganizationAccountRepository;
 import com.usepipeline.portal.database.organization.account.invite.OrganizationAccountInviteTokenEntity;
 import com.usepipeline.portal.database.organization.account.invite.OrganizationAccountInviteTokenRepository;
-import com.usepipeline.portal.web.organization.model.OrganizationAccountInvitationModel;
-import com.usepipeline.portal.web.organization.model.OrganizationAssignableRolesModel;
+import com.usepipeline.portal.web.organization.invitation.model.OrganizationAccountInvitationModel;
+import com.usepipeline.portal.web.organization.invitation.model.OrganizationAssignableRolesModel;
 import com.usepipeline.portal.web.security.authentication.SecurityContextUtils;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.user.role.model.UserRoleModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -78,13 +77,10 @@ public class OrganizationInvitationService {
     }
 
     private List<UserRoleModel> getAssignableRoleModels() {
-        ExampleMatcher matcher = ExampleMatcher
-                .matchingAll()
-                .withIgnoreNullValues();
-        Example<RoleEntity> query = Example
-                .of(new RoleEntity(null, PortalAuthorityConstants.ORGANIZATION_ROLE_PREFIX, null, false), matcher);
-        return roleRepository.findAll(query)
+        // TODO determine if we should allow multiple account owners
+        return roleRepository.findByRoleLevelStartingWith(PortalAuthorityConstants.ORGANIZATION_ROLE_PREFIX)
                 .stream()
+                .filter(role -> !role.getIsRoleRestricted())
                 .map(role -> new UserRoleModel(role.getRoleLevel(), role.getDescription()))
                 .collect(Collectors.toList());
     }
@@ -133,11 +129,9 @@ public class OrganizationInvitationService {
     }
 
     private UserDetails getLoggedInUser() {
-        Optional<UsernamePasswordAuthenticationToken> optionalAuthToken = SecurityContextUtils.retrieveUserAuthToken();
-        if (optionalAuthToken.isPresent()) {
-            return SecurityContextUtils.extractUserDetails(optionalAuthToken.get());
-        }
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        return SecurityContextUtils.retrieveUserAuthToken()
+                .map(SecurityContextUtils::extractUserDetails)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
     }
 
     private OrganizationAccountEntity getOrgAccountEntity(Long orgAccountId) {
@@ -151,7 +145,7 @@ public class OrganizationInvitationService {
     private void sendInvitationEmail(String email, String invitationToken) {
         // TODO implement
         String url = String.format("localhost:8080/api/organization/invite/validate?token=%s&email=%s", invitationToken, email);
-        log.info("*** REMOVE ME *** Invitation Link: {}", invitationToken);
+        log.info("*** REMOVE ME *** Invitation Link: {}", url);
 
         // TODO create email message
         EmailMessage emailMessage = null;

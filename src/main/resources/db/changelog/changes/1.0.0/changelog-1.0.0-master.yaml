@@ -23,6 +23,10 @@ databaseChangeLog:
       file: change_add_organization_roles_4_1_2020.yaml
       relativeToChangelogFile: true
 
+  - include:
+      file: change_create_organization_account_invite_token_table_4_6_2020.yaml
+      relativeToChangelogFile: true
+
   # TODO REMOVE DEVELOPMENT DATA BEFORE RELEASE
   - include:
       file: development/change_add_test_users_3_22_2019.yaml

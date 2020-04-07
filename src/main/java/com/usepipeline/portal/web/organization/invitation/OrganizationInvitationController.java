@@ -1,17 +1,16 @@
-package com.usepipeline.portal.web.organization;
+package com.usepipeline.portal.web.organization.invitation;
 
-import com.usepipeline.portal.web.organization.model.OrganizationAccountInvitationModel;
-import com.usepipeline.portal.web.organization.model.OrganizationAssignableRolesModel;
+import com.usepipeline.portal.web.organization.OrganizationEndpointConstants;
+import com.usepipeline.portal.web.organization.invitation.model.OrganizationAccountInvitationModel;
+import com.usepipeline.portal.web.organization.invitation.model.OrganizationAssignableRolesModel;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(OrganizationInvitationController.BASE_ENDPOINT)
+@RequestMapping(OrganizationEndpointConstants.BASE_ENDPOINT)
 public class OrganizationInvitationController {
-    public static final String BASE_ENDPOINT = "/organization";
-
     private OrganizationInvitationService organizationInvitationService;
 
     @Autowired

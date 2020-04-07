@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Entity
 @IdClass(OrganizationAccountInviteTokenPK.class)
 @Table(schema = "portal", name = "organization_account_invite_tokens")
-// TODO add table in liquibase
 public class OrganizationAccountInviteTokenEntity {
     @Id
     @Column(name = "email")

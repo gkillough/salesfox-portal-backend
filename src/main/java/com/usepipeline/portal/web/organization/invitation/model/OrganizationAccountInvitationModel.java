@@ -1,4 +1,4 @@
-package com.usepipeline.portal.web.organization.model;
+package com.usepipeline.portal.web.organization.invitation.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,5 +11,5 @@ public class OrganizationAccountInvitationModel {
     private String organizationAccountName;
     private String inviteEmail;
     private String inviteRole;
-    
+
 }
