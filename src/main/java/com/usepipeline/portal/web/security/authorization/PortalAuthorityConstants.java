@@ -30,8 +30,10 @@ public final class PortalAuthorityConstants {
     public static final String ORGANIZATION_ACCOUNT_REP_AUTH_CHECK = "hasAuthority('" + ORGANIZATION_ACCOUNT_REP + "')";
 
     // Application Authorities
-    // Note: https://stackoverflow.com/questions/42146110/when-should-i-prefix-role-with-spring-security
     public static final String UPDATE_PASSWORD_PERMISSION = "UPDATE_PASSWORD_PERMISSION";
     public static final String UPDATE_PASSWORD_PERMISSION_AUTH_CHECK = "hasAuthority('" + UPDATE_PASSWORD_PERMISSION + "')";
+
+    public static final String CREATE_ORGANIZATION_ACCOUNT_PERMISSION = "CREATE_ORGANIZATION_ACCOUNT_PERMISSION";
+    public static final String CREATE_ORGANIZATION_ACCOUNT_PERMISSION_AUTH_CHECK = "hasAuthority('" + CREATE_ORGANIZATION_ACCOUNT_PERMISSION + "')";
 
 }

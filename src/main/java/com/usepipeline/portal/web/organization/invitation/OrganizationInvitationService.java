@@ -9,9 +9,11 @@ import com.usepipeline.portal.database.account.entity.UserEntity;
 import com.usepipeline.portal.database.account.repository.RoleRepository;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
 import com.usepipeline.portal.database.organization.account.invite.OrganizationAccountInviteTokenEntity;
+import com.usepipeline.portal.database.organization.account.invite.OrganizationAccountInviteTokenPK;
 import com.usepipeline.portal.database.organization.account.invite.OrganizationAccountInviteTokenRepository;
 import com.usepipeline.portal.web.organization.invitation.model.OrganizationAccountInvitationModel;
 import com.usepipeline.portal.web.organization.invitation.model.OrganizationAssignableRolesModel;
+import com.usepipeline.portal.web.password.PasswordController;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.user.role.model.UserRoleModel;
 import com.usepipeline.portal.web.util.HttpSafeUserMembershipRetrievalService;
@@ -19,20 +21,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 public class OrganizationInvitationService {
+    public static final Duration DURATION_OF_TOKEN_VALIDITY = Duration.ofDays(7);
+
     private RoleRepository roleRepository;
     private OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository;
     private HttpSafeUserMembershipRetrievalService userMembershipRetrievalService;
@@ -69,6 +76,29 @@ public class OrganizationInvitationService {
         organizationAccountInviteTokenRepository.save(inviteEntity);
 
         sendInvitationEmail(requestModel.getInviteEmail(), invitationToken);
+    }
+
+    public void validateOrganizationAccountInvitation(HttpServletResponse response, String email, String token) {
+        if (StringUtils.isBlank(email)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The parameter 'email' cannot be blank");
+        }
+
+        if (StringUtils.isBlank(token)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The parameter 'token' cannot be blank");
+        }
+
+        OrganizationAccountInviteTokenPK invitePK = new OrganizationAccountInviteTokenPK(email, token);
+        LocalDateTime dateTokenGenerated = organizationAccountInviteTokenRepository.findById(invitePK)
+                .map(OrganizationAccountInviteTokenEntity::getDateGenerated)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
+
+        Duration timeSinceTokenGenerated = Duration.between(dateTokenGenerated, LocalDateTime.now());
+        if (timeSinceTokenGenerated.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
+            grantOrganizationAccountCreationAuthorityToUser(email);
+            response.setHeader("Location", PasswordController.UPDATE_ENDPOINT);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your invitation has expired. Please contact your organization's account owner.");
+        }
     }
 
     private List<UserRoleModel> getAssignableRoleModels() {
@@ -110,6 +140,13 @@ public class OrganizationInvitationService {
         if (!isInviteRoleAssignable) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Invite Role is invalid");
         }
+    }
+
+    private void grantOrganizationAccountCreationAuthorityToUser(String email) {
+        // FIXME can't use UsernamePasswordAuthenticationToken because the user does not exist yet
+        Authentication auth = new UsernamePasswordAuthenticationToken(
+                email, null, Collections.singletonList(new SimpleGrantedAuthority(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION)));
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     private void sendInvitationEmail(String email, String invitationToken) {

@@ -112,6 +112,7 @@ public class PasswordService {
         Optional<UsernamePasswordAuthenticationToken> optionalUserAuthToken = SecurityContextUtils.retrieveUserAuthToken();
         if (optionalUserAuthToken.isPresent()) {
             UsernamePasswordAuthenticationToken userAuthToken = optionalUserAuthToken.get();
+            // TODO this is a redundant check and can be removed
             if (canUpdatePassword(userAuthToken)) {
                 UserDetails userDetails = SecurityContextUtils.extractUserDetails(userAuthToken);
 

@@ -3,14 +3,20 @@ package com.usepipeline.portal.web.organization.invitation;
 import com.usepipeline.portal.web.organization.OrganizationEndpointConstants;
 import com.usepipeline.portal.web.organization.invitation.model.OrganizationAccountInvitationModel;
 import com.usepipeline.portal.web.organization.invitation.model.OrganizationAssignableRolesModel;
+import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping(OrganizationEndpointConstants.BASE_ENDPOINT)
-public class OrganizationInvitationController {
+public class OrganizationInvitationController implements AnonymousAccessible {
+    public static final String INVITE_ENDPOINT = "/invite";
+    public static final String VALIDATE_INVITE_ENDPOINT = INVITE_ENDPOINT + "/validate";
+
     private OrganizationInvitationService organizationInvitationService;
 
     @Autowired
@@ -24,10 +30,21 @@ public class OrganizationInvitationController {
         return organizationInvitationService.getAssignableRoles();
     }
 
-    @PostMapping("/invite")
+    @PostMapping(INVITE_ENDPOINT)
     @PreAuthorize(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER_AUTH_CHECK)
     public void sendOrganizationAccountInvitation(@RequestBody OrganizationAccountInvitationModel requestModel) {
         organizationInvitationService.sendOrganizationAccountInvitation(requestModel);
     }
 
+    @GetMapping(VALIDATE_INVITE_ENDPOINT)
+    public void validateOrganizationAccountInvitation(HttpServletResponse response, @RequestParam("email") String emailRequestParam, @RequestParam("token") String tokenRequestParam) {
+        organizationInvitationService.validateOrganizationAccountInvitation(response, emailRequestParam, tokenRequestParam);
+    }
+
+    @Override
+    public String[] allowedEndpointAntMatchers() {
+        return new String[]{
+                OrganizationEndpointConstants.BASE_ENDPOINT + VALIDATE_INVITE_ENDPOINT
+        };
+    }
 }
