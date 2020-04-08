@@ -5,23 +5,20 @@ import com.usepipeline.portal.common.service.email.EmailMessage;
 import com.usepipeline.portal.common.service.email.EmailMessagingService;
 import com.usepipeline.portal.common.service.email.PortalEmailException;
 import com.usepipeline.portal.database.account.entity.MembershipEntity;
-import com.usepipeline.portal.database.account.repository.MembershipRepository;
+import com.usepipeline.portal.database.account.entity.UserEntity;
 import com.usepipeline.portal.database.account.repository.RoleRepository;
-import com.usepipeline.portal.database.account.repository.UserRepository;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
-import com.usepipeline.portal.database.organization.account.OrganizationAccountRepository;
 import com.usepipeline.portal.database.organization.account.invite.OrganizationAccountInviteTokenEntity;
 import com.usepipeline.portal.database.organization.account.invite.OrganizationAccountInviteTokenRepository;
 import com.usepipeline.portal.web.organization.invitation.model.OrganizationAccountInvitationModel;
 import com.usepipeline.portal.web.organization.invitation.model.OrganizationAssignableRolesModel;
-import com.usepipeline.portal.web.security.authentication.SecurityContextUtils;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.user.role.model.UserRoleModel;
+import com.usepipeline.portal.web.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -37,21 +34,16 @@ import java.util.stream.Collectors;
 @Component
 public class OrganizationInvitationService {
     private RoleRepository roleRepository;
-    private UserRepository userRepository;
-    private MembershipRepository membershipRepository;
-    private OrganizationAccountRepository organizationAccountRepository;
     private OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository;
+    private HttpSafeUserMembershipRetrievalService userMembershipRetrievalService;
     private EmailMessagingService emailMessagingService;
 
     @Autowired
-    public OrganizationInvitationService(RoleRepository roleRepository, UserRepository userRepository, MembershipRepository membershipRepository,
-                                         OrganizationAccountRepository organizationAccountRepository, OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository,
-                                         EmailMessagingService emailMessagingService) {
+    public OrganizationInvitationService(RoleRepository roleRepository, OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository,
+                                         HttpSafeUserMembershipRetrievalService userMembershipRetrievalService, EmailMessagingService emailMessagingService) {
         this.roleRepository = roleRepository;
-        this.userRepository = userRepository;
-        this.membershipRepository = membershipRepository;
-        this.organizationAccountRepository = organizationAccountRepository;
         this.organizationAccountInviteTokenRepository = organizationAccountInviteTokenRepository;
+        this.userMembershipRetrievalService = userMembershipRetrievalService;
         this.emailMessagingService = emailMessagingService;
     }
 
@@ -63,14 +55,17 @@ public class OrganizationInvitationService {
     @Transactional
     public void sendOrganizationAccountInvitation(OrganizationAccountInvitationModel requestModel) {
         validateRequestModel(requestModel);
-        Long organizationAccountId = getLoggedInOrgOwnerOrgAccountId();
-        OrganizationAccountEntity orgAccountEntity = getOrgAccountEntity(organizationAccountId);
+
+        UserEntity authenticatedUser = userMembershipRetrievalService.getAuthenticatedUserEntity();
+        MembershipEntity membership = userMembershipRetrievalService.getMembershipEntity(authenticatedUser);
+        OrganizationAccountEntity orgAccountEntity = userMembershipRetrievalService.getOrganizationAccountEntity(membership);
+
         if (!orgAccountEntity.getOrganizationAccountName().equals(requestModel.getOrganizationAccountName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You do not have access to that Organization Account");
         }
 
         String invitationToken = UUID.randomUUID().toString();
-        OrganizationAccountInviteTokenEntity inviteEntity = new OrganizationAccountInviteTokenEntity(requestModel.getInviteEmail(), invitationToken, organizationAccountId, requestModel.getInviteRole(), LocalDateTime.now());
+        OrganizationAccountInviteTokenEntity inviteEntity = new OrganizationAccountInviteTokenEntity(requestModel.getInviteEmail(), invitationToken, orgAccountEntity.getOrganizationAccountId(), requestModel.getInviteRole(), LocalDateTime.now());
         organizationAccountInviteTokenRepository.save(inviteEntity);
 
         sendInvitationEmail(requestModel.getInviteEmail(), invitationToken);
@@ -115,31 +110,6 @@ public class OrganizationInvitationService {
         if (!isInviteRoleAssignable) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Invite Role is invalid");
         }
-    }
-
-    private Long getLoggedInOrgOwnerOrgAccountId() {
-        UserDetails loggedInUser = getLoggedInUser();
-        return userRepository.findFirstByEmail(loggedInUser.getUsername())
-                .flatMap(user -> membershipRepository.findFirstByUserId(user.getUserId()))
-                .map(MembershipEntity::getOrganizationAccountId)
-                .orElseThrow(() -> {
-                    log.error("User missing from database: {}" + loggedInUser.getUsername());
-                    return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-                });
-    }
-
-    private UserDetails getLoggedInUser() {
-        return SecurityContextUtils.retrieveUserAuthToken()
-                .map(SecurityContextUtils::extractUserDetails)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
-    }
-
-    private OrganizationAccountEntity getOrgAccountEntity(Long orgAccountId) {
-        return organizationAccountRepository.findById(orgAccountId)
-                .orElseThrow(() -> {
-                    log.error("Organization Account with id [{}] missing from the database", orgAccountId);
-                    return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-                });
     }
 
     private void sendInvitationEmail(String email, String invitationToken) {
