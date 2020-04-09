@@ -14,11 +14,17 @@ import com.usepipeline.portal.database.organization.account.invite.OrganizationA
 import com.usepipeline.portal.database.organization.account.invite.OrganizationAccountInviteTokenRepository;
 import com.usepipeline.portal.web.organization.invitation.model.OrganizationAccountInvitationModel;
 import com.usepipeline.portal.web.organization.invitation.model.OrganizationAssignableRolesModel;
+import com.usepipeline.portal.web.password.PasswordService;
 import com.usepipeline.portal.web.registration.RegistrationController;
+import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountUserRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationService;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
+import com.usepipeline.portal.web.user.profile.UserProfileService;
+import com.usepipeline.portal.web.user.profile.model.UserProfileUpdateModel;
+import com.usepipeline.portal.web.user.role.UserRoleService;
 import com.usepipeline.portal.web.user.role.model.UserRoleModel;
+import com.usepipeline.portal.web.user.role.model.UserRoleUpdateModel;
 import com.usepipeline.portal.web.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -47,16 +53,23 @@ public class OrganizationInvitationService {
     private OrganizationAccountRepository organizationAccountRepository;
     private OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository;
     private UserRegistrationService userRegistrationService;
+    private UserProfileService userProfileService;
+    private PasswordService passwordService;
+    private UserRoleService userRoleService;
     private HttpSafeUserMembershipRetrievalService userMembershipRetrievalService;
     private EmailMessagingService emailMessagingService;
 
     @Autowired
     public OrganizationInvitationService(RoleRepository roleRepository, OrganizationAccountRepository organizationAccountRepository, OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository,
-                                         UserRegistrationService userRegistrationService, HttpSafeUserMembershipRetrievalService userMembershipRetrievalService, EmailMessagingService emailMessagingService) {
+                                         UserRegistrationService userRegistrationService, UserProfileService userProfileService, PasswordService passwordService, UserRoleService userRoleService,
+                                         HttpSafeUserMembershipRetrievalService userMembershipRetrievalService, EmailMessagingService emailMessagingService) {
         this.roleRepository = roleRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.organizationAccountInviteTokenRepository = organizationAccountInviteTokenRepository;
         this.userRegistrationService = userRegistrationService;
+        this.userProfileService = userProfileService;
+        this.passwordService = passwordService;
+        this.userRoleService = userRoleService;
         this.userMembershipRetrievalService = userMembershipRetrievalService;
         this.emailMessagingService = emailMessagingService;
     }
@@ -68,7 +81,7 @@ public class OrganizationInvitationService {
 
     @Transactional
     public void sendOrganizationAccountInvitation(OrganizationAccountInvitationModel requestModel) {
-        validateRequestModel(requestModel);
+        validateInviteRequestModel(requestModel);
 
         UserEntity authenticatedUser = userMembershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity membership = userMembershipRetrievalService.getMembershipEntity(authenticatedUser);
@@ -102,11 +115,36 @@ public class OrganizationInvitationService {
         Duration timeSinceTokenGenerated = Duration.between(inviteTokenEntity.getDateGenerated(), LocalDateTime.now());
         if (timeSinceTokenGenerated.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
             createUserAccountWithOrgAccountCreationRole(inviteTokenEntity);
-            createUserSessionWithOrgAccountCreationPermssion(email);
+            createUserSessionWithOrgAccountCreationPermission(email);
             response.setHeader("Location", RegistrationController.BASE_ENDPOINT + RegistrationController.ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your invitation has expired. Please contact your organization's account owner.");
         }
+    }
+
+    @Transactional
+    public void completeOrganizationAccountRegistrationFromInvite(HttpServletResponse httpServletResponse, OrganizationAccountUserRegistrationModel registrationModel) {
+        UserEntity temporarilyAuthenticatedUser = userMembershipRetrievalService.getAuthenticatedUserEntity();
+        OrganizationAccountInviteTokenEntity inviteTokenEntity = getMostRecentInvitationTokenForUser(temporarilyAuthenticatedUser.getEmail());
+
+        UserProfileUpdateModel userProfileUpdateModel = new UserProfileUpdateModel(
+                registrationModel.getFirstName(), registrationModel.getLastName(), temporarilyAuthenticatedUser.getEmail(), registrationModel.getUserAddress(), registrationModel.getMobilePhoneNumber(), registrationModel.getBusinessPhoneNumber());
+        userProfileService.updateProfile(temporarilyAuthenticatedUser.getUserId(), userProfileUpdateModel);
+
+        boolean didUpdatePassword = passwordService.updatePassword(temporarilyAuthenticatedUser.getEmail(), registrationModel.getPassword());
+        if (!didUpdatePassword) {
+            log.error("Could not update password for user [{}] while completing organization account registration", temporarilyAuthenticatedUser.getEmail());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        UserRoleUpdateModel roleUpdateModel = new UserRoleUpdateModel(inviteTokenEntity.getRoleLevel());
+        userRoleService.updateRole(temporarilyAuthenticatedUser.getUserId(), roleUpdateModel);
+
+        // Now that the user is fully registered, clear all invitations.
+        organizationAccountInviteTokenRepository.deleteByEmail(temporarilyAuthenticatedUser.getEmail());
+
+        clearCreateOrgAccountAuthorityFromSecurityContext();
+        httpServletResponse.setHeader("Location", "/");
     }
 
     private List<UserRoleModel> getAssignableRoleModels() {
@@ -118,7 +156,7 @@ public class OrganizationInvitationService {
                 .collect(Collectors.toList());
     }
 
-    private void validateRequestModel(OrganizationAccountInvitationModel requestModel) {
+    private void validateInviteRequestModel(OrganizationAccountInvitationModel requestModel) {
         Set<String> errors = new LinkedHashSet<>();
         if (StringUtils.isBlank(requestModel.getOrganizationAccountName())) {
             errors.add("Organization Account Name");
@@ -162,10 +200,24 @@ public class OrganizationInvitationService {
         userRegistrationService.registerOrganizationUser(userRegistrationModel, orgAccount.getOrganizationId(), PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION);
     }
 
-    private void createUserSessionWithOrgAccountCreationPermssion(String email) {
+    private void createUserSessionWithOrgAccountCreationPermission(String email) {
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 email, null, Collections.singletonList(new SimpleGrantedAuthority(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION)));
         SecurityContextHolder.getContext().setAuthentication(auth);
+    }
+
+    private OrganizationAccountInviteTokenEntity getMostRecentInvitationTokenForUser(String email) {
+        return organizationAccountInviteTokenRepository.findByEmail(email)
+                .stream()
+                .max(Comparator.comparing(OrganizationAccountInviteTokenEntity::getDateGenerated))
+                .orElseThrow(() -> {
+                    log.warn("An attempt to complete organization account registration was made, but no invitation exists for the authenticated user wit email [{}]", email);
+                    return new ResponseStatusException(HttpStatus.FORBIDDEN);
+                });
+    }
+
+    private void clearCreateOrgAccountAuthorityFromSecurityContext() {
+        SecurityContextHolder.getContext().setAuthentication(null);
     }
 
     private void sendInvitationEmail(String email, String invitationToken) {

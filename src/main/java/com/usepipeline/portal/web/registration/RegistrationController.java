@@ -2,6 +2,7 @@ package com.usepipeline.portal.web.registration;
 
 import com.usepipeline.portal.web.common.model.EmailToValidateModel;
 import com.usepipeline.portal.web.common.model.ValidationResponseModel;
+import com.usepipeline.portal.web.organization.invitation.OrganizationInvitationService;
 import com.usepipeline.portal.web.registration.organization.OrganizationAccountRegistrationService;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountNameToValidateModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountRegistrationModel;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping(RegistrationController.BASE_ENDPOINT)
 public class RegistrationController implements CsrfIgnorable, AnonymousAccessible {
@@ -28,12 +31,14 @@ public class RegistrationController implements CsrfIgnorable, AnonymousAccessibl
 
     private UserRegistrationService userRegistrationService;
     private OrganizationAccountRegistrationService organizationAccountRegistrationService;
+    private OrganizationInvitationService organizationInvitationService;
 
     @Autowired
     public RegistrationController(UserRegistrationService userRegistrationService,
-                                  OrganizationAccountRegistrationService organizationAccountRegistrationService) {
+                                  OrganizationAccountRegistrationService organizationAccountRegistrationService, OrganizationInvitationService organizationInvitationService) {
         this.userRegistrationService = userRegistrationService;
         this.organizationAccountRegistrationService = organizationAccountRegistrationService;
+        this.organizationInvitationService = organizationInvitationService;
     }
 
     @PostMapping(USER_ENDPOINT_SUFFIX)
@@ -49,8 +54,8 @@ public class RegistrationController implements CsrfIgnorable, AnonymousAccessibl
 
     @PostMapping(ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX)
     @PreAuthorize(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION_AUTH_CHECK)
-    public void registerOrganizationAccountUser(@RequestBody OrganizationAccountUserRegistrationModel registrationRequest) {
-        // FIXME implement
+    public void registerOrganizationAccountUser(HttpServletResponse httpServletResponse, @RequestBody OrganizationAccountUserRegistrationModel registrationRequest) {
+        organizationInvitationService.completeOrganizationAccountRegistrationFromInvite(httpServletResponse, registrationRequest);
     }
 
     @PostMapping("/organization/validate/account_owner")

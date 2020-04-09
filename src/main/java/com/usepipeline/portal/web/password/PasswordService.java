@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -108,41 +107,34 @@ public class PasswordService {
     }
 
     @Transactional
-    public boolean updatePassword(HttpServletResponse response, UpdatePasswordModel updatePasswordModel) {
+    public boolean updateAuthenticatedUserPassword(HttpServletResponse response, UpdatePasswordModel updatePasswordModel) {
         Optional<UsernamePasswordAuthenticationToken> optionalUserAuthToken = SecurityContextUtils.retrieveUserAuthToken();
         if (optionalUserAuthToken.isPresent()) {
             UsernamePasswordAuthenticationToken userAuthToken = optionalUserAuthToken.get();
-            // TODO this is a redundant check and can be removed
-            if (canUpdatePassword(userAuthToken)) {
-                UserDetails userDetails = SecurityContextUtils.extractUserDetails(userAuthToken);
+            UserDetails userDetails = SecurityContextUtils.extractUserDetails(userAuthToken);
 
-                String authenticatedUserEmail = userDetails.getUsername();
-                boolean wasSaveSuccessful = persistPasswordUpdate(authenticatedUserEmail, updatePasswordModel.getNewPassword());
-                if (wasSaveSuccessful) {
-                    response.setHeader("Location", "/");
-                    clearResetPasswordAuthorityFromSecurityContext();
-                    return true;
-                }
+            String authenticatedUserEmail = userDetails.getUsername();
+            boolean wasSaveSuccessful = updatePassword(authenticatedUserEmail, updatePasswordModel.getNewPassword());
+            if (wasSaveSuccessful) {
+                response.setHeader("Location", "/");
+                clearResetPasswordAuthorityFromSecurityContext();
+                return true;
             }
         }
-
         log.error("The password could not be updated");
         return false;
     }
 
-    private boolean canUpdatePassword(UsernamePasswordAuthenticationToken auth) {
-        return auth.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .anyMatch(PortalAuthorityConstants.UPDATE_PASSWORD_PERMISSION::equals);
-    }
-
-    private boolean persistPasswordUpdate(String email, String password) {
-        if (StringUtils.isBlank(email) || StringUtils.isBlank(password)) {
+    @Transactional
+    public boolean updatePassword(String email, String newPassword) {
+        if (StringUtils.isBlank(email) || StringUtils.isBlank(newPassword)) {
             log.error("Blank credential(s) provided");
             return false;
         }
+        return persistPasswordUpdate(email, newPassword);
+    }
 
+    private boolean persistPasswordUpdate(String email, String password) {
         Optional<LoginEntity> optionalLoginEntity = userRepository.findFirstByEmail(email)
                 .map(UserEntity::getUserId)
                 .map(loginRepository::findFirstByUserId)
