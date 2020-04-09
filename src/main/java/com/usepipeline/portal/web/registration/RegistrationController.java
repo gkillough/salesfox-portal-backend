@@ -5,11 +5,14 @@ import com.usepipeline.portal.web.common.model.ValidationResponseModel;
 import com.usepipeline.portal.web.registration.organization.OrganizationAccountRegistrationService;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountNameToValidateModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountRegistrationModel;
+import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountUserRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationService;
 import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
 import com.usepipeline.portal.web.security.authorization.CsrfIgnorable;
+import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(RegistrationController.BASE_ENDPOINT)
 public class RegistrationController implements CsrfIgnorable, AnonymousAccessible {
     public static final String BASE_ENDPOINT = "/register";
+    public static final String USER_ENDPOINT_SUFFIX = "/user";
+    public static final String ORGANIZATION_ENDPOINT_SUFFIX = "/organization";
+    public static final String ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX = ORGANIZATION_ENDPOINT_SUFFIX + USER_ENDPOINT_SUFFIX;
 
     private UserRegistrationService userRegistrationService;
     private OrganizationAccountRegistrationService organizationAccountRegistrationService;
@@ -30,15 +36,21 @@ public class RegistrationController implements CsrfIgnorable, AnonymousAccessibl
         this.organizationAccountRegistrationService = organizationAccountRegistrationService;
     }
 
-    @PostMapping("/user")
+    @PostMapping(USER_ENDPOINT_SUFFIX)
     public boolean registerUser(@RequestBody UserRegistrationModel registrationRequest) {
         userRegistrationService.registerUser(registrationRequest);
         return true;
     }
 
-    @PostMapping("/organization")
+    @PostMapping(ORGANIZATION_ENDPOINT_SUFFIX)
     public void registerOrganizationAccount(@RequestBody OrganizationAccountRegistrationModel registrationRequest) {
         organizationAccountRegistrationService.registerOrganizationAccount(registrationRequest);
+    }
+
+    @PostMapping(ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX)
+    @PreAuthorize(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION_AUTH_CHECK)
+    public void registerOrganizationAccountUser(@RequestBody OrganizationAccountUserRegistrationModel registrationRequest) {
+        // FIXME implement
     }
 
     @PostMapping("/organization/validate/account_owner")

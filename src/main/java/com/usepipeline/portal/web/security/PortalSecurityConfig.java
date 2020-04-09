@@ -4,6 +4,7 @@ import com.usepipeline.portal.database.account.entity.RoleEntity;
 import com.usepipeline.portal.database.account.repository.RoleRepository;
 import com.usepipeline.portal.web.common.DefaultLocationsController;
 import com.usepipeline.portal.web.password.PasswordController;
+import com.usepipeline.portal.web.registration.RegistrationController;
 import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
 import com.usepipeline.portal.web.security.authentication.user.PortalUserDetailsService;
 import com.usepipeline.portal.web.security.authorization.CsrfIgnorable;
@@ -64,7 +65,8 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
         HttpSecurity csrfSecured = configureCsrf(security);
         HttpSecurity corsAllowed = configureCors(csrfSecured);
         HttpSecurity passwordResetSecured = configurePasswordReset(corsAllowed);
-        HttpSecurity defaultPermissionsSecured = configureDefaultPermissions(passwordResetSecured);
+        HttpSecurity orgAccountRegistrationSecured = configureOrganizationAccountRegistration(passwordResetSecured);
+        HttpSecurity defaultPermissionsSecured = configureDefaultPermissions(orgAccountRegistrationSecured);
         HttpSecurity errorHandlingSecured = configureErrorHandling(defaultPermissionsSecured);
         HttpSecurity loginSecured = configureLogin(errorHandlingSecured);
         configureLogout(loginSecured);
@@ -86,10 +88,18 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and();
     }
 
+    // TODO consider an interface for password reset and org account registration to implement, then use it here instead of having two similar methods
     private HttpSecurity configurePasswordReset(HttpSecurity security) throws Exception {
         return security.authorizeRequests()
                 .antMatchers(PasswordController.UPDATE_ENDPOINT)
                 .hasAuthority(PortalAuthorityConstants.UPDATE_PASSWORD_PERMISSION)
+                .and();
+    }
+
+    private HttpSecurity configureOrganizationAccountRegistration(HttpSecurity security) throws Exception {
+        return security.authorizeRequests()
+                .antMatchers(RegistrationController.BASE_ENDPOINT + RegistrationController.ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX)
+                .hasAuthority(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION)
                 .and();
     }
 

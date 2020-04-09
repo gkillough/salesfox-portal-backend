@@ -8,12 +8,15 @@ import com.usepipeline.portal.database.account.entity.MembershipEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
 import com.usepipeline.portal.database.account.repository.RoleRepository;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
+import com.usepipeline.portal.database.organization.account.OrganizationAccountRepository;
 import com.usepipeline.portal.database.organization.account.invite.OrganizationAccountInviteTokenEntity;
 import com.usepipeline.portal.database.organization.account.invite.OrganizationAccountInviteTokenPK;
 import com.usepipeline.portal.database.organization.account.invite.OrganizationAccountInviteTokenRepository;
 import com.usepipeline.portal.web.organization.invitation.model.OrganizationAccountInvitationModel;
 import com.usepipeline.portal.web.organization.invitation.model.OrganizationAssignableRolesModel;
-import com.usepipeline.portal.web.password.PasswordController;
+import com.usepipeline.portal.web.registration.RegistrationController;
+import com.usepipeline.portal.web.registration.user.UserRegistrationModel;
+import com.usepipeline.portal.web.registration.user.UserRegistrationService;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.user.role.model.UserRoleModel;
 import com.usepipeline.portal.web.util.HttpSafeUserMembershipRetrievalService;
@@ -41,15 +44,19 @@ public class OrganizationInvitationService {
     public static final Duration DURATION_OF_TOKEN_VALIDITY = Duration.ofDays(7);
 
     private RoleRepository roleRepository;
+    private OrganizationAccountRepository organizationAccountRepository;
     private OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository;
+    private UserRegistrationService userRegistrationService;
     private HttpSafeUserMembershipRetrievalService userMembershipRetrievalService;
     private EmailMessagingService emailMessagingService;
 
     @Autowired
-    public OrganizationInvitationService(RoleRepository roleRepository, OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository,
-                                         HttpSafeUserMembershipRetrievalService userMembershipRetrievalService, EmailMessagingService emailMessagingService) {
+    public OrganizationInvitationService(RoleRepository roleRepository, OrganizationAccountRepository organizationAccountRepository, OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository,
+                                         UserRegistrationService userRegistrationService, HttpSafeUserMembershipRetrievalService userMembershipRetrievalService, EmailMessagingService emailMessagingService) {
         this.roleRepository = roleRepository;
+        this.organizationAccountRepository = organizationAccountRepository;
         this.organizationAccountInviteTokenRepository = organizationAccountInviteTokenRepository;
+        this.userRegistrationService = userRegistrationService;
         this.userMembershipRetrievalService = userMembershipRetrievalService;
         this.emailMessagingService = emailMessagingService;
     }
@@ -78,6 +85,7 @@ public class OrganizationInvitationService {
         sendInvitationEmail(requestModel.getInviteEmail(), invitationToken);
     }
 
+    @Transactional
     public void validateOrganizationAccountInvitation(HttpServletResponse response, String email, String token) {
         if (StringUtils.isBlank(email)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The parameter 'email' cannot be blank");
@@ -88,14 +96,14 @@ public class OrganizationInvitationService {
         }
 
         OrganizationAccountInviteTokenPK invitePK = new OrganizationAccountInviteTokenPK(email, token);
-        LocalDateTime dateTokenGenerated = organizationAccountInviteTokenRepository.findById(invitePK)
-                .map(OrganizationAccountInviteTokenEntity::getDateGenerated)
+        OrganizationAccountInviteTokenEntity inviteTokenEntity = organizationAccountInviteTokenRepository.findById(invitePK)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
 
-        Duration timeSinceTokenGenerated = Duration.between(dateTokenGenerated, LocalDateTime.now());
+        Duration timeSinceTokenGenerated = Duration.between(inviteTokenEntity.getDateGenerated(), LocalDateTime.now());
         if (timeSinceTokenGenerated.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
-            grantOrganizationAccountCreationAuthorityToUser(email);
-            response.setHeader("Location", PasswordController.UPDATE_ENDPOINT);
+            createUserAccountWithOrgAccountCreationRole(inviteTokenEntity);
+            createUserSessionWithOrgAccountCreationPermssion(email);
+            response.setHeader("Location", RegistrationController.BASE_ENDPOINT + RegistrationController.ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your invitation has expired. Please contact your organization's account owner.");
         }
@@ -142,12 +150,19 @@ public class OrganizationInvitationService {
         }
     }
 
-    private void grantOrganizationAccountCreationAuthorityToUser(String email) {
-        // TODO get or create a new account for the user and set isActive=false (if get, assert isActive=false before proceeding)
-        //  set their password to a random UUID
-        //  when they POST to the actual account creation endpoint, update this account internally
+    private void createUserAccountWithOrgAccountCreationRole(OrganizationAccountInviteTokenEntity inviteTokenEntity) {
+        OrganizationAccountEntity orgAccount = organizationAccountRepository.findById(inviteTokenEntity.getOrganizationAccountId())
+                .orElseThrow(() -> {
+                    log.error("Expected organization account with id [{}] to exist in the database", inviteTokenEntity.getOrganizationAccountId());
+                    return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+                });
 
-        // FIXME can't use UsernamePasswordAuthenticationToken because the user does not exist yet
+        String randomTemporaryPassword = UUID.randomUUID().toString();
+        UserRegistrationModel userRegistrationModel = new UserRegistrationModel(StringUtils.EMPTY, StringUtils.EMPTY, inviteTokenEntity.getEmail(), randomTemporaryPassword, orgAccount.getOrganizationAccountName());
+        userRegistrationService.registerOrganizationUser(userRegistrationModel, orgAccount.getOrganizationId(), PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION);
+    }
+
+    private void createUserSessionWithOrgAccountCreationPermssion(String email) {
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 email, null, Collections.singletonList(new SimpleGrantedAuthority(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION)));
         SecurityContextHolder.getContext().setAuthentication(auth);

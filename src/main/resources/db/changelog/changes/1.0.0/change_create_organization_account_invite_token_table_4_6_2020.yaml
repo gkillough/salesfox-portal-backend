@@ -36,3 +36,21 @@ databaseChangeLog:
             referencedTableSchemaName: portal
             referencedTableName: organization_accounts
             referencedColumnNames: organization_account_id
+
+  - changeSet:
+      id: add-org-account-invite-role-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: roles
+            columns:
+              - column:
+                  name: role_level
+                  value: TEMPORARY_CREATE_ORGANIZATION_ACCOUNT_PERMISSION
+              - column:
+                  name: role_description
+                  value: A temporary role that gets replaced once a new user completes their account registration.
+              - column:
+                  name: is_role_restricted
+                  valueBoolean: false

@@ -15,8 +15,8 @@ import com.usepipeline.portal.database.organization.account.profile.Organization
 import com.usepipeline.portal.web.common.model.EmailToValidateModel;
 import com.usepipeline.portal.web.common.model.ValidationResponseModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountNameToValidateModel;
-import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountOwnerRegistrationModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountRegistrationModel;
+import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountUserRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationService;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
@@ -148,7 +148,7 @@ public class OrganizationAccountRegistrationService {
         return organizationAccountAddressRepository.save(orgAccountAddressEntityToSave);
     }
 
-    private void registerOrganizationAccountOwner(OrganizationAccountOwnerRegistrationModel accountOwnerModel, OrganizationEntity organization, OrganizationAccountEntity organizationAccount) {
+    private void registerOrganizationAccountOwner(OrganizationAccountUserRegistrationModel accountOwnerModel, OrganizationEntity organization, OrganizationAccountEntity organizationAccount) {
         UserRegistrationModel organizationAccountOwnerToRegister = new UserRegistrationModel(
                 accountOwnerModel.getFirstName(), accountOwnerModel.getLastName(), accountOwnerModel.getEmail(), accountOwnerModel.getPassword(), organizationAccount.getOrganizationAccountName());
         Long registeredUserId = userRegistrationService.registerOrganizationUser(organizationAccountOwnerToRegister, organization.getOrganizationId(), PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER);
@@ -205,7 +205,7 @@ public class OrganizationAccountRegistrationService {
         }
     }
 
-    private void validateOrganizationAccountOwner(Collection<String> errorFields, OrganizationAccountOwnerRegistrationModel accountOwner) {
+    private void validateOrganizationAccountOwner(Collection<String> errorFields, OrganizationAccountUserRegistrationModel accountOwner) {
         if (!FieldValidationUtils.isValidEmailAddress(accountOwner.getEmail(), false)) {
             errorFields.add("Account Owner Email is invalid");
         }
