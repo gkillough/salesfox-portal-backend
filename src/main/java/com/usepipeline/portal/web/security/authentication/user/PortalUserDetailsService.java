@@ -26,16 +26,13 @@ public class PortalUserDetailsService implements UserDetailsService {
     private LoginRepository loginRepository;
     private UserRepository userRepository;
     private RoleRepository roleRepository;
-    private PortalUserLoginAttemptService portalUserLoginAttemptService;
 
     @Autowired
-    public PortalUserDetailsService(MembershipRepository membershipRepository, LoginRepository loginRepository, UserRepository userRepository, RoleRepository roleRepository,
-                                    PortalUserLoginAttemptService portalUserLoginAttemptService) {
+    public PortalUserDetailsService(MembershipRepository membershipRepository, LoginRepository loginRepository, UserRepository userRepository, RoleRepository roleRepository) {
         this.membershipRepository = membershipRepository;
         this.loginRepository = loginRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        this.portalUserLoginAttemptService = portalUserLoginAttemptService;
     }
 
     @Override
@@ -53,7 +50,6 @@ public class PortalUserDetailsService implements UserDetailsService {
         roleRepository.findById(membership.getRoleId())
                 .map(RoleEntity::getRoleLevel)
                 .ifPresent(userRoles::add);
-
 
         boolean userLocked = isUserLocked(username, userLogin);
         return new PortalUserDetails(userRoles, user.getEmail(), userLogin.getPasswordHash(), userLocked, membership.getIsActive());

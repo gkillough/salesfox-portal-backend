@@ -143,6 +143,10 @@ public class OrganizationInvitationService {
     }
 
     private void grantOrganizationAccountCreationAuthorityToUser(String email) {
+        // TODO get or create a new account for the user and set isActive=false (if get, assert isActive=false before proceeding)
+        //  set their password to a random UUID
+        //  when they POST to the actual account creation endpoint, update this account internally
+
         // FIXME can't use UsernamePasswordAuthenticationToken because the user does not exist yet
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 email, null, Collections.singletonList(new SimpleGrantedAuthority(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION)));
