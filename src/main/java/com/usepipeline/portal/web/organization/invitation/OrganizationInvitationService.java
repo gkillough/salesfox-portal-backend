@@ -34,6 +34,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -53,6 +55,7 @@ public class OrganizationInvitationService {
     private OrganizationAccountRepository organizationAccountRepository;
     private OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository;
     private UserRegistrationService userRegistrationService;
+    private UserDetailsService userDetailsService;
     private UserProfileService userProfileService;
     private PasswordService passwordService;
     private UserRoleService userRoleService;
@@ -61,12 +64,13 @@ public class OrganizationInvitationService {
 
     @Autowired
     public OrganizationInvitationService(RoleRepository roleRepository, OrganizationAccountRepository organizationAccountRepository, OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository,
-                                         UserRegistrationService userRegistrationService, UserProfileService userProfileService, PasswordService passwordService, UserRoleService userRoleService,
+                                         UserRegistrationService userRegistrationService, UserDetailsService userDetailsService, UserProfileService userProfileService, PasswordService passwordService, UserRoleService userRoleService,
                                          HttpSafeUserMembershipRetrievalService userMembershipRetrievalService, EmailMessagingService emailMessagingService) {
         this.roleRepository = roleRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.organizationAccountInviteTokenRepository = organizationAccountInviteTokenRepository;
         this.userRegistrationService = userRegistrationService;
+        this.userDetailsService = userDetailsService;
         this.userProfileService = userProfileService;
         this.passwordService = passwordService;
         this.userRoleService = userRoleService;
@@ -196,13 +200,15 @@ public class OrganizationInvitationService {
                 });
 
         String randomTemporaryPassword = UUID.randomUUID().toString();
-        UserRegistrationModel userRegistrationModel = new UserRegistrationModel(StringUtils.EMPTY, StringUtils.EMPTY, inviteTokenEntity.getEmail(), randomTemporaryPassword, orgAccount.getOrganizationAccountName());
+        UserRegistrationModel userRegistrationModel = new UserRegistrationModel("First Name", "Last Name", inviteTokenEntity.getEmail(), randomTemporaryPassword, orgAccount.getOrganizationAccountName());
         userRegistrationService.registerOrganizationUser(userRegistrationModel, orgAccount.getOrganizationId(), PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION);
     }
 
     private void createUserSessionWithOrgAccountCreationPermission(String email) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                email, null, Collections.singletonList(new SimpleGrantedAuthority(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION)));
+                userDetails, null, Collections.singletonList(new SimpleGrantedAuthority(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION)));
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
