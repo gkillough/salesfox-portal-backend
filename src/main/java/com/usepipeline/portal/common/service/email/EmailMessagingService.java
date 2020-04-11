@@ -4,9 +4,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EmailMessagingService {
-    public boolean sendMessage(EmailMessage emailMessage) {
+    public void sendMessage(EmailMessage emailMessage) throws PortalEmailException {
         // TODO implement
-        return false;
     }
 
 }

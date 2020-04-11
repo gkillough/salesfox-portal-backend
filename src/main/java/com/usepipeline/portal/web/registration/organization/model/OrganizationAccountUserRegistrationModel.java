@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrganizationAccountOwnerRegistrationModel {
+public class OrganizationAccountUserRegistrationModel {
     private String firstName;
     private String lastName;
     private String email;

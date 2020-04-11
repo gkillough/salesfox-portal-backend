@@ -2,13 +2,21 @@ package com.usepipeline.portal.web.registration.organization;
 
 import com.usepipeline.portal.common.FieldValidationUtils;
 import com.usepipeline.portal.common.model.PortalAddressModel;
-import com.usepipeline.portal.database.account.entity.*;
-import com.usepipeline.portal.database.account.repository.*;
+import com.usepipeline.portal.database.account.entity.LicenseEntity;
+import com.usepipeline.portal.database.account.repository.LicenseRepository;
+import com.usepipeline.portal.database.organization.OrganizationEntity;
+import com.usepipeline.portal.database.organization.OrganizationRepository;
+import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
+import com.usepipeline.portal.database.organization.account.OrganizationAccountRepository;
+import com.usepipeline.portal.database.organization.account.address.OrganizationAccountAddressEntity;
+import com.usepipeline.portal.database.organization.account.address.OrganizationAccountAddressRepository;
+import com.usepipeline.portal.database.organization.account.profile.OrganizationAccountProfileEntity;
+import com.usepipeline.portal.database.organization.account.profile.OrganizationAccountProfileRepository;
 import com.usepipeline.portal.web.common.model.EmailToValidateModel;
 import com.usepipeline.portal.web.common.model.ValidationResponseModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountNameToValidateModel;
-import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountOwnerRegistrationModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountRegistrationModel;
+import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountUserRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationService;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
@@ -120,7 +128,11 @@ public class OrganizationAccountRegistrationService {
 
     private OrganizationEntity getOrCreateOrganizationWithName(String organizationName) {
         Optional<OrganizationEntity> optionalExistingOrganization = organizationRepository.findFirstByOrganizationName(organizationName);
-        return optionalExistingOrganization.orElseGet(() -> new OrganizationEntity(null, organizationName, true));
+        if (optionalExistingOrganization.isPresent()) {
+            return optionalExistingOrganization.get();
+        }
+        OrganizationEntity newOrganizationEntity = new OrganizationEntity(null, organizationName, true);
+        return organizationRepository.save(newOrganizationEntity);
     }
 
     private OrganizationAccountEntity createOrganizationAccount(OrganizationAccountRegistrationModel registrationModel, LicenseEntity license, OrganizationEntity organization) {
@@ -136,7 +148,7 @@ public class OrganizationAccountRegistrationService {
         return organizationAccountAddressRepository.save(orgAccountAddressEntityToSave);
     }
 
-    private void registerOrganizationAccountOwner(OrganizationAccountOwnerRegistrationModel accountOwnerModel, OrganizationEntity organization, OrganizationAccountEntity organizationAccount) {
+    private void registerOrganizationAccountOwner(OrganizationAccountUserRegistrationModel accountOwnerModel, OrganizationEntity organization, OrganizationAccountEntity organizationAccount) {
         UserRegistrationModel organizationAccountOwnerToRegister = new UserRegistrationModel(
                 accountOwnerModel.getFirstName(), accountOwnerModel.getLastName(), accountOwnerModel.getEmail(), accountOwnerModel.getPassword(), organizationAccount.getOrganizationAccountName());
         Long registeredUserId = userRegistrationService.registerOrganizationUser(organizationAccountOwnerToRegister, organization.getOrganizationId(), PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER);
@@ -177,7 +189,6 @@ public class OrganizationAccountRegistrationService {
             errorFields.add("That Organization Account Address is invalid");
         }
 
-
         if (registrationModel.getAccountOwner() == null) {
             errorFields.add("Missing Account Owner details");
         } else {
@@ -194,7 +205,7 @@ public class OrganizationAccountRegistrationService {
         }
     }
 
-    private void validateOrganizationAccountOwner(Collection<String> errorFields, OrganizationAccountOwnerRegistrationModel accountOwner) {
+    private void validateOrganizationAccountOwner(Collection<String> errorFields, OrganizationAccountUserRegistrationModel accountOwner) {
         if (!FieldValidationUtils.isValidEmailAddress(accountOwner.getEmail(), false)) {
             errorFields.add("Account Owner Email is invalid");
         }

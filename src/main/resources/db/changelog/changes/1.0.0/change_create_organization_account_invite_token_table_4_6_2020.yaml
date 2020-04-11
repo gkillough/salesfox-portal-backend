@@ -1,0 +1,56 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-org-account-invite-tables-1
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: organization_account_invite_tokens
+            columns:
+              - column:
+                  name: email
+                  type: VARCHAR
+              - column:
+                  name: token
+                  type: VARCHAR
+              - column:
+                  name: organization_account_id
+                  type: BIGINT
+              - column:
+                  name: role_level
+                  type: VARCHAR
+              - column:
+                  name: date_generated
+                  type: timestamp without time zone
+
+        - addPrimaryKey:
+            schemaName: portal
+            tableName: organization_account_invite_tokens
+            columnNames: email,token
+
+        - addForeignKeyConstraint:
+            constraintName: organization_account_invite_organization_account_id_fk
+            baseTableSchemaName: portal
+            baseTableName: organization_account_invite_tokens
+            baseColumnNames: organization_account_id
+            referencedTableSchemaName: portal
+            referencedTableName: organization_accounts
+            referencedColumnNames: organization_account_id
+
+  - changeSet:
+      id: add-org-account-invite-role-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: roles
+            columns:
+              - column:
+                  name: role_level
+                  value: TEMPORARY_CREATE_ORGANIZATION_ACCOUNT_PERMISSION
+              - column:
+                  name: role_description
+                  value: A temporary role that gets replaced once a new user completes their account registration.
+              - column:
+                  name: is_role_restricted
+                  valueBoolean: false

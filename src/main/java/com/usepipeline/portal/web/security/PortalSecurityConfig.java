@@ -1,7 +1,10 @@
 package com.usepipeline.portal.web.security;
 
+import com.usepipeline.portal.database.account.entity.RoleEntity;
+import com.usepipeline.portal.database.account.repository.RoleRepository;
 import com.usepipeline.portal.web.common.DefaultLocationsController;
 import com.usepipeline.portal.web.password.PasswordController;
+import com.usepipeline.portal.web.registration.RegistrationController;
 import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
 import com.usepipeline.portal.web.security.authentication.user.PortalUserDetailsService;
 import com.usepipeline.portal.web.security.authorization.CsrfIgnorable;
@@ -32,16 +35,18 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String PORTAL_COOKIE_NAME = "PORTAL_SESSION_ID";
 
     private CsrfTokenRepository csrfTokenRepository;
+    private RoleRepository roleRepository;
     private List<CsrfIgnorable> csrfIgnorables;
     private List<AnonymousAccessible> anonymousAccessibles;
     private PortalUserDetailsService userDetailsService;
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public PortalSecurityConfig(CsrfTokenRepository csrfTokenRepository,
+    public PortalSecurityConfig(CsrfTokenRepository csrfTokenRepository, RoleRepository roleRepository,
                                 List<CsrfIgnorable> csrfIgnorables, List<AnonymousAccessible> anonymousAccessibles,
                                 PortalUserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         this.csrfTokenRepository = csrfTokenRepository;
+        this.roleRepository = roleRepository;
         this.csrfIgnorables = csrfIgnorables;
         this.anonymousAccessibles = anonymousAccessibles;
         this.userDetailsService = userDetailsService;
@@ -60,7 +65,8 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
         HttpSecurity csrfSecured = configureCsrf(security);
         HttpSecurity corsAllowed = configureCors(csrfSecured);
         HttpSecurity passwordResetSecured = configurePasswordReset(corsAllowed);
-        HttpSecurity defaultPermissionsSecured = configureDefaultPermissions(passwordResetSecured);
+        HttpSecurity orgAccountRegistrationSecured = configureOrganizationAccountRegistration(passwordResetSecured);
+        HttpSecurity defaultPermissionsSecured = configureDefaultPermissions(orgAccountRegistrationSecured);
         HttpSecurity errorHandlingSecured = configureErrorHandling(defaultPermissionsSecured);
         HttpSecurity loginSecured = configureLogin(errorHandlingSecured);
         configureLogout(loginSecured);
@@ -82,10 +88,18 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and();
     }
 
+    // TODO consider an interface for password reset and org account registration to implement, then use it here instead of having two similar methods
     private HttpSecurity configurePasswordReset(HttpSecurity security) throws Exception {
         return security.authorizeRequests()
                 .antMatchers(PasswordController.UPDATE_ENDPOINT)
                 .hasAuthority(PortalAuthorityConstants.UPDATE_PASSWORD_PERMISSION)
+                .and();
+    }
+
+    private HttpSecurity configureOrganizationAccountRegistration(HttpSecurity security) throws Exception {
+        return security.authorizeRequests()
+                .antMatchers(RegistrationController.BASE_ENDPOINT + RegistrationController.ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX)
+                .hasAuthority(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION)
                 .and();
     }
 
@@ -94,7 +108,7 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(createAllowedEndpoints())
                 .permitAll()
                 .anyRequest()
-                .authenticated()
+                .hasAnyAuthority(collectUserAuthoritiesFromDatabase())
                 .and();
     }
 
@@ -120,6 +134,14 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutRequestMatcher(new AntPathRequestMatcher(DefaultAllowedEndpoints.LOGOUT_ENDPOINT))
                 .deleteCookies(PORTAL_COOKIE_NAME) // TODO we may not need this cookie with JSESSIONID
                 .logoutSuccessUrl(DefaultLocationsController.ROOT_ENDPOINT);
+    }
+
+    private String[] collectUserAuthoritiesFromDatabase() {
+        return roleRepository.findAll()
+                .stream()
+                .map(RoleEntity::getRoleLevel)
+                .filter(roleLevel -> !roleLevel.startsWith(PortalAuthorityConstants.TEMPORARY_AUTHORITY_PREFIX))
+                .toArray(String[]::new);
     }
 
     private String[] createAllowedEndpoints() {

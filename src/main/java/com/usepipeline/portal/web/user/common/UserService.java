@@ -2,15 +2,13 @@ package com.usepipeline.portal.web.user.common;
 
 import com.usepipeline.portal.database.account.entity.UserEntity;
 import com.usepipeline.portal.database.account.repository.UserRepository;
-import com.usepipeline.portal.web.security.authentication.SecurityContextUtils;
 import com.usepipeline.portal.web.user.common.model.CurrentUserModel;
 import com.usepipeline.portal.web.user.common.model.UserAccountModel;
 import com.usepipeline.portal.web.user.role.model.UserRoleModel;
+import com.usepipeline.portal.web.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -21,34 +19,24 @@ import java.util.Optional;
 public class UserService {
     private UserRepository userRepository;
     private UserAccessService userAccessService;
+    private HttpSafeUserMembershipRetrievalService userMembershipRetrievalService;
 
     @Autowired
-    public UserService(UserRepository userRepository, UserAccessService userAccessService) {
+    public UserService(UserRepository userRepository, UserAccessService userAccessService, HttpSafeUserMembershipRetrievalService userMembershipRetrievalService) {
         this.userRepository = userRepository;
         this.userAccessService = userAccessService;
+        this.userMembershipRetrievalService = userMembershipRetrievalService;
     }
 
     public CurrentUserModel getCurrentUserFromSession() {
-        Optional<UsernamePasswordAuthenticationToken> optionalUserAuthToken = SecurityContextUtils.retrieveUserAuthToken();
-        if (optionalUserAuthToken.isPresent()) {
-            UserDetails userDetails = SecurityContextUtils.extractUserDetails(optionalUserAuthToken.get());
-
-            Optional<UserEntity> optionalUser = userRepository.findFirstByEmail(userDetails.getUsername());
-            if (optionalUser.isPresent()) {
-                UserEntity user = optionalUser.get();
-                UserRoleModel role = userAccessService.findRoleByUserId(user.getUserId());
-                return new CurrentUserModel(user.getUserId(), user.getFirstName(), user.getLastName(), role);
-            } else {
-                log.error("The logged in user is not in the database. Username: [{}]", userDetails.getUsername());
-            }
-        }
-
-        return CurrentUserModel.ANONYMOUS_USER;
+        UserEntity user = userMembershipRetrievalService.getAuthenticatedUserEntity();
+        UserRoleModel role = userAccessService.findRoleByUserId(user.getUserId());
+        return new CurrentUserModel(user.getUserId(), user.getFirstName(), user.getLastName(), role);
     }
 
     public UserAccountModel getUser(Long userId) {
         if (userId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'userId' is required");
         }
 
         if (!userAccessService.canCurrentUserAccessDataForUser(userId)) {

@@ -1,4 +1,4 @@
-package com.usepipeline.portal.database.account.entity;
+package com.usepipeline.portal.database.organization;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
