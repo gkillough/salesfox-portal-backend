@@ -152,10 +152,10 @@ public class OrganizationInvitationService {
     }
 
     private List<UserRoleModel> getAssignableRoleModels() {
-        // TODO determine if we should allow multiple account owners
         return roleRepository.findByRoleLevelStartingWith(PortalAuthorityConstants.ORGANIZATION_ROLE_PREFIX)
                 .stream()
                 .filter(role -> !role.getIsRoleRestricted())
+                .filter(role -> !PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER.equals(role.getRoleLevel()))
                 .map(role -> new UserRoleModel(role.getRoleLevel(), role.getDescription()))
                 .collect(Collectors.toList());
     }
