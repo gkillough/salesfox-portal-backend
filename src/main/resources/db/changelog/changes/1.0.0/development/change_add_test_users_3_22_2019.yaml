@@ -60,6 +60,60 @@ databaseChangeLog:
                   valueBoolean: true
 
   - changeSet:
+      id: create-user-address-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 123
+              - column:
+                  name: street_name
+                  value: Sesame Street
+              - column:
+                  name: apt_suite
+                  value: Suite A
+              - column:
+                  name: city
+                  value: New York
+              - column:
+                  name: state
+                  value: NY
+              - column:
+                  name: zip_code
+                  value: 10001
+              - column:
+                  name: is_business
+                  valueBoolean: true
+
+  - changeSet:
+      id: create-user-profile-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: profiles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com')
+              - column:
+                  name: mobile_number
+                  valueComputed: 5555550001
+              - column:
+                  name: business_number
+                  valueComputed: 5555550002
+              - column:
+                  name: mailing_address_id
+                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('basic.user@usepipeline.com')
+
+  - changeSet:
       id: create-user-2
       author: gavinkillough
       changes:
@@ -120,6 +174,60 @@ databaseChangeLog:
                   valueBoolean: true
 
   - changeSet:
+      id: create-user-address-2
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 1024
+              - column:
+                  name: street_name
+                  value: Main Street
+              - column:
+                  name: apt_suite
+                  value: Unit 5
+              - column:
+                  name: city
+                  value: New York
+              - column:
+                  name: state
+                  value: NY
+              - column:
+                  name: zip_code
+                  value: 10002
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: create-user-profile-2
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: profiles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com')
+              - column:
+                  name: mobile_number
+                  valueComputed: 5555550003
+              - column:
+                  name: business_number
+                  valueComputed: 5555550004
+              - column:
+                  name: mailing_address_id
+                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('premium.user@usepipeline.com')
+
+  - changeSet:
       id: create-user-3
       author: gavinkillough
       changes:
@@ -178,3 +286,57 @@ databaseChangeLog:
               - column:
                   name: is_active
                   valueBoolean: true
+
+  - changeSet:
+      id: create-user-address-3
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('admin@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 42
+              - column:
+                  name: street_name
+                  value: West Blvd
+              - column:
+                  name: apt_suite
+                  value: ''
+              - column:
+                  name: city
+                  value: New York
+              - column:
+                  name: state
+                  value: NY
+              - column:
+                  name: zip_code
+                  value: 10003
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: create-user-profile-3
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: profiles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('admin@usepipeline.com')
+              - column:
+                  name: mobile_number
+                  valueComputed: 5555550005
+              - column:
+                  name: business_number
+                  valueComputed: 5555550006
+              - column:
+                  name: mailing_address_id
+                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('admin@usepipeline.com')
