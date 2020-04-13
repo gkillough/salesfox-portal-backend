@@ -2,10 +2,10 @@ package com.usepipeline.portal.web.security;
 
 import com.usepipeline.portal.database.account.entity.RoleEntity;
 import com.usepipeline.portal.database.account.repository.RoleRepository;
-import com.usepipeline.portal.web.common.DefaultLocationsController;
 import com.usepipeline.portal.web.password.PasswordController;
 import com.usepipeline.portal.web.registration.RegistrationController;
 import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
+import com.usepipeline.portal.web.security.authentication.DefaultAuthenticationHandlers;
 import com.usepipeline.portal.web.security.authentication.user.PortalUserDetailsService;
 import com.usepipeline.portal.web.security.authorization.CsrfIgnorable;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
@@ -114,26 +114,24 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private HttpSecurity configureErrorHandling(HttpSecurity security) throws Exception {
         return security.exceptionHandling()
-                .accessDeniedPage(DefaultLocationsController.ACCESS_DENIED_ENDPOINT)
+                .authenticationEntryPoint(DefaultAuthenticationHandlers.AUTHENTICATION_ENTRY_POINT_HANDLER)
+                .accessDeniedHandler(DefaultAuthenticationHandlers.AUTHENTICATION_ACCESS_DENIED_HANDLER)
                 .and();
     }
 
     private HttpSecurity configureLogin(HttpSecurity security) throws Exception {
         return security.formLogin()
-                // TODO enable these once the UI has a login-error page
-                //  be careful not to create a redirect loop
-                // .loginPage(DefaultEndpointRoutes.LOGIN_PAGE)
-                // .permitAll()
-                // .successForwardUrl("/")
-                // .failureForwardUrl("/login?error")
+                .permitAll()
+                .successHandler(DefaultAuthenticationHandlers.AUTHENTICATION_SUCCESS_HANDLER)
+                .failureHandler(DefaultAuthenticationHandlers.AUTHENTICATION_FAILURE_HANDLER)
                 .and();
     }
 
     private void configureLogout(HttpSecurity security) throws Exception {
         security.logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher(DefaultAllowedEndpoints.LOGOUT_ENDPOINT))
-                .deleteCookies(PORTAL_COOKIE_NAME) // TODO we may not need this cookie with JSESSIONID
-                .logoutSuccessUrl(DefaultLocationsController.ROOT_ENDPOINT);
+                .deleteCookies(PORTAL_COOKIE_NAME)
+                .logoutSuccessHandler(DefaultAuthenticationHandlers.LOGOUT_SUCCESS_HANDLER);
     }
 
     private String[] collectUserAuthoritiesFromDatabase() {
