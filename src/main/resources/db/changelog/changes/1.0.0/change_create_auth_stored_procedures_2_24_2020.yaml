@@ -103,3 +103,26 @@ databaseChangeLog:
                               END;
                           $result$
                           LANGUAGE plpgsql;
+
+  # This procedure takes in an email (text) and returns the user_address_id of the user with that email.
+  - changeSet:
+      id: create-auth-function-6
+      author: gavinkillough
+      changes:
+        - createProcedure:
+            dbms: postgresql
+            schemaName: portal
+            procedureBody: |-
+              CREATE OR REPLACE FUNCTION GET_USER_ADDRESS_ID_BY_USER_EMAIL(text)
+                          RETURNS BIGINT AS $result$
+                              DECLARE result BIGINT;
+                              BEGIN
+                                  select addr.user_address_id
+                                  into result
+                                  from portal.user_addresses addr
+                                  join portal.users u on u.user_id = addr.user_id
+                                  where u.email = $1;
+                                  RETURN result;
+                              END;
+                          $result$
+                          LANGUAGE plpgsql;
