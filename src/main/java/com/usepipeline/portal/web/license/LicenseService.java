@@ -2,8 +2,8 @@ package com.usepipeline.portal.web.license;
 
 import com.usepipeline.portal.common.FieldValidationUtils;
 import com.usepipeline.portal.common.enumeration.LicenseType;
-import com.usepipeline.portal.common.model.PortalDateModel;
 import com.usepipeline.portal.common.service.LicenseGenerator;
+import com.usepipeline.portal.database.account.entity.LicenseEntity;
 import com.usepipeline.portal.database.account.repository.LicenseRepository;
 import com.usepipeline.portal.web.license.model.LicenseCreationRequestModel;
 import com.usepipeline.portal.web.license.model.LicenseModel;
@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Component
 public class LicenseService {
@@ -31,16 +32,33 @@ public class LicenseService {
     public LicenseModel createLicense(LicenseCreationRequestModel requestModel) {
         validateLicenseCreationRequestModel(requestModel);
         LicenseType licenseType = LicenseType.valueOf(requestModel.getType());
-        PortalDateModel expirationDateModel = requestModel.getExpirationDate();
-        LocalDate expirationDate = LocalDate.of(expirationDateModel.getYear(), expirationDateModel.getMonth(), expirationDateModel.getDay());
+        LocalDate expirationDate = requestModel.getExpirationDate().toLocalDate();
 
         return licenseGenerator.generateLicense(licenseType, requestModel.getLicenseSeats(), requestModel.getMonthlyCost(), expirationDate);
+    }
+
+    public void updateLicense(Long licenseId, LicenseCreationRequestModel requestModel) {
+        LicenseEntity existingLicense = licenseRepository.findById(licenseId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        validateLicenseCreationRequestModel(requestModel);
+        LocalDate expirationDate = requestModel.getExpirationDate().toLocalDate();
+
+        existingLicense.setType(requestModel.getType());
+        existingLicense.setLicenseSeats(requestModel.getLicenseSeats());
+        existingLicense.setMonthlyCost(requestModel.getMonthlyCost());
+        existingLicense.setExpirationDate(expirationDate);
+        licenseRepository.save(existingLicense);
     }
 
     private void validateLicenseCreationRequestModel(LicenseCreationRequestModel requestModel) {
         List<String> errorFields = new ArrayList<>();
         if (StringUtils.isBlank(requestModel.getType())) {
             errorFields.add("License Type is blank");
+        }
+
+        if (isValidLicenseType(requestModel.getType())) {
+            errorFields.add("License Type is invalid");
         }
 
         if (requestModel.getLicenseSeats() == null) {
@@ -75,6 +93,14 @@ public class LicenseService {
             String errorFieldsString = String.join(", ", errorFields);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("There are errors with the fields: %s", errorFieldsString));
         }
+    }
+
+    private boolean isValidLicenseType(String licenseType) {
+        return Stream
+                .of(LicenseType.values())
+                .filter(type -> !type.equals(LicenseType.PIPELINE_TEAM))
+                .map(LicenseType::name)
+                .anyMatch(licenseType::equals);
     }
 
 }
