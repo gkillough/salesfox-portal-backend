@@ -1,8 +1,11 @@
 package com.usepipeline.portal.common;
 
 import com.usepipeline.portal.common.model.PortalAddressModel;
+import com.usepipeline.portal.common.model.PortalDateModel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+
+import java.time.DateTimeException;
 
 public class FieldValidationUtils {
     // https://emailregex.com/
@@ -19,6 +22,15 @@ public class FieldValidationUtils {
 
     public static boolean isValidNumber(String number, boolean allowBlank) {
         return isValidBlank(number, allowBlank) || NumberUtils.isDigits(number);
+    }
+
+    public static boolean isValidDate(PortalDateModel date) {
+        try {
+            date.toLocalDate();
+            return true;
+        } catch (DateTimeException e) {
+            return false;
+        }
     }
 
     public static boolean isValidUSAddress(PortalAddressModel addressModel, boolean allowBlank) {
