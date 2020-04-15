@@ -1,11 +1,11 @@
-package com.usepipeline.portal.web.license;
+package com.usepipeline.portal.web.license.model;
 
 import com.usepipeline.portal.database.account.entity.LicenseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -14,7 +14,7 @@ import java.util.UUID;
 public class LicenseModel {
     private Long licenseId;
     private UUID licenseHash;
-    private Date expirationDate;
+    private LocalDate expirationDate;
     private String type;
     private Integer licenseSeats;
     private Double monthlyCost;
