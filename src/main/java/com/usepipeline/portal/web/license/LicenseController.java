@@ -28,7 +28,7 @@ public class LicenseController {
     }
 
     @GetMapping("/{licenseId}")
-    public LicenseModel getLicense(@RequestParam Long licenseId) {
+    public LicenseModel getLicense(@PathVariable Long licenseId) {
         return licenseService.getLicense(licenseId);
     }
 
@@ -38,12 +38,12 @@ public class LicenseController {
     }
 
     @PutMapping("/{licenseId}")
-    public void updateLicense(@RequestParam Long licenseId, @RequestBody LicenseCreationRequestModel requestModel) {
+    public void updateLicense(@PathVariable Long licenseId, @RequestBody LicenseCreationRequestModel requestModel) {
         licenseService.updateLicense(licenseId, requestModel);
     }
 
     @PatchMapping("/{licenseId}/active")
-    public void setActiveStatus(@RequestParam Long licenseId, @RequestBody ActiveStatusPatchModel updateModel) {
+    public void setActiveStatus(@PathVariable Long licenseId, @RequestBody ActiveStatusPatchModel updateModel) {
         licenseService.setActiveStatus(licenseId, updateModel);
     }
 

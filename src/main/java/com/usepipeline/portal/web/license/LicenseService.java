@@ -111,7 +111,7 @@ public class LicenseService {
             errorFields.add("License Type is blank");
         }
 
-        if (isValidLicenseType(requestModel.getType())) {
+        if (!isValidLicenseType(requestModel.getType())) {
             errorFields.add("License Type is invalid");
         }
 
@@ -139,7 +139,7 @@ public class LicenseService {
             errorFields.add("Expiration Date is invalid");
         }
 
-        if (LocalDate.now().isBefore(requestModel.getExpirationDate().toLocalDate())) {
+        if (!LocalDate.now().isBefore(requestModel.getExpirationDate().toLocalDate())) {
             errorFields.add("Expiration Date must be in the future");
         }
 
