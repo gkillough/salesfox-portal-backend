@@ -46,12 +46,12 @@ public class LicenseService {
     }
 
     // TODO this may need to be replaced with paging in the future
-    public AllLicensesModel getAllLicenses() {
+    public MultiLicenseModel getAllLicenses() {
         List<LicenseModel> allLicenses = licenseRepository.findAll()
                 .stream()
                 .map(this::convertToLicenseModel)
                 .collect(Collectors.toList());
-        return new AllLicensesModel(allLicenses);
+        return new MultiLicenseModel(allLicenses);
     }
 
     public LicenseModel createLicense(LicenseCreationRequestModel requestModel) {

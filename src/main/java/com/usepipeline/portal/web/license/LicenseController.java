@@ -1,9 +1,9 @@
 package com.usepipeline.portal.web.license;
 
 import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
-import com.usepipeline.portal.web.license.model.AllLicensesModel;
 import com.usepipeline.portal.web.license.model.LicenseCreationRequestModel;
 import com.usepipeline.portal.web.license.model.LicenseModel;
+import com.usepipeline.portal.web.license.model.MultiLicenseModel;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +23,7 @@ public class LicenseController {
     }
 
     @GetMapping
-    public AllLicensesModel getAllLicenses() {
+    public MultiLicenseModel getAllLicenses() {
         return licenseService.getAllLicenses();
     }
 

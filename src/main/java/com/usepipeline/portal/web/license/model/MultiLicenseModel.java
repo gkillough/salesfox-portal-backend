@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AllLicensesModel {
+public class MultiLicenseModel {
     private List<LicenseModel> licenses;
 
 }
