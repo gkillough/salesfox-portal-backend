@@ -1,5 +1,6 @@
 package com.usepipeline.portal.web.license;
 
+import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
 import com.usepipeline.portal.web.license.model.AllLicensesModel;
 import com.usepipeline.portal.web.license.model.LicenseCreationRequestModel;
 import com.usepipeline.portal.web.license.model.LicenseModel;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(LicenseController.BASE_ENDPOINT)
 @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_ROLE_CHECK)
 public class LicenseController {
-    public static final String BASE_ENDPOINT = "/license";
+    public static final String BASE_ENDPOINT = "/licenses";
 
     private LicenseService licenseService;
 
@@ -20,8 +21,6 @@ public class LicenseController {
     public LicenseController(LicenseService licenseService) {
         this.licenseService = licenseService;
     }
-
-    // TODO setActive
 
     @GetMapping
     public AllLicensesModel getAllLicenses() {
@@ -41,6 +40,11 @@ public class LicenseController {
     @PutMapping("/{licenseId}")
     public void updateLicense(@RequestParam Long licenseId, @RequestBody LicenseCreationRequestModel requestModel) {
         licenseService.updateLicense(licenseId, requestModel);
+    }
+
+    @PatchMapping("/{licenseId}/active")
+    public void setActiveStatus(@RequestParam Long licenseId, @RequestBody ActiveStatusPatchModel updateModel) {
+        licenseService.setActiveStatus(licenseId, updateModel);
     }
 
 }

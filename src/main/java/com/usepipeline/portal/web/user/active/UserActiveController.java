@@ -1,6 +1,6 @@
 package com.usepipeline.portal.web.user.active;
 
-import com.usepipeline.portal.web.common.model.ActiveStatusUpdateModel;
+import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +15,8 @@ public class UserActiveController {
         this.userActiveService = userActiveService;
     }
 
-    @PutMapping("/{user_id}")
-    public void updateActiveStatus(@PathVariable(name = "user_id") Long userId, @RequestBody ActiveStatusUpdateModel updateModel) {
+    @PatchMapping("/{user_id}")
+    public void updateActiveStatus(@PathVariable(name = "user_id") Long userId, @RequestBody ActiveStatusPatchModel updateModel) {
         userActiveService.updateUserActiveStatus(userId, updateModel);
     }
 

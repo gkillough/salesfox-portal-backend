@@ -9,6 +9,7 @@ import com.usepipeline.portal.database.organization.OrganizationEntity;
 import com.usepipeline.portal.database.organization.OrganizationRepository;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountRepository;
+import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
 import com.usepipeline.portal.web.license.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +74,17 @@ public class LicenseService {
         existingLicense.setMonthlyCost(requestModel.getMonthlyCost());
         existingLicense.setExpirationDate(expirationDate);
         licenseRepository.save(existingLicense);
+    }
+
+    public void setActiveStatus(Long licenseId, ActiveStatusPatchModel activeStatusModel) {
+        if (activeStatusModel.getActiveStatus() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field activeStatus is required");
+        }
+
+        LicenseEntity licenseEntity = licenseRepository.findById(licenseId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        licenseEntity.setIsActive(activeStatusModel.getActiveStatus());
+        licenseRepository.save(licenseEntity);
     }
 
     private LicenseModel convertToLicenseModel(LicenseEntity licenseEntity) {

@@ -4,7 +4,7 @@ import com.usepipeline.portal.database.account.entity.MembershipEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
 import com.usepipeline.portal.database.account.repository.MembershipRepository;
 import com.usepipeline.portal.database.account.repository.UserRepository;
-import com.usepipeline.portal.web.common.model.ActiveStatusUpdateModel;
+import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
 import com.usepipeline.portal.web.user.common.UserAccessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ public class UserActiveService {
     }
 
     @Transactional
-    public void updateUserActiveStatus(Long userId, ActiveStatusUpdateModel updateModel) {
+    public void updateUserActiveStatus(Long userId, ActiveStatusPatchModel updateModel) {
         if (!userAccessService.canCurrentUserAccessDataForUser(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
