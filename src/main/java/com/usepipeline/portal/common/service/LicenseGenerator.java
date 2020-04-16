@@ -22,7 +22,7 @@ public class LicenseGenerator {
     /**
      * @return a LicenseModel corresponding to an inactive license entry in the database
      */
-    public LicenseModel generateLicense(LicenseType type, int licenseSeats, Double monthlyCost, LocalDate expirationDate) {
+    public LicenseModel generateLicense(LicenseType type, long licenseSeats, Double monthlyCost, LocalDate expirationDate) {
         UUID licenseHash = UUID.randomUUID();
         LicenseEntity licenseEntity = new LicenseEntity(null, licenseHash, expirationDate, type.name(), licenseSeats, monthlyCost, false);
         LicenseEntity savedLicense = licenseRepository.save(licenseEntity);

@@ -1,5 +1,6 @@
 package com.usepipeline.portal.web.license;
 
+import com.usepipeline.portal.web.license.model.AllLicensesModel;
 import com.usepipeline.portal.web.license.model.LicenseCreationRequestModel;
 import com.usepipeline.portal.web.license.model.LicenseModel;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
@@ -18,6 +19,18 @@ public class LicenseController {
     @Autowired
     public LicenseController(LicenseService licenseService) {
         this.licenseService = licenseService;
+    }
+
+    // TODO setActive
+
+    @GetMapping
+    public AllLicensesModel getAllLicenses() {
+        return licenseService.getAllLicenses();
+    }
+
+    @GetMapping("/{licenseId}")
+    public LicenseModel getLicense(@RequestParam Long licenseId) {
+        return licenseService.getLicense(licenseId);
     }
 
     @PostMapping

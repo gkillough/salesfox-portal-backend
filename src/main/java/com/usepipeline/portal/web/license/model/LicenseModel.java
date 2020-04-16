@@ -16,7 +16,7 @@ public class LicenseModel {
     private UUID licenseHash;
     private LocalDate expirationDate;
     private String type;
-    private Integer licenseSeats;
+    private Long licenseSeats;
     private Double monthlyCost;
     private Boolean isActive;
 

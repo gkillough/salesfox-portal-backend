@@ -30,7 +30,7 @@ public class LicenseEntity implements Serializable {
     private String type;
 
     @Column(name = "license_seats")
-    private Integer licenseSeats;
+    private Long licenseSeats;
 
     @Column(name = "monthly_cost")
     private Double monthlyCost;

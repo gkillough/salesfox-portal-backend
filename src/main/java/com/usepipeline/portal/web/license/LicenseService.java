@@ -5,8 +5,11 @@ import com.usepipeline.portal.common.enumeration.LicenseType;
 import com.usepipeline.portal.common.service.LicenseGenerator;
 import com.usepipeline.portal.database.account.entity.LicenseEntity;
 import com.usepipeline.portal.database.account.repository.LicenseRepository;
-import com.usepipeline.portal.web.license.model.LicenseCreationRequestModel;
-import com.usepipeline.portal.web.license.model.LicenseModel;
+import com.usepipeline.portal.database.organization.OrganizationEntity;
+import com.usepipeline.portal.database.organization.OrganizationRepository;
+import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
+import com.usepipeline.portal.database.organization.account.OrganizationAccountRepository;
+import com.usepipeline.portal.web.license.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,17 +19,38 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
 public class LicenseService {
     private LicenseRepository licenseRepository;
     private LicenseGenerator licenseGenerator;
+    private OrganizationRepository organizationRepository;
+    private OrganizationAccountRepository organizationAccountRepository;
 
     @Autowired
-    public LicenseService(LicenseRepository licenseRepository, LicenseGenerator licenseGenerator) {
+    public LicenseService(LicenseRepository licenseRepository, LicenseGenerator licenseGenerator, OrganizationRepository organizationRepository, OrganizationAccountRepository organizationAccountRepository) {
         this.licenseRepository = licenseRepository;
         this.licenseGenerator = licenseGenerator;
+        this.organizationRepository = organizationRepository;
+        this.organizationAccountRepository = organizationAccountRepository;
+    }
+
+    public LicenseModel getLicense(Long licenseId) {
+        return licenseRepository.findById(licenseId)
+                .map(this::convertToLicenseModel)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    // TODO this may need to be replaced with paging in the future
+    public AllLicensesModel getAllLicenses() {
+        List<LicenseModel> allLicenses = licenseRepository.findAll()
+                .stream()
+                .map(this::convertToLicenseModel)
+                .collect(Collectors.toList());
+        return new AllLicensesModel(allLicenses);
     }
 
     public LicenseModel createLicense(LicenseCreationRequestModel requestModel) {
@@ -49,6 +73,24 @@ public class LicenseService {
         existingLicense.setMonthlyCost(requestModel.getMonthlyCost());
         existingLicense.setExpirationDate(expirationDate);
         licenseRepository.save(existingLicense);
+    }
+
+    private LicenseModel convertToLicenseModel(LicenseEntity licenseEntity) {
+        if (licenseEntity.getIsActive()) {
+            // TODO If the license is set to active and the account doesn't exist, what should we do?
+            //  This is an admin endpoint, so rather than throwing a 500 error, we could display the error in the organization account name.
+            Optional<OrganizationAccountEntity> optionalOrganizationAccount = organizationAccountRepository.findFirstByLicenseId(licenseEntity.getLicenseId());
+            if (optionalOrganizationAccount.isPresent()) {
+                OrganizationAccountEntity organizationAccount = optionalOrganizationAccount.get();
+                String organizationName = organizationRepository.findById(organizationAccount.getOrganizationId())
+                        .map(OrganizationEntity::getOrganizationName)
+                        .orElse("ERROR: no Organization Name found in database");
+
+                LicensedOrganizationAccountModel licensedAccount = new LicensedOrganizationAccountModel(organizationAccount.getOrganizationAccountId(), organizationName, organizationAccount.getOrganizationAccountName());
+                return ActiveLicenseModel.fromLicenseEntity(licenseEntity, licensedAccount);
+            }
+        }
+        return LicenseModel.fromEntity(licenseEntity);
     }
 
     private void validateLicenseCreationRequestModel(LicenseCreationRequestModel requestModel) {

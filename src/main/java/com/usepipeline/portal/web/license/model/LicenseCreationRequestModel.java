@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LicenseCreationRequestModel {
     private String type;
-    private Integer licenseSeats;
+    private Long licenseSeats;
     private Double monthlyCost;
     private PortalDateModel expirationDate;
 
