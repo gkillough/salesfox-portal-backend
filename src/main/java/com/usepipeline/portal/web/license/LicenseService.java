@@ -20,7 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -89,18 +88,14 @@ public class LicenseService {
 
     private LicenseModel convertToLicenseModel(LicenseEntity licenseEntity) {
         if (licenseEntity.getIsActive()) {
-            // TODO If the license is set to active and the account doesn't exist, what should we do?
-            //  This is an admin endpoint, so rather than throwing a 500 error, we could display the error in the organization account name.
-            Optional<OrganizationAccountEntity> optionalOrganizationAccount = organizationAccountRepository.findFirstByLicenseId(licenseEntity.getLicenseId());
-            if (optionalOrganizationAccount.isPresent()) {
-                OrganizationAccountEntity organizationAccount = optionalOrganizationAccount.get();
-                String organizationName = organizationRepository.findById(organizationAccount.getOrganizationId())
-                        .map(OrganizationEntity::getOrganizationName)
-                        .orElse("ERROR: no Organization Name found in database");
+            OrganizationAccountEntity organizationAccount = organizationAccountRepository.findFirstByLicenseId(licenseEntity.getLicenseId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Organization account is missing from the database"));
+            String organizationName = organizationRepository.findById(organizationAccount.getOrganizationId())
+                    .map(OrganizationEntity::getOrganizationName)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Organization is missing from the database"));
 
-                LicensedOrganizationAccountModel licensedAccount = new LicensedOrganizationAccountModel(organizationAccount.getOrganizationAccountId(), organizationName, organizationAccount.getOrganizationAccountName());
-                return ActiveLicenseModel.fromLicenseEntity(licenseEntity, licensedAccount);
-            }
+            LicensedOrganizationAccountModel licensedAccount = new LicensedOrganizationAccountModel(organizationAccount.getOrganizationAccountId(), organizationName, organizationAccount.getOrganizationAccountName());
+            return ActiveLicenseModel.fromLicenseEntity(licenseEntity, licensedAccount);
         }
         return LicenseModel.fromEntity(licenseEntity);
     }
