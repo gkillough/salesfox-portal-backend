@@ -16,7 +16,8 @@ import javax.persistence.*;
 @Table(schema = "portal", name = "user_addresses")
 public class UserAddressEntity extends AbstractAddressEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(schema = "portal", name = "user_addresses_user_address_id_seq_generator", sequenceName = "user_addresses_user_address_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_addresses_user_address_id_seq_generator")
     @Column(name = "user_address_id")
     private Long userAddressId;
 

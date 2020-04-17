@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 @Table(schema = "portal", name = "logins")
 public class LoginEntity implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(schema = "portal", name = "logins_login_id_seq_generator", sequenceName = "logins_login_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "logins_login_id_seq_generator")
     @Column(name = "login_id")
     private Long loginId;
 
