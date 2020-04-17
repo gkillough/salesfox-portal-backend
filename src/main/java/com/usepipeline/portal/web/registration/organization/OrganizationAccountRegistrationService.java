@@ -96,6 +96,8 @@ public class OrganizationAccountRegistrationService {
 
         createOrganizationAccountProfile(
                 orgAccountEntity, orgAccountAddressEntity, registrationModel.getBusinessPhoneNumber());
+
+        activateLicense(orgAccountLicense);
     }
 
     private boolean isOrganizationRestricted(String organizationName) {
@@ -163,6 +165,11 @@ public class OrganizationAccountRegistrationService {
         OrganizationAccountProfileEntity orgAccountProfileToSave = new OrganizationAccountProfileEntity(
                 null, organizationAccount.getOrganizationAccountId(), organizationAccountAddress.getOrganizationAccountAddressId(), businessPhoneNumber);
         return organizationAccountProfileRepository.save(orgAccountProfileToSave);
+    }
+
+    private void activateLicense(LicenseEntity license) {
+        license.setIsActive(true);
+        licenseRepository.save(license);
     }
 
     private void validateRegistrationFields(OrganizationAccountRegistrationModel registrationModel) {

@@ -4,6 +4,7 @@ import com.usepipeline.portal.database.account.entity.MembershipEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
 import com.usepipeline.portal.database.account.repository.MembershipRepository;
 import com.usepipeline.portal.database.account.repository.UserRepository;
+import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
 import com.usepipeline.portal.web.user.common.UserAccessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ public class UserActiveService {
     }
 
     @Transactional
-    public void updateUserActiveStatus(Long userId, UserActiveUpdateModel updateModel) {
+    public void updateUserActiveStatus(Long userId, ActiveStatusPatchModel updateModel) {
         if (!userAccessService.canCurrentUserAccessDataForUser(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
@@ -41,12 +42,12 @@ public class UserActiveService {
 
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> createBadRequest(String.format("A user with the id ['%s'] does not exist", userId)));
-        userEntity.setIsActive(updateModel.activeStatus);
+        userEntity.setIsActive(updateModel.getActiveStatus());
         userRepository.save(userEntity);
 
         MembershipEntity membershipEntity = membershipRepository.findFirstByUserId(userId)
                 .orElseThrow(() -> createBadRequest(String.format("A membership with the user id ['%s'] does not exist", userId)));
-        membershipEntity.setIsActive(updateModel.activeStatus);
+        membershipEntity.setIsActive(updateModel.getActiveStatus());
         membershipRepository.save(membershipEntity);
     }
 
