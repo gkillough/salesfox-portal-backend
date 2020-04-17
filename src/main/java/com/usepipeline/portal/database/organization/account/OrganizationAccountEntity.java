@@ -14,7 +14,8 @@ import java.io.Serializable;
 @Table(schema = "portal", name = "organization_accounts")
 public class OrganizationAccountEntity implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(schema = "portal", name = "organization_accounts_organization_account_id_seq_generator", sequenceName = "organization_accounts_organization_account_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "organization_accounts_organization_account_id_seq_generator")
     @Column(name = "organization_account_id")
     private Long organizationAccountId;
 

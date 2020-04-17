@@ -14,7 +14,8 @@ import java.io.Serializable;
 @Table(schema = "portal", name = "users")
 public class UserEntity implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(schema = "portal", name = "users_user_id_seq_generator", sequenceName = "users_user_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_user_id_seq_generator")
     @Column(name = "user_id")
     private Long userId;
 
