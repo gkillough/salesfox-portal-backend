@@ -44,10 +44,10 @@ alter table portal.memberships OWNER TO root;
 alter table ONLY portal.memberships
     ADD CONSTRAINT memberships_pkey PRIMARY KEY (membership_id);
 
-create sequence portal.org_accounts_org_account_id_seq;
+create sequence portal.org_account_addresses_org_account_address_id_seq;
 
 create table portal.organization_account_addresses (
-    organization_account_address_id bigint NOT NULL DEFAULT nextval('portal.org_accounts_org_account_id_seq'::regclass),
+    organization_account_address_id bigint NOT NULL DEFAULT nextval('portal.org_account_addresses_org_account_address_id_seq'::regclass),
     organization_account_id bigint UNIQUE NOT NULL,
     street_number integer,
     street_name character varying,
@@ -60,9 +60,9 @@ create table portal.organization_account_addresses (
 
 alter table portal.organization_account_addresses OWNER TO root;
 
-alter sequence portal.org_accounts_org_account_id_seq OWNER TO root;
+alter sequence portal.org_account_addresses_org_account_address_id_seq OWNER TO root;
 
-alter sequence portal.org_accounts_org_account_id_seq
+alter sequence portal.org_account_addresses_org_account_address_id_seq
     OWNED BY portal.organization_account_addresses.organization_account_address_id;
 
 alter table ONLY portal.organization_account_addresses
