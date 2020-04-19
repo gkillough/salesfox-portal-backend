@@ -76,6 +76,14 @@ public class HttpSafeUserMembershipRetrievalService {
                 });
     }
 
+    public UserEntity getUserEntity(@NotNull MembershipEntity membershipEntity) {
+        return userRepository.findById(membershipEntity.getUserId())
+                .orElseThrow(() -> {
+                    log.error("Expected user with id [{}] and membership id [{}] to exist in the database", membershipEntity.getUserId(), membershipEntity.getMembershipId());
+                    return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+                });
+    }
+
     public OrganizationAccountEntity getOrganizationAccountEntity(@NotNull MembershipEntity membershipEntity) {
         return organizationAccountRepository.findById(membershipEntity.getOrganizationAccountId())
                 .orElseThrow(() -> {
