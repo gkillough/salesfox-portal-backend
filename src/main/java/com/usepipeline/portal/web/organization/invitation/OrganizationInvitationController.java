@@ -44,7 +44,7 @@ public class OrganizationInvitationController implements AnonymousAccessible {
     @Override
     public String[] allowedEndpointAntMatchers() {
         return new String[]{
-                OrganizationEndpointConstants.ACCOUNT_ENDPOINT + VALIDATE_INVITE_ENDPOINT
+                OrganizationEndpointConstants.BASE_ENDPOINT + VALIDATE_INVITE_ENDPOINT
         };
     }
 
