@@ -18,7 +18,7 @@ public class UserRoleController {
     }
 
     @PatchMapping("/{user_id}")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_AUTH_CHECK)
     public void updateRole(@PathVariable(name = "user_id") Long userId, @RequestBody UserRoleUpdateModel updateModel) {
         userRoleService.updateRole(userId, updateModel);
     }
