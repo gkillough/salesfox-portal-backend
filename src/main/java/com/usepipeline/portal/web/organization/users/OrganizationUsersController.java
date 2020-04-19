@@ -1,12 +1,12 @@
 package com.usepipeline.portal.web.organization.users;
 
 import com.usepipeline.portal.web.organization.common.OrganizationEndpointConstants;
+import com.usepipeline.portal.web.organization.users.model.NewAccountOwnerRequestModel;
 import com.usepipeline.portal.web.organization.users.model.OrganizationMultiUsersModel;
+import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.user.profile.model.UserProfileModel;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(OrganizationUsersController.BASE_ENDPOINT)
@@ -29,6 +29,12 @@ public class OrganizationUsersController {
     public UserProfileModel getOrganizationAccountOwner(@PathVariable Long accountId) {
         // TODO implement
         return null;
+    }
+
+    @PostMapping("/account_owner")
+    @PreAuthorize(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER_AUTH_CHECK)
+    public void transferOrganizationAccountOwnership(@RequestBody NewAccountOwnerRequestModel requestModel) {
+        // TODO implement
     }
 
 }
