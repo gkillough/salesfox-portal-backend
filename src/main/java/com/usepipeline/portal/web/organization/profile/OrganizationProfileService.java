@@ -118,7 +118,8 @@ public class OrganizationProfileService {
         isBlankAddError(errorFields, "Organization Account Name", updateModel.getOrganizationAccountName());
         isBlankAddError(errorFields, "Business Phone Number", updateModel.getBusinessPhoneNumber());
 
-        if (organizationValidationService.isOrganizationAccountNameInUse(orgAccountEntity.getOrganizationId(), updateModel.getOrganizationAccountName())) {
+        if (!orgAccountEntity.getOrganizationAccountName().equals(updateModel.getOrganizationAccountName())
+                && organizationValidationService.isOrganizationAccountNameInUse(orgAccountEntity.getOrganizationId(), updateModel.getOrganizationAccountName())) {
             errorFields.add("That Organization Account Name is already in use");
         }
 
