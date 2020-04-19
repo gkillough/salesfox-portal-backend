@@ -26,7 +26,7 @@ public class OrganizationService {
         OrganizationAccountEntity organizationAccountEntity = userMembershipRetrievalService.getOrganizationAccountEntity(membershipEntity);
         OrganizationEntity organizationEntity = userMembershipRetrievalService.getOrganizationEntity(organizationAccountEntity);
 
-        return new OrganizationAccountModel(organizationEntity.getOrganizationName(), organizationAccountEntity.getOrganizationAccountName());
+        return new OrganizationAccountModel(organizationEntity.getOrganizationName(), organizationAccountEntity.getOrganizationAccountName(), organizationAccountEntity.getOrganizationAccountId());
     }
 
 }

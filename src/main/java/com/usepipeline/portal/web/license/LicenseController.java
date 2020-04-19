@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(LicenseController.BASE_ENDPOINT)
-@PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_ROLE_CHECK)
+@PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK)
 public class LicenseController {
     public static final String BASE_ENDPOINT = "/licenses";
 

@@ -2,7 +2,9 @@ package com.usepipeline.portal.web.organization.activation;
 
 import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
 import com.usepipeline.portal.web.organization.OrganizationEndpointConstants;
+import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +18,7 @@ public class OrganizationAccountActivationController {
     }
 
     @PatchMapping("/{accountId}/active")
+    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK)
     public void setOrganizationAccountActiveStatus(@PathVariable Long accountId, @RequestBody ActiveStatusPatchModel requestModel) {
         organizationActivationService.updateOrganizationAccountActiveStatus(accountId, requestModel);
     }
