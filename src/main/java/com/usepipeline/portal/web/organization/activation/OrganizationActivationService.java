@@ -39,14 +39,15 @@ public class OrganizationActivationService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'activeStatus' cannot be null");
         }
 
-        setActiveStatusForOrgUsers(organizationAccountId, activeStatusModel.getActiveStatus());
-
         OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        orgAccountEntity.setIsActive(activeStatusModel.getActiveStatus());
-        organizationAccountRepository.save(orgAccountEntity);
 
         licenseService.setActiveStatus(orgAccountEntity.getLicenseId(), activeStatusModel);
+
+        setActiveStatusForOrgUsers(organizationAccountId, activeStatusModel.getActiveStatus());
+
+        orgAccountEntity.setIsActive(activeStatusModel.getActiveStatus());
+        organizationAccountRepository.save(orgAccountEntity);
     }
 
     private void validateUpdatePermission(Long organizationAccountId) {
