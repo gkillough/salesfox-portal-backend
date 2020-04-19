@@ -14,6 +14,7 @@ import com.usepipeline.portal.database.organization.account.profile.Organization
 import com.usepipeline.portal.database.organization.account.profile.OrganizationAccountProfileRepository;
 import com.usepipeline.portal.web.common.model.EmailToValidateModel;
 import com.usepipeline.portal.web.common.model.ValidationResponseModel;
+import com.usepipeline.portal.web.organization.common.OrganizationValidationService;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountNameToValidateModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountRegistrationModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountUserRegistrationModel;
@@ -38,6 +39,7 @@ public class OrganizationAccountRegistrationService {
     private OrganizationAccountRepository organizationAccountRepository;
     private OrganizationAccountAddressRepository organizationAccountAddressRepository;
     private OrganizationAccountProfileRepository organizationAccountProfileRepository;
+    private OrganizationValidationService organizationValidationService;
     private UserRegistrationService userRegistrationService;
     private UserProfileService userProfileService;
 
@@ -47,12 +49,13 @@ public class OrganizationAccountRegistrationService {
                                                   OrganizationAccountRepository organizationAccountRepository,
                                                   OrganizationAccountAddressRepository organizationAccountAddressRepository,
                                                   OrganizationAccountProfileRepository organizationAccountProfileRepository,
-                                                  UserRegistrationService userRegistrationService, UserProfileService userProfileService) {
+                                                  OrganizationValidationService organizationValidationService, UserRegistrationService userRegistrationService, UserProfileService userProfileService) {
         this.licenseRepository = licenseRepository;
         this.organizationRepository = organizationRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.organizationAccountAddressRepository = organizationAccountAddressRepository;
         this.organizationAccountProfileRepository = organizationAccountProfileRepository;
+        this.organizationValidationService = organizationValidationService;
         this.userRegistrationService = userRegistrationService;
         this.userProfileService = userProfileService;
     }
@@ -73,11 +76,11 @@ public class OrganizationAccountRegistrationService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Organization Account Name cannot be blank");
         }
 
-        if (isOrganizationRestricted(model.getOrganizationName())) {
+        if (organizationValidationService.isOrganizationRestricted(model.getOrganizationName())) {
             return ValidationResponseModel.invalid("That Organization Name is not allowed");
         }
 
-        if (isOrganizationAccountNameInUse(model.getOrganizationName(), model.getOrganizationAccountName())) {
+        if (organizationValidationService.isOrganizationAccountNameInUse(model.getOrganizationName(), model.getOrganizationAccountName())) {
             return ValidationResponseModel.invalid("An Organization Account with that name exists");
         }
         return ValidationResponseModel.valid();
@@ -98,20 +101,6 @@ public class OrganizationAccountRegistrationService {
                 orgAccountEntity, orgAccountAddressEntity, registrationModel.getBusinessPhoneNumber());
 
         activateLicense(orgAccountLicense);
-    }
-
-    private boolean isOrganizationRestricted(String organizationName) {
-        return OrganizationConstants.INTERNAL_PIPELINE_ORG_NAME.equals(organizationName) || OrganizationConstants.PLAN_PIPELINE_BASIC_OR_PREMIUM_DEFAULT_ORG_NAME.equals(organizationName);
-    }
-
-    private boolean isOrganizationAccountNameInUse(String organizationName, String organizationAccountName) {
-        Optional<Long> optionalOrganizationId = organizationRepository.findFirstByOrganizationName(organizationName).map(OrganizationEntity::getOrganizationId);
-        if (optionalOrganizationId.isPresent()) {
-            return organizationAccountRepository.findFirstByOrganizationIdAndOrganizationAccountName(optionalOrganizationId.get(), organizationAccountName).isPresent();
-        } else {
-            // If no organization exists yet, then no account names exist yet.
-            return false;
-        }
     }
 
     private LicenseEntity getAndValidateLicenseByHash(UUID licenseHash) {
@@ -178,11 +167,11 @@ public class OrganizationAccountRegistrationService {
         isBlankAddError(errorFields, "Organization Account Name", registrationModel.getOrganizationAccountName());
         isBlankAddError(errorFields, "Business Phone Number", registrationModel.getBusinessPhoneNumber());
 
-        if (isOrganizationRestricted(registrationModel.getOrganizationName())) {
+        if (organizationValidationService.isOrganizationRestricted(registrationModel.getOrganizationName())) {
             errorFields.add("That Organization Name is not allowed");
         }
 
-        if (isOrganizationAccountNameInUse(registrationModel.getOrganizationName(), registrationModel.getOrganizationAccountName())) {
+        if (organizationValidationService.isOrganizationAccountNameInUse(registrationModel.getOrganizationName(), registrationModel.getOrganizationAccountName())) {
             errorFields.add("That Organization Account Name is already in use");
         }
 

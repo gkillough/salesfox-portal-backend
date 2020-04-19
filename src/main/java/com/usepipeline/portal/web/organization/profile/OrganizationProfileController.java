@@ -23,7 +23,7 @@ public class OrganizationProfileController {
 
     @PutMapping("/account/{accountId}/profile")
     public void updateOrganizationAccountProfile(@PathVariable Long accountId, @RequestBody OrganizationAccountProfileUpdateModel requestModel) {
-        // TODO implement
+        organizationProfileService.updateProfile(accountId, requestModel);
     }
 
 }
