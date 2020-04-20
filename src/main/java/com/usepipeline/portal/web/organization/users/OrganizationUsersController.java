@@ -26,13 +26,13 @@ public class OrganizationUsersController {
     @GetMapping("/users")
     public OrganizationMultiUsersModel getOrganizationAccountUsers(@PathVariable Long accountId) {
         // TODO implement
-        throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED);
+        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
     }
 
     @GetMapping("/users/{userId}")
     public UserProfileModel getOrganizationAccountUser(@PathVariable Long accountId, @PathVariable Long userId) {
         // TODO implement
-        throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED);
+        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
     }
 
     @GetMapping("/account_owner")
@@ -45,7 +45,7 @@ public class OrganizationUsersController {
     @PreAuthorize(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER_AUTH_CHECK)
     public void transferOrganizationAccountOwnership(@PathVariable Long accountId, @RequestBody NewAccountOwnerRequestModel requestModel) {
         // TODO implement
-        throw new ResponseStatusException(HttpStatus.METHOD_NOT_ALLOWED);
+        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
     }
 
 }
