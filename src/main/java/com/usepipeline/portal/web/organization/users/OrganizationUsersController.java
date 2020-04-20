@@ -41,11 +41,10 @@ public class OrganizationUsersController {
     }
 
     @PostMapping("/account_owner")
-    // TODO add PIPELINE_ADMIN as well
+    // FIXME add PIPELINE_ADMIN as well
     @PreAuthorize(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER_AUTH_CHECK)
     public void transferOrganizationAccountOwnership(@PathVariable Long accountId, @RequestBody NewAccountOwnerRequestModel requestModel) {
-        // TODO implement
-        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
+        organizationUsersService.transferOrganizationAccountOwnership(accountId, requestModel);
     }
 
 }
