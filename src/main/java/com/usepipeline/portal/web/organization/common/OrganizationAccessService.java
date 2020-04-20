@@ -12,9 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @Component
 public class OrganizationAccessService {
+    private static final Predicate<String> IS_ORG_ROLE = roleLevel -> roleLevel.startsWith(PortalAuthorityConstants.ORGANIZATION_ROLE_PREFIX);
+    private static final Predicate<String> IS_PIPELINE_ADMIN_ROLE = roleLevel -> roleLevel.equals(PortalAuthorityConstants.PIPELINE_ADMIN);
+
     private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private RoleRepository roleRepository;
 
@@ -26,10 +30,12 @@ public class OrganizationAccessService {
 
     public AccessLevel getAccessLevelForUserRequestingAccount(UserEntity requestingUser, OrganizationAccountEntity requestedAccount) {
         MembershipEntity membershipEntity = membershipRetrievalService.getMembershipEntity(requestingUser);
-        if (membershipEntity.getOrganizationAccountId().equals(requestedAccount.getOrganizationAccountId())) {
-            Optional<String> optionalOrgRoleLevel = getOrganizationRoleLevel(membershipEntity);
-            if (optionalOrgRoleLevel.isPresent()) {
-                switch (optionalOrgRoleLevel.get()) {
+
+        Optional<String> optionalOrgRoleLevel = getOrganizationRoleLevel(membershipEntity);
+        if (optionalOrgRoleLevel.isPresent()) {
+            String requestingUserRoleLevel = optionalOrgRoleLevel.get();
+            if (membershipEntity.getOrganizationAccountId().equals(requestedAccount.getOrganizationAccountId())) {
+                switch (requestingUserRoleLevel) {
                     case PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER:
                         return AccessLevel.FULL;
                     case PortalAuthorityConstants.ORGANIZATION_ACCOUNT_MANAGER:
@@ -37,6 +43,8 @@ public class OrganizationAccessService {
                     default:
                         return AccessLevel.READ_INSENSITIVE;
                 }
+            } else if (PortalAuthorityConstants.PIPELINE_ADMIN.equals(requestingUserRoleLevel)) {
+                return AccessLevel.FULL;
             }
         }
         return AccessLevel.NONE;
@@ -49,16 +57,21 @@ public class OrganizationAccessService {
 
         MembershipEntity requestingUserMembership = membershipRetrievalService.getMembershipEntity(requestingUser);
         MembershipEntity requestedUserMembership = membershipRetrievalService.getMembershipEntity(requestedUser);
-        if (requestingUserMembership.getOrganizationAccountId() == requestedUserMembership.getOrganizationAccountId()) {
-            Optional<String> organizationRoleLevel = getOrganizationRoleLevel(requestingUserMembership);
-            if (organizationRoleLevel.isPresent()) {
-                switch (organizationRoleLevel.get()) {
+
+        Optional<String> organizationRoleLevel = getOrganizationRoleLevel(requestingUserMembership);
+        if (organizationRoleLevel.isPresent()) {
+            String requestingUserRoleLevel = organizationRoleLevel.get();
+            if (requestingUserMembership.getOrganizationAccountId() == requestedUserMembership.getOrganizationAccountId()) {
+                switch (requestingUserRoleLevel) {
+                    case PortalAuthorityConstants.PIPELINE_ADMIN:
+                        return AccessLevel.FULL;
                     case PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER:
-                    case PortalAuthorityConstants.ORGANIZATION_ACCOUNT_MANAGER:
                         return AccessLevel.READ_WRITE_INSENSITIVE;
                     default:
                         return AccessLevel.READ_INSENSITIVE;
                 }
+            } else if (PortalAuthorityConstants.PIPELINE_ADMIN.equals(requestingUserRoleLevel)) {
+                return AccessLevel.FULL;
             }
         }
         return AccessLevel.NONE;
@@ -67,7 +80,7 @@ public class OrganizationAccessService {
     private Optional<String> getOrganizationRoleLevel(MembershipEntity membership) {
         return roleRepository.findById(membership.getRoleId())
                 .map(RoleEntity::getRoleLevel)
-                .filter(level -> level.startsWith(PortalAuthorityConstants.ORGANIZATION_ROLE_PREFIX));
+                .filter(IS_ORG_ROLE.or(IS_PIPELINE_ADMIN_ROLE));
     }
 
 }

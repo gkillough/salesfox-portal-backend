@@ -13,4 +13,6 @@ public interface MembershipRepository extends JpaRepository<MembershipEntity, Lo
 
     List<MembershipEntity> findByRoleId(Long roleId);
 
+    List<MembershipEntity> findByRoleIdAndOrganizationAccountId(Long roleId, Long organizationAccountId);
+
 }
