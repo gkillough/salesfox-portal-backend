@@ -165,7 +165,7 @@ public class PasswordService {
     }
 
     private void clearResetPasswordAuthorityFromSecurityContext() {
-        SecurityContextHolder.getContext().setAuthentication(null);
+        SecurityContextHolder.clearContext();
     }
 
     private boolean sendPasswordResetEmail(String email, String passwordResetToken) {

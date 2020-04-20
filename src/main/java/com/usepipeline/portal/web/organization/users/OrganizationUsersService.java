@@ -100,7 +100,8 @@ public class OrganizationUsersService {
         membershipRepository.saveAll(membershipsToSave);
 
         if (authenticatedUserEntity.getUserId().equals(orgAcctOwnerEntity.getUserId())) {
-            SecurityContextHolder.clearContext();
+            // If the "old" org account owner is the one making the request, his/her session will still have the role until logging out.
+            clearOldOrgAccountOwnerSession();
         }
     }
 
@@ -133,6 +134,10 @@ public class OrganizationUsersService {
                     log.error("The org account owner was not present for org account with id [{}]", orgAccount.getOrganizationAccountId());
                     return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
                 });
+    }
+
+    private void clearOldOrgAccountOwnerSession() {
+        SecurityContextHolder.clearContext();
     }
 
 }

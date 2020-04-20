@@ -223,7 +223,7 @@ public class OrganizationInvitationService {
     }
 
     private void clearCreateOrgAccountAuthorityFromSecurityContext() {
-        SecurityContextHolder.getContext().setAuthentication(null);
+        SecurityContextHolder.clearContext();
     }
 
     private void sendInvitationEmail(String email, String invitationToken) {
