@@ -50,7 +50,6 @@ public class UserAccessService {
                             .anyMatch(PortalAuthorityConstants.PIPELINE_ADMIN::equals);
                 }
             }
-
         }
         return false;
     }

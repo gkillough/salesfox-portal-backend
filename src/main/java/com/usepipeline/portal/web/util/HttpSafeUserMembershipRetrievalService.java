@@ -9,10 +9,12 @@ import com.usepipeline.portal.database.organization.OrganizationRepository;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountRepository;
 import com.usepipeline.portal.web.security.authentication.SecurityContextUtils;
+import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -37,13 +39,25 @@ public class HttpSafeUserMembershipRetrievalService {
         this.organizationAccountRepository = organizationAccountRepository;
     }
 
-    public UserEntity getAuthenticatedUserEntity() {
+    public UserDetails getAuthenticatedUserDetails() {
         Optional<UsernamePasswordAuthenticationToken> authToken = SecurityContextUtils.retrieveUserAuthToken();
         if (authToken.isPresent()) {
-            UserDetails userDetails = SecurityContextUtils.extractUserDetails(authToken.get());
-            return getExistingUserByEmail(userDetails.getUsername());
+            return SecurityContextUtils.extractUserDetails(authToken.get());
         }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+    }
+
+    public boolean isPipelineAdmin() {
+        return getAuthenticatedUserDetails()
+                .getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(PortalAuthorityConstants.PIPELINE_ADMIN::equals);
+    }
+
+    public UserEntity getAuthenticatedUserEntity() {
+        UserDetails userDetails = getAuthenticatedUserDetails();
+        return getExistingUserByEmail(userDetails.getUsername());
     }
 
     public UserEntity getExistingUserByEmail(@NotNull String email) {
@@ -58,6 +72,14 @@ public class HttpSafeUserMembershipRetrievalService {
         return membershipRepository.findFirstByUserId(userEntity.getUserId())
                 .orElseThrow(() -> {
                     log.error("Expected membership for user with id [{}] to exist in the database", userEntity.getUserId());
+                    return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+                });
+    }
+
+    public UserEntity getUserEntity(@NotNull MembershipEntity membershipEntity) {
+        return userRepository.findById(membershipEntity.getUserId())
+                .orElseThrow(() -> {
+                    log.error("Expected user with id [{}] and membership id [{}] to exist in the database", membershipEntity.getUserId(), membershipEntity.getMembershipId());
                     return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
                 });
     }

@@ -35,8 +35,7 @@ create table portal.memberships (
     membership_id bigserial NOT NULL,
     user_id bigint,
     organization_account_id bigint,
-    role_id bigint,
-    is_active boolean DEFAULT true
+    role_id bigint
 );
 
 alter table portal.memberships OWNER TO root;

@@ -13,7 +13,7 @@ public final class PortalAuthorityConstants {
     public static final String ANONYMOUS = "ANONYMOUS";
 
     public static final String PIPELINE_ADMIN = PIPELINE_ROLE_PREFIX + "ADMIN";
-    public static final String PIPELINE_ADMIN_ROLE_CHECK = "hasAuthority('" + PIPELINE_ADMIN + "')";
+    public static final String PIPELINE_ADMIN_AUTH_CHECK = "hasAuthority('" + PIPELINE_ADMIN + "')";
 
     public static final String PIPELINE_BASIC_USER = PIPELINE_ROLE_PREFIX + "BASIC_USER";
     public static final String PIPELINE_BASIC_USER_AUTH_CHECK = "hasAuthority('" + PIPELINE_BASIC_USER + "')";
@@ -36,5 +36,8 @@ public final class PortalAuthorityConstants {
 
     public static final String CREATE_ORGANIZATION_ACCOUNT_PERMISSION = TEMPORARY_AUTHORITY_PREFIX + "CREATE_ORGANIZATION_ACCOUNT_PERMISSION";
     public static final String CREATE_ORGANIZATION_ACCOUNT_PERMISSION_AUTH_CHECK = "hasAuthority('" + CREATE_ORGANIZATION_ACCOUNT_PERMISSION + "')";
+
+    // Common Auth Checks
+    public static final String PIPELINE_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK = "hasAnyAuthority('" + PIPELINE_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "')";
 
 }
