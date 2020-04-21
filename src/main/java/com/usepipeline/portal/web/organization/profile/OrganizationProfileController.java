@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(OrganizationEndpointConstants.BASE_ENDPOINT)
+@RequestMapping(OrganizationEndpointConstants.ACCOUNT_ENDPOINT)
 public class OrganizationProfileController {
     private OrganizationProfileService organizationProfileService;
 
@@ -16,12 +16,12 @@ public class OrganizationProfileController {
         this.organizationProfileService = organizationProfileService;
     }
 
-    @GetMapping("/account/{accountId}/profile")
+    @GetMapping("/{accountId}/profile")
     public OrganizationAccountProfileModel getOrganizationAccountProfile(@PathVariable Long accountId) {
         return organizationProfileService.getProfile(accountId);
     }
 
-    @PutMapping("/account/{accountId}/profile")
+    @PutMapping("/{accountId}/profile")
     public void updateOrganizationAccountProfile(@PathVariable Long accountId, @RequestBody OrganizationAccountProfileUpdateModel requestModel) {
         organizationProfileService.updateProfile(accountId, requestModel);
     }

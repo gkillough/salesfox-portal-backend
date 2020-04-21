@@ -14,7 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping(OrganizationUsersController.BASE_ENDPOINT)
 public class OrganizationUsersController {
-    public static final String BASE_ENDPOINT = OrganizationEndpointConstants.BASE_ENDPOINT + "/account/{accountId}";
+    public static final String BASE_ENDPOINT = OrganizationEndpointConstants.ACCOUNT_ENDPOINT + "/{accountId}";
 
     private OrganizationUsersService organizationUsersService;
 
@@ -41,8 +41,7 @@ public class OrganizationUsersController {
     }
 
     @PostMapping("/account_owner")
-    // FIXME add PIPELINE_ADMIN as well
-    @PreAuthorize(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK)
     public void transferOrganizationAccountOwnership(@PathVariable Long accountId, @RequestBody NewAccountOwnerRequestModel requestModel) {
         organizationUsersService.transferOrganizationAccountOwnership(accountId, requestModel);
     }
