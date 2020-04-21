@@ -16,7 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -66,18 +65,12 @@ public class OrganizationActivationService {
     }
 
     private void setActiveStatusForOrgUsers(Long orgAccountId, boolean activeStatus) {
-        List<MembershipEntity> memberships = membershipRepository.findByOrganizationAccountId(orgAccountId);
-        for (MembershipEntity membership : memberships) {
-            membership.setIsActive(activeStatus);
-        }
-
-        List<MembershipEntity> updatedMemberships = membershipRepository.saveAll(memberships);
-        Set<Long> memberUserIds = updatedMemberships
+        List<Long> orgMemberUserIds = membershipRepository.findByOrganizationAccountId(orgAccountId)
                 .stream()
                 .map(MembershipEntity::getUserId)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
-        List<UserEntity> users = userRepository.findAllById(memberUserIds);
+        List<UserEntity> users = userRepository.findAllById(orgMemberUserIds);
         for (UserEntity user : users) {
             user.setIsActive(activeStatus);
         }
