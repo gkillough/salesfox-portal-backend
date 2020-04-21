@@ -31,7 +31,4 @@ public class MembershipEntity implements Serializable {
     @Column(name = "role_id")
     private Long roleId;
 
-    @Column(name = "is_active")
-    private Boolean isActive;
-
 }

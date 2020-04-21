@@ -47,4 +47,5 @@ public class OrganizationInvitationController implements AnonymousAccessible {
                 OrganizationEndpointConstants.BASE_ENDPOINT + VALIDATE_INVITE_ENDPOINT
         };
     }
+
 }

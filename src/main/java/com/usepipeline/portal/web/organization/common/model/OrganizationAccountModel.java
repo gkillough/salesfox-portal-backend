@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class OrganizationAccountModel {
     private String organizationName;
     private String organizationAccountName;
+    private Long organizationAccountId;
 
 }

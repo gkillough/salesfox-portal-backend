@@ -1,6 +1,5 @@
 package com.usepipeline.portal.web.user.active;
 
-import com.usepipeline.portal.database.account.entity.MembershipEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
 import com.usepipeline.portal.database.account.repository.MembershipRepository;
 import com.usepipeline.portal.database.account.repository.UserRepository;
@@ -44,11 +43,6 @@ public class UserActiveService {
                 .orElseThrow(() -> createBadRequest(String.format("A user with the id ['%s'] does not exist", userId)));
         userEntity.setIsActive(updateModel.getActiveStatus());
         userRepository.save(userEntity);
-
-        MembershipEntity membershipEntity = membershipRepository.findFirstByUserId(userId)
-                .orElseThrow(() -> createBadRequest(String.format("A membership with the user id ['%s'] does not exist", userId)));
-        membershipEntity.setIsActive(updateModel.getActiveStatus());
-        membershipRepository.save(membershipEntity);
     }
 
     private ResponseStatusException createBadRequest(String message) {

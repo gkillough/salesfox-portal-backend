@@ -55,9 +55,6 @@ databaseChangeLog:
               - column:
                   name: role_id
                   valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PIPELINE_BASIC_USER')
-              - column:
-                  name: is_active
-                  valueBoolean: true
 
   - changeSet:
       id: create-user-address-1
@@ -169,9 +166,6 @@ databaseChangeLog:
               - column:
                   name: role_id
                   valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PIPELINE_PREMIUM_USER')
-              - column:
-                  name: is_active
-                  valueBoolean: true
 
   - changeSet:
       id: create-user-address-2
@@ -283,9 +277,6 @@ databaseChangeLog:
               - column:
                   name: role_id
                   valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PIPELINE_ADMIN')
-              - column:
-                  name: is_active
-                  valueBoolean: true
 
   - changeSet:
       id: create-user-address-3

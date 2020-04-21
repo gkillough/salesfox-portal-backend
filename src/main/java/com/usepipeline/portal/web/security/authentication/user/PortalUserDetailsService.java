@@ -52,7 +52,7 @@ public class PortalUserDetailsService implements UserDetailsService {
                 .ifPresent(userRoles::add);
 
         boolean userLocked = isUserLocked(username, userLogin);
-        return new PortalUserDetails(userRoles, user.getEmail(), userLogin.getPasswordHash(), userLocked, membership.getIsActive());
+        return new PortalUserDetails(userRoles, user.getEmail(), userLogin.getPasswordHash(), userLocked, user.getIsActive());
     }
 
     private boolean isUserLocked(String username, LoginEntity userLogin) {
@@ -61,8 +61,7 @@ public class PortalUserDetailsService implements UserDetailsService {
             log.debug("User: [{}]. Time since last locked: [{}].", username, lastLockedTime);
             Duration timeSinceLocked = Duration.between(lastLockedTime, LocalDateTime.now());
             if (timeSinceLocked.compareTo(PortalUserLoginAttemptService.DURATION_UNTIL_ACCOUNT_UNLOCKED) < 0) {
-                // If the time since the account was locked is strictly less than the time needed to unlock the account,
-                // then the account is still locked.
+                // If the time since the account was locked is strictly less than the time needed to unlock the account,  then the account is still locked.
                 return true;
             }
         }

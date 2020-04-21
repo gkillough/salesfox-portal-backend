@@ -82,6 +82,11 @@ public class LicenseService {
 
         LicenseEntity licenseEntity = licenseRepository.findById(licenseId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (activeStatusModel.getActiveStatus() && hasLicenseExpired(licenseEntity)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot activate an expired license");
+        }
+
         licenseEntity.setIsActive(activeStatusModel.getActiveStatus());
         licenseRepository.save(licenseEntity);
     }
@@ -150,6 +155,10 @@ public class LicenseService {
                 .filter(type -> !type.equals(LicenseType.PIPELINE_TEAM))
                 .map(LicenseType::name)
                 .anyMatch(licenseType::equals);
+    }
+
+    private boolean hasLicenseExpired(LicenseEntity license) {
+        return !LocalDate.now().isBefore(license.getExpirationDate());
     }
 
 }

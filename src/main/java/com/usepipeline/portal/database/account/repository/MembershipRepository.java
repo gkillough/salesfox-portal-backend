@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface MembershipRepository extends JpaRepository<MembershipEntity, Long> {
     Optional<MembershipEntity> findFirstByUserId(Long userId);
 
-    List<MembershipEntity> findByRoleId(Long roleId);
+    List<MembershipEntity> findByOrganizationAccountId(Long organizationAccountId);
 
     List<MembershipEntity> findByRoleIdAndOrganizationAccountId(Long roleId, Long organizationAccountId);
 
