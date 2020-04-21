@@ -43,7 +43,7 @@ public class OrganizationAccessService {
                     default:
                         return AccessLevel.READ_INSENSITIVE;
                 }
-            } else if (PortalAuthorityConstants.PIPELINE_ADMIN.equals(requestingUserRoleLevel)) {
+            } else if (IS_PIPELINE_ADMIN_ROLE.test(requestingUserRoleLevel)) {
                 return AccessLevel.FULL;
             }
         }
@@ -70,7 +70,7 @@ public class OrganizationAccessService {
                     default:
                         return AccessLevel.READ_INSENSITIVE;
                 }
-            } else if (PortalAuthorityConstants.PIPELINE_ADMIN.equals(requestingUserRoleLevel)) {
+            } else if (IS_PIPELINE_ADMIN_ROLE.test(requestingUserRoleLevel)) {
                 return AccessLevel.FULL;
             }
         }
