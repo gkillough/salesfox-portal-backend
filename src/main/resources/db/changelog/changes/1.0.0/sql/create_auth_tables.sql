@@ -3,7 +3,8 @@ create table portal.licenses (
     license_hash uuid,
     expiration_date date,
     type character varying,
-    license_seats bigint,
+    available_license_seats bigint,
+    max_license_seats bigint,
     monthly_cost double precision,
     is_active boolean DEFAULT true
 );

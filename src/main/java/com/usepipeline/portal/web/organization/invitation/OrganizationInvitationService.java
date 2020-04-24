@@ -1,9 +1,14 @@
 package com.usepipeline.portal.web.organization.invitation;
 
 import com.usepipeline.portal.common.FieldValidationUtils;
+import com.usepipeline.portal.common.exception.PortalDatabaseIntegrityViolationException;
+import com.usepipeline.portal.common.exception.PortalException;
 import com.usepipeline.portal.common.service.email.EmailMessage;
 import com.usepipeline.portal.common.service.email.EmailMessagingService;
 import com.usepipeline.portal.common.service.email.PortalEmailException;
+import com.usepipeline.portal.common.service.license.LicenseSeatManager;
+import com.usepipeline.portal.common.service.license.PortalLicenseSeatException;
+import com.usepipeline.portal.database.account.entity.LicenseEntity;
 import com.usepipeline.portal.database.account.entity.MembershipEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
 import com.usepipeline.portal.database.account.repository.RoleRepository;
@@ -59,13 +64,14 @@ public class OrganizationInvitationService {
     private UserProfileService userProfileService;
     private PasswordService passwordService;
     private UserRoleService userRoleService;
+    private LicenseSeatManager licenseSeatManager;
     private HttpSafeUserMembershipRetrievalService userMembershipRetrievalService;
     private EmailMessagingService emailMessagingService;
 
     @Autowired
     public OrganizationInvitationService(RoleRepository roleRepository, OrganizationAccountRepository organizationAccountRepository, OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository,
                                          UserRegistrationService userRegistrationService, UserDetailsService userDetailsService, UserProfileService userProfileService, PasswordService passwordService, UserRoleService userRoleService,
-                                         HttpSafeUserMembershipRetrievalService userMembershipRetrievalService, EmailMessagingService emailMessagingService) {
+                                         LicenseSeatManager licenseSeatManager, HttpSafeUserMembershipRetrievalService userMembershipRetrievalService, EmailMessagingService emailMessagingService) {
         this.roleRepository = roleRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.organizationAccountInviteTokenRepository = organizationAccountInviteTokenRepository;
@@ -74,6 +80,7 @@ public class OrganizationInvitationService {
         this.userProfileService = userProfileService;
         this.passwordService = passwordService;
         this.userRoleService = userRoleService;
+        this.licenseSeatManager = licenseSeatManager;
         this.userMembershipRetrievalService = userMembershipRetrievalService;
         this.emailMessagingService = emailMessagingService;
     }
@@ -93,6 +100,16 @@ public class OrganizationInvitationService {
 
         if (!orgAccountEntity.getOrganizationAccountName().equals(requestModel.getOrganizationAccountName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You do not have access to that Organization Account");
+        }
+
+        try {
+            LicenseEntity orgLicense = licenseSeatManager.getLicenseForOrganizationAccount(orgAccountEntity);
+            if (!licenseSeatManager.hasAvailableSeats(orgLicense)) {
+                throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "No available license seats");
+            }
+        } catch (PortalException e) {
+            log.error("There was a problem managing the organization license", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         String invitationToken = UUID.randomUUID().toString();
@@ -115,6 +132,16 @@ public class OrganizationInvitationService {
         OrganizationAccountInviteTokenPK invitePK = new OrganizationAccountInviteTokenPK(email, token);
         OrganizationAccountInviteTokenEntity inviteTokenEntity = organizationAccountInviteTokenRepository.findById(invitePK)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
+
+        try {
+            LicenseEntity orgLicense = licenseSeatManager.getLicenseForOrganizationAccountId(inviteTokenEntity.getOrganizationAccountId());
+            if (!licenseSeatManager.hasAvailableSeats(orgLicense)) {
+                throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "No available license seats");
+            }
+        } catch (PortalException e) {
+            log.error("There was a problem managing the organization license", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         Duration timeSinceTokenGenerated = Duration.between(inviteTokenEntity.getDateGenerated(), LocalDateTime.now());
         if (timeSinceTokenGenerated.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
@@ -143,6 +170,17 @@ public class OrganizationInvitationService {
 
         UserRoleUpdateModel roleUpdateModel = new UserRoleUpdateModel(inviteTokenEntity.getRoleLevel());
         userRoleService.updateRole(temporarilyAuthenticatedUser.getUserId(), roleUpdateModel);
+
+        try {
+            MembershipEntity membershipEntity = userMembershipRetrievalService.getMembershipEntity(temporarilyAuthenticatedUser);
+            LicenseEntity orgAccountLicense = licenseSeatManager.getLicenseForOrganizationAccountId(membershipEntity.getOrganizationAccountId());
+            licenseSeatManager.fillSeat(orgAccountLicense);
+        } catch (PortalLicenseSeatException e) {
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, e.getMessage());
+        } catch (PortalDatabaseIntegrityViolationException e) {
+            log.error("There was a problem managing the organization license", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         // Now that the user is fully registered, clear all invitations.
         organizationAccountInviteTokenRepository.deleteByEmail(temporarilyAuthenticatedUser.getEmail());

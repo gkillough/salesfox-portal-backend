@@ -2,7 +2,7 @@ package com.usepipeline.portal.web.license;
 
 import com.usepipeline.portal.common.FieldValidationUtils;
 import com.usepipeline.portal.common.enumeration.LicenseType;
-import com.usepipeline.portal.common.service.LicenseGenerator;
+import com.usepipeline.portal.common.service.license.LicenseGenerator;
 import com.usepipeline.portal.database.account.entity.LicenseEntity;
 import com.usepipeline.portal.database.account.repository.LicenseRepository;
 import com.usepipeline.portal.database.organization.OrganizationEntity;
@@ -69,7 +69,7 @@ public class LicenseService {
         LocalDate expirationDate = requestModel.getExpirationDate().toLocalDate();
 
         existingLicense.setType(requestModel.getType());
-        existingLicense.setLicenseSeats(requestModel.getLicenseSeats());
+        existingLicense.setAvailableLicenseSeats(requestModel.getLicenseSeats());
         existingLicense.setMonthlyCost(requestModel.getMonthlyCost());
         existingLicense.setExpirationDate(expirationDate);
         licenseRepository.save(existingLicense);

@@ -15,11 +15,11 @@ public class ActiveLicenseModel extends LicenseModel {
     private LicensedOrganizationAccountModel organizationAccount;
 
     public static ActiveLicenseModel fromLicenseEntity(LicenseEntity licenseEntity, LicensedOrganizationAccountModel organizationAccount) {
-        return new ActiveLicenseModel(licenseEntity.getLicenseId(), licenseEntity.getLicenseHash(), licenseEntity.getExpirationDate(), licenseEntity.getType(), licenseEntity.getLicenseSeats(), licenseEntity.getMonthlyCost(), organizationAccount);
+        return new ActiveLicenseModel(licenseEntity.getLicenseId(), licenseEntity.getLicenseHash(), licenseEntity.getExpirationDate(), licenseEntity.getType(), licenseEntity.getAvailableLicenseSeats(), licenseEntity.getMaxLicenseSeats(), licenseEntity.getMonthlyCost(), organizationAccount);
     }
 
-    public ActiveLicenseModel(Long licenseId, UUID licenseHash, LocalDate expirationDate, String type, Long licenseSeats, Double monthlyCost, LicensedOrganizationAccountModel organizationAccount) {
-        super(licenseId, licenseHash, expirationDate, type, licenseSeats, monthlyCost, true);
+    public ActiveLicenseModel(Long licenseId, UUID licenseHash, LocalDate expirationDate, String type, Long availableLicenseSeats, Long maxLicenseSeats, Double monthlyCost, LicensedOrganizationAccountModel organizationAccount) {
+        super(licenseId, licenseHash, expirationDate, type, availableLicenseSeats, maxLicenseSeats, monthlyCost, true);
         this.organizationAccount = organizationAccount;
     }
 
