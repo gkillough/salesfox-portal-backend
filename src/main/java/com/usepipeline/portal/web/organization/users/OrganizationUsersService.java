@@ -58,7 +58,7 @@ public class OrganizationUsersService {
         validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
 
         RoleEntity orgAccountOwnerRole = getExistingRole(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER);
-        UserEntity orgAccountOwnerEntity = getUserEntity(orgAccountEntity, orgAccountOwnerRole);
+        UserEntity orgAccountOwnerEntity = getOrganizationAccountOwnerEntity(orgAccountEntity, orgAccountOwnerRole);
         return userProfileService.retrieveProfileWithoutPermissionCheck(orgAccountOwnerEntity.getUserId());
     }
 
@@ -74,15 +74,15 @@ public class OrganizationUsersService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The 'email' field cannot be blank");
         }
 
-        UserEntity orgAcctOwnerCandidate = userRepository.findFirstByEmail(updateModel.getEmail())
+        UserEntity candidateOrgAcctOwner = userRepository.findFirstByEmail(updateModel.getEmail())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No user with the email ['%s'] exists", updateModel.getEmail())));
 
-        MembershipEntity orgAcctOwnerCandidateMembership = membershipRetrievalService.getMembershipEntity(orgAcctOwnerCandidate);
-        if (!orgAcctOwnerCandidateMembership.getOrganizationAccountId().equals(organizationAccountId)) {
+        MembershipEntity candidateOrgAcctOwnerMembership = membershipRetrievalService.getMembershipEntity(candidateOrgAcctOwner);
+        if (!candidateOrgAcctOwnerMembership.getOrganizationAccountId().equals(organizationAccountId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The user with the email ['%s'] is not a member of the Organization Account", updateModel.getEmail()));
         }
 
-        RoleEntity roleEntity = membershipRetrievalService.getRoleEntity(orgAcctOwnerCandidateMembership);
+        RoleEntity roleEntity = membershipRetrievalService.getRoleEntity(candidateOrgAcctOwnerMembership);
         if (!roleEntity.getRoleLevel().startsWith(PortalAuthorityConstants.ORGANIZATION_ROLE_PREFIX)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The user with the email ['%s'] does not have a valid role in the Organization Account", updateModel.getEmail()));
         }
@@ -90,16 +90,16 @@ public class OrganizationUsersService {
         RoleEntity orgAcctOwnerRole = getExistingRole(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER);
         RoleEntity orgAcctManagerRole = getExistingRole(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_MANAGER);
 
-        UserEntity orgAcctOwnerEntity = getUserEntity(orgAccountEntity, orgAcctOwnerRole);
-        MembershipEntity orgAcctOwnerMembership = membershipRetrievalService.getMembershipEntity(orgAcctOwnerEntity);
+        UserEntity oldOrgAcctOwner = getOrganizationAccountOwnerEntity(orgAccountEntity, orgAcctOwnerRole);
+        MembershipEntity oldOrgAcctOwnerMembership = membershipRetrievalService.getMembershipEntity(oldOrgAcctOwner);
 
-        orgAcctOwnerCandidateMembership.setRoleId(orgAcctOwnerRole.getRoleId());
-        orgAcctOwnerMembership.setRoleId(orgAcctManagerRole.getRoleId());
+        candidateOrgAcctOwnerMembership.setRoleId(orgAcctOwnerRole.getRoleId());
+        oldOrgAcctOwnerMembership.setRoleId(orgAcctManagerRole.getRoleId());
 
-        List<MembershipEntity> membershipsToSave = Arrays.asList(orgAcctOwnerCandidateMembership, orgAcctOwnerMembership);
+        List<MembershipEntity> membershipsToSave = Arrays.asList(candidateOrgAcctOwnerMembership, oldOrgAcctOwnerMembership);
         membershipRepository.saveAll(membershipsToSave);
 
-        if (authenticatedUserEntity.getUserId().equals(orgAcctOwnerEntity.getUserId())) {
+        if (authenticatedUserEntity.getUserId().equals(oldOrgAcctOwner.getUserId())) {
             // If the "old" org account owner is the one making the request, his/her session will still have the role until logging out.
             clearOldOrgAccountOwnerSession();
         }
@@ -120,7 +120,7 @@ public class OrganizationUsersService {
                 });
     }
 
-    private UserEntity getUserEntity(OrganizationAccountEntity orgAccount, RoleEntity role) {
+    private UserEntity getOrganizationAccountOwnerEntity(OrganizationAccountEntity orgAccount, RoleEntity role) {
         List<MembershipEntity> orgAccountOwners = membershipRepository.findByRoleIdAndOrganizationAccountId(role.getRoleId(), orgAccount.getOrganizationAccountId());
         if (orgAccountOwners.size() != 1) {
             log.error("More than one org account owner for org account with id [{}]", orgAccount.getOrganizationAccountId());
