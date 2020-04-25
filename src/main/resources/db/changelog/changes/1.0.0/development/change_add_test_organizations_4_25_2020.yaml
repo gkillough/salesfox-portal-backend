@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: test-orgs-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organizations
+            columns:
+              - column:
+                  name: organization_name
+                  value: Big Apple Corp
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-orgs-licenses-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: licenses
+            columns:
+              - column:
+                  name: license_hash
+                  value: 354d0583-3e0e-4a39-9a23-80f8e979b058
+              - column:
+                  name: expiration_date
+                  valueDate: 2021-12-31
+              - column:
+                  name: type
+                  value: PIPELINE_BUSINESS
+              - column:
+                  name: license_seats
+                  valueNumeric: 10
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 250.0
+              - column:
+                  name: is_active
+                  valueBoolean: true

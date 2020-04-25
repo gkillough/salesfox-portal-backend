@@ -29,5 +29,13 @@ databaseChangeLog:
 
   # TODO REMOVE DEVELOPMENT DATA BEFORE RELEASE
   - include:
-      file: development/change_add_test_users_3_22_2019.yaml
+      file: development/change_add_test_users_3_22_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: development/change_add_test_organizations_4_25_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: development/change_add_test_organization_users_4_25_2020.yaml
       relativeToChangelogFile: true
