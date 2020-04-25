@@ -69,10 +69,11 @@ public class LicenseService {
         LocalDate expirationDate = requestModel.getExpirationDate().toLocalDate();
 
         existingLicense.setType(requestModel.getType());
-        existingLicense.setAvailableLicenseSeats(requestModel.getLicenseSeats());
         existingLicense.setMonthlyCost(requestModel.getMonthlyCost());
         existingLicense.setExpirationDate(expirationDate);
-        licenseRepository.save(existingLicense);
+
+        LicenseEntity savedLicense = licenseRepository.save(existingLicense);
+        setMaxLicenseSeats(savedLicense.getLicenseId(), new LicenseSeatUpdateModel(requestModel.getLicenseSeats()));
     }
 
     public void setActiveStatus(Long licenseId, ActiveStatusPatchModel activeStatusModel) {

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(LicenseController.BASE_ENDPOINT)
-@PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK)
+@PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_AUTH_CHECK)
 public class LicenseController {
     public static final String BASE_ENDPOINT = "/licenses";
 
@@ -49,7 +49,6 @@ public class LicenseController {
     }
 
     @PatchMapping("/{licenseId}/seats")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN)
     public void setMaxLicenseSeats(@PathVariable Long licenseId, @RequestBody LicenseSeatUpdateModel updateModel) {
         licenseService.setMaxLicenseSeats(licenseId, updateModel);
     }

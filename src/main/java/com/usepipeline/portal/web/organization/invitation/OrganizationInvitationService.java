@@ -1,13 +1,11 @@
 package com.usepipeline.portal.web.organization.invitation;
 
 import com.usepipeline.portal.common.FieldValidationUtils;
-import com.usepipeline.portal.common.exception.PortalDatabaseIntegrityViolationException;
 import com.usepipeline.portal.common.exception.PortalException;
 import com.usepipeline.portal.common.service.email.EmailMessage;
 import com.usepipeline.portal.common.service.email.EmailMessagingService;
 import com.usepipeline.portal.common.service.email.PortalEmailException;
 import com.usepipeline.portal.common.service.license.LicenseSeatManager;
-import com.usepipeline.portal.common.service.license.PortalLicenseSeatException;
 import com.usepipeline.portal.database.account.entity.LicenseEntity;
 import com.usepipeline.portal.database.account.entity.MembershipEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
@@ -170,17 +168,6 @@ public class OrganizationInvitationService {
 
         UserRoleUpdateModel roleUpdateModel = new UserRoleUpdateModel(inviteTokenEntity.getRoleLevel());
         userRoleService.updateRole(temporarilyAuthenticatedUser.getUserId(), roleUpdateModel);
-
-        try {
-            MembershipEntity membershipEntity = userMembershipRetrievalService.getMembershipEntity(temporarilyAuthenticatedUser);
-            LicenseEntity orgAccountLicense = licenseSeatManager.getLicenseForOrganizationAccountId(membershipEntity.getOrganizationAccountId());
-            licenseSeatManager.fillSeat(orgAccountLicense);
-        } catch (PortalLicenseSeatException e) {
-            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, e.getMessage());
-        } catch (PortalDatabaseIntegrityViolationException e) {
-            log.error("There was a problem managing the organization license", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
 
         // Now that the user is fully registered, clear all invitations.
         organizationAccountInviteTokenRepository.deleteByEmail(temporarilyAuthenticatedUser.getEmail());
