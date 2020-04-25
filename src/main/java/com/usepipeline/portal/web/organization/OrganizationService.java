@@ -4,7 +4,7 @@ import com.usepipeline.portal.database.account.entity.MembershipEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
 import com.usepipeline.portal.database.organization.OrganizationEntity;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
-import com.usepipeline.portal.web.organization.model.OrganizationAccountModel;
+import com.usepipeline.portal.web.organization.common.model.OrganizationAccountModel;
 import com.usepipeline.portal.web.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

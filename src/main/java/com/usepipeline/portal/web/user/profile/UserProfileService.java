@@ -53,7 +53,14 @@ public class UserProfileService {
 
     public UserProfileModel retrieveProfile(Long userId) {
         validateUserId(userId);
+        return retrieveProfileWithoutPermissionCheck(userId);
+    }
 
+    /**
+     * For use when permission to perform this action has already been validated, but that
+     * validation is not reflected in the HTTP Session (e.g. during Organization Account Owner retrieval).
+     */
+    public UserProfileModel retrieveProfileWithoutPermissionCheck(Long userId) {
         // Any failed lookups after the above validation are fatal.
         Supplier<ResponseStatusException> internalServerError = () -> {
             log.error("Missing database entity when attempting to retrieve a user profile");

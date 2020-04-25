@@ -1,6 +1,6 @@
 package com.usepipeline.portal.web.organization.invitation;
 
-import com.usepipeline.portal.web.organization.OrganizationEndpointConstants;
+import com.usepipeline.portal.web.organization.common.OrganizationEndpointConstants;
 import com.usepipeline.portal.web.organization.invitation.model.OrganizationAccountInvitationModel;
 import com.usepipeline.portal.web.organization.invitation.model.OrganizationAssignableRolesModel;
 import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;

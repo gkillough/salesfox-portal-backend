@@ -1,6 +1,7 @@
 package com.usepipeline.portal.web.organization;
 
-import com.usepipeline.portal.web.organization.model.OrganizationAccountModel;
+import com.usepipeline.portal.web.organization.common.OrganizationEndpointConstants;
+import com.usepipeline.portal.web.organization.common.model.OrganizationAccountModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
