@@ -48,7 +48,7 @@ databaseChangeLog:
                   value: PIPELINE_BASIC
               - column:
                   name: available_license_seats
-                  valueNumeric: 999999999999
+                  valueNumeric: 999999999998
               - column:
                   name: max_license_seats
                   valueNumeric: 999999999999
@@ -78,7 +78,7 @@ databaseChangeLog:
                   value: PIPELINE_PREMIUM
               - column:
                   name: available_license_seats
-                  valueNumeric: 999999999999
+                  valueNumeric: 999999999998
               - column:
                   name: max_license_seats
                   valueNumeric: 999999999999
