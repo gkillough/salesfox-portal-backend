@@ -90,16 +90,16 @@ public class OrganizationUsersService {
         RoleEntity orgAcctOwnerRole = getExistingRole(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER);
         RoleEntity orgAcctManagerRole = getExistingRole(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_MANAGER);
 
-        UserEntity oldOrgAcctOwner = getOrganizationAccountOwnerEntity(orgAccountEntity, orgAcctOwnerRole);
-        MembershipEntity oldOrgAcctOwnerMembership = membershipRetrievalService.getMembershipEntity(oldOrgAcctOwner);
+        UserEntity currentOrgAcctOwner = getOrganizationAccountOwnerEntity(orgAccountEntity, orgAcctOwnerRole);
+        MembershipEntity currentOrgAcctOwnerMembership = membershipRetrievalService.getMembershipEntity(currentOrgAcctOwner);
 
         candidateOrgAcctOwnerMembership.setRoleId(orgAcctOwnerRole.getRoleId());
-        oldOrgAcctOwnerMembership.setRoleId(orgAcctManagerRole.getRoleId());
+        currentOrgAcctOwnerMembership.setRoleId(orgAcctManagerRole.getRoleId());
 
-        List<MembershipEntity> membershipsToSave = Arrays.asList(candidateOrgAcctOwnerMembership, oldOrgAcctOwnerMembership);
+        List<MembershipEntity> membershipsToSave = Arrays.asList(candidateOrgAcctOwnerMembership, currentOrgAcctOwnerMembership);
         membershipRepository.saveAll(membershipsToSave);
 
-        if (authenticatedUserEntity.getUserId().equals(oldOrgAcctOwner.getUserId())) {
+        if (authenticatedUserEntity.getUserId().equals(currentOrgAcctOwner.getUserId())) {
             // If the "old" org account owner is the one making the request, his/her session will still have the role until logging out.
             clearOldOrgAccountOwnerSession();
         }
