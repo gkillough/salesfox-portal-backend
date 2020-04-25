@@ -8,6 +8,7 @@ import com.usepipeline.portal.database.organization.account.OrganizationAccountE
 import com.usepipeline.portal.database.organization.account.OrganizationAccountRepository;
 import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
 import com.usepipeline.portal.web.license.LicenseService;
+import com.usepipeline.portal.web.user.active.UserActiveService;
 import com.usepipeline.portal.web.util.HttpSafeUserMembershipRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,15 +26,17 @@ public class OrganizationActivationService {
     private UserRepository userRepository;
     private OrganizationAccountRepository organizationAccountRepository;
     private LicenseService licenseService;
+    private UserActiveService userActiveService;
 
     @Autowired
     public OrganizationActivationService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, MembershipRepository membershipRepository, UserRepository userRepository,
-                                         OrganizationAccountRepository organizationAccountRepository, LicenseService licenseService) {
+                                         OrganizationAccountRepository organizationAccountRepository, LicenseService licenseService, UserActiveService userActiveService) {
         this.membershipRetrievalService = membershipRetrievalService;
         this.membershipRepository = membershipRepository;
         this.userRepository = userRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.licenseService = licenseService;
+        this.userActiveService = userActiveService;
     }
 
     @Transactional
@@ -72,10 +75,9 @@ public class OrganizationActivationService {
 
         List<UserEntity> users = userRepository.findAllById(orgMemberUserIds);
         for (UserEntity user : users) {
-            user.setIsActive(activeStatus);
+            // TODO figure out how to avoid reactivating "permanently" deactivated users
+            userActiveService.updateUserActiveStatus(user.getUserId(), activeStatus);
         }
-
-        userRepository.saveAll(users);
     }
 
 }
