@@ -38,17 +38,18 @@ public class UserActiveService {
         if (updateModel.getActiveStatus() == null) {
             throw createBadRequest("The field 'activeStatus' cannot be null");
         }
-        updateUserActiveStatus(userId, updateModel.getActiveStatus());
-    }
-
-    @Transactional
-    public void updateUserActiveStatus(Long userId, boolean activeStatus) {
-        if (userId == null) {
-            throw createBadRequest("The field 'userId' cannot be null");
-        }
 
         if (!userAccessService.canCurrentUserAccessDataForUser(userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        updateUserActiveStatusWithoutPermissionCheck(userId, updateModel.getActiveStatus());
+    }
+
+    @Transactional
+    public void updateUserActiveStatusWithoutPermissionCheck(Long userId, boolean activeStatus) {
+        if (userId == null) {
+            throw createBadRequest("The field 'userId' cannot be null");
         }
 
         UserEntity requestedUser = userRepository.findById(userId)

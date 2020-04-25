@@ -76,7 +76,7 @@ public class OrganizationActivationService {
         List<UserEntity> users = userRepository.findAllById(orgMemberUserIds);
         for (UserEntity user : users) {
             // TODO figure out how to avoid reactivating "permanently" deactivated users
-            userActiveService.updateUserActiveStatus(user.getUserId(), activeStatus);
+            userActiveService.updateUserActiveStatusWithoutPermissionCheck(user.getUserId(), activeStatus);
         }
     }
 

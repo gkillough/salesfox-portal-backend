@@ -15,8 +15,8 @@ public class UserActiveController {
         this.userActiveService = userActiveService;
     }
 
-    @PatchMapping("/{user_id}")
-    public void updateActiveStatus(@PathVariable(name = "user_id") Long userId, @RequestBody ActiveStatusPatchModel updateModel) {
+    @PatchMapping("/{userId}")
+    public void updateActiveStatus(@PathVariable Long userId, @RequestBody ActiveStatusPatchModel updateModel) {
         userActiveService.updateUserActiveStatus(userId, updateModel);
     }
 

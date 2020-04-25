@@ -1,5 +1,6 @@
 package com.usepipeline.portal.web.organization.users;
 
+import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
 import com.usepipeline.portal.web.organization.common.OrganizationEndpointConstants;
 import com.usepipeline.portal.web.organization.users.model.NewAccountOwnerRequestModel;
 import com.usepipeline.portal.web.organization.users.model.OrganizationMultiUsersModel;
@@ -32,6 +33,12 @@ public class OrganizationUsersController {
     @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     public UserAccountModel getOrganizationAccountUser(@PathVariable Long accountId, @PathVariable Long userId) {
         return organizationUsersService.getOrganizationAccountUser(accountId, userId);
+    }
+
+    @PatchMapping("/users/{userId}/active")
+    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
+    public void setOrganizationAccountUserActiveStatus(@PathVariable Long accountId, @PathVariable Long userId, @RequestBody ActiveStatusPatchModel updateModel) {
+        organizationUsersService.setOrganizationAccountUserActiveStatus(accountId, userId, updateModel);
     }
 
     @GetMapping("/account_owner")

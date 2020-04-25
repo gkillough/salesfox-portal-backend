@@ -9,10 +9,12 @@ import com.usepipeline.portal.database.account.repository.RoleRepository;
 import com.usepipeline.portal.database.account.repository.UserRepository;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountRepository;
+import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
 import com.usepipeline.portal.web.organization.common.OrganizationAccessService;
 import com.usepipeline.portal.web.organization.users.model.NewAccountOwnerRequestModel;
 import com.usepipeline.portal.web.organization.users.model.OrganizationMultiUsersModel;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
+import com.usepipeline.portal.web.user.active.UserActiveService;
 import com.usepipeline.portal.web.user.common.UserAccessService;
 import com.usepipeline.portal.web.user.common.model.UserAccountModel;
 import com.usepipeline.portal.web.user.profile.UserProfileService;
@@ -40,6 +42,7 @@ public class OrganizationUsersService {
     private OrganizationAccessService organizationAccessService;
     private UserProfileService userProfileService;
     private UserAccessService userAccessService;
+    private UserActiveService userActiveService;
     private OrganizationAccountRepository organizationAccountRepository;
     private RoleRepository roleRepository;
     private MembershipRepository membershipRepository;
@@ -47,11 +50,12 @@ public class OrganizationUsersService {
 
     @Autowired
     public OrganizationUsersService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccessService organizationAccessService, UserProfileService userProfileService, UserAccessService userAccessService,
-                                    OrganizationAccountRepository organizationAccountRepository, RoleRepository roleRepository, MembershipRepository membershipRepository, UserRepository userRepository) {
+                                    UserActiveService userActiveService, OrganizationAccountRepository organizationAccountRepository, RoleRepository roleRepository, MembershipRepository membershipRepository, UserRepository userRepository) {
         this.membershipRetrievalService = membershipRetrievalService;
         this.organizationAccessService = organizationAccessService;
         this.userProfileService = userProfileService;
         this.userAccessService = userAccessService;
+        this.userActiveService = userActiveService;
         this.organizationAccountRepository = organizationAccountRepository;
         this.roleRepository = roleRepository;
         this.membershipRepository = membershipRepository;
@@ -65,16 +69,32 @@ public class OrganizationUsersService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
-        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
 
-        MembershipEntity requestedUserMembership = membershipRetrievalService.getMembershipEntity(requestedUser);
-        if (!requestedUserMembership.getOrganizationAccountId().equals(organizationAccountId)) {
-            // The user exists, but is not a member of the organization account. To prevent any unnecessary details about
-            // the user's account being leaked, treat this the as if the user does not exist.
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
+        validateUserIsAMemberOfOrgAccount(organizationAccountId, requestedUser);
 
         return convertToAccountModel(requestedUser);
+    }
+
+    public void setOrganizationAccountUserActiveStatus(Long organizationAccountId, Long userId, ActiveStatusPatchModel updateModel) {
+        OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        UserEntity userToBeUpdated = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
+
+        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
+        validateUserIsAMemberOfOrgAccount(organizationAccountId, userToBeUpdated);
+
+        // Ensure that if the org account owner active status is being changed, that it is either by the org account owner or a pipeline admin.
+        RoleEntity orgAccountOwnerRole = getExistingRole(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER);
+        UserEntity orgAccountOwnerEntity = getOrganizationAccountOwnerEntity(orgAccountEntity, orgAccountOwnerRole);
+        if (orgAccountOwnerEntity.getUserId().equals(userId) && !authenticatedUserEntity.getUserId().equals(userId) && !membershipRetrievalService.isPipelineAdmin()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        userActiveService.updateUserActiveStatusWithoutPermissionCheck(userId, updateModel.getActiveStatus());
     }
 
     public OrganizationMultiUsersModel getOrganizationAccountUsers(Long organizationAccountId) {
@@ -156,6 +176,15 @@ public class OrganizationUsersService {
         AccessLevel orgAccountAccessLevel = organizationAccessService.getAccessLevelForUserRequestingAccount(authenticatedUserEntity, orgAccountEntity);
         if (AccessLevel.NONE.equals(orgAccountAccessLevel)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+    }
+
+    private void validateUserIsAMemberOfOrgAccount(Long organizationAccountId, UserEntity userEntity) {
+        MembershipEntity requestedUserMembership = membershipRetrievalService.getMembershipEntity(userEntity);
+        if (!requestedUserMembership.getOrganizationAccountId().equals(organizationAccountId)) {
+            // The user exists, but is not a member of the organization account. To prevent any unnecessary details about
+            // the user's account being leaked, treat this the as if the user does not exist.
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
 
