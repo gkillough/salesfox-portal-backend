@@ -76,18 +76,46 @@ public class LicenseService {
     }
 
     public void setActiveStatus(Long licenseId, ActiveStatusPatchModel activeStatusModel) {
-        if (activeStatusModel.getActiveStatus() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field activeStatus is required");
-        }
-
         LicenseEntity licenseEntity = licenseRepository.findById(licenseId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (activeStatusModel.getActiveStatus() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'activeStatus' is required");
+        }
 
         if (activeStatusModel.getActiveStatus() && hasLicenseExpired(licenseEntity)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot activate an expired license");
         }
 
         licenseEntity.setIsActive(activeStatusModel.getActiveStatus());
+        licenseRepository.save(licenseEntity);
+    }
+
+    public void setMaxLicenseSeats(Long licenseId, LicenseSeatUpdateModel licenseSeatUpdateModel) {
+        LicenseEntity licenseEntity = licenseRepository.findById(licenseId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (licenseSeatUpdateModel.getMaxLicenseSeats() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'maxLicenseSeats' is required");
+        }
+
+        if (licenseSeatUpdateModel.getMaxLicenseSeats() < 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'maxLicenseSeats' must be a positive integer");
+        }
+
+        Long currentMaxLicenseSeats = licenseEntity.getMaxLicenseSeats();
+        Long currentAvailableLicenseSeats = licenseEntity.getAvailableLicenseSeats();
+
+        Long currentOccupiedLicenseSeats = currentMaxLicenseSeats - currentAvailableLicenseSeats;
+        if (licenseSeatUpdateModel.getMaxLicenseSeats() < currentOccupiedLicenseSeats) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'maxLicenseSeats' cannot be less than the number of license seats in use");
+        }
+
+        Long netNewLicenseSeats = Math.abs(currentMaxLicenseSeats - licenseSeatUpdateModel.getMaxLicenseSeats());
+        Long newAvailableLicenseSeats = currentAvailableLicenseSeats + netNewLicenseSeats;
+
+        licenseEntity.setMaxLicenseSeats(licenseSeatUpdateModel.getMaxLicenseSeats());
+        licenseEntity.setAvailableLicenseSeats(newAvailableLicenseSeats);
         licenseRepository.save(licenseEntity);
     }
 

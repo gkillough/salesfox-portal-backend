@@ -3,6 +3,7 @@ package com.usepipeline.portal.web.license;
 import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
 import com.usepipeline.portal.web.license.model.LicenseCreationRequestModel;
 import com.usepipeline.portal.web.license.model.LicenseModel;
+import com.usepipeline.portal.web.license.model.LicenseSeatUpdateModel;
 import com.usepipeline.portal.web.license.model.MultiLicenseModel;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,12 @@ public class LicenseController {
     @PatchMapping("/{licenseId}/active")
     public void setActiveStatus(@PathVariable Long licenseId, @RequestBody ActiveStatusPatchModel updateModel) {
         licenseService.setActiveStatus(licenseId, updateModel);
+    }
+
+    @PatchMapping("/{licenseId}/seats")
+    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN)
+    public void setMaxLicenseSeats(@PathVariable Long licenseId, @RequestBody LicenseSeatUpdateModel updateModel) {
+        licenseService.setMaxLicenseSeats(licenseId, updateModel);
     }
 
 }
