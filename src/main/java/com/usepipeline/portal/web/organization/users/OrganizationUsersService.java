@@ -46,11 +46,12 @@ public class OrganizationUsersService {
     private UserRepository userRepository;
 
     @Autowired
-    public OrganizationUsersService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccessService organizationAccessService, UserProfileService userProfileService,
+    public OrganizationUsersService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccessService organizationAccessService, UserProfileService userProfileService, UserAccessService userAccessService,
                                     OrganizationAccountRepository organizationAccountRepository, RoleRepository roleRepository, MembershipRepository membershipRepository, UserRepository userRepository) {
         this.membershipRetrievalService = membershipRetrievalService;
         this.organizationAccessService = organizationAccessService;
         this.userProfileService = userProfileService;
+        this.userAccessService = userAccessService;
         this.organizationAccountRepository = organizationAccountRepository;
         this.roleRepository = roleRepository;
         this.membershipRepository = membershipRepository;
