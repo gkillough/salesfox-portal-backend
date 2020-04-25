@@ -11,9 +11,13 @@ import com.usepipeline.portal.database.organization.account.OrganizationAccountE
 import com.usepipeline.portal.database.organization.account.OrganizationAccountRepository;
 import com.usepipeline.portal.web.organization.common.OrganizationAccessService;
 import com.usepipeline.portal.web.organization.users.model.NewAccountOwnerRequestModel;
+import com.usepipeline.portal.web.organization.users.model.OrganizationMultiUsersModel;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
+import com.usepipeline.portal.web.user.common.UserAccessService;
+import com.usepipeline.portal.web.user.common.model.UserAccountModel;
 import com.usepipeline.portal.web.user.profile.UserProfileService;
 import com.usepipeline.portal.web.user.profile.model.UserProfileModel;
+import com.usepipeline.portal.web.user.role.model.UserRoleModel;
 import com.usepipeline.portal.web.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +30,8 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -33,6 +39,7 @@ public class OrganizationUsersService {
     private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private OrganizationAccessService organizationAccessService;
     private UserProfileService userProfileService;
+    private UserAccessService userAccessService;
     private OrganizationAccountRepository organizationAccountRepository;
     private RoleRepository roleRepository;
     private MembershipRepository membershipRepository;
@@ -48,6 +55,45 @@ public class OrganizationUsersService {
         this.roleRepository = roleRepository;
         this.membershipRepository = membershipRepository;
         this.userRepository = userRepository;
+    }
+
+    public UserAccountModel getOrganizationAccountUser(Long organizationAccountId, Long userId) {
+        OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        UserEntity requestedUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
+        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
+
+        MembershipEntity requestedUserMembership = membershipRetrievalService.getMembershipEntity(requestedUser);
+        if (!requestedUserMembership.getOrganizationAccountId().equals(organizationAccountId)) {
+            // The user exists, but is not a member of the organization account. To prevent any unnecessary details about
+            // the user's account being leaked, treat this the as if the user does not exist.
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        return convertToAccountModel(requestedUser);
+    }
+
+    public OrganizationMultiUsersModel getOrganizationAccountUsers(Long organizationAccountId) {
+        OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
+        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
+
+        Set<Long> orgAccountUserIds = membershipRepository.findByOrganizationAccountId(organizationAccountId)
+                .stream()
+                .map(MembershipEntity::getUserId)
+                .collect(Collectors.toSet());
+
+        List<UserAccountModel> orgAccountUserAccountModels = userRepository.findAllById(orgAccountUserIds)
+                .stream()
+                .map(this::convertToAccountModel)
+                .collect(Collectors.toList());
+
+        return new OrganizationMultiUsersModel(orgAccountUserAccountModels);
     }
 
     public UserProfileModel getOrganizationAccountOwner(Long organizationAccountId) {
@@ -134,6 +180,11 @@ public class OrganizationUsersService {
                     log.error("The org account owner was not present for org account with id [{}]", orgAccount.getOrganizationAccountId());
                     return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
                 });
+    }
+
+    private UserAccountModel convertToAccountModel(UserEntity userEntity) {
+        UserRoleModel userRole = userAccessService.findRoleByUserId(userEntity.getUserId());
+        return new UserAccountModel(userEntity.getFirstName(), userEntity.getLastName(), userEntity.getEmail(), userRole, userEntity.getIsActive());
     }
 
     private void clearOldOrgAccountOwnerSession() {

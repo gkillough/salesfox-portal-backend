@@ -4,12 +4,11 @@ import com.usepipeline.portal.web.organization.common.OrganizationEndpointConsta
 import com.usepipeline.portal.web.organization.users.model.NewAccountOwnerRequestModel;
 import com.usepipeline.portal.web.organization.users.model.OrganizationMultiUsersModel;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
+import com.usepipeline.portal.web.user.common.model.UserAccountModel;
 import com.usepipeline.portal.web.user.profile.model.UserProfileModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping(OrganizationUsersController.BASE_ENDPOINT)
@@ -24,15 +23,15 @@ public class OrganizationUsersController {
     }
 
     @GetMapping("/users")
+    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     public OrganizationMultiUsersModel getOrganizationAccountUsers(@PathVariable Long accountId) {
-        // TODO implement
-        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
+        return organizationUsersService.getOrganizationAccountUsers(accountId);
     }
 
     @GetMapping("/users/{userId}")
-    public UserProfileModel getOrganizationAccountUser(@PathVariable Long accountId, @PathVariable Long userId) {
-        // TODO implement
-        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
+    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
+    public UserAccountModel getOrganizationAccountUser(@PathVariable Long accountId, @PathVariable Long userId) {
+        return organizationUsersService.getOrganizationAccountUser(accountId, userId);
     }
 
     @GetMapping("/account_owner")
