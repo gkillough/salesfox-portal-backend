@@ -87,11 +87,10 @@ public class OrganizationUsersService {
         validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
         validateUserIsAMemberOfOrgAccount(organizationAccountId, userToBeUpdated);
 
-        // Ensure that if the org account owner active status is being changed, that it is either by the org account owner or a pipeline admin.
         RoleEntity orgAccountOwnerRole = getExistingRole(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER);
         UserEntity orgAccountOwnerEntity = getOrganizationAccountOwnerEntity(orgAccountEntity, orgAccountOwnerRole);
-        if (orgAccountOwnerEntity.getUserId().equals(userId) && !authenticatedUserEntity.getUserId().equals(userId) && !membershipRetrievalService.isPipelineAdmin()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        if (orgAccountOwnerEntity.getUserId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Organization Account Owner's active status cannot be changed");
         }
 
         userActiveService.updateUserActiveStatusWithoutPermissionCheck(userId, updateModel.getActiveStatus());
