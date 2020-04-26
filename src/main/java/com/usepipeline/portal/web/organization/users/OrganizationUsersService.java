@@ -9,11 +9,17 @@ import com.usepipeline.portal.database.account.repository.RoleRepository;
 import com.usepipeline.portal.database.account.repository.UserRepository;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountRepository;
+import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
 import com.usepipeline.portal.web.organization.common.OrganizationAccessService;
 import com.usepipeline.portal.web.organization.users.model.NewAccountOwnerRequestModel;
+import com.usepipeline.portal.web.organization.users.model.OrganizationMultiUsersModel;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
+import com.usepipeline.portal.web.user.active.UserActiveService;
+import com.usepipeline.portal.web.user.common.UserAccessService;
+import com.usepipeline.portal.web.user.common.model.UserAccountModel;
 import com.usepipeline.portal.web.user.profile.UserProfileService;
 import com.usepipeline.portal.web.user.profile.model.UserProfileModel;
+import com.usepipeline.portal.web.user.role.model.UserRoleModel;
 import com.usepipeline.portal.web.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +32,8 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -33,21 +41,79 @@ public class OrganizationUsersService {
     private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private OrganizationAccessService organizationAccessService;
     private UserProfileService userProfileService;
+    private UserAccessService userAccessService;
+    private UserActiveService userActiveService;
     private OrganizationAccountRepository organizationAccountRepository;
     private RoleRepository roleRepository;
     private MembershipRepository membershipRepository;
     private UserRepository userRepository;
 
     @Autowired
-    public OrganizationUsersService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccessService organizationAccessService, UserProfileService userProfileService,
-                                    OrganizationAccountRepository organizationAccountRepository, RoleRepository roleRepository, MembershipRepository membershipRepository, UserRepository userRepository) {
+    public OrganizationUsersService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccessService organizationAccessService, UserProfileService userProfileService, UserAccessService userAccessService,
+                                    UserActiveService userActiveService, OrganizationAccountRepository organizationAccountRepository, RoleRepository roleRepository, MembershipRepository membershipRepository, UserRepository userRepository) {
         this.membershipRetrievalService = membershipRetrievalService;
         this.organizationAccessService = organizationAccessService;
         this.userProfileService = userProfileService;
+        this.userAccessService = userAccessService;
+        this.userActiveService = userActiveService;
         this.organizationAccountRepository = organizationAccountRepository;
         this.roleRepository = roleRepository;
         this.membershipRepository = membershipRepository;
         this.userRepository = userRepository;
+    }
+
+    public UserAccountModel getOrganizationAccountUser(Long organizationAccountId, Long userId) {
+        OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        UserEntity requestedUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
+
+        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
+        validateUserIsAMemberOfOrgAccount(organizationAccountId, requestedUser);
+
+        return convertToAccountModel(requestedUser);
+    }
+
+    public void setOrganizationAccountUserActiveStatus(Long organizationAccountId, Long userId, ActiveStatusPatchModel updateModel) {
+        OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        UserEntity userToBeUpdated = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
+
+        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
+        validateUserIsAMemberOfOrgAccount(organizationAccountId, userToBeUpdated);
+
+        RoleEntity orgAccountOwnerRole = getExistingRole(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER);
+        UserEntity orgAccountOwnerEntity = getOrganizationAccountOwnerEntity(orgAccountEntity, orgAccountOwnerRole);
+        if (orgAccountOwnerEntity.getUserId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Organization Account Owner's active status cannot be changed");
+        }
+
+        userActiveService.updateUserActiveStatusWithoutPermissionCheck(userId, updateModel.getActiveStatus());
+    }
+
+    public OrganizationMultiUsersModel getOrganizationAccountUsers(Long organizationAccountId) {
+        OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
+        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
+
+        Set<Long> orgAccountUserIds = membershipRepository.findByOrganizationAccountId(organizationAccountId)
+                .stream()
+                .map(MembershipEntity::getUserId)
+                .collect(Collectors.toSet());
+
+        List<UserAccountModel> orgAccountUserAccountModels = userRepository.findAllById(orgAccountUserIds)
+                .stream()
+                .map(this::convertToAccountModel)
+                .collect(Collectors.toList());
+
+        return new OrganizationMultiUsersModel(orgAccountUserAccountModels);
     }
 
     public UserProfileModel getOrganizationAccountOwner(Long organizationAccountId) {
@@ -112,6 +178,15 @@ public class OrganizationUsersService {
         }
     }
 
+    private void validateUserIsAMemberOfOrgAccount(Long organizationAccountId, UserEntity userEntity) {
+        MembershipEntity requestedUserMembership = membershipRetrievalService.getMembershipEntity(userEntity);
+        if (!requestedUserMembership.getOrganizationAccountId().equals(organizationAccountId)) {
+            // The user exists, but is not a member of the organization account. To prevent any unnecessary details about
+            // the user's account being leaked, treat this the as if the user does not exist.
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+    }
+
     private RoleEntity getExistingRole(String roleLevel) {
         return roleRepository.findFirstByRoleLevel(roleLevel)
                 .<ResponseStatusException>orElseThrow(() -> {
@@ -134,6 +209,11 @@ public class OrganizationUsersService {
                     log.error("The org account owner was not present for org account with id [{}]", orgAccount.getOrganizationAccountId());
                     return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
                 });
+    }
+
+    private UserAccountModel convertToAccountModel(UserEntity userEntity) {
+        UserRoleModel userRole = userAccessService.findRoleByUserId(userEntity.getUserId());
+        return new UserAccountModel(userEntity.getFirstName(), userEntity.getLastName(), userEntity.getEmail(), userRole, userEntity.getIsActive());
     }
 
     private void clearOldOrgAccountOwnerSession() {

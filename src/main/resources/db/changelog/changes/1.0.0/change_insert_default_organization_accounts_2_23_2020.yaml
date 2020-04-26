@@ -47,7 +47,10 @@ databaseChangeLog:
                   name: type
                   value: PIPELINE_BASIC
               - column:
-                  name: license_seats
+                  name: available_license_seats
+                  valueNumeric: 999999999998
+              - column:
+                  name: max_license_seats
                   valueNumeric: 999999999999
               - column:
                   name: monthly_cost
@@ -74,7 +77,10 @@ databaseChangeLog:
                   name: type
                   value: PIPELINE_PREMIUM
               - column:
-                  name: license_seats
+                  name: available_license_seats
+                  valueNumeric: 999999999998
+              - column:
+                  name: max_license_seats
                   valueNumeric: 999999999999
               - column:
                   name: monthly_cost
@@ -101,7 +107,10 @@ databaseChangeLog:
                   name: type
                   value: PIPELINE_TEAM
               - column:
-                  name: license_seats
+                  name: available_license_seats
+                  valueNumeric: 49
+              - column:
+                  name: max_license_seats
                   valueNumeric: 50
               - column:
                   name: monthly_cost

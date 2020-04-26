@@ -16,12 +16,13 @@ public class LicenseModel {
     private UUID licenseHash;
     private LocalDate expirationDate;
     private String type;
-    private Long licenseSeats;
+    private Long availableLicenseSeats;
+    private Long maxLicenseSeats;
     private Double monthlyCost;
     private Boolean isActive;
 
     public static LicenseModel fromEntity(LicenseEntity licenseEntity) {
-        return new LicenseModel(licenseEntity.getLicenseId(), licenseEntity.getLicenseHash(), licenseEntity.getExpirationDate(), licenseEntity.getType(), licenseEntity.getLicenseSeats(), licenseEntity.getMonthlyCost(), licenseEntity.getIsActive());
+        return new LicenseModel(licenseEntity.getLicenseId(), licenseEntity.getLicenseHash(), licenseEntity.getExpirationDate(), licenseEntity.getType(), licenseEntity.getAvailableLicenseSeats(), licenseEntity.getMaxLicenseSeats(), licenseEntity.getMonthlyCost(), licenseEntity.getIsActive());
     }
 
 }
