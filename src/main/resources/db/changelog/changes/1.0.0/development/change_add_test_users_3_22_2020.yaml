@@ -51,7 +51,7 @@ databaseChangeLog:
                   valueComputed: GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com')
               - column:
                   name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_NAME('Pipeline Basic')
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pipeline for Individuals', 'Pipeline Basic')
               - column:
                   name: role_id
                   valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PIPELINE_BASIC_USER')
@@ -162,7 +162,7 @@ databaseChangeLog:
                   valueComputed: GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com')
               - column:
                   name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_NAME('Pipeline Premium')
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pipeline for Individuals', 'Pipeline Premium')
               - column:
                   name: role_id
                   valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PIPELINE_PREMIUM_USER')
@@ -273,7 +273,7 @@ databaseChangeLog:
                   valueComputed: GET_USER_ID_BY_EMAIL('admin@usepipeline.com')
               - column:
                   name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_NAME('Pipeline Team')
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pipeline Organization', 'Pipeline Team')
               - column:
                   name: role_id
                   valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PIPELINE_ADMIN')

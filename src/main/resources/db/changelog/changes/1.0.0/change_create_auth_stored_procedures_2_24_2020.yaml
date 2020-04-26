@@ -41,7 +41,7 @@ databaseChangeLog:
                           $result$
                           LANGUAGE plpgsql;
 
-  # This procedure takes in an organization account name (text) and returns the organization_account_id of the row containing that name.
+  # This procedure takes in an organization name (text) and organization account name (text) and returns the organization_account_id of the row containing that name.
   - changeSet:
       id: create-auth-function-3
       author: gavinkillough
@@ -50,13 +50,15 @@ databaseChangeLog:
             dbms: postgresql
             schemaName: portal
             procedureBody: |-
-              CREATE OR REPLACE FUNCTION GET_ORGANIZATION_ACCOUNT_ID_BY_NAME(text)
+              CREATE OR REPLACE FUNCTION GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME(text, text)
                           RETURNS BIGINT AS $result$
                               DECLARE result BIGINT;
                               BEGIN
                                   select organization_account_id
                                   into result
-                                  from portal.organization_accounts where organization_account_name = $1;
+                                  from portal.organization_accounts
+                                  where organization_id = GET_ORGANIZATION_ID_BY_NAME($1)
+                                  and organization_account_name = $2;
                                   RETURN result;
                               END;
                           $result$
@@ -122,6 +124,28 @@ databaseChangeLog:
                                   from portal.user_addresses addr
                                   join portal.users u on u.user_id = addr.user_id
                                   where u.email = $1;
+                                  RETURN result;
+                              END;
+                          $result$
+                          LANGUAGE plpgsql;
+
+  # This procedure takes in an organization name (text) and organization account name (text) and returns the organization_account_address_id of the entry with that organization account.
+  - changeSet:
+      id: create-auth-function-7
+      author: gavinkillough
+      changes:
+        - createProcedure:
+            dbms: postgresql
+            schemaName: portal
+            procedureBody: |-
+              CREATE OR REPLACE FUNCTION GET_ORG_ACCT_ADDRESS_ID_BY_ORG_NAME_AND_ACCT_NAME(text, text)
+                          RETURNS BIGINT AS $result$
+                              DECLARE result BIGINT;
+                              BEGIN
+                                  select organization_account_address_id
+                                  into result
+                                  from portal.organization_account_addresses
+                                  where organization_account_id = GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME($1, $2);
                                   RETURN result;
                               END;
                           $result$
