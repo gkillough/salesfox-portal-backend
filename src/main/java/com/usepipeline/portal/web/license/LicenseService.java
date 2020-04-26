@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,7 @@ public class LicenseService {
         return licenseGenerator.generateLicense(licenseType, requestModel.getLicenseSeats(), requestModel.getMonthlyCost(), expirationDate);
     }
 
+    @Transactional
     public void updateLicense(Long licenseId, LicenseCreationRequestModel requestModel) {
         LicenseEntity existingLicense = licenseRepository.findById(licenseId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
