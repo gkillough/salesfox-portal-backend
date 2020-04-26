@@ -95,12 +95,9 @@ public class OrganizationAccountRegistrationService {
         OrganizationAccountEntity orgAccountEntity = createOrganizationAccount(registrationModel, orgAccountLicense, orgEntity);
         OrganizationAccountAddressEntity orgAccountAddressEntity = createOrganizationAccountAddress(registrationModel.getOrganizationAddress(), orgAccountEntity);
 
-        registerOrganizationAccountOwner(registrationModel.getAccountOwner(), orgEntity, orgAccountEntity);
-
-        createOrganizationAccountProfile(
-                orgAccountEntity, orgAccountAddressEntity, registrationModel.getBusinessPhoneNumber());
-
         activateLicense(orgAccountLicense);
+        registerOrganizationAccountOwner(registrationModel.getAccountOwner(), orgEntity, orgAccountEntity);
+        createOrganizationAccountProfile(orgAccountEntity, orgAccountAddressEntity, registrationModel.getBusinessPhoneNumber());
     }
 
     private LicenseEntity getAndValidateLicenseByHash(UUID licenseHash) {

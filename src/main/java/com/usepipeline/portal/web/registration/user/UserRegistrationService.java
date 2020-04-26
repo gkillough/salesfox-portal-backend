@@ -1,10 +1,10 @@
 package com.usepipeline.portal.web.registration.user;
 
 import com.usepipeline.portal.common.FieldValidationUtils;
-import com.usepipeline.portal.database.account.entity.LoginEntity;
-import com.usepipeline.portal.database.account.entity.MembershipEntity;
-import com.usepipeline.portal.database.account.entity.RoleEntity;
-import com.usepipeline.portal.database.account.entity.UserEntity;
+import com.usepipeline.portal.common.exception.PortalDatabaseIntegrityViolationException;
+import com.usepipeline.portal.common.service.license.LicenseSeatManager;
+import com.usepipeline.portal.common.service.license.PortalLicenseSeatException;
+import com.usepipeline.portal.database.account.entity.*;
 import com.usepipeline.portal.database.account.repository.LoginRepository;
 import com.usepipeline.portal.database.account.repository.MembershipRepository;
 import com.usepipeline.portal.database.account.repository.RoleRepository;
@@ -40,12 +40,13 @@ public class UserRegistrationService {
     private OrganizationAccountRepository organizationAccountRepository;
     private MembershipRepository membershipRepository;
     private UserProfileService userProfileService;
+    private LicenseSeatManager licenseSeatManager;
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserRegistrationService(UserRepository userRepository, LoginRepository loginRepository, RoleRepository roleRepository,
-                                   OrganizationRepository organizationRepository, OrganizationAccountRepository organizationAccountRepository,
-                                   MembershipRepository membershipRepository, UserProfileService userProfileService, PasswordEncoder passwordEncoder) {
+                                   OrganizationRepository organizationRepository, OrganizationAccountRepository organizationAccountRepository, MembershipRepository membershipRepository,
+                                   UserProfileService userProfileService, LicenseSeatManager licenseSeatManager, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.loginRepository = loginRepository;
         this.roleRepository = roleRepository;
@@ -53,6 +54,7 @@ public class UserRegistrationService {
         this.organizationAccountRepository = organizationAccountRepository;
         this.membershipRepository = membershipRepository;
         this.userProfileService = userProfileService;
+        this.licenseSeatManager = licenseSeatManager;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -77,15 +79,16 @@ public class UserRegistrationService {
     @Transactional
     public Long registerOrganizationUser(UserRegistrationModel registrationModel, Long organizationId, @Nullable String role) {
         validateRegistrationModel(registrationModel);
-        return registerValidUser(registrationModel, organizationId, role);
+        return registerValidOrganizationUser(registrationModel, organizationId, role);
     }
 
-    private Long registerValidUser(UserRegistrationModel registrationModel, Long organizationId, @Nullable String role) {
+    private Long registerValidOrganizationUser(UserRegistrationModel registrationModel, Long organizationId, @Nullable String role) {
         UserEntity userEntity = saveUserInfo(registrationModel.getFirstName(), registrationModel.getLastName(), registrationModel.getEmail());
 
         RoleEntity roleEntity = getRoleInfo(registrationModel.getPlanType(), role);
         OrganizationAccountEntity organizationAccountEntity = getPlanInfo(registrationModel.getPlanType(), organizationId);
 
+        reserveLicenseSeatForNewUser(organizationAccountEntity);
         saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
         saveMembershipInfo(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId(), roleEntity.getRoleId());
         userProfileService.initializeProfile(userEntity.getUserId());
@@ -121,6 +124,18 @@ public class UserRegistrationService {
 
         return roleRepository.findFirstByRoleLevel(portalRole)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+    }
+
+    private void reserveLicenseSeatForNewUser(OrganizationAccountEntity orgAccount) {
+        try {
+            LicenseEntity orgLicense = licenseSeatManager.getLicenseForOrganizationAccount(orgAccount);
+            licenseSeatManager.fillSeat(orgLicense);
+        } catch (PortalDatabaseIntegrityViolationException e) {
+            log.error("There was a problem managing the organization license", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (PortalLicenseSeatException e) {
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, e.getMessage());
+        }
     }
 
     private void saveLoginInfo(Long userId, String password) {

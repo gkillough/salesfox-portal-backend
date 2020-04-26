@@ -17,8 +17,4 @@ public class PortalException extends Exception {
         super(cause);
     }
 
-    protected PortalException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
-
 }

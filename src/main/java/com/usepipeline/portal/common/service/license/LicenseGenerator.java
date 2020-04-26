@@ -1,4 +1,4 @@
-package com.usepipeline.portal.common.service;
+package com.usepipeline.portal.common.service.license;
 
 import com.usepipeline.portal.common.enumeration.LicenseType;
 import com.usepipeline.portal.database.account.entity.LicenseEntity;
@@ -24,7 +24,7 @@ public class LicenseGenerator {
      */
     public LicenseModel generateLicense(LicenseType type, long licenseSeats, Double monthlyCost, LocalDate expirationDate) {
         UUID licenseHash = UUID.randomUUID();
-        LicenseEntity licenseEntity = new LicenseEntity(null, licenseHash, expirationDate, type.name(), licenseSeats, monthlyCost, false);
+        LicenseEntity licenseEntity = new LicenseEntity(null, licenseHash, expirationDate, type.name(), licenseSeats, licenseSeats, monthlyCost, false);
         LicenseEntity savedLicense = licenseRepository.save(licenseEntity);
         return LicenseModel.fromEntity(savedLicense);
     }

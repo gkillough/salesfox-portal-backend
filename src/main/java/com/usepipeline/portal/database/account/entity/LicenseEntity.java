@@ -30,8 +30,11 @@ public class LicenseEntity implements Serializable {
     @Column(name = "type")
     private String type;
 
-    @Column(name = "license_seats")
-    private Long licenseSeats;
+    @Column(name = "available_license_seats")
+    private Long availableLicenseSeats;
+
+    @Column(name = "max_license_seats")
+    private Long maxLicenseSeats;
 
     @Column(name = "monthly_cost")
     private Double monthlyCost;

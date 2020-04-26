@@ -39,5 +39,6 @@ public final class PortalAuthorityConstants {
 
     // Common Auth Checks
     public static final String PIPELINE_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK = "hasAnyAuthority('" + PIPELINE_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "')";
+    public static final String PIPELINE_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK = "hasAnyAuthority('" + PIPELINE_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "','" + ORGANIZATION_ACCOUNT_MANAGER + "')";
 
 }
