@@ -38,7 +38,6 @@ public class PortalUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // FIXME replace with reasonable joins
-        // FIXME replace with better exceptions
         UserEntity user = userRepository.findFirstByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("No user"));
         LoginEntity userLogin = loginRepository.findFirstByUserId(user.getUserId())
@@ -63,7 +62,7 @@ public class PortalUserDetailsService implements UserDetailsService {
         if (lastLockedTime != null) {
             Duration timeSinceLocked = Duration.between(lastLockedTime, LocalDateTime.now());
             if (timeSinceLocked.compareTo(PortalUserLoginAttemptService.DURATION_UNTIL_ACCOUNT_UNLOCKED) < 0) {
-                // If the time since the account was locked is strictly less than the time needed to unlock the account,  then the account is still locked.
+                // If the time since the account was locked is strictly less than the time needed to unlock the account, then the account is still locked.
                 return true;
             }
         }
