@@ -51,14 +51,16 @@ public class PortalUserDetailsService implements UserDetailsService {
                 .map(RoleEntity::getRoleLevel)
                 .ifPresent(userRoles::add);
 
-        boolean userLocked = isUserLocked(username, userLogin);
+        boolean userLocked = isUserLocked(userLogin);
+        if (userLocked) {
+            log.debug("User: [{}]. Time since last locked: [{}].", username, userLogin.getLastLocked());
+        }
         return new PortalUserDetails(userRoles, user.getEmail(), userLogin.getPasswordHash(), userLocked, user.getIsActive());
     }
 
-    private boolean isUserLocked(String username, LoginEntity userLogin) {
+    public boolean isUserLocked(LoginEntity userLogin) {
         LocalDateTime lastLockedTime = userLogin.getLastLocked();
         if (lastLockedTime != null) {
-            log.debug("User: [{}]. Time since last locked: [{}].", username, lastLockedTime);
             Duration timeSinceLocked = Duration.between(lastLockedTime, LocalDateTime.now());
             if (timeSinceLocked.compareTo(PortalUserLoginAttemptService.DURATION_UNTIL_ACCOUNT_UNLOCKED) < 0) {
                 // If the time since the account was locked is strictly less than the time needed to unlock the account,  then the account is still locked.
