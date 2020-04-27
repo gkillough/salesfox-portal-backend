@@ -75,7 +75,7 @@ public class OrganizationUsersService {
         validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
         validateUserIsAMemberOfOrgAccount(organizationAccountId, requestedUser);
 
-        return convertToAdminViewModel(requestedUser, new UserRoleModelCache(roleRepository));
+        return convertToAdminViewModel(requestedUser, new UserRoleModelCache(roleRepository), true);
     }
 
     public OrganizationMultiUsersModel getOrganizationAccountUsers(Long organizationAccountId) {
@@ -93,7 +93,7 @@ public class OrganizationUsersService {
         UserRoleModelCache roleCache = new UserRoleModelCache(roleRepository);
         List<OrganizationUserAdminViewModel> orgAccountUserAccountModels = userRepository.findAllById(orgAccountUserIds)
                 .stream()
-                .map(user -> convertToAdminViewModel(user, roleCache))
+                .map(user -> convertToAdminViewModel(user, roleCache, false))
                 .collect(Collectors.toList());
 
         return new OrganizationMultiUsersModel(orgAccountUserAccountModels);
@@ -178,15 +178,18 @@ public class OrganizationUsersService {
                 });
     }
 
-    private OrganizationUserAdminViewModel convertToAdminViewModel(UserEntity userEntity, UserRoleModelCache roleCache) {
+    private OrganizationUserAdminViewModel convertToAdminViewModel(UserEntity userEntity, UserRoleModelCache roleCache, boolean includeLoginInfo) {
         UserProfileModel userProfileModel = userProfileService.retrieveProfileWithoutPermissionCheck(userEntity.getUserId());
         MembershipEntity membershipEntity = membershipRetrievalService.getMembershipEntity(userEntity);
         UserRoleModel userRole = roleCache.findRoleByIdAndConvertToModel(membershipEntity.getRoleId());
 
-        LoginEntity loginEntity = loginRepository.findFirstByUserId(userEntity.getUserId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
-        boolean isUserLocked = portalUserDetailsService.isUserLocked(loginEntity);
-        UserLoginInfoModel loginInfo = new UserLoginInfoModel(loginEntity.getLastSuccessfulLogin(), loginEntity.getLastLocked(), isUserLocked);
+        UserLoginInfoModel loginInfo = null;
+        if (includeLoginInfo) {
+            LoginEntity loginEntity = loginRepository.findFirstByUserId(userEntity.getUserId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+            boolean isUserLocked = portalUserDetailsService.isUserLocked(loginEntity);
+            loginInfo = new UserLoginInfoModel(loginEntity.getLastSuccessfulLogin(), loginEntity.getLastLocked(), isUserLocked);
+        }
 
         return OrganizationUserAdminViewModel.fromProfile(userEntity.getUserId(), userProfileModel, userEntity.getIsActive(), userRole, loginInfo);
     }
