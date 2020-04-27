@@ -37,5 +37,9 @@ databaseChangeLog:
       relativeToChangelogFile: true
 
   - include:
-      file: development/change_add_test_organization_users_4_25_2020.yaml
+      file: development/change_add_test_organization_1_users_4_25_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: development/change_add_test_organization_2_users_4_25_2020.yaml
       relativeToChangelogFile: true
