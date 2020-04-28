@@ -1,0 +1,921 @@
+databaseChangeLog:
+
+  ###############################
+  # TEST ORG 2 ACCOUNT 1 USER 1 #
+  ###############################
+
+  - changeSet:
+      id: test-org-users-211
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: test9@usepipeline.com
+              - column:
+                  name: first_name
+                  value: Test
+              - column:
+                  name: last_name
+                  value: Nine
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-org-users-logins-211
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: logins
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test9@usepipeline.com')
+              - column:
+                  name: password_hash
+                  value: $2a$08$j.QARNAT.eorZjsetIb/Ru/9T0aY2jprfoZgHJE09G9WvA/AACBxS
+              - column:
+                  name: num_failed_logins
+                  valueNumeric: 0
+
+  - changeSet:
+      id: test-org-users-memberships-211
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: memberships
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test9@usepipeline.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
+              - column:
+                  name: role_id
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('ORGANIZATION_ACCOUNT_OWNER')
+
+  - changeSet:
+      id: test-org-users-addresses-211
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test9@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 1
+              - column:
+                  name: street_name
+                  value: A Street
+              - column:
+                  name: apt_suite
+                  value: Unit 9
+              - column:
+                  name: city
+                  value: New York
+              - column:
+                  name: state
+                  value: NY
+              - column:
+                  name: zip_code
+                  value: 10001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-org-users-profiles-211
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: profiles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test9@usepipeline.com')
+              - column:
+                  name: mobile_number
+                  valueComputed: 5555555211
+              - column:
+                  name: business_number
+                  valueComputed: 5555555211
+              - column:
+                  name: mailing_address_id
+                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test9@usepipeline.com')
+
+  ###############################
+  # TEST ORG 2 ACCOUNT 1 USER 2 #
+  ###############################
+
+  - changeSet:
+      id: test-org-users-212
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: test10@usepipeline.com
+              - column:
+                  name: first_name
+                  value: Test
+              - column:
+                  name: last_name
+                  value: Ten
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-org-users-logins-212
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: logins
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test10@usepipeline.com')
+              - column:
+                  name: password_hash
+                  value: $2a$08$j.QARNAT.eorZjsetIb/Ru/9T0aY2jprfoZgHJE09G9WvA/AACBxS
+              - column:
+                  name: num_failed_logins
+                  valueNumeric: 0
+
+  - changeSet:
+      id: test-org-users-memberships-212
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: memberships
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test10@usepipeline.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
+              - column:
+                  name: role_id
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('ORGANIZATION_ACCOUNT_MANAGER')
+
+  - changeSet:
+      id: test-org-users-addresses-212
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test10@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 1
+              - column:
+                  name: street_name
+                  value: A Street
+              - column:
+                  name: apt_suite
+                  value: Unit 10
+              - column:
+                  name: city
+                  value: New York
+              - column:
+                  name: state
+                  value: NY
+              - column:
+                  name: zip_code
+                  value: 10001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-org-users-profiles-212
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: profiles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test10@usepipeline.com')
+              - column:
+                  name: mobile_number
+                  valueComputed: 5555555212
+              - column:
+                  name: business_number
+                  valueComputed: 5555555212
+              - column:
+                  name: mailing_address_id
+                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test10@usepipeline.com')
+
+  ###############################
+  # TEST ORG 2 ACCOUNT 1 USER 3 #
+  ###############################
+
+  - changeSet:
+      id: test-org-users-213
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: test11@usepipeline.com
+              - column:
+                  name: first_name
+                  value: Test
+              - column:
+                  name: last_name
+                  value: Eleven
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-org-users-logins-213
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: logins
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test11@usepipeline.com')
+              - column:
+                  name: password_hash
+                  value: $2a$08$j.QARNAT.eorZjsetIb/Ru/9T0aY2jprfoZgHJE09G9WvA/AACBxS
+              - column:
+                  name: num_failed_logins
+                  valueNumeric: 0
+
+  - changeSet:
+      id: test-org-users-memberships-213
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: memberships
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test11@usepipeline.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
+              - column:
+                  name: role_id
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('ORGANIZATION_ACCOUNT_REP')
+
+  - changeSet:
+      id: test-org-users-addresses-213
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test11@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 1
+              - column:
+                  name: street_name
+                  value: A Street
+              - column:
+                  name: apt_suite
+                  value: Unit 11
+              - column:
+                  name: city
+                  value: New York
+              - column:
+                  name: state
+                  value: NY
+              - column:
+                  name: zip_code
+                  value: 10001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-org-users-profiles-213
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: profiles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test11@usepipeline.com')
+              - column:
+                  name: mobile_number
+                  valueComputed: 5555555213
+              - column:
+                  name: business_number
+                  valueComputed: 5555555213
+              - column:
+                  name: mailing_address_id
+                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test11@usepipeline.com')
+
+  ###############################
+  # TEST ORG 2 ACCOUNT 1 USER 4 #
+  ###############################
+
+  - changeSet:
+      id: test-org-users-214
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: test12@usepipeline.com
+              - column:
+                  name: first_name
+                  value: Test
+              - column:
+                  name: last_name
+                  value: Twelve
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-org-users-logins-214
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: logins
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test12@usepipeline.com')
+              - column:
+                  name: password_hash
+                  value: $2a$08$j.QARNAT.eorZjsetIb/Ru/9T0aY2jprfoZgHJE09G9WvA/AACBxS
+              - column:
+                  name: num_failed_logins
+                  valueNumeric: 0
+
+  - changeSet:
+      id: test-org-users-memberships-214
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: memberships
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test12@usepipeline.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
+              - column:
+                  name: role_id
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('ORGANIZATION_ACCOUNT_REP')
+
+  - changeSet:
+      id: test-org-users-addresses-214
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test12@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 1
+              - column:
+                  name: street_name
+                  value: A Street
+              - column:
+                  name: apt_suite
+                  value: Unit 12
+              - column:
+                  name: city
+                  value: New York
+              - column:
+                  name: state
+                  value: NY
+              - column:
+                  name: zip_code
+                  value: 10001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-org-users-profiles-214
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: profiles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test12@usepipeline.com')
+              - column:
+                  name: mobile_number
+                  valueComputed: 5555555214
+              - column:
+                  name: business_number
+                  valueComputed: 5555555214
+              - column:
+                  name: mailing_address_id
+                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test12@usepipeline.com')
+
+  ###############################
+  # TEST ORG 2 ACCOUNT 2 USER 1 #
+  ###############################
+
+  - changeSet:
+      id: test-org-users-221
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: test13@usepipeline.com
+              - column:
+                  name: first_name
+                  value: Test
+              - column:
+                  name: last_name
+                  value: Thirteen
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-org-users-logins-221
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: logins
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test13@usepipeline.com')
+              - column:
+                  name: password_hash
+                  value: $2a$08$j.QARNAT.eorZjsetIb/Ru/9T0aY2jprfoZgHJE09G9WvA/AACBxS
+              - column:
+                  name: num_failed_logins
+                  valueNumeric: 0
+
+  - changeSet:
+      id: test-org-users-memberships-221
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: memberships
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test13@usepipeline.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
+              - column:
+                  name: role_id
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('ORGANIZATION_ACCOUNT_OWNER')
+
+  - changeSet:
+      id: test-org-users-addresses-221
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test13@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 1
+              - column:
+                  name: street_name
+                  value: A Street
+              - column:
+                  name: apt_suite
+                  value: Unit 13
+              - column:
+                  name: city
+                  value: New York
+              - column:
+                  name: state
+                  value: NY
+              - column:
+                  name: zip_code
+                  value: 10001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-org-users-profiles-221
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: profiles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test13@usepipeline.com')
+              - column:
+                  name: mobile_number
+                  valueComputed: 5555555221
+              - column:
+                  name: business_number
+                  valueComputed: 5555555221
+              - column:
+                  name: mailing_address_id
+                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test13@usepipeline.com')
+
+  ###############################
+  # TEST ORG 2 ACCOUNT 2 USER 2 #
+  ###############################
+
+  - changeSet:
+      id: test-org-users-222
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: test14@usepipeline.com
+              - column:
+                  name: first_name
+                  value: Test
+              - column:
+                  name: last_name
+                  value: Fourteen
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-org-users-logins-222
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: logins
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test14@usepipeline.com')
+              - column:
+                  name: password_hash
+                  value: $2a$08$j.QARNAT.eorZjsetIb/Ru/9T0aY2jprfoZgHJE09G9WvA/AACBxS
+              - column:
+                  name: num_failed_logins
+                  valueNumeric: 0
+
+  - changeSet:
+      id: test-org-users-memberships-222
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: memberships
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test14@usepipeline.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
+              - column:
+                  name: role_id
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('ORGANIZATION_ACCOUNT_MANAGER')
+
+  - changeSet:
+      id: test-org-users-addresses-222
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test14@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 1
+              - column:
+                  name: street_name
+                  value: A Street
+              - column:
+                  name: apt_suite
+                  value: Unit 14
+              - column:
+                  name: city
+                  value: New York
+              - column:
+                  name: state
+                  value: NY
+              - column:
+                  name: zip_code
+                  value: 10001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-org-users-profiles-222
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: profiles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test14@usepipeline.com')
+              - column:
+                  name: mobile_number
+                  valueComputed: 5555555222
+              - column:
+                  name: business_number
+                  valueComputed: 5555555222
+              - column:
+                  name: mailing_address_id
+                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test10@usepipeline.com')
+
+  ###############################
+  # TEST ORG 2 ACCOUNT 2 USER 3 #
+  ###############################
+
+  - changeSet:
+      id: test-org-users-223
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: test15@usepipeline.com
+              - column:
+                  name: first_name
+                  value: Test
+              - column:
+                  name: last_name
+                  value: Fifteen
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-org-users-logins-223
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: logins
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test15@usepipeline.com')
+              - column:
+                  name: password_hash
+                  value: $2a$08$j.QARNAT.eorZjsetIb/Ru/9T0aY2jprfoZgHJE09G9WvA/AACBxS
+              - column:
+                  name: num_failed_logins
+                  valueNumeric: 0
+
+  - changeSet:
+      id: test-org-users-memberships-223
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: memberships
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test15@usepipeline.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
+              - column:
+                  name: role_id
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('ORGANIZATION_ACCOUNT_REP')
+
+  - changeSet:
+      id: test-org-users-addresses-223
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test15@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 1
+              - column:
+                  name: street_name
+                  value: A Street
+              - column:
+                  name: apt_suite
+                  value: Unit 15
+              - column:
+                  name: city
+                  value: New York
+              - column:
+                  name: state
+                  value: NY
+              - column:
+                  name: zip_code
+                  value: 10001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-org-users-profiles-223
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: profiles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test15@usepipeline.com')
+              - column:
+                  name: mobile_number
+                  valueComputed: 5555555223
+              - column:
+                  name: business_number
+                  valueComputed: 5555555223
+              - column:
+                  name: mailing_address_id
+                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test11@usepipeline.com')
+
+  ###############################
+  # TEST ORG 2 ACCOUNT 2 USER 4 #
+  ###############################
+
+  - changeSet:
+      id: test-org-users-224
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: test16@usepipeline.com
+              - column:
+                  name: first_name
+                  value: Test
+              - column:
+                  name: last_name
+                  value: Sixteen
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-org-users-logins-224
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: logins
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test16@usepipeline.com')
+              - column:
+                  name: password_hash
+                  value: $2a$08$j.QARNAT.eorZjsetIb/Ru/9T0aY2jprfoZgHJE09G9WvA/AACBxS
+              - column:
+                  name: num_failed_logins
+                  valueNumeric: 0
+
+  - changeSet:
+      id: test-org-users-memberships-224
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: memberships
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test16@usepipeline.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
+              - column:
+                  name: role_id
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('ORGANIZATION_ACCOUNT_REP')
+
+  - changeSet:
+      id: test-org-users-addresses-224
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test16@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 1
+              - column:
+                  name: street_name
+                  value: A Street
+              - column:
+                  name: apt_suite
+                  value: Unit 16
+              - column:
+                  name: city
+                  value: New York
+              - column:
+                  name: state
+                  value: NY
+              - column:
+                  name: zip_code
+                  value: 10001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-org-users-profiles-224
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: profiles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test16@usepipeline.com')
+              - column:
+                  name: mobile_number
+                  valueComputed: 5555555224
+              - column:
+                  name: business_number
+                  valueComputed: 5555555224
+              - column:
+                  name: mailing_address_id
+                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test12@usepipeline.com')

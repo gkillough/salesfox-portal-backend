@@ -1,0 +1,467 @@
+databaseChangeLog:
+
+  ##############
+  # TEST ORG 1 #
+  ##############
+
+  - changeSet:
+      id: test-orgs-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organizations
+            columns:
+              - column:
+                  name: organization_name
+                  value: Big Apple Corp
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  ########################
+  # TEST ORG 1 ACCOUNT 1 #
+  ########################
+
+  - changeSet:
+      id: test-orgs-licenses-11
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: licenses
+            columns:
+              - column:
+                  name: license_hash
+                  value: 354d0583-3e0e-4a39-9a23-80f8e979b058
+              - column:
+                  name: expiration_date
+                  valueDate: 2021-12-31
+              - column:
+                  name: type
+                  value: PIPELINE_BUSINESS
+              - column:
+                  # 4 initial users
+                  name: available_license_seats
+                  valueNumeric: 6
+              - column:
+                  name: max_license_seats
+                  valueNumeric: 10
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 250.0
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-orgs-accounts-11
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_accounts
+            columns:
+              - column:
+                  name: organization_account_name
+                  value: Sales
+              - column:
+                  name: license_id
+                  valueComputed: GET_LICENSE_ID_BY_HASH('354d0583-3e0e-4a39-9a23-80f8e979b058')
+              - column:
+                  name: organization_id
+                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Big Apple Corp')
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-orgs-addresses-11
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_addresses
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
+              - column:
+                  name: street_number
+                  valueNumeric: 100
+              - column:
+                  name: street_name
+                  value: Main Street
+              - column:
+                  name: apt_suite
+                  value: Suite B
+              - column:
+                  name: city
+                  value: New York
+              - column:
+                  name: state
+                  value: NY
+              - column:
+                  name: zip_code
+                  value: 10003
+              - column:
+                  name: is_business
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-orgs-profiles-11
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_profiles
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
+              - column:
+                  name: mailing_address_id
+                  valueComputed: GET_ORG_ACCT_ADDRESS_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
+              - column:
+                  name: business_number
+                  value: 5555555555
+
+  ########################
+  # TEST ORG 1 ACCOUNT 2 #
+  ########################
+
+  - changeSet:
+      id: test-orgs-licenses-12
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: licenses
+            columns:
+              - column:
+                  name: license_hash
+                  value: 88570497-1a02-4353-9afc-fd90f3b62ebc
+              - column:
+                  name: expiration_date
+                  valueDate: 2021-12-31
+              - column:
+                  name: type
+                  value: PIPELINE_BUSINESS
+              - column:
+                  # 4 initial users
+                  name: available_license_seats
+                  valueNumeric: 16
+              - column:
+                  name: max_license_seats
+                  valueNumeric: 20
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 499.99
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-orgs-accounts-12
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_accounts
+            columns:
+              - column:
+                  name: organization_account_name
+                  value: Marketing
+              - column:
+                  name: license_id
+                  valueComputed: GET_LICENSE_ID_BY_HASH('88570497-1a02-4353-9afc-fd90f3b62ebc')
+              - column:
+                  name: organization_id
+                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Big Apple Corp')
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-orgs-addresses-12
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_addresses
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
+              - column:
+                  name: street_number
+                  valueNumeric: 100
+              - column:
+                  name: street_name
+                  value: Main Street
+              - column:
+                  name: apt_suite
+                  value: Suite A
+              - column:
+                  name: city
+                  value: New York
+              - column:
+                  name: state
+                  value: NY
+              - column:
+                  name: zip_code
+                  value: 10003
+              - column:
+                  name: is_business
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-orgs-profiles-12
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_profiles
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
+              - column:
+                  name: mailing_address_id
+                  valueComputed: GET_ORG_ACCT_ADDRESS_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
+              - column:
+                  name: business_number
+                  value: 5555550005
+
+    ##############
+    # TEST ORG 2 #
+    ##############
+
+  - changeSet:
+      id: test-orgs-2
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organizations
+            columns:
+              - column:
+                  name: organization_name
+                  value: Pet Food Online Inc
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  ########################
+  # TEST ORG 2 ACCOUNT 1 #
+  ########################
+
+  - changeSet:
+      id: test-orgs-licenses-21
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: licenses
+            columns:
+              - column:
+                  name: license_hash
+                  value: 651390af-7758-484e-ba36-a845d1796b57
+              - column:
+                  name: expiration_date
+                  valueDate: 2021-12-31
+              - column:
+                  name: type
+                  value: PIPELINE_BUSINESS
+              - column:
+                  # 4 initial users
+                  name: available_license_seats
+                  valueNumeric: 11
+              - column:
+                  name: max_license_seats
+                  valueNumeric: 15
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 325.0
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-orgs-accounts-21
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_accounts
+            columns:
+              - column:
+                  name: organization_account_name
+                  value: Support
+              - column:
+                  name: license_id
+                  valueComputed: GET_LICENSE_ID_BY_HASH('651390af-7758-484e-ba36-a845d1796b57')
+              - column:
+                  name: organization_id
+                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pet Food Online Inc')
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-orgs-addresses-21
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_addresses
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
+              - column:
+                  name: street_number
+                  valueNumeric: 100
+              - column:
+                  name: street_name
+                  value: Side Street
+              - column:
+                  name: apt_suite
+                  value: ''
+              - column:
+                  name: city
+                  value: New York
+              - column:
+                  name: state
+                  value: NY
+              - column:
+                  name: zip_code
+                  value: 10003
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-orgs-profiles-21
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_profiles
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
+              - column:
+                  name: mailing_address_id
+                  valueComputed: GET_ORG_ACCT_ADDRESS_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
+              - column:
+                  name: business_number
+                  value: 5555550050
+
+  ########################
+  # TEST ORG 2 ACCOUNT 2 #
+  ########################
+
+  - changeSet:
+      id: test-orgs-licenses-22
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: licenses
+            columns:
+              - column:
+                  name: license_hash
+                  value: 4a430ab7-223f-4560-9110-e1e07e53dd62
+              - column:
+                  name: expiration_date
+                  valueDate: 2021-12-31
+              - column:
+                  name: type
+                  value: PIPELINE_BUSINESS
+              - column:
+                  # 4 initial users
+                  name: available_license_seats
+                  valueNumeric: 46
+              - column:
+                  name: max_license_seats
+                  valueNumeric: 50
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 325.0
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-orgs-accounts-22
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_accounts
+            columns:
+              - column:
+                  name: organization_account_name
+                  value: Distribution
+              - column:
+                  name: license_id
+                  valueComputed: GET_LICENSE_ID_BY_HASH('4a430ab7-223f-4560-9110-e1e07e53dd62')
+              - column:
+                  name: organization_id
+                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pet Food Online Inc')
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-orgs-addresses-22
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_addresses
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
+              - column:
+                  name: street_number
+                  valueNumeric: 100
+              - column:
+                  name: street_name
+                  value: Side Street
+              - column:
+                  name: apt_suite
+                  value: ''
+              - column:
+                  name: city
+                  value: New York
+              - column:
+                  name: state
+                  value: NY
+              - column:
+                  name: zip_code
+                  value: 10003
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-orgs-profiles-22
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_profiles
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
+              - column:
+                  name: mailing_address_id
+                  valueComputed: GET_ORG_ACCT_ADDRESS_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
+              - column:
+                  name: business_number
+                  value: 5555550055
