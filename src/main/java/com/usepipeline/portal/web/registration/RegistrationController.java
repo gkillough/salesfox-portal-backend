@@ -12,6 +12,8 @@ import com.usepipeline.portal.web.registration.user.UserRegistrationService;
 import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
 import com.usepipeline.portal.web.security.authorization.CsrfIgnorable;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 
+@Api(value = "Account Registration Service")
 @RestController
 @RequestMapping(RegistrationController.BASE_ENDPOINT)
 public class RegistrationController implements CsrfIgnorable, AnonymousAccessible {
@@ -41,28 +44,33 @@ public class RegistrationController implements CsrfIgnorable, AnonymousAccessibl
         this.organizationInvitationService = organizationInvitationService;
     }
 
+    @ApiOperation(value = "Register a non organization user", response = Boolean.class)
     @PostMapping(USER_ENDPOINT_SUFFIX)
     public boolean registerUser(@RequestBody UserRegistrationModel registrationRequest) {
         userRegistrationService.registerUser(registrationRequest);
         return true;
     }
 
+    @ApiOperation(value = "Register a non organization user", response = Boolean.class)
     @PostMapping(ORGANIZATION_ENDPOINT_SUFFIX)
     public void registerOrganizationAccount(@RequestBody OrganizationAccountRegistrationModel registrationRequest) {
         organizationAccountRegistrationService.registerOrganizationAccount(registrationRequest);
     }
 
+    @ApiOperation(value = "Register an organization with an initial account manager user")
     @PostMapping(ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX)
     @PreAuthorize(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION_AUTH_CHECK)
     public void registerOrganizationAccountUser(HttpServletResponse httpServletResponse, @RequestBody OrganizationAccountUserRegistrationModel registrationRequest) {
         organizationInvitationService.completeOrganizationAccountRegistrationFromInvite(httpServletResponse, registrationRequest);
     }
 
+    @ApiOperation(value = "Validate that an email address is eligible to own an organization account")
     @PostMapping("/organization/validate/account_owner")
     public ValidationResponseModel validateOrganizationAccountManager(@RequestBody EmailToValidateModel validationRequest) {
         return organizationAccountRegistrationService.isAccountOwnerEmailValid(validationRequest);
     }
 
+    @ApiOperation(value = "Validate that an account name is eligible to be assigned to an organization")
     @PostMapping("/organization/validate/account_name")
     public ValidationResponseModel validateOrganizationAccountName(@RequestBody OrganizationAccountNameToValidateModel validationRequest) {
         return organizationAccountRegistrationService.isOrganizationAccountNameValid(validationRequest);
