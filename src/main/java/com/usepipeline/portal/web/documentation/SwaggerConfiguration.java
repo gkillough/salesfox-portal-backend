@@ -1,4 +1,4 @@
-package com.usepipeline.portal.documentation;
+package com.usepipeline.portal.web.documentation;
 
 import com.usepipeline.portal.web.security.authorization.AdminOnlyAccessible;
 import org.springframework.context.annotation.Bean;

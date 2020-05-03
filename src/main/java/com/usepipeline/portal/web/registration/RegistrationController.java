@@ -50,7 +50,7 @@ public class RegistrationController implements CsrfIgnorable, AnonymouslyAccessi
         return true;
     }
 
-    @ApiOperation(value = "Register an organization with an initial account manager user", response = Boolean.class)
+    @ApiOperation(value = "Register an organization with an initial account owner user", response = Boolean.class)
     @PostMapping(ORGANIZATION_ENDPOINT_SUFFIX)
     public void registerOrganizationAccount(@RequestBody OrganizationAccountRegistrationModel registrationRequest) {
         organizationAccountRegistrationService.registerOrganizationAccount(registrationRequest);
