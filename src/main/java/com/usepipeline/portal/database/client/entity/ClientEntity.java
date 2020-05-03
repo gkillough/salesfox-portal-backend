@@ -19,6 +19,10 @@ public class ClientEntity implements Serializable {
     @Column(name = "client_id")
     private Long clientId;
 
+    @PrimaryKeyJoinColumn
+    @Column(name = "organization_account_id")
+    private Long organizationAccountId;
+
     @Column(name = "first_name")
     private String firstName;
 

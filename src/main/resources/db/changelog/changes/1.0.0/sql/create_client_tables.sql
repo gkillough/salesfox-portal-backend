@@ -1,10 +1,14 @@
 create table portal.clients (
     client_id bigserial NOT NULL,
+    organization_account_id bigint UNIQUE NOT NULL,
     first_name character varying,
     last_name character varying,
     email character varying,
     is_active boolean DEFAULT true
 );
+
+alter table portal.clients
+    add CONSTRAINT client_organization_account_id_fk FOREIGN KEY (organization_account_id) REFERENCES portal.organization_accounts(organization_account_id);
 
 alter table portal.clients OWNER TO root;
 
