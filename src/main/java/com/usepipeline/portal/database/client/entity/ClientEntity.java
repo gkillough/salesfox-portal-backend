@@ -14,9 +14,7 @@ import java.io.Serializable;
 @Table(schema = "portal", name = "clients")
 public class ClientEntity implements Serializable {
     @Id
-    // FIXME for bulk upload, allocationSize=1 will likely not be sufficient
-    //  consider a different generation strategy
-    @SequenceGenerator(schema = "portal", name = "clients_client_id_seq_generator", sequenceName = "clients_client_id_seq", allocationSize = 1)
+    @SequenceGenerator(schema = "portal", name = "clients_client_id_seq_generator", sequenceName = "clients_client_id_seq", allocationSize = 25, initialValue = 100)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clients_client_id_seq_generator")
     @Column(name = "client_id")
     private Long clientId;
@@ -27,20 +25,8 @@ public class ClientEntity implements Serializable {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "organization_name")
-    private String organizationName;
-
-    @Column(name = "title")
-    private String title;
-
     @Column(name = "email")
     private String email;
-
-    @Column(name = "phone_number")
-    private String phoneNumber;
-
-    @Column(name = "organization_point_of_contact")
-    private String organizationPointOfContact;
 
     @Column(name = "is_active")
     private Boolean isActive;
