@@ -25,7 +25,7 @@ create table portal.client_addresses (
 
 alter table portal.client_addresses OWNER TO root;
 
-alter table ONLY portal.clients
+alter table ONLY portal.client_addresses
     ADD CONSTRAINT client_addresses_pkey PRIMARY KEY (client_address_id);
 
 alter table portal.client_addresses
@@ -56,7 +56,7 @@ alter table portal.client_profiles
 create table portal.client_interactions (
     client_id bigint NOT NULL,
     contact_initiations bigint DEFAULT 0,
-    engagements_generated bigint DEFAULT 0,
+    engagements_generated bigint DEFAULT 0
 );
 
 alter table portal.client_interactions OWNER TO root;
