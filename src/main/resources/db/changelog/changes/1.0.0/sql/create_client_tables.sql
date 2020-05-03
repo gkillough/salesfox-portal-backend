@@ -52,3 +52,17 @@ alter table portal.client_profiles
 
 alter table portal.client_profiles
     add CONSTRAINT client_profile_client_address_id_fk FOREIGN KEY (client_address_id) REFERENCES portal.client_addresses(client_address_id);
+
+create table portal.client_interactions (
+    client_id bigint NOT NULL,
+    contact_initiations bigint DEFAULT 0,
+    engagements_generated bigint DEFAULT 0,
+);
+
+alter table portal.client_interactions OWNER TO root;
+
+alter table ONLY portal.client_interactions
+    ADD CONSTRAINT client_interactions_pkey PRIMARY KEY (client_id);
+
+alter table portal.client_interactions
+    add CONSTRAINT client_interaction_client_id_fk FOREIGN KEY (client_id) REFERENCES portal.clients(client_id);
