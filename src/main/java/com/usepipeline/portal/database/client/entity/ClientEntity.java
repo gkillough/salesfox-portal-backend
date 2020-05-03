@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Table(schema = "portal", name = "clients")
 public class ClientEntity implements Serializable {
     @Id
-    @SequenceGenerator(schema = "portal", name = "clients_client_id_seq_generator", sequenceName = "clients_client_id_seq", allocationSize = 25, initialValue = 100)
+    @SequenceGenerator(schema = "portal", name = "clients_client_id_seq_generator", sequenceName = "clients_client_id_seq", allocationSize = 100, initialValue = 100)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "clients_client_id_seq_generator")
     @Column(name = "client_id")
     private Long clientId;

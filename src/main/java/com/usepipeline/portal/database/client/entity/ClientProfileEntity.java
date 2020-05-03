@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Table(schema = "portal", name = "client_profiles")
 public class ClientProfileEntity {
     @Id
-    @SequenceGenerator(schema = "portal", name = "client_profiles_profile_id_seq_generator", sequenceName = "client_profiles_profile_id_seq", allocationSize = 25, initialValue = 100)
+    @SequenceGenerator(schema = "portal", name = "client_profiles_profile_id_seq_generator", sequenceName = "client_profiles_profile_id_seq", allocationSize = 100, initialValue = 100)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_profiles_profile_id_seq_generator")
     @Column(name = "profile_id")
     private Long profileId;
