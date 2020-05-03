@@ -9,7 +9,7 @@ import com.usepipeline.portal.web.registration.organization.model.OrganizationAc
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountUserRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationModel;
 import com.usepipeline.portal.web.registration.user.UserRegistrationService;
-import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
+import com.usepipeline.portal.web.security.authentication.AnonymouslyAccessible;
 import com.usepipeline.portal.web.security.authorization.CsrfIgnorable;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(RegistrationController.BASE_ENDPOINT)
-public class RegistrationController implements CsrfIgnorable, AnonymousAccessible {
+public class RegistrationController implements CsrfIgnorable, AnonymouslyAccessible {
     public static final String BASE_ENDPOINT = "/register";
     public static final String USER_ENDPOINT_SUFFIX = "/user";
     public static final String ORGANIZATION_ENDPOINT_SUFFIX = "/organization";

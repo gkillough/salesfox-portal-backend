@@ -1,6 +1,6 @@
 package com.usepipeline.portal.web.security.authorization;
 
-import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
+import com.usepipeline.portal.web.security.authentication.AnonymouslyAccessible;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-public class CsrfTokenProviderController implements AnonymousAccessible {
+public class CsrfTokenProviderController implements AnonymouslyAccessible {
     public static final String CSRF_TOKEN_REQUEST_ENDPOINT = "/csrf/token";
     private CsrfTokenRepository csrfTokenRepository;
 
@@ -25,7 +25,6 @@ public class CsrfTokenProviderController implements AnonymousAccessible {
         CsrfToken csrfToken = csrfTokenRepository.loadToken(request);
         response.setHeader(csrfToken.getHeaderName(), csrfToken.getToken());
     }
-
 
     @Override
     public String[] allowedEndpointAntMatchers() {

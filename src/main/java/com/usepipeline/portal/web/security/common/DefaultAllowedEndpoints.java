@@ -1,8 +1,8 @@
 package com.usepipeline.portal.web.security.common;
 
-import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
+import com.usepipeline.portal.web.security.authentication.AnonymouslyAccessible;
 
-public class DefaultAllowedEndpoints implements AnonymousAccessible {
+public class DefaultAllowedEndpoints implements AnonymouslyAccessible {
     public static final String LOGIN_ENDPOINT = "/login";
     public static final String LOGOUT_ENDPOINT = "/logout";
     public static final String CSS_DIRECTORIES = "static/css/**";

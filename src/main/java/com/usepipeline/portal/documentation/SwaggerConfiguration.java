@@ -1,6 +1,6 @@
 package com.usepipeline.portal.documentation;
 
-import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
+import com.usepipeline.portal.web.security.authorization.AdminOnlyAccessible;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -16,7 +16,7 @@ import java.util.Collections;
 
 @Configuration
 @EnableSwagger2
-public class SwaggerConfiguration implements AnonymousAccessible {
+public class SwaggerConfiguration implements AdminOnlyAccessible {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
@@ -36,7 +36,7 @@ public class SwaggerConfiguration implements AnonymousAccessible {
     }
 
     @Override
-    public String[] allowedEndpointAntMatchers() {
+    public String[] adminOnlyEndpointAntMatchers() {
         return new String[]{
                 "/swagger-ui.html",
                 "/webjars",

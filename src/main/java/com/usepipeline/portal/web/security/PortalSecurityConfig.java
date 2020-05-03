@@ -4,9 +4,10 @@ import com.usepipeline.portal.database.account.entity.RoleEntity;
 import com.usepipeline.portal.database.account.repository.RoleRepository;
 import com.usepipeline.portal.web.password.PasswordController;
 import com.usepipeline.portal.web.registration.RegistrationController;
-import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
+import com.usepipeline.portal.web.security.authentication.AnonymouslyAccessible;
 import com.usepipeline.portal.web.security.authentication.DefaultAuthenticationHandlers;
 import com.usepipeline.portal.web.security.authentication.user.PortalUserDetailsService;
+import com.usepipeline.portal.web.security.authorization.AdminOnlyAccessible;
 import com.usepipeline.portal.web.security.authorization.CsrfIgnorable;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.security.common.DefaultAllowedEndpoints;
@@ -37,18 +38,20 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     private CsrfTokenRepository csrfTokenRepository;
     private RoleRepository roleRepository;
     private List<CsrfIgnorable> csrfIgnorables;
-    private List<AnonymousAccessible> anonymousAccessibles;
+    private List<AnonymouslyAccessible> anonymouslyAccessibles;
+    private List<AdminOnlyAccessible> adminOnlyAccessibles;
     private PortalUserDetailsService userDetailsService;
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     public PortalSecurityConfig(CsrfTokenRepository csrfTokenRepository, RoleRepository roleRepository,
-                                List<CsrfIgnorable> csrfIgnorables, List<AnonymousAccessible> anonymousAccessibles,
+                                List<CsrfIgnorable> csrfIgnorables, List<AnonymouslyAccessible> anonymouslyAccessibles, List<AdminOnlyAccessible> adminOnlyAccessibles,
                                 PortalUserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         this.csrfTokenRepository = csrfTokenRepository;
         this.roleRepository = roleRepository;
         this.csrfIgnorables = csrfIgnorables;
-        this.anonymousAccessibles = anonymousAccessibles;
+        this.anonymouslyAccessibles = anonymouslyAccessibles;
+        this.adminOnlyAccessibles = adminOnlyAccessibles;
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -66,7 +69,8 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
         HttpSecurity corsAllowed = configureCors(csrfSecured);
         HttpSecurity passwordResetSecured = configurePasswordReset(corsAllowed);
         HttpSecurity orgAccountRegistrationSecured = configureOrganizationAccountRegistration(passwordResetSecured);
-        HttpSecurity defaultPermissionsSecured = configureDefaultPermissions(orgAccountRegistrationSecured);
+        HttpSecurity adminPermissionsSecured = configureAdminPermissions(orgAccountRegistrationSecured);
+        HttpSecurity defaultPermissionsSecured = configureDefaultPermissions(adminPermissionsSecured);
         HttpSecurity errorHandlingSecured = configureErrorHandling(defaultPermissionsSecured);
         HttpSecurity loginSecured = configureLogin(errorHandlingSecured);
         configureLogout(loginSecured);
@@ -105,10 +109,17 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private HttpSecurity configureDefaultPermissions(HttpSecurity security) throws Exception {
         return security.authorizeRequests()
-                .antMatchers(createAllowedEndpoints())
+                .antMatchers(collectAnonymouslyAccessibleEndpoints())
                 .permitAll()
                 .anyRequest()
                 .hasAnyAuthority(collectUserAuthoritiesFromDatabase())
+                .and();
+    }
+
+    private HttpSecurity configureAdminPermissions(HttpSecurity security) throws Exception {
+        return security.authorizeRequests()
+                .antMatchers(collectAdminOnlyEndpoints())
+                .hasAuthority(PortalAuthorityConstants.PIPELINE_ADMIN)
                 .and();
     }
 
@@ -142,8 +153,12 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
                 .toArray(String[]::new);
     }
 
-    private String[] createAllowedEndpoints() {
-        return collectFlattenedStrings(anonymousAccessibles, AnonymousAccessible::allowedEndpointAntMatchers);
+    private String[] collectAnonymouslyAccessibleEndpoints() {
+        return collectFlattenedStrings(anonymouslyAccessibles, AnonymouslyAccessible::allowedEndpointAntMatchers);
+    }
+
+    private String[] collectAdminOnlyEndpoints() {
+        return collectFlattenedStrings(adminOnlyAccessibles, AdminOnlyAccessible::adminOnlyEndpointAntMatchers);
     }
 
     private <T extends SecurityInterface> String[] collectFlattenedStrings(Collection<T> securityInterfaces, Function<T, String[]> stringExtractor) {
