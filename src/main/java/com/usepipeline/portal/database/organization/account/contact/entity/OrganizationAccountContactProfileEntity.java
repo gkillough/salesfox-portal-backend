@@ -19,12 +19,12 @@ public class OrganizationAccountContactProfileEntity {
     private Long profileId;
 
     @PrimaryKeyJoinColumn
-    @Column(name = "client_id")
-    private Long clientId;
+    @Column(name = "contact_id")
+    private Long contactId;
 
     @PrimaryKeyJoinColumn
-    @Column(name = "client_address_id")
-    private Long clientAddressId;
+    @Column(name = "contact_address_id")
+    private Long contactAddressId;
 
     @Column(name = "organization_point_of_contact_user_id")
     private Long organizationPointOfContactUserId;
