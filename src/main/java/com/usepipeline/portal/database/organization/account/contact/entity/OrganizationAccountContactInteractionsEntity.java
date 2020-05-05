@@ -1,4 +1,4 @@
-package com.usepipeline.portal.database.client.entity;
+package com.usepipeline.portal.database.organization.account.contact.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,12 +10,12 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "portal", name = "client_interactions")
-public class ClientInteractionsEntity {
+@Table(schema = "portal", name = "organization_account_contact_interactions")
+public class OrganizationAccountContactInteractionsEntity {
     @Id
     @PrimaryKeyJoinColumn
-    @Column(name = "client_id")
-    private Long clientId;
+    @Column(name = "contact_id")
+    private Long contactId;
 
     @Column(name = "contact_initiations")
     private Long contactInitiations;

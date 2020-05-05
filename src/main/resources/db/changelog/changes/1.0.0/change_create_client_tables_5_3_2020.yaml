@@ -6,4 +6,4 @@ databaseChangeLog:
         - sqlFile:
             dbms: postgresql
             relativeToChangelogFile: true
-            path: sql/create_client_tables.sql
+            path: sql/create_organization_contact_tables.sql
