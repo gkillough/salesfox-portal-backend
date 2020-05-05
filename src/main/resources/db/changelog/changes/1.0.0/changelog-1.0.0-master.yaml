@@ -53,5 +53,9 @@ databaseChangeLog:
       relativeToChangelogFile: true
 
   - include:
-      file: development/change_add_test_contacts_5_5_2020.yaml
+      file: development/change_add_test_org_1_contacts_5_5_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: development/change_add_test_org_2_contacts_5_5_2020.yaml
       relativeToChangelogFile: true
