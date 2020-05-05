@@ -28,7 +28,11 @@ databaseChangeLog:
       relativeToChangelogFile: true
 
   - include:
-      file: change_create_client_tables_5_3_2020.yaml
+      file: change_create_contact_tables_5_3_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: change_create_contact_stored_procedures.yaml
       relativeToChangelogFile: true
 
   # TODO REMOVE DEVELOPMENT DATA BEFORE RELEASE
@@ -46,4 +50,8 @@ databaseChangeLog:
 
   - include:
       file: development/change_add_test_organization_2_users_4_25_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: development/change_add_test_contacts_5_5_2020.yaml
       relativeToChangelogFile: true
