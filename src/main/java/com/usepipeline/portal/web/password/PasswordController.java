@@ -1,6 +1,6 @@
 package com.usepipeline.portal.web.password;
 
-import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
+import com.usepipeline.portal.web.security.authentication.AnonymouslyAccessible;
 import com.usepipeline.portal.web.security.authorization.CsrfIgnorable;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-public class PasswordController implements CsrfIgnorable, AnonymousAccessible {
+public class PasswordController implements CsrfIgnorable, AnonymouslyAccessible {
     public static final String BASE_ENDPOINT = "/password";
     public static final String RESET_ENDPOINT = BASE_ENDPOINT + "/reset";
     public static final String GRANT_UPDATE_PERMISSION_ENDPOINT = RESET_ENDPOINT + "/validate";

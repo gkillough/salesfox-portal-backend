@@ -1,13 +1,13 @@
 package com.usepipeline.portal.web.common;
 
-import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
+import com.usepipeline.portal.web.security.authentication.AnonymouslyAccessible;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-public class DefaultLocationsController implements AnonymousAccessible {
+public class DefaultLocationsController implements AnonymouslyAccessible {
     public static final String ROOT_ENDPOINT = "/";
     public static final String ERROR_ENDPOINT = "/error";
     public static final String ACCESS_DENIED_ENDPOINT = ERROR_ENDPOINT;

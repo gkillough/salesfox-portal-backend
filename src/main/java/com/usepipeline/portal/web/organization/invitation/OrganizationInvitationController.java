@@ -3,7 +3,7 @@ package com.usepipeline.portal.web.organization.invitation;
 import com.usepipeline.portal.web.organization.common.OrganizationEndpointConstants;
 import com.usepipeline.portal.web.organization.invitation.model.OrganizationAccountInvitationModel;
 import com.usepipeline.portal.web.organization.invitation.model.OrganizationAssignableRolesModel;
-import com.usepipeline.portal.web.security.authentication.AnonymousAccessible;
+import com.usepipeline.portal.web.security.authentication.AnonymouslyAccessible;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping(OrganizationEndpointConstants.BASE_ENDPOINT)
-public class OrganizationInvitationController implements AnonymousAccessible {
+public class OrganizationInvitationController implements AnonymouslyAccessible {
     public static final String INVITE_ENDPOINT = "/invite";
     public static final String VALIDATE_INVITE_ENDPOINT = INVITE_ENDPOINT + "/validate";
 
@@ -44,7 +44,8 @@ public class OrganizationInvitationController implements AnonymousAccessible {
     @Override
     public String[] allowedEndpointAntMatchers() {
         return new String[]{
-                OrganizationEndpointConstants.BASE_ENDPOINT + VALIDATE_INVITE_ENDPOINT
+                OrganizationEndpointConstants.BASE_ENDPOINT + VALIDATE_INVITE_ENDPOINT,
+                createSubDirectoryPattern(OrganizationEndpointConstants.BASE_ENDPOINT + VALIDATE_INVITE_ENDPOINT)
         };
     }
 
