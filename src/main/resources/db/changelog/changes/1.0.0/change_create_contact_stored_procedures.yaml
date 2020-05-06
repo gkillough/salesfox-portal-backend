@@ -1,0 +1,44 @@
+databaseChangeLog:
+  # This procedure takes in an email and returns the contact_id of the row containing that email.
+  - changeSet:
+      id: create-contact-function-1
+      author: gavinkillough
+      changes:
+        - createProcedure:
+            dbms: postgresql
+            schemaName: portal
+            procedureBody: |-
+              CREATE OR REPLACE FUNCTION GET_CONTACT_ID_BY_EMAIL(text)
+                          RETURNS BIGINT AS $result$
+                              DECLARE result BIGINT;
+                              BEGIN
+                                  select contact_id
+                                  into result
+                                  from portal.organization_account_contacts where email = $1;
+                                  RETURN result;
+                              END;
+                          $result$
+                          LANGUAGE plpgsql;
+
+  # This procedure takes in an email and returns the contact_id of the row containing that email.
+  - changeSet:
+      id: create-contact-function-2
+      author: gavinkillough
+      changes:
+        - createProcedure:
+            dbms: postgresql
+            schemaName: portal
+            procedureBody: |-
+              CREATE OR REPLACE FUNCTION GET_CONTACT_ADDRESS_ID_BY_EMAIL(text)
+                          RETURNS BIGINT AS $result$
+                              DECLARE result BIGINT;
+                              BEGIN
+                                  select addr.address_id
+                                  into result
+                                  from portal.organization_account_contact_addresses addr
+                                  join portal.organization_account_contacts contacts on contacts.contact_id = addr.contact_id
+                                  where email = $1;
+                                  RETURN result;
+                              END;
+                          $result$
+                          LANGUAGE plpgsql;

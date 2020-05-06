@@ -1,0 +1,801 @@
+databaseChangeLog:
+
+  ##################################
+  # TEST ORG 1 ACCOUNT 1 CONTACT 1 #
+  ##################################
+
+  - changeSet:
+      id: test-contacts-111
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contacts
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
+              - column:
+                  name: first_name
+                  value: Contact
+              - column:
+                  name: last_name
+                  value: One
+              - column:
+                  name: email
+                  value: contact1@usepipeline.com
+
+  - changeSet:
+      id: test-contacts-address-111
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_addresses
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 1
+              - column:
+                  name: street_name
+                  value: Contact Street
+              - column:
+                  name: apt_suite
+                  value: ''
+              - column:
+                  name: city
+                  value: Dallas
+              - column:
+                  name: state
+                  value: TX
+              - column:
+                  name: zip_code
+                  value: 75001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-contacts-profile-111
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_profiles
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@usepipeline.com')
+              - column:
+                  name: contact_address_id
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact1@usepipeline.com')
+              - column:
+                  name: organization_point_of_contact_user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test3@usepipeline.com')
+              - column:
+                  name: contact_organization_name
+                  value: A Random Org
+              - column:
+                  name: title
+                  value: A Cool Title
+              - column:
+                  name: business_number
+                  value: 5550005111
+              - column:
+                  name: mobile_number
+                  value: 5550005111
+
+  - changeSet:
+      id: test-contacts-interactions-111
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_interactions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@usepipeline.com')
+
+  ##################################
+  # TEST ORG 1 ACCOUNT 1 CONTACT 2 #
+  ##################################
+
+  - changeSet:
+      id: test-contacts-112
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contacts
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
+              - column:
+                  name: first_name
+                  value: Contact
+              - column:
+                  name: last_name
+                  value: Two
+              - column:
+                  name: email
+                  value: contact2@usepipeline.com
+
+  - changeSet:
+      id: test-contacts-address-112
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_addresses
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 2
+              - column:
+                  name: street_name
+                  value: Contact Street
+              - column:
+                  name: apt_suite
+                  value: ''
+              - column:
+                  name: city
+                  value: Dallas
+              - column:
+                  name: state
+                  value: TX
+              - column:
+                  name: zip_code
+                  value: 75001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-contacts-profile-112
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_profiles
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@usepipeline.com')
+              - column:
+                  name: contact_address_id
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact2@usepipeline.com')
+              - column:
+                  name: organization_point_of_contact_user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test3@usepipeline.com')
+              - column:
+                  name: contact_organization_name
+                  value: A Random Org
+              - column:
+                  name: title
+                  value: A Cool Title
+              - column:
+                  name: business_number
+                  value: 5550005112
+              - column:
+                  name: mobile_number
+                  value: 5550005112
+
+  - changeSet:
+      id: test-contacts-interactions-112
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_interactions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@usepipeline.com')
+
+  ##################################
+  # TEST ORG 1 ACCOUNT 1 CONTACT 3 #
+  ##################################
+
+  - changeSet:
+      id: test-contacts-113
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contacts
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
+              - column:
+                  name: first_name
+                  value: Contact
+              - column:
+                  name: last_name
+                  value: Three
+              - column:
+                  name: email
+                  value: contact3@usepipeline.com
+
+  - changeSet:
+      id: test-contacts-address-113
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_addresses
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 3
+              - column:
+                  name: street_name
+                  value: Contact Street
+              - column:
+                  name: apt_suite
+                  value: ''
+              - column:
+                  name: city
+                  value: Dallas
+              - column:
+                  name: state
+                  value: TX
+              - column:
+                  name: zip_code
+                  value: 75001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-contacts-profile-113
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_profiles
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@usepipeline.com')
+              - column:
+                  name: contact_address_id
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact3@usepipeline.com')
+              - column:
+                  name: organization_point_of_contact_user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test4@usepipeline.com')
+              - column:
+                  name: contact_organization_name
+                  value: A Random Org
+              - column:
+                  name: title
+                  value: A Cool Title
+              - column:
+                  name: business_number
+                  value: 5550005113
+              - column:
+                  name: mobile_number
+                  value: 5550005113
+
+  - changeSet:
+      id: test-contacts-interactions-113
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_interactions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@usepipeline.com')
+
+  ##################################
+  # TEST ORG 1 ACCOUNT 1 CONTACT 4 #
+  ##################################
+
+  - changeSet:
+      id: test-contacts-114
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contacts
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
+              - column:
+                  name: first_name
+                  value: Contact
+              - column:
+                  name: last_name
+                  value: Four
+              - column:
+                  name: email
+                  value: contact4@usepipeline.com
+
+  - changeSet:
+      id: test-contacts-address-114
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_addresses
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 4
+              - column:
+                  name: street_name
+                  value: Contact Street
+              - column:
+                  name: apt_suite
+                  value: ''
+              - column:
+                  name: city
+                  value: Dallas
+              - column:
+                  name: state
+                  value: TX
+              - column:
+                  name: zip_code
+                  value: 75001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-contacts-profile-114
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_profiles
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@usepipeline.com')
+              - column:
+                  name: contact_address_id
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact4@usepipeline.com')
+              - column:
+                  name: organization_point_of_contact_user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test4@usepipeline.com')
+              - column:
+                  name: contact_organization_name
+                  value: A Random Org
+              - column:
+                  name: title
+                  value: A Cool Title
+              - column:
+                  name: business_number
+                  value: 5550005114
+              - column:
+                  name: mobile_number
+                  value: 5550005114
+
+  - changeSet:
+      id: test-contacts-interactions-114
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_interactions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@usepipeline.com')
+
+  ##################################
+  # TEST ORG 1 ACCOUNT 2 CONTACT 1 #
+  ##################################
+
+  - changeSet:
+      id: test-contacts-121
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contacts
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
+              - column:
+                  name: first_name
+                  value: Contact
+              - column:
+                  name: last_name
+                  value: Five
+              - column:
+                  name: email
+                  value: contact5@usepipeline.com
+
+  - changeSet:
+      id: test-contacts-address-121
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_addresses
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 5
+              - column:
+                  name: street_name
+                  value: Contact Street
+              - column:
+                  name: apt_suite
+                  value: ''
+              - column:
+                  name: city
+                  value: Dallas
+              - column:
+                  name: state
+                  value: TX
+              - column:
+                  name: zip_code
+                  value: 75001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-contacts-profile-121
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_profiles
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@usepipeline.com')
+              - column:
+                  name: contact_address_id
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact5@usepipeline.com')
+              - column:
+                  name: organization_point_of_contact_user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test7@usepipeline.com')
+              - column:
+                  name: contact_organization_name
+                  value: A Random Org
+              - column:
+                  name: title
+                  value: A Cool Title
+              - column:
+                  name: business_number
+                  value: 5550005121
+              - column:
+                  name: mobile_number
+                  value: 5550005121
+
+  - changeSet:
+      id: test-contacts-interactions-121
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_interactions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@usepipeline.com')
+
+  ##################################
+  # TEST ORG 1 ACCOUNT 2 CONTACT 2 #
+  ##################################
+
+  - changeSet:
+      id: test-contacts-122
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contacts
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
+              - column:
+                  name: first_name
+                  value: Contact
+              - column:
+                  name: last_name
+                  value: Six
+              - column:
+                  name: email
+                  value: contact6@usepipeline.com
+
+  - changeSet:
+      id: test-contacts-address-122
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_addresses
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 6
+              - column:
+                  name: street_name
+                  value: Contact Street
+              - column:
+                  name: apt_suite
+                  value: ''
+              - column:
+                  name: city
+                  value: Dallas
+              - column:
+                  name: state
+                  value: TX
+              - column:
+                  name: zip_code
+                  value: 75001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-contacts-profile-122
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_profiles
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@usepipeline.com')
+              - column:
+                  name: contact_address_id
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact6@usepipeline.com')
+              - column:
+                  name: organization_point_of_contact_user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test7@usepipeline.com')
+              - column:
+                  name: contact_organization_name
+                  value: A Random Org
+              - column:
+                  name: title
+                  value: A Cool Title
+              - column:
+                  name: business_number
+                  value: 5550005122
+              - column:
+                  name: mobile_number
+                  value: 5550005122
+
+  - changeSet:
+      id: test-contacts-interactions-122
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_interactions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@usepipeline.com')
+
+  ##################################
+  # TEST ORG 1 ACCOUNT 2 CONTACT 3 #
+  ##################################
+
+  - changeSet:
+      id: test-contacts-123
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contacts
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
+              - column:
+                  name: first_name
+                  value: Contact
+              - column:
+                  name: last_name
+                  value: Seven
+              - column:
+                  name: email
+                  value: contact7@usepipeline.com
+
+  - changeSet:
+      id: test-contacts-address-123
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_addresses
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 7
+              - column:
+                  name: street_name
+                  value: Contact Street
+              - column:
+                  name: apt_suite
+                  value: ''
+              - column:
+                  name: city
+                  value: Dallas
+              - column:
+                  name: state
+                  value: TX
+              - column:
+                  name: zip_code
+                  value: 75001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-contacts-profile-123
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_profiles
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@usepipeline.com')
+              - column:
+                  name: contact_address_id
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact7@usepipeline.com')
+              - column:
+                  name: organization_point_of_contact_user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test8@usepipeline.com')
+              - column:
+                  name: contact_organization_name
+                  value: A Random Org
+              - column:
+                  name: title
+                  value: A Cool Title
+              - column:
+                  name: business_number
+                  value: 5550005123
+              - column:
+                  name: mobile_number
+                  value: 5550005123
+
+  - changeSet:
+      id: test-contacts-interactions-123
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_interactions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@usepipeline.com')
+
+  ##################################
+  # TEST ORG 1 ACCOUNT 2 CONTACT 4 #
+  ##################################
+
+  - changeSet:
+      id: test-contacts-124
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contacts
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
+              - column:
+                  name: first_name
+                  value: Contact
+              - column:
+                  name: last_name
+                  value: Eight
+              - column:
+                  name: email
+                  value: contact8@usepipeline.com
+
+  - changeSet:
+      id: test-contacts-address-124
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_addresses
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@usepipeline.com')
+              - column:
+                  name: street_number
+                  valueNumeric: 8
+              - column:
+                  name: street_name
+                  value: Contact Street
+              - column:
+                  name: apt_suite
+                  value: ''
+              - column:
+                  name: city
+                  value: Dallas
+              - column:
+                  name: state
+                  value: TX
+              - column:
+                  name: zip_code
+                  value: 75001
+              - column:
+                  name: is_business
+                  valueBoolean: false
+
+  - changeSet:
+      id: test-contacts-profile-124
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_profiles
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@usepipeline.com')
+              - column:
+                  name: contact_address_id
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact8@usepipeline.com')
+              - column:
+                  name: organization_point_of_contact_user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('test8@usepipeline.com')
+              - column:
+                  name: contact_organization_name
+                  value: A Random Org
+              - column:
+                  name: title
+                  value: A Cool Title
+              - column:
+                  name: business_number
+                  value: 5550005124
+              - column:
+                  name: mobile_number
+                  value: 5550005124
+
+  - changeSet:
+      id: test-contacts-interactions-124
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_account_contact_interactions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@usepipeline.com')

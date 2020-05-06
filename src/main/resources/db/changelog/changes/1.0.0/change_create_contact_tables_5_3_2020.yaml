@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: create-client-tables-1
+      id: create-contact-tables-1
       author: gavinkillough
       changes:
         - sqlFile:
