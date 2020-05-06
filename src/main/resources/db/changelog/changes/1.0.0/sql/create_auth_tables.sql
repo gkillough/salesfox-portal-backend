@@ -17,7 +17,6 @@ alter table ONLY portal.licenses
 alter table ONLY portal.licenses
     ADD CONSTRAINT licenses_pkey PRIMARY KEY (license_id);
 
-
 create table portal.logins (
     login_id bigserial NOT NULL,
     user_id bigint,
