@@ -1,6 +1,7 @@
 package com.usepipeline.portal.database.organization.account.contact.entity;
 
 import com.usepipeline.portal.database.common.AbstractAddressEntity;
+import com.usepipeline.portal.database.organization.account.contact.Contactable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +15,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "organization_account_contact_addresses")
-public class OrganizationAccountContactAddressEntity extends AbstractAddressEntity {
+public class OrganizationAccountContactAddressEntity extends AbstractAddressEntity implements Contactable {
     @Id
     @SequenceGenerator(schema = "portal", name = "org_account_contact_addresses_address_id_seq_generator", sequenceName = "org_account_contact_addresses_address_id_seq", allocationSize = 100, initialValue = 100)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "org_account_contact_addresses_address_id_seq_generator")
