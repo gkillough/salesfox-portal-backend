@@ -1,14 +1,11 @@
 package com.usepipeline.portal.web.util;
 
-import com.usepipeline.portal.database.account.entity.MembershipEntity;
-import com.usepipeline.portal.database.account.entity.RoleEntity;
+import com.usepipeline.portal.common.service.auth.AbstractMembershipRetrievalService;
 import com.usepipeline.portal.database.account.entity.UserEntity;
 import com.usepipeline.portal.database.account.repository.MembershipRepository;
 import com.usepipeline.portal.database.account.repository.RoleRepository;
 import com.usepipeline.portal.database.account.repository.UserRepository;
-import com.usepipeline.portal.database.organization.OrganizationEntity;
 import com.usepipeline.portal.database.organization.OrganizationRepository;
-import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountRepository;
 import com.usepipeline.portal.web.security.authentication.SecurityContextUtils;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
@@ -21,26 +18,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.constraints.NotNull;
 import java.util.Optional;
 
 @Slf4j
 @Component
-public class HttpSafeUserMembershipRetrievalService {
-    private UserRepository userRepository;
-    private MembershipRepository membershipRepository;
-    private RoleRepository roleRepository;
-    private OrganizationRepository organizationRepository;
-    private OrganizationAccountRepository organizationAccountRepository;
-
+public class HttpSafeUserMembershipRetrievalService extends AbstractMembershipRetrievalService<ResponseStatusException> {
     @Autowired
     public HttpSafeUserMembershipRetrievalService(UserRepository userRepository, MembershipRepository membershipRepository,
                                                   RoleRepository roleRepository, OrganizationRepository organizationRepository, OrganizationAccountRepository organizationAccountRepository) {
-        this.userRepository = userRepository;
-        this.membershipRepository = membershipRepository;
-        this.roleRepository = roleRepository;
-        this.organizationRepository = organizationRepository;
-        this.organizationAccountRepository = organizationAccountRepository;
+        super(userRepository, membershipRepository, roleRepository, organizationRepository, organizationAccountRepository);
     }
 
     public UserDetails getAuthenticatedUserDetails() {
@@ -51,7 +37,7 @@ public class HttpSafeUserMembershipRetrievalService {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
-    public boolean isPipelineAdmin() {
+    public boolean isAuthenticatedUserPipelineAdmin() {
         return getAuthenticatedUserDetails()
                 .getAuthorities()
                 .stream()
@@ -64,52 +50,9 @@ public class HttpSafeUserMembershipRetrievalService {
         return getExistingUserByEmail(userDetails.getUsername());
     }
 
-    public UserEntity getExistingUserByEmail(@NotNull String email) {
-        return userRepository.findFirstByEmail(email)
-                .orElseThrow(() -> {
-                    log.error("Expected user with email [{}] to exist in the database", email);
-                    return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-                });
-    }
-
-    public UserEntity getExistingUserFromMembership(@NotNull MembershipEntity membershipEntity) {
-        return userRepository.findById(membershipEntity.getUserId())
-                .orElseThrow(() -> {
-                    log.error("Expected user with id [{}] and membership id [{}] to exist in the database", membershipEntity.getUserId(), membershipEntity.getMembershipId());
-                    return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-                });
-    }
-
-    public MembershipEntity getMembershipEntity(@NotNull UserEntity userEntity) {
-        return membershipRepository.findFirstByUserId(userEntity.getUserId())
-                .orElseThrow(() -> {
-                    log.error("Expected membership for user with id [{}] to exist in the database", userEntity.getUserId());
-                    return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-                });
-    }
-
-    public RoleEntity getRoleEntity(@NotNull MembershipEntity membershipEntity) {
-        return roleRepository.findById(membershipEntity.getRoleId())
-                .orElseThrow(() -> {
-                    log.error("Expected role with id [{}] for user id [{}] and membership id [{}] to exist in the database", membershipEntity.getRoleId(), membershipEntity.getUserId(), membershipEntity.getMembershipId());
-                    return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-                });
-    }
-
-    public OrganizationAccountEntity getOrganizationAccountEntity(@NotNull MembershipEntity membershipEntity) {
-        return organizationAccountRepository.findById(membershipEntity.getOrganizationAccountId())
-                .orElseThrow(() -> {
-                    log.error("Expected organization account for user with id [{}], with membership id [{}] to exist in the database", membershipEntity.getUserId(), membershipEntity.getMembershipId());
-                    return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-                });
-    }
-
-    public OrganizationEntity getOrganizationEntity(@NotNull OrganizationAccountEntity organizationAccountEntity) {
-        return organizationRepository.findById(organizationAccountEntity.getOrganizationId())
-                .orElseThrow(() -> {
-                    log.error("Missing Organization for Organization Account '{}' with id {}", organizationAccountEntity.getOrganizationAccountName(), organizationAccountEntity.getOrganizationAccountId());
-                    return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-                });
+    @Override
+    public ResponseStatusException unexpectedErrorDuringRetrieval() {
+        return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

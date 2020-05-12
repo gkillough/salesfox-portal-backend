@@ -1,17 +1,19 @@
 package com.usepipeline.portal.database.organization.account.contact.entity;
 
+import com.usepipeline.portal.database.organization.account.contact.Contactable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "organization_account_contact_interactions")
-public class OrganizationAccountContactInteractionsEntity {
+public class OrganizationAccountContactInteractionsEntity implements Serializable, Contactable {
     @Id
     @PrimaryKeyJoinColumn
     @Column(name = "contact_id")

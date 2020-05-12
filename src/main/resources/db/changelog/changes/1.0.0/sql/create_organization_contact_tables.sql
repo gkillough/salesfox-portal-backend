@@ -1,5 +1,5 @@
 -- Begin organization_account_contacts
-create sequence portal.org_account_contacts_contact_id_seq;
+create sequence portal.org_account_contacts_contact_id_seq increment by 100;
 
 create table portal.organization_account_contacts (
     contact_id bigint NOT NULL DEFAULT nextval('portal.org_account_contacts_contact_id_seq'::regclass),
@@ -25,7 +25,7 @@ alter table portal.organization_account_contacts
 -- End organization_account_contacts
 
 -- Begin organization_account_contact_addresses
-create sequence portal.org_account_contact_addresses_address_id_seq;
+create sequence portal.org_account_contact_addresses_address_id_seq increment by 100;
 
 create table portal.organization_account_contact_addresses (
     address_id bigint NOT NULL DEFAULT nextval('portal.org_account_contact_addresses_address_id_seq'::regclass),
@@ -54,7 +54,7 @@ alter table portal.organization_account_contact_addresses
 -- End organization_account_contact_addresses
 
 -- Begin organization_account_contact_profiles
-create sequence portal.org_account_contact_profiles_profile_id_seq;
+create sequence portal.org_account_contact_profiles_profile_id_seq increment by 100;
 
 create table portal.organization_account_contact_profiles (
     profile_id bigint NOT NULL DEFAULT nextval('portal.org_account_contact_profiles_profile_id_seq'::regclass),

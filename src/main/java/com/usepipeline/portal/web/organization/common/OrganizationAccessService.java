@@ -28,6 +28,8 @@ public class OrganizationAccessService {
         this.roleRepository = roleRepository;
     }
 
+    // TODO replace this method with one that accepts an AccessOperation and
+    //  validates that the requesting user has a role permitted for that operation
     public AccessLevel getAccessLevelForUserRequestingAccount(UserEntity requestingUser, OrganizationAccountEntity requestedAccount) {
         MembershipEntity membershipEntity = membershipRetrievalService.getMembershipEntity(requestingUser);
 
@@ -39,33 +41,6 @@ public class OrganizationAccessService {
                     case PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER:
                         return AccessLevel.FULL;
                     case PortalAuthorityConstants.ORGANIZATION_ACCOUNT_MANAGER:
-                        return AccessLevel.READ_WRITE_INSENSITIVE;
-                    default:
-                        return AccessLevel.READ_INSENSITIVE;
-                }
-            } else if (IS_PIPELINE_ADMIN_ROLE.test(requestingUserRoleLevel)) {
-                return AccessLevel.FULL;
-            }
-        }
-        return AccessLevel.NONE;
-    }
-
-    public AccessLevel getAccessLevelForUserRequestingUser(UserEntity requestingUser, UserEntity requestedUser) {
-        if (requestingUser.getUserId() == requestedUser.getUserId()) {
-            return AccessLevel.FULL;
-        }
-
-        MembershipEntity requestingUserMembership = membershipRetrievalService.getMembershipEntity(requestingUser);
-        MembershipEntity requestedUserMembership = membershipRetrievalService.getMembershipEntity(requestedUser);
-
-        Optional<String> organizationRoleLevel = getOrganizationRoleLevel(requestingUserMembership);
-        if (organizationRoleLevel.isPresent()) {
-            String requestingUserRoleLevel = organizationRoleLevel.get();
-            if (requestingUserMembership.getOrganizationAccountId() == requestedUserMembership.getOrganizationAccountId()) {
-                switch (requestingUserRoleLevel) {
-                    case PortalAuthorityConstants.PIPELINE_ADMIN:
-                        return AccessLevel.FULL;
-                    case PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER:
                         return AccessLevel.READ_WRITE_INSENSITIVE;
                     default:
                         return AccessLevel.READ_INSENSITIVE;

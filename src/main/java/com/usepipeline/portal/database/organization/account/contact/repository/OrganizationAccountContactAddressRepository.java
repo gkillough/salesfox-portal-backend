@@ -4,7 +4,10 @@ import com.usepipeline.portal.database.organization.account.contact.entity.Organ
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public interface OrganizationAccountContactAddressRepository extends JpaRepository<OrganizationAccountContactAddressEntity, Long> {
+    Optional<OrganizationAccountContactAddressEntity> findByContactId(Long contactId);
 
 }

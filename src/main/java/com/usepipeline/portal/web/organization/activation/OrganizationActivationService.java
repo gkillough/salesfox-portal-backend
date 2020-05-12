@@ -58,7 +58,7 @@ public class OrganizationActivationService {
     }
 
     private void validateUpdatePermission(Long organizationAccountId) {
-        if (!membershipRetrievalService.isPipelineAdmin()) {
+        if (!membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
             UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
             MembershipEntity membershipEntity = membershipRetrievalService.getMembershipEntity(authenticatedUserEntity);
             if (membershipEntity.getOrganizationAccountId() != organizationAccountId) {
