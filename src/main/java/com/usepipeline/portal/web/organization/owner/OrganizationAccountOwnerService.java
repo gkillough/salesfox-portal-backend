@@ -1,6 +1,6 @@
 package com.usepipeline.portal.web.organization.owner;
 
-import com.usepipeline.portal.common.enumeration.AccessLevel;
+import com.usepipeline.portal.common.enumeration.AccessOperation;
 import com.usepipeline.portal.database.account.entity.MembershipEntity;
 import com.usepipeline.portal.database.account.entity.RoleEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
@@ -55,7 +55,7 @@ public class OrganizationAccountOwnerService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
-        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
+        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity, AccessOperation.READ);
 
         RoleEntity orgAccountOwnerRole = getExistingRole(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER);
         UserEntity orgAccountOwnerEntity = getOrganizationAccountOwnerEntity(orgAccountEntity, orgAccountOwnerRole);
@@ -68,7 +68,7 @@ public class OrganizationAccountOwnerService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
-        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
+        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity, AccessOperation.UPDATE);
 
         if (StringUtils.isBlank(updateModel.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The 'email' field cannot be blank");
@@ -129,9 +129,9 @@ public class OrganizationAccountOwnerService {
                 });
     }
 
-    private void validateUserHasAccessToOrgAccount(UserEntity authenticatedUserEntity, OrganizationAccountEntity orgAccountEntity) {
-        AccessLevel orgAccountAccessLevel = organizationAccessService.getAccessLevelForUserRequestingAccount(authenticatedUserEntity, orgAccountEntity);
-        if (AccessLevel.NONE.equals(orgAccountAccessLevel)) {
+    private void validateUserHasAccessToOrgAccount(UserEntity authenticatedUserEntity, OrganizationAccountEntity orgAccountEntity, AccessOperation requestedAccessOperation) {
+        boolean canAccess = organizationAccessService.canUserAccessOrganizationAccount(authenticatedUserEntity, orgAccountEntity, requestedAccessOperation);
+        if (!canAccess) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
     }

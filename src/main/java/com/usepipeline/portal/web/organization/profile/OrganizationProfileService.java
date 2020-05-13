@@ -1,7 +1,7 @@
 package com.usepipeline.portal.web.organization.profile;
 
 import com.usepipeline.portal.common.FieldValidationUtils;
-import com.usepipeline.portal.common.enumeration.AccessLevel;
+import com.usepipeline.portal.common.enumeration.AccessOperation;
 import com.usepipeline.portal.common.model.PortalAddressModel;
 import com.usepipeline.portal.database.account.entity.UserEntity;
 import com.usepipeline.portal.database.organization.OrganizationEntity;
@@ -52,11 +52,7 @@ public class OrganizationProfileService {
     public OrganizationAccountProfileModel getProfile(Long organizationAccountId) {
         OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        AccessLevel accessLevel = getPermittedAccessLevel(orgAccountEntity);
-        if (AccessLevel.NONE.equals(accessLevel)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
+        validatePermittedAccessLevel(orgAccountEntity, AccessOperation.READ);
 
         OrganizationEntity organizationEntity = membershipRetrievalService.getOrganizationEntity(orgAccountEntity);
         OrganizationAccountProfileEntity orgAcctProfileEntity = getOrganizationAccountProfileEntity(organizationAccountId);
@@ -70,13 +66,7 @@ public class OrganizationProfileService {
     public void updateProfile(Long organizationAccountId, OrganizationAccountProfileUpdateModel requestModel) {
         OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        AccessLevel accessLevel = getPermittedAccessLevel(orgAccountEntity);
-        boolean hasSufficientWriteAccess = AccessLevel.FULL.equals(accessLevel) || AccessLevel.READ_WRITE_INSENSITIVE.equals(accessLevel);
-        if (!hasSufficientWriteAccess) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-
+        validatePermittedAccessLevel(orgAccountEntity, AccessOperation.UPDATE);
         validateUpdateRequestModel(orgAccountEntity, requestModel);
 
         OrganizationAccountProfileEntity orgAcctProfileEntity = getOrganizationAccountProfileEntity(organizationAccountId);
@@ -92,9 +82,12 @@ public class OrganizationProfileService {
         organizationAccountProfileRepository.save(orgAcctProfileEntity);
     }
 
-    private AccessLevel getPermittedAccessLevel(OrganizationAccountEntity orgAccountEntity) {
+    private void validatePermittedAccessLevel(OrganizationAccountEntity orgAccountEntity, AccessOperation requestedAccessOperation) {
         UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
-        return organizationAccessService.getAccessLevelForUserRequestingAccount(authenticatedUserEntity, orgAccountEntity);
+        boolean canAccess = organizationAccessService.canUserAccessOrganizationAccount(authenticatedUserEntity, orgAccountEntity, requestedAccessOperation);
+        if (!canAccess) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
     }
 
     private OrganizationAccountProfileEntity getOrganizationAccountProfileEntity(Long orgAccountId) {

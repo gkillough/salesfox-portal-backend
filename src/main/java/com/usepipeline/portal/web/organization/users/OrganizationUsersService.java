@@ -1,6 +1,6 @@
 package com.usepipeline.portal.web.organization.users;
 
-import com.usepipeline.portal.common.enumeration.AccessLevel;
+import com.usepipeline.portal.common.enumeration.AccessOperation;
 import com.usepipeline.portal.database.account.entity.LoginEntity;
 import com.usepipeline.portal.database.account.entity.MembershipEntity;
 import com.usepipeline.portal.database.account.entity.RoleEntity;
@@ -72,7 +72,7 @@ public class OrganizationUsersService {
 
         UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
 
-        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
+        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity, AccessOperation.READ);
         validateUserIsAMemberOfOrgAccount(organizationAccountId, requestedUser);
 
         return convertToAdminViewModel(requestedUser, new UserRoleModelCache(roleRepository), true);
@@ -83,7 +83,7 @@ public class OrganizationUsersService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
-        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
+        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity, AccessOperation.READ);
 
         Set<Long> orgAccountUserIds = membershipRepository.findByOrganizationAccountId(organizationAccountId)
                 .stream()
@@ -107,7 +107,7 @@ public class OrganizationUsersService {
 
         UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
 
-        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
+        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity, AccessOperation.UPDATE);
         validateUserIsAMemberOfOrgAccount(organizationAccountId, userToBeUpdated);
 
         RoleEntity orgAccountOwnerRole = getExistingRole(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER);
@@ -126,7 +126,7 @@ public class OrganizationUsersService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
-        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity);
+        validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity, AccessOperation.UPDATE);
         validateUserIsAMemberOfOrgAccount(organizationAccountId, userToBeUnlocked);
 
         LoginEntity loginEntity = loginRepository.findFirstByUserId(userId)
@@ -138,9 +138,9 @@ public class OrganizationUsersService {
         }
     }
 
-    private void validateUserHasAccessToOrgAccount(UserEntity authenticatedUserEntity, OrganizationAccountEntity orgAccountEntity) {
-        AccessLevel orgAccountAccessLevel = organizationAccessService.getAccessLevelForUserRequestingAccount(authenticatedUserEntity, orgAccountEntity);
-        if (AccessLevel.NONE.equals(orgAccountAccessLevel)) {
+    private void validateUserHasAccessToOrgAccount(UserEntity authenticatedUserEntity, OrganizationAccountEntity orgAccountEntity, AccessOperation requestedAccessOperation) {
+        boolean canAccess = organizationAccessService.canUserAccessOrganizationAccount(authenticatedUserEntity, orgAccountEntity, requestedAccessOperation);
+        if (!canAccess) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
     }
