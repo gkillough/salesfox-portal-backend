@@ -62,7 +62,7 @@ public class ContactService {
 
         List<OrganizationAccountContactEntity> accessibleContacts = getAccessibleContacts(loggedInUser, userMembership, contactActiveStatus);
         if (accessibleContacts.isEmpty()) {
-            return new MultiContactModel(Collections.emptyList());
+            return new MultiContactModel(List.of());
         }
 
         Set<Long> contactIds = accessibleContacts
@@ -219,7 +219,7 @@ public class ContactService {
                     .collect(Collectors.toSet());
             return contactRepository.findAllByContactIdInAndIsActive(userContactIds, isActive);
         }
-        return Collections.emptyList();
+        return List.of();
     }
 
     private <T extends Contactable> Map<Long, T> createContactableIdMap(Collection<T> contactables) {
