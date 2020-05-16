@@ -233,7 +233,7 @@ public class OrganizationInvitationService {
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                userDetails, null, Collections.singletonList(new SimpleGrantedAuthority(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION)));
+                userDetails, null, List.of(new SimpleGrantedAuthority(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION)));
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 

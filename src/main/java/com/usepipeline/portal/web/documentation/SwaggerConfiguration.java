@@ -12,7 +12,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collections;
+import java.util.Set;
 
 @Configuration
 @EnableSwagger2
@@ -23,8 +23,8 @@ public class SwaggerConfiguration implements AdminOnlyAccessible {
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.usepipeline.portal.web"))
                 .build()
-                .produces(Collections.singleton("application/json"))
-                .consumes(Collections.singleton("application/json"))
+                .produces(Set.of("application/json"))
+                .consumes(Set.of("application/json"))
                 .ignoredParameterTypes(HttpServletRequest.class, HttpServletResponse.class)
                 .apiInfo(apiEndPointsInfo());
     }

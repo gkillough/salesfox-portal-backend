@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -160,7 +160,7 @@ public class PasswordService {
         UserDetails user = userDetailsService.loadUserByUsername(email);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                user, null, Collections.singletonList(new SimpleGrantedAuthority(PortalAuthorityConstants.UPDATE_PASSWORD_PERMISSION)));
+                user, null, List.of(new SimpleGrantedAuthority(PortalAuthorityConstants.UPDATE_PASSWORD_PERMISSION)));
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 

@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -96,7 +95,7 @@ public class OrganizationAccountOwnerService {
         candidateOrgAcctOwnerMembership.setRoleId(orgAcctOwnerRole.getRoleId());
         currentOrgAcctOwnerMembership.setRoleId(orgAcctManagerRole.getRoleId());
 
-        List<MembershipEntity> membershipsToSave = Arrays.asList(candidateOrgAcctOwnerMembership, currentOrgAcctOwnerMembership);
+        List<MembershipEntity> membershipsToSave = List.of(candidateOrgAcctOwnerMembership, currentOrgAcctOwnerMembership);
         membershipRepository.saveAll(membershipsToSave);
 
         if (authenticatedUserEntity.getUserId().equals(currentOrgAcctOwner.getUserId())) {
