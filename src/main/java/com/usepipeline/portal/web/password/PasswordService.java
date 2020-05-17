@@ -1,8 +1,9 @@
 package com.usepipeline.portal.web.password;
 
-import com.usepipeline.portal.common.service.email.EmailMessage;
+import com.usepipeline.portal.PortalConfiguration;
 import com.usepipeline.portal.common.service.email.EmailMessagingService;
 import com.usepipeline.portal.common.service.email.PortalEmailException;
+import com.usepipeline.portal.common.service.email.model.EmailMessageModel;
 import com.usepipeline.portal.database.account.entity.LoginEntity;
 import com.usepipeline.portal.database.account.entity.PasswordResetTokenEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
@@ -37,6 +38,7 @@ import java.util.UUID;
 public class PasswordService {
     public static final Duration DURATION_OF_TOKEN_VALIDITY = Duration.ofMinutes(30);
 
+    private PortalConfiguration portalConfiguration;
     private PasswordResetTokenRepository passwordResetTokenRepository;
     private UserRepository userRepository;
     private LoginRepository loginRepository;
@@ -45,10 +47,11 @@ public class PasswordService {
     private EmailMessagingService emailMessagingService;
 
     @Autowired
-    public PasswordService(PasswordResetTokenRepository passwordResetTokenRepository,
+    public PasswordService(PortalConfiguration portalConfiguration, PasswordResetTokenRepository passwordResetTokenRepository,
                            UserRepository userRepository, LoginRepository loginRepository,
                            PortalUserDetailsService userDetailsService, PasswordEncoder passwordEncoder,
                            EmailMessagingService emailMessagingService) {
+        this.portalConfiguration = portalConfiguration;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.userRepository = userRepository;
         this.loginRepository = loginRepository;
@@ -169,14 +172,12 @@ public class PasswordService {
     }
 
     private boolean sendPasswordResetEmail(String email, String passwordResetToken) {
-        // TODO implement
-        String url = String.format("localhost:8080/api/password/reset/validate?token=%s&email=%s", passwordResetToken, email);
+        String passwordResetUrl = createResetPasswordLink(email, passwordResetToken);
+
         log.info("*** REMOVE ME *** Password Reset Token: " + passwordResetToken);
-        log.info("*** REMOVE ME *** Password Reset URL: " + url);
+        log.info("*** REMOVE ME *** Password Reset URL: " + passwordResetUrl);
 
-        // TODO create email message
-        EmailMessage emailMessage = null;
-
+        EmailMessageModel emailMessage = new EmailMessageModel(List.of(email), "PIPELINE Password Reset", passwordResetUrl);
         try {
             emailMessagingService.sendMessage(emailMessage);
             return true;
@@ -184,6 +185,16 @@ public class PasswordService {
             log.error("Problem sending password reset email", e);
         }
         return false;
+    }
+
+    private String createResetPasswordLink(String email, String passwordResetToken) {
+        StringBuilder linkBuilder = new StringBuilder(portalConfiguration.getPortalBaseUrl());
+        linkBuilder.append(portalConfiguration.getResetPasswordLinkSpec());
+        linkBuilder.append("?token=");
+        linkBuilder.append(passwordResetToken);
+        linkBuilder.append("&email=");
+        linkBuilder.append(email);
+        return linkBuilder.toString();
     }
 
 }

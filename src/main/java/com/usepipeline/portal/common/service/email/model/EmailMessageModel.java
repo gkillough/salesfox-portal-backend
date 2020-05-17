@@ -1,0 +1,17 @@
+package com.usepipeline.portal.common.service.email.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class EmailMessageModel {
+    private List<String> recipients;
+    private String subjectLine;
+    private String primaryMessage;
+
+}

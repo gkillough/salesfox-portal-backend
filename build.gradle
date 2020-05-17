@@ -39,11 +39,12 @@ dependencies {
 
     // Utilities
     implementation 'org.apache.commons:commons-lang3:3.8'
+    implementation 'javax.mail:javax.mail-api:1.6.2'
+    runtimeOnly 'com.sun.mail:javax.mail:1.6.2'
 
     // Extras TODO determine which of these can be removed
     implementation 'io.springfox:springfox-swagger2:2.8.0'
     implementation 'io.springfox:springfox-swagger-ui:2.8.0'
-    // implementation 'com.okta.spring:okta-spring-boot-starter:1.3.0'
 
     // Database
     runtimeOnly 'org.postgresql:postgresql'
