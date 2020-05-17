@@ -1,10 +1,11 @@
 package com.usepipeline.portal.web.organization.invitation;
 
+import com.usepipeline.portal.PortalConfiguration;
 import com.usepipeline.portal.common.FieldValidationUtils;
 import com.usepipeline.portal.common.exception.PortalException;
-import com.usepipeline.portal.common.service.email.EmailMessage;
 import com.usepipeline.portal.common.service.email.EmailMessagingService;
 import com.usepipeline.portal.common.service.email.PortalEmailException;
+import com.usepipeline.portal.common.service.email.model.EmailMessageModel;
 import com.usepipeline.portal.common.service.license.LicenseSeatManager;
 import com.usepipeline.portal.database.account.entity.LicenseEntity;
 import com.usepipeline.portal.database.account.entity.MembershipEntity;
@@ -54,6 +55,7 @@ import java.util.stream.Collectors;
 public class OrganizationInvitationService {
     public static final Duration DURATION_OF_TOKEN_VALIDITY = Duration.ofDays(7);
 
+    private PortalConfiguration portalConfiguration;
     private RoleRepository roleRepository;
     private OrganizationAccountRepository organizationAccountRepository;
     private OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository;
@@ -67,9 +69,10 @@ public class OrganizationInvitationService {
     private EmailMessagingService emailMessagingService;
 
     @Autowired
-    public OrganizationInvitationService(RoleRepository roleRepository, OrganizationAccountRepository organizationAccountRepository, OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository,
+    public OrganizationInvitationService(PortalConfiguration portalConfiguration, RoleRepository roleRepository, OrganizationAccountRepository organizationAccountRepository, OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository,
                                          UserRegistrationService userRegistrationService, UserDetailsService userDetailsService, UserProfileService userProfileService, PasswordService passwordService, UserRoleService userRoleService,
                                          LicenseSeatManager licenseSeatManager, HttpSafeUserMembershipRetrievalService userMembershipRetrievalService, EmailMessagingService emailMessagingService) {
+        this.portalConfiguration = portalConfiguration;
         this.roleRepository = roleRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.organizationAccountInviteTokenRepository = organizationAccountInviteTokenRepository;
@@ -114,7 +117,7 @@ public class OrganizationInvitationService {
         OrganizationAccountInviteTokenEntity inviteEntity = new OrganizationAccountInviteTokenEntity(requestModel.getInviteEmail(), invitationToken, orgAccountEntity.getOrganizationAccountId(), requestModel.getInviteRole(), LocalDateTime.now());
         organizationAccountInviteTokenRepository.save(inviteEntity);
 
-        sendInvitationEmail(requestModel.getInviteEmail(), invitationToken);
+        sendInvitationEmail(requestModel.getInviteEmail(), orgAccountEntity.getOrganizationAccountName(), invitationToken);
     }
 
     @Transactional
@@ -251,19 +254,28 @@ public class OrganizationInvitationService {
         SecurityContextHolder.clearContext();
     }
 
-    private void sendInvitationEmail(String email, String invitationToken) {
-        // TODO implement
-        String url = String.format("localhost:8080/api/organization/invite/validate?token=%s&email=%s", invitationToken, email);
-        log.info("*** REMOVE ME *** Invitation Link: {}", url);
+    private void sendInvitationEmail(String email, String organizationAccountName, String invitationToken) {
+        String invitationUrl = createInvitationLink(email, invitationToken);
 
-        // TODO create email message
-        EmailMessage emailMessage = null;
+        log.info("*** REMOVE ME *** Invitation Link: {}", invitationUrl);
 
+        String subjectLine = String.format("Invitation to join %s on PIPELINE", organizationAccountName);
+        EmailMessageModel emailMessage = new EmailMessageModel(Collections.singletonList(email), subjectLine, invitationUrl);
         try {
             emailMessagingService.sendMessage(emailMessage);
         } catch (PortalEmailException e) {
             log.error("Problem sending organization account invitation email", e);
         }
+    }
+
+    private String createInvitationLink(String email, String invitationToken) {
+        StringBuilder linkBuilder = new StringBuilder(portalConfiguration.getPortalBaseUrl());
+        linkBuilder.append(portalConfiguration.getInviteOrganizationAccountUserLinkSpec());
+        linkBuilder.append("?token=");
+        linkBuilder.append(invitationToken);
+        linkBuilder.append("&email=");
+        linkBuilder.append(email);
+        return linkBuilder.toString();
     }
 
 }
