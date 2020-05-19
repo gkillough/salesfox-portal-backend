@@ -1,6 +1,7 @@
 package com.usepipeline.portal.web.contact;
 
-import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
+import com.usepipeline.portal.web.common.model.request.ActiveStatusPatchModel;
+import com.usepipeline.portal.web.common.page.PageMetadata;
 import com.usepipeline.portal.web.contact.model.ContactUpdateModel;
 import com.usepipeline.portal.web.contact.model.MultiContactModel;
 import com.usepipeline.portal.web.contact.model.PointOfContactAssignmentModel;
@@ -23,10 +24,9 @@ public class ContactController {
         this.contactInteractionsService = contactInteractionsService;
     }
 
-    // TODO consider endpoint with expanded contact info
     @GetMapping
-    public MultiContactModel getContacts(@RequestParam Boolean active) {
-        return contactService.getContacts(active);
+    public MultiContactModel getContacts(@RequestParam Boolean active, @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset, @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit) {
+        return contactService.getContacts(active, offset, limit);
     }
 
     @PostMapping

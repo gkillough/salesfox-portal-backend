@@ -1,6 +1,6 @@
 package com.usepipeline.portal.web.user.active;
 
-import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
+import com.usepipeline.portal.web.common.model.request.ActiveStatusPatchModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

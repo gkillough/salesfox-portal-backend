@@ -8,7 +8,7 @@ import com.usepipeline.portal.database.account.entity.MembershipEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
 import com.usepipeline.portal.database.account.repository.UserRepository;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
-import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
+import com.usepipeline.portal.web.common.model.request.ActiveStatusPatchModel;
 import com.usepipeline.portal.web.user.common.UserAccessService;
 import com.usepipeline.portal.web.util.HttpSafeUserMembershipRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
