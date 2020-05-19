@@ -1,6 +1,7 @@
 package com.usepipeline.portal.web.organization.users;
 
-import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
+import com.usepipeline.portal.web.common.model.request.ActiveStatusPatchModel;
+import com.usepipeline.portal.web.common.page.PageMetadata;
 import com.usepipeline.portal.web.organization.common.OrganizationEndpointConstants;
 import com.usepipeline.portal.web.organization.owner.OrganizationAccountOwnerService;
 import com.usepipeline.portal.web.organization.users.model.NewAccountOwnerRequestModel;
@@ -28,8 +29,8 @@ public class OrganizationUsersController {
 
     @GetMapping("/users")
     @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
-    public OrganizationMultiUsersModel getOrganizationAccountUsers(@PathVariable Long accountId) {
-        return organizationUsersService.getOrganizationAccountUsers(accountId);
+    public OrganizationMultiUsersModel getOrganizationAccountUsers(@PathVariable Long accountId, @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset, @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit) {
+        return organizationUsersService.getOrganizationAccountUsers(accountId, offset, limit);
     }
 
     @GetMapping("/users/{userId}")

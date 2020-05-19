@@ -16,13 +16,16 @@ import com.usepipeline.portal.database.organization.account.contact.repository.O
 import com.usepipeline.portal.database.organization.account.contact.repository.OrganizationAccountContactInteractionsRepository;
 import com.usepipeline.portal.database.organization.account.contact.repository.OrganizationAccountContactProfileRepository;
 import com.usepipeline.portal.database.organization.account.contact.repository.OrganizationAccountContactRepository;
-import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
+import com.usepipeline.portal.web.common.model.request.ActiveStatusPatchModel;
+import com.usepipeline.portal.web.common.page.PageRequestValidationUtils;
 import com.usepipeline.portal.web.contact.model.*;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -55,14 +58,14 @@ public class ContactService {
         this.contactAccessOperationUtility = new ContactAccessOperationUtility<>(membershipRetrievalService, contactProfileRepository);
     }
 
-    // TODO consider paging
-    public MultiContactModel getContacts(boolean contactActiveStatus) {
+    public MultiContactModel getContacts(boolean contactActiveStatus, Integer pageOffset, Integer pageLimit) {
+        PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
 
-        List<OrganizationAccountContactEntity> accessibleContacts = getAccessibleContacts(loggedInUser, userMembership, contactActiveStatus);
+        Page<OrganizationAccountContactEntity> accessibleContacts = getAccessibleContacts(loggedInUser, userMembership, contactActiveStatus, pageOffset, pageLimit);
         if (accessibleContacts.isEmpty()) {
-            return new MultiContactModel(List.of());
+            return MultiContactModel.empty();
         }
 
         Set<Long> contactIds = accessibleContacts
@@ -87,7 +90,7 @@ public class ContactService {
             contactModels.add(contactModel);
         }
 
-        return new MultiContactModel(contactModels);
+        return new MultiContactModel(contactModels, accessibleContacts);
     }
 
     @Transactional
@@ -204,22 +207,23 @@ public class ContactService {
         contactRepository.save(contactToUpdate);
     }
 
-    private List<OrganizationAccountContactEntity> getAccessibleContacts(UserEntity user, MembershipEntity userMembership, boolean isActive) {
+    private Page<OrganizationAccountContactEntity> getAccessibleContacts(UserEntity user, MembershipEntity userMembership, boolean isActive, Integer pageOffset, Integer pageLimit) {
+        PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
         if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
-            return contactRepository.findAll();
+            return contactRepository.findAllByIsActive(isActive, pageRequest);
         }
 
         String roleLevel = membershipRetrievalService.getRoleEntity(userMembership).getRoleLevel();
         if (roleLevel.startsWith(PortalAuthorityConstants.ORGANIZATION_ROLE_PREFIX)) {
-            return contactRepository.findByOrganizationAccountIdAndIsActive(userMembership.getOrganizationAccountId(), isActive);
+            return contactRepository.findByOrganizationAccountIdAndIsActive(userMembership.getOrganizationAccountId(), isActive, pageRequest);
         } else if (isNonOrganizationRole(roleLevel)) {
             Set<Long> userContactIds = contactProfileRepository.findByOrganizationPointOfContactUserId(user.getUserId())
                     .stream()
                     .map(OrganizationAccountContactProfileEntity::getContactId)
                     .collect(Collectors.toSet());
-            return contactRepository.findAllByContactIdInAndIsActive(userContactIds, isActive);
+            return contactRepository.findAllByContactIdInAndIsActive(userContactIds, isActive, pageRequest);
         }
-        return List.of();
+        return Page.empty();
     }
 
     private <T extends Contactable> Map<Long, T> createContactableIdMap(Collection<T> contactables) {

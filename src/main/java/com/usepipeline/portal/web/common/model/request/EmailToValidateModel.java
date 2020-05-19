@@ -1,4 +1,4 @@
-package com.usepipeline.portal.web.common.model;
+package com.usepipeline.portal.web.common.model.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -12,8 +12,8 @@ import com.usepipeline.portal.database.organization.account.address.Organization
 import com.usepipeline.portal.database.organization.account.address.OrganizationAccountAddressRepository;
 import com.usepipeline.portal.database.organization.account.profile.OrganizationAccountProfileEntity;
 import com.usepipeline.portal.database.organization.account.profile.OrganizationAccountProfileRepository;
-import com.usepipeline.portal.web.common.model.EmailToValidateModel;
-import com.usepipeline.portal.web.common.model.ValidationResponseModel;
+import com.usepipeline.portal.web.common.model.request.EmailToValidateModel;
+import com.usepipeline.portal.web.common.model.response.ValidationResponseModel;
 import com.usepipeline.portal.web.organization.common.OrganizationValidationService;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountNameToValidateModel;
 import com.usepipeline.portal.web.registration.organization.model.OrganizationAccountRegistrationModel;

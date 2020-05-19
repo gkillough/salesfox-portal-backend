@@ -11,7 +11,8 @@ import com.usepipeline.portal.database.account.repository.RoleRepository;
 import com.usepipeline.portal.database.account.repository.UserRepository;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountRepository;
-import com.usepipeline.portal.web.common.model.ActiveStatusPatchModel;
+import com.usepipeline.portal.web.common.model.request.ActiveStatusPatchModel;
+import com.usepipeline.portal.web.common.page.PageRequestValidationUtils;
 import com.usepipeline.portal.web.organization.common.OrganizationAccessService;
 import com.usepipeline.portal.web.organization.users.model.OrganizationMultiUsersModel;
 import com.usepipeline.portal.web.organization.users.model.OrganizationUserAdminViewModel;
@@ -25,6 +26,8 @@ import com.usepipeline.portal.web.user.role.model.UserRoleModel;
 import com.usepipeline.portal.web.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -32,7 +35,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -78,17 +80,20 @@ public class OrganizationUsersService {
         return convertToAdminViewModel(requestedUser, new UserRoleModelCache(roleRepository), true);
     }
 
-    public OrganizationMultiUsersModel getOrganizationAccountUsers(Long organizationAccountId) {
+    public OrganizationMultiUsersModel getOrganizationAccountUsers(Long organizationAccountId, Integer pageOffset, Integer pageLimit) {
+        PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
         OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
         validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity, AccessOperation.READ);
 
-        Set<Long> orgAccountUserIds = membershipRepository.findByOrganizationAccountId(organizationAccountId)
+        PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
+        Page<MembershipEntity> orgAccountMembershipsPage = membershipRepository.findByOrganizationAccountId(organizationAccountId, pageRequest);
+        List<Long> orgAccountUserIds = orgAccountMembershipsPage
                 .stream()
                 .map(MembershipEntity::getUserId)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toList());
 
         UserRoleModelCache roleCache = new UserRoleModelCache(roleRepository);
         List<OrganizationUserAdminViewModel> orgAccountUserAccountModels = userRepository.findAllById(orgAccountUserIds)
@@ -96,7 +101,7 @@ public class OrganizationUsersService {
                 .map(user -> convertToAdminViewModel(user, roleCache, false))
                 .collect(Collectors.toList());
 
-        return new OrganizationMultiUsersModel(orgAccountUserAccountModels);
+        return new OrganizationMultiUsersModel(orgAccountUserAccountModels, orgAccountMembershipsPage);
     }
 
     public void setOrganizationAccountUserActiveStatus(Long organizationAccountId, Long userId, ActiveStatusPatchModel updateModel) {
