@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -15,14 +16,13 @@ import java.time.LocalDateTime;
 @Table(schema = "portal", name = "logins")
 public class LoginEntity implements Serializable {
     @Id
-    @SequenceGenerator(schema = "portal", name = "logins_login_id_seq_generator", sequenceName = "logins_login_id_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "logins_login_id_seq_generator")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "login_id")
-    private Long loginId;
+    private UUID loginId;
 
     @PrimaryKeyJoinColumn
     @Column(name = "user_id")
-    private Long userId;
+    private UUID userId;
 
     @Column(name = "password_hash")
     private String passwordHash;

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -14,14 +15,13 @@ import java.io.Serializable;
 @Table(schema = "portal", name = "profiles")
 public class ProfileEntity implements Serializable {
     @Id
-    @SequenceGenerator(schema = "portal", name = "profiles_profile_id_seq_generator", sequenceName = "profiles_profile_id_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "profiles_profile_id_seq_generator")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "profile_id")
-    private Long profileId;
+    private UUID profileId;
 
     @PrimaryKeyJoinColumn
     @Column(name = "user_id")
-    private Long userId;
+    private UUID userId;
 
     @Column(name = "mobile_number")
     private String mobileNumber;
@@ -31,6 +31,6 @@ public class ProfileEntity implements Serializable {
 
     @PrimaryKeyJoinColumn
     @Column(name = "mailing_address_id")
-    private Long mailingAddressId;
+    private UUID mailingAddressId;
 
 }

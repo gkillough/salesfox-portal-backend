@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -16,13 +17,12 @@ import javax.persistence.*;
 @Table(schema = "portal", name = "user_addresses")
 public class UserAddressEntity extends AbstractAddressEntity {
     @Id
-    @SequenceGenerator(schema = "portal", name = "user_addresses_user_address_id_seq_generator", sequenceName = "user_addresses_user_address_id_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_addresses_user_address_id_seq_generator")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "user_address_id")
-    private Long userAddressId;
+    private UUID userAddressId;
 
     @PrimaryKeyJoinColumn
     @Column(name = "user_id")
-    private Long userId;
+    private UUID userId;
 
 }

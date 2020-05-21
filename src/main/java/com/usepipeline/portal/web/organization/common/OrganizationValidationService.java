@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class OrganizationValidationService {
@@ -25,7 +26,7 @@ public class OrganizationValidationService {
     }
 
     public boolean isOrganizationAccountNameInUse(String organizationName, String organizationAccountName) {
-        Optional<Long> optionalOrganizationId = organizationRepository.findFirstByOrganizationName(organizationName).map(OrganizationEntity::getOrganizationId);
+        Optional<UUID> optionalOrganizationId = organizationRepository.findFirstByOrganizationName(organizationName).map(OrganizationEntity::getOrganizationId);
         if (optionalOrganizationId.isPresent()) {
             return organizationAccountRepository.findFirstByOrganizationIdAndOrganizationAccountName(optionalOrganizationId.get(), organizationAccountName).isPresent();
         } else {
@@ -34,7 +35,7 @@ public class OrganizationValidationService {
         }
     }
 
-    public boolean isOrganizationAccountNameInUse(Long organizationId, String organizationAccountName) {
+    public boolean isOrganizationAccountNameInUse(UUID organizationId, String organizationAccountName) {
         return organizationAccountRepository.findFirstByOrganizationIdAndOrganizationAccountName(organizationId, organizationAccountName).isPresent();
     }
 

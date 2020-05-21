@@ -4,6 +4,8 @@ import com.usepipeline.portal.web.common.model.request.ActiveStatusPatchModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping(UserActiveController.BASE_ENDPOINT)
 public class UserActiveController {
@@ -16,7 +18,7 @@ public class UserActiveController {
     }
 
     @PatchMapping("/{userId}")
-    public void updateActiveStatus(@PathVariable Long userId, @RequestBody ActiveStatusPatchModel updateModel) {
+    public void updateActiveStatus(@PathVariable UUID userId, @RequestBody ActiveStatusPatchModel updateModel) {
         userActiveService.updateUserActiveStatus(userId, updateModel);
     }
 

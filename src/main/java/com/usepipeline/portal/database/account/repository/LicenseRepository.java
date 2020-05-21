@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-public interface LicenseRepository extends JpaRepository<LicenseEntity, Long> {
+public interface LicenseRepository extends JpaRepository<LicenseEntity, UUID> {
     Optional<LicenseEntity> findFirstByLicenseHash(UUID uuid);
 
 }

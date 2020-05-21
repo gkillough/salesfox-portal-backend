@@ -35,6 +35,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -66,7 +67,7 @@ public class OrganizationUsersService {
         this.loginRepository = loginRepository;
     }
 
-    public OrganizationUserAdminViewModel getOrganizationAccountUser(Long organizationAccountId, Long userId) {
+    public OrganizationUserAdminViewModel getOrganizationAccountUser(UUID organizationAccountId, UUID userId) {
         OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         UserEntity requestedUser = userRepository.findById(userId)
@@ -80,7 +81,7 @@ public class OrganizationUsersService {
         return convertToAdminViewModel(requestedUser, new UserRoleModelCache(roleRepository), true);
     }
 
-    public OrganizationMultiUsersModel getOrganizationAccountUsers(Long organizationAccountId, Integer pageOffset, Integer pageLimit) {
+    public OrganizationMultiUsersModel getOrganizationAccountUsers(UUID organizationAccountId, Integer pageOffset, Integer pageLimit) {
         PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
         OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -90,7 +91,7 @@ public class OrganizationUsersService {
 
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
         Page<MembershipEntity> orgAccountMembershipsPage = membershipRepository.findByOrganizationAccountId(organizationAccountId, pageRequest);
-        List<Long> orgAccountUserIds = orgAccountMembershipsPage
+        List<UUID> orgAccountUserIds = orgAccountMembershipsPage
                 .stream()
                 .map(MembershipEntity::getUserId)
                 .collect(Collectors.toList());
@@ -104,7 +105,7 @@ public class OrganizationUsersService {
         return new OrganizationMultiUsersModel(orgAccountUserAccountModels, orgAccountMembershipsPage);
     }
 
-    public void setOrganizationAccountUserActiveStatus(Long organizationAccountId, Long userId, ActiveStatusPatchModel updateModel) {
+    public void setOrganizationAccountUserActiveStatus(UUID organizationAccountId, UUID userId, ActiveStatusPatchModel updateModel) {
         OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         UserEntity userToBeUpdated = userRepository.findById(userId)
@@ -124,7 +125,7 @@ public class OrganizationUsersService {
         userActiveService.updateUserActiveStatusWithoutPermissionCheck(userId, updateModel.getActiveStatus());
     }
 
-    public void unlockOrganizationAccountUser(Long organizationAccountId, Long userId) {
+    public void unlockOrganizationAccountUser(UUID organizationAccountId, UUID userId) {
         OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         UserEntity userToBeUnlocked = userRepository.findById(userId)
@@ -150,7 +151,7 @@ public class OrganizationUsersService {
         }
     }
 
-    private void validateUserIsAMemberOfOrgAccount(Long organizationAccountId, UserEntity userEntity) {
+    private void validateUserIsAMemberOfOrgAccount(UUID organizationAccountId, UserEntity userEntity) {
         MembershipEntity requestedUserMembership = membershipRetrievalService.getMembershipEntity(userEntity);
         if (!requestedUserMembership.getOrganizationAccountId().equals(organizationAccountId)) {
             // The user exists, but is not a member of the organization account. To prevent any unnecessary details about
@@ -201,13 +202,13 @@ public class OrganizationUsersService {
 
     private static class UserRoleModelCache {
         private RoleRepository roleRepository;
-        private Map<Long, UserRoleModel> roleIdToModelMap = new HashMap<>();
+        private Map<UUID, UserRoleModel> roleIdToModelMap = new HashMap<>();
 
         private UserRoleModelCache(RoleRepository roleRepository) {
             this.roleRepository = roleRepository;
         }
 
-        public UserRoleModel findRoleByIdAndConvertToModel(Long roleId) {
+        public UserRoleModel findRoleByIdAndConvertToModel(UUID roleId) {
             UserRoleModel userRoleModel = roleIdToModelMap.computeIfAbsent(roleId, ignored ->
                     roleRepository.findById(roleId)
                             .map(role -> new UserRoleModel(role.getRoleLevel(), role.getDescription()))

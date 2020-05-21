@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import java.util.UUID;
 
 @Component
 public class UserRoleService {
@@ -25,7 +26,7 @@ public class UserRoleService {
     }
 
     @Transactional
-    public void updateRole(Long userId, UserRoleUpdateModel updateModel) {
+    public void updateRole(UUID userId, UserRoleUpdateModel updateModel) {
         if (userId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }

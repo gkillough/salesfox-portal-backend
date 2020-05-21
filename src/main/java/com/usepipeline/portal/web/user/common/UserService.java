@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -34,7 +35,7 @@ public class UserService {
         return new CurrentUserModel(user.getUserId(), user.getFirstName(), user.getLastName(), role);
     }
 
-    public UserAccountModel getUser(Long userId) {
+    public UserAccountModel getUser(UUID userId) {
         if (userId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'userId' is required");
         }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(UserEndpointConstants.BASE_ENDPOINT)
@@ -27,9 +28,8 @@ public class UserController {
     }
 
     @GetMapping("/{user_id}")
-    public UserAccountModel getUserById(HttpServletResponse response, @PathVariable(name = "user_id") Long userId) {
+    public UserAccountModel getUserById(HttpServletResponse response, @PathVariable(name = "user_id") UUID userId) {
         return userService.getUser(userId);
     }
-
 
 }

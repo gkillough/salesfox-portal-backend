@@ -27,6 +27,7 @@ import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -49,7 +50,7 @@ public class OrganizationProfileService {
         this.organizationAccountAddressRepository = organizationAccountAddressRepository;
     }
 
-    public OrganizationAccountProfileModel getProfile(Long organizationAccountId) {
+    public OrganizationAccountProfileModel getProfile(UUID organizationAccountId) {
         OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         validatePermittedAccessLevel(orgAccountEntity, AccessOperation.READ);
@@ -63,7 +64,7 @@ public class OrganizationProfileService {
     }
 
     @Transactional
-    public void updateProfile(Long organizationAccountId, OrganizationAccountProfileUpdateModel requestModel) {
+    public void updateProfile(UUID organizationAccountId, OrganizationAccountProfileUpdateModel requestModel) {
         OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         validatePermittedAccessLevel(orgAccountEntity, AccessOperation.UPDATE);
@@ -90,7 +91,7 @@ public class OrganizationProfileService {
         }
     }
 
-    private OrganizationAccountProfileEntity getOrganizationAccountProfileEntity(Long orgAccountId) {
+    private OrganizationAccountProfileEntity getOrganizationAccountProfileEntity(UUID orgAccountId) {
         return organizationAccountProfileRepository.findFirstByOrganizationAccountId(orgAccountId)
                 .orElseThrow(() -> {
                     log.error("Missing organization account profile for organizationAccountId: [{}]", orgAccountId);

@@ -23,6 +23,7 @@ public class PasswordResetTokenEntity implements Serializable {
     @Column(name = "token")
     private String token;
     @Column(name = "date_generated")
+    // TODO revisit this time implementation
     private LocalDateTime dateGenerated;
 
 }

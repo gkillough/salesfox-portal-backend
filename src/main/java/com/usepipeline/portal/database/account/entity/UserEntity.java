@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -14,10 +15,9 @@ import java.io.Serializable;
 @Table(schema = "portal", name = "users")
 public class UserEntity implements Serializable {
     @Id
-    @SequenceGenerator(schema = "portal", name = "users_user_id_seq_generator", sequenceName = "users_user_id_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_user_id_seq_generator")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "user_id")
-    private Long userId;
+    private UUID userId;
 
     @Column(name = "email")
     private String email;

@@ -1,7 +1,7 @@
 create table portal.organization_account_profiles (
-    profile_id bigserial NOT NULL,
-    organization_account_id bigint NOT NULL,
-    mailing_address_id bigint NOT NULL,
+    profile_id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    organization_account_id uuid NOT NULL,
+    mailing_address_id uuid NOT NULL,
     business_number character varying
 );
 

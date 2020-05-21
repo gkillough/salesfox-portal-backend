@@ -68,16 +68,16 @@ public class ContactService {
             return MultiContactModel.empty();
         }
 
-        Set<Long> contactIds = accessibleContacts
+        Set<UUID> contactIds = accessibleContacts
                 .stream()
                 .map(OrganizationAccountContactEntity::getContactId)
                 .collect(Collectors.toSet());
 
-        List<OrganizationAccountContactProfileEntity> contactProfiles = contactProfileRepository.findAllById(contactIds);
-        Map<Long, OrganizationAccountContactProfileEntity> contactIdToProfile = createContactableIdMap(contactProfiles);
+        List<OrganizationAccountContactProfileEntity> contactProfiles = contactProfileRepository.findAllByContactIdIn(contactIds);
+        Map<UUID, OrganizationAccountContactProfileEntity> contactIdToProfile = createContactableIdMap(contactProfiles);
 
         List<OrganizationAccountContactInteractionsEntity> contactInteractions = contactInteractionsRepository.findAllById(contactIds);
-        Map<Long, OrganizationAccountContactInteractionsEntity> contactIdToInteractions = createContactableIdMap(contactInteractions);
+        Map<UUID, OrganizationAccountContactInteractionsEntity> contactIdToInteractions = createContactableIdMap(contactInteractions);
 
         List<ContactModel> contactModels = new ArrayList<>();
         for (OrganizationAccountContactEntity contact : accessibleContacts) {
@@ -100,7 +100,7 @@ public class ContactService {
         MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
         RoleEntity userRole = membershipRetrievalService.getRoleEntity(userMembership);
 
-        Long pointOfContactUserId = contactUpdateModel.getPointOfContactUserId();
+        UUID pointOfContactUserId = contactUpdateModel.getPointOfContactUserId();
         if (isNonOrganizationRole(userRole.getRoleLevel())) {
             pointOfContactUserId = loggedInUser.getUserId();
         } else if (pointOfContactUserId != null) {
@@ -125,7 +125,7 @@ public class ContactService {
     }
 
     @Transactional
-    public void updateContact(Long contactId, ContactUpdateModel contactUpdateModel) {
+    public void updateContact(UUID contactId, ContactUpdateModel contactUpdateModel) {
         OrganizationAccountContactEntity contactToUpdate = contactRepository.findById(contactId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -161,7 +161,7 @@ public class ContactService {
         contactProfileRepository.save(contactProfileToUpdate);
     }
 
-    public void assignContactToUser(Long contactId, PointOfContactAssignmentModel pocAssignmentModel) {
+    public void assignContactToUser(UUID contactId, PointOfContactAssignmentModel pocAssignmentModel) {
         OrganizationAccountContactEntity requestedContact = contactRepository.findById(contactId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -189,7 +189,7 @@ public class ContactService {
 
     }
 
-    public void setContactActiveStatus(Long contactId, ActiveStatusPatchModel activeStatusModel) {
+    public void setContactActiveStatus(UUID contactId, ActiveStatusPatchModel activeStatusModel) {
         OrganizationAccountContactEntity contactToUpdate = contactRepository.findById(contactId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -217,7 +217,7 @@ public class ContactService {
         if (roleLevel.startsWith(PortalAuthorityConstants.ORGANIZATION_ROLE_PREFIX)) {
             return contactRepository.findByOrganizationAccountIdAndIsActive(userMembership.getOrganizationAccountId(), isActive, pageRequest);
         } else if (isNonOrganizationRole(roleLevel)) {
-            Set<Long> userContactIds = contactProfileRepository.findByOrganizationPointOfContactUserId(user.getUserId())
+            Set<UUID> userContactIds = contactProfileRepository.findByOrganizationPointOfContactUserId(user.getUserId())
                     .stream()
                     .map(OrganizationAccountContactProfileEntity::getContactId)
                     .collect(Collectors.toSet());
@@ -226,13 +226,13 @@ public class ContactService {
         return Page.empty();
     }
 
-    private <T extends Contactable> Map<Long, T> createContactableIdMap(Collection<T> contactables) {
+    private <T extends Contactable> Map<UUID, T> createContactableIdMap(Collection<T> contactables) {
         return contactables
                 .stream()
                 .collect(Collectors.toMap(Contactable::getContactId, Function.identity()));
     }
 
-    private PointOfContactUserModel retrievePointOfContactIfExists(Long userId) {
+    private PointOfContactUserModel retrievePointOfContactIfExists(UUID userId) {
         if (userId != null) {
             Optional<UserEntity> optionalUser = userRepository.findById(userId);
             if (optionalUser.isPresent()) {
@@ -275,11 +275,6 @@ public class ContactService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The address is invalid");
         }
 
-        Long pocUserId = contactUpdateModel.getPointOfContactUserId();
-        if (pocUserId != null && pocUserId < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Point of Contact User Id cannot be negative");
-        }
-
         if (!FieldValidationUtils.isValidUSPhoneNumber(contactUpdateModel.getMobileNumber(), true)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The mobile phone number is invalid");
         }
@@ -289,7 +284,7 @@ public class ContactService {
         }
     }
 
-    private void validatePointOfContactUser(Long requestingUserOrgAcctId, Long pointOfContactUserId) {
+    private void validatePointOfContactUser(UUID requestingUserOrgAcctId, UUID pointOfContactUserId) {
         UserEntity pocUser = userRepository.findById(pointOfContactUserId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Point of Contact User specified does not exist"));
         MembershipEntity pocUserMembership = membershipRetrievalService.getMembershipEntity(pocUser);

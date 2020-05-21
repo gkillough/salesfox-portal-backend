@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -13,18 +14,17 @@ import javax.persistence.*;
 @Table(schema = "portal", name = "organization_account_profiles")
 public class OrganizationAccountProfileEntity {
     @Id
-    @SequenceGenerator(schema = "portal", name = "organization_account_profiles_profile_id_seq_generator", sequenceName = "organization_account_profiles_profile_id_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "organization_account_profiles_profile_id_seq_generator")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "profile_id")
-    private Long profileId;
+    private UUID profileId;
 
     @PrimaryKeyJoinColumn
     @Column(name = "organization_account_id")
-    private Long organizationAccountId;
+    private UUID organizationAccountId;
 
     @PrimaryKeyJoinColumn(referencedColumnName = "organization_account_address_id")
     @Column(name = "mailing_address_id")
-    private Long mailingAddressId;
+    private UUID mailingAddressId;
 
     @Column(name = "business_number")
     private String businessNumber;

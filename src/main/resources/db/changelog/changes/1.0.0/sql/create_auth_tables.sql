@@ -1,5 +1,5 @@
 create table portal.licenses (
-    license_id bigserial NOT NULL,
+    license_id uuid NOT NULL DEFAULT uuid_generate_v4(),
     license_hash uuid,
     expiration_date date,
     type character varying,
@@ -18,8 +18,8 @@ alter table ONLY portal.licenses
     ADD CONSTRAINT licenses_pkey PRIMARY KEY (license_id);
 
 create table portal.logins (
-    login_id bigserial NOT NULL,
-    user_id bigint,
+    login_id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    user_id uuid,
     password_hash character varying,
     last_successful_login timestamp without time zone,
     last_locked timestamp without time zone,
@@ -32,10 +32,10 @@ alter table ONLY portal.logins
     ADD CONSTRAINT logins_pkey PRIMARY KEY (login_id);
 
 create table portal.memberships (
-    membership_id bigserial NOT NULL,
-    user_id bigint,
-    organization_account_id bigint,
-    role_id bigint
+    membership_id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    user_id uuid,
+    organization_account_id uuid,
+    role_id uuid
 );
 
 alter table portal.memberships OWNER TO root;
@@ -43,11 +43,9 @@ alter table portal.memberships OWNER TO root;
 alter table ONLY portal.memberships
     ADD CONSTRAINT memberships_pkey PRIMARY KEY (membership_id);
 
-create sequence portal.org_account_addresses_org_account_address_id_seq;
-
 create table portal.organization_account_addresses (
-    organization_account_address_id bigint NOT NULL DEFAULT nextval('portal.org_account_addresses_org_account_address_id_seq'::regclass),
-    organization_account_id bigint UNIQUE NOT NULL,
+    organization_account_address_id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    organization_account_id uuid UNIQUE NOT NULL,
     street_number integer,
     street_name character varying,
     apt_suite character varying,
@@ -59,19 +57,14 @@ create table portal.organization_account_addresses (
 
 alter table portal.organization_account_addresses OWNER TO root;
 
-alter sequence portal.org_account_addresses_org_account_address_id_seq OWNER TO root;
-
-alter sequence portal.org_account_addresses_org_account_address_id_seq
-    OWNED BY portal.organization_account_addresses.organization_account_address_id;
-
 alter table ONLY portal.organization_account_addresses
     ADD CONSTRAINT organization_account_addresses_pkey PRIMARY KEY (organization_account_address_id);
 
 create table portal.organization_accounts (
-    organization_account_id bigserial NOT NULL,
+    organization_account_id uuid NOT NULL DEFAULT uuid_generate_v4(),
     organization_account_name character varying,
-    license_id bigint,
-    organization_id bigint,
+    license_id uuid,
+    organization_id uuid,
     is_active boolean DEFAULT true
 );
 
@@ -88,7 +81,7 @@ alter table portal.organization_account_addresses
 
 
 create table portal.organizations (
-    organization_id bigserial NOT NULL,
+    organization_id uuid NOT NULL DEFAULT uuid_generate_v4(),
     organization_name character varying,
     is_active boolean DEFAULT true
 );
@@ -99,11 +92,11 @@ alter table ONLY portal.organizations
     ADD CONSTRAINT organizations_pkey PRIMARY KEY (organization_id);
 
 create table portal.profiles (
-    profile_id bigserial NOT NULL,
-    user_id bigint UNIQUE NOT NULL,
+    profile_id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    user_id uuid UNIQUE NOT NULL,
     mobile_number character varying,
     business_number character varying,
-    mailing_address_id bigint
+    mailing_address_id uuid
 );
 
 alter table portal.profiles OWNER TO root;
@@ -112,7 +105,7 @@ alter table ONLY portal.profiles
     ADD CONSTRAINT profiles_pkey PRIMARY KEY (profile_id);
 
 create table portal.roles (
-    role_id bigserial NOT NULL,
+    role_id uuid NOT NULL DEFAULT uuid_generate_v4(),
     role_level character varying,
     role_description character varying,
     is_role_restricted boolean
@@ -127,8 +120,8 @@ alter table ONLY portal.roles
     ADD CONSTRAINT roles_role_level_key UNIQUE (role_level);
 
 create table portal.user_addresses (
-    user_address_id bigserial NOT NULL,
-    user_id bigint UNIQUE NOT NULL,
+    user_address_id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    user_id uuid UNIQUE NOT NULL,
     street_number integer,
     street_name character varying,
     apt_suite character varying,
@@ -144,7 +137,7 @@ alter table ONLY portal.user_addresses
     ADD CONSTRAINT user_addresses_pkey PRIMARY KEY (user_address_id);
 
 create table portal.users (
-    user_id bigserial NOT NULL,
+    user_id uuid NOT NULL DEFAULT uuid_generate_v4(),
     email character varying NOT NULL,
     first_name character varying,
     last_name character varying,

@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-uuid-extension-1
+      author: gavinkillough
+      changes:
+        - sql:
+            create extension if not exists "uuid-ossp" schema pg_catalog version "1.1";

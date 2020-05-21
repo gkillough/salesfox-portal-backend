@@ -6,6 +6,8 @@ import com.usepipeline.portal.web.organization.profile.model.OrganizationAccount
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping(OrganizationEndpointConstants.ACCOUNT_ENDPOINT)
 public class OrganizationProfileController {
@@ -17,12 +19,12 @@ public class OrganizationProfileController {
     }
 
     @GetMapping("/{accountId}/profile")
-    public OrganizationAccountProfileModel getOrganizationAccountProfile(@PathVariable Long accountId) {
+    public OrganizationAccountProfileModel getOrganizationAccountProfile(@PathVariable UUID accountId) {
         return organizationProfileService.getProfile(accountId);
     }
 
     @PutMapping("/{accountId}/profile")
-    public void updateOrganizationAccountProfile(@PathVariable Long accountId, @RequestBody OrganizationAccountProfileUpdateModel requestModel) {
+    public void updateOrganizationAccountProfile(@PathVariable UUID accountId, @RequestBody OrganizationAccountProfileUpdateModel requestModel) {
         organizationProfileService.updateProfile(accountId, requestModel);
     }
 

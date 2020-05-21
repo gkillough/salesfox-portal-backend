@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.UUID;
 import java.util.function.Consumer;
 
 @Component
@@ -32,15 +33,15 @@ public class ContactInteractionsService {
         this.contactInteractionsUtility = new ContactInteractionsUtility<>(membershipRetrievalService, contactInteractionsRepository);
     }
 
-    public void incrementContactInitiations(Long contactId) {
+    public void incrementContactInitiations(UUID contactId) {
         increment(contactId, contactInteractionsUtility::incrementContactInitiations);
     }
 
-    public void incrementEngagementsGenerated(Long contactId) {
+    public void incrementEngagementsGenerated(UUID contactId) {
         increment(contactId, contactInteractionsUtility::incrementEngagementsGenerated);
     }
 
-    private void increment(Long contactId, Consumer<OrganizationAccountContactEntity> incrementer) {
+    private void increment(UUID contactId, Consumer<OrganizationAccountContactEntity> incrementer) {
         OrganizationAccountContactEntity contactToUpdate = contactRepository.findById(contactId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 

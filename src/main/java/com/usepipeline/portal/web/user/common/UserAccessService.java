@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class UserAccessService {
@@ -29,7 +30,7 @@ public class UserAccessService {
         this.roleRepository = roleRepository;
     }
 
-    public boolean canCurrentUserAccessDataForUser(Long userId) {
+    public boolean canCurrentUserAccessDataForUser(UUID userId) {
         Optional<UsernamePasswordAuthenticationToken> optionalAuthToken = SecurityContextUtils.retrieveUserAuthToken();
         if (optionalAuthToken.isPresent()) {
             UserDetails userDetails = SecurityContextUtils.extractUserDetails(optionalAuthToken.get());
@@ -37,9 +38,9 @@ public class UserAccessService {
             Optional<UserEntity> optionalUser = userRepository.findFirstByEmail(email);
             if (optionalUser.isPresent()) {
                 UserEntity userEntity = optionalUser.get();
-                Long entityUserId = userEntity.getUserId();
+                UUID entityUserId = userEntity.getUserId();
                 // TODO in the future, we may want to also check if the logged in user manages the user with this userId
-                if (entityUserId == userId) {
+                if (entityUserId.equals(userId)) {
                     // If the logged in user is the requested user, grant access.
                     return true;
                 } else {
@@ -54,7 +55,7 @@ public class UserAccessService {
         return false;
     }
 
-    public UserRoleModel findRoleByUserId(Long userId) {
+    public UserRoleModel findRoleByUserId(UUID userId) {
         return membershipRepository.findFirstByUserId(userId)
                 .map(MembershipEntity::getRoleId)
                 .flatMap(roleRepository::findById)
