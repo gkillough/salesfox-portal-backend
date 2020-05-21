@@ -15,7 +15,7 @@ databaseChangeLog:
                   type: VARCHAR
               - column:
                   name: organization_account_id
-                  type: BIGINT
+                  type: UUID
               - column:
                   name: role_level
                   type: VARCHAR

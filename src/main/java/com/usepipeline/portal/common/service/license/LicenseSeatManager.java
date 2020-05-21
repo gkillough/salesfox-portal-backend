@@ -4,24 +4,30 @@ import com.usepipeline.portal.common.exception.PortalDatabaseIntegrityViolationE
 import com.usepipeline.portal.database.account.entity.LicenseEntity;
 import com.usepipeline.portal.database.account.repository.LicenseRepository;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
+import com.usepipeline.portal.database.organization.account.OrganizationAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 public class LicenseSeatManager {
     private LicenseRepository licenseRepository;
+    private OrganizationAccountRepository organizationAccountRepository;
 
     @Autowired
-    public LicenseSeatManager(LicenseRepository licenseRepository) {
+    public LicenseSeatManager(LicenseRepository licenseRepository, OrganizationAccountRepository organizationAccountRepository) {
         this.licenseRepository = licenseRepository;
+        this.organizationAccountRepository = organizationAccountRepository;
     }
 
     public LicenseEntity getLicenseForOrganizationAccount(OrganizationAccountEntity organizationAccountEntity) throws PortalDatabaseIntegrityViolationException {
         return getLicenseForOrganizationAccountId(organizationAccountEntity.getOrganizationAccountId());
     }
 
-    public LicenseEntity getLicenseForOrganizationAccountId(Long orgAccountId) throws PortalDatabaseIntegrityViolationException {
-        return licenseRepository.findById(orgAccountId)
+    public LicenseEntity getLicenseForOrganizationAccountId(UUID orgAccountId) throws PortalDatabaseIntegrityViolationException {
+        return organizationAccountRepository.findById(orgAccountId)
+                .flatMap(orgAcct -> licenseRepository.findById(orgAcct.getLicenseId()))
                 .orElseThrow(() -> new PortalDatabaseIntegrityViolationException(String.format("Missing license for Organization Account Entity with id: [%d]", orgAccountId)));
     }
 

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -17,7 +18,7 @@ public class OrganizationAccountContactInteractionsEntity implements Serializabl
     @Id
     @PrimaryKeyJoinColumn
     @Column(name = "contact_id")
-    private Long contactId;
+    private UUID contactId;
 
     @Column(name = "contact_initiations")
     private Long contactInitiations;

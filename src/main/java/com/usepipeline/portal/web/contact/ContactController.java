@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping(ContactController.BASE_ENDPOINT)
 public class ContactController {
@@ -35,28 +37,28 @@ public class ContactController {
     }
 
     @PutMapping("/{contactId}")
-    public void updateContact(@PathVariable Long contactId, @RequestBody ContactUpdateModel requestModel) {
+    public void updateContact(@PathVariable UUID contactId, @RequestBody ContactUpdateModel requestModel) {
         contactService.updateContact(contactId, requestModel);
     }
 
     @PatchMapping("/{contactId}/active")
-    public void setContactActiveStatus(@PathVariable Long contactId, @RequestBody ActiveStatusPatchModel requestModel) {
+    public void setContactActiveStatus(@PathVariable UUID contactId, @RequestBody ActiveStatusPatchModel requestModel) {
         contactService.setContactActiveStatus(contactId, requestModel);
     }
 
     @PostMapping("/{contactId}/assign")
     @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCT_MEMBER_AUTH_CHECK)
-    public void assignContact(@PathVariable Long contactId, @RequestBody PointOfContactAssignmentModel requestModel) {
+    public void assignContact(@PathVariable UUID contactId, @RequestBody PointOfContactAssignmentModel requestModel) {
         contactService.assignContactToUser(contactId, requestModel);
     }
 
     @PostMapping("/{contactId}/interactions/initiation")
-    public void incrementContactInitiations(@PathVariable Long contactId) {
+    public void incrementContactInitiations(@PathVariable UUID contactId) {
         contactInteractionsService.incrementContactInitiations(contactId);
     }
 
     @PostMapping("/{contactId}/interactions/engagement")
-    public void incrementEngagementsGenerated(@PathVariable Long contactId) {
+    public void incrementEngagementsGenerated(@PathVariable UUID contactId) {
         contactInteractionsService.incrementEngagementsGenerated(contactId);
     }
 

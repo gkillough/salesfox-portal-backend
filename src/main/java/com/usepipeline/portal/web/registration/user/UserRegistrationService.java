@@ -29,6 +29,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -63,8 +64,8 @@ public class UserRegistrationService {
      * @return the id of the registered user
      */
     @Transactional
-    public Long registerUser(UserRegistrationModel registrationModel) {
-        Long defaultPipelineOrganizationId = organizationRepository.findFirstByOrganizationName(OrganizationConstants.PLAN_PIPELINE_BASIC_OR_PREMIUM_DEFAULT_ORG_NAME)
+    public UUID registerUser(UserRegistrationModel registrationModel) {
+        UUID defaultPipelineOrganizationId = organizationRepository.findFirstByOrganizationName(OrganizationConstants.PLAN_PIPELINE_BASIC_OR_PREMIUM_DEFAULT_ORG_NAME)
                 .map(OrganizationEntity::getOrganizationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
         return registerOrganizationUser(registrationModel, defaultPipelineOrganizationId, null);
@@ -77,12 +78,12 @@ public class UserRegistrationService {
      * @return the id of the registered user
      */
     @Transactional
-    public Long registerOrganizationUser(UserRegistrationModel registrationModel, Long organizationId, @Nullable String role) {
+    public UUID registerOrganizationUser(UserRegistrationModel registrationModel, UUID organizationId, @Nullable String role) {
         validateRegistrationModel(registrationModel);
         return registerValidOrganizationUser(registrationModel, organizationId, role);
     }
 
-    private Long registerValidOrganizationUser(UserRegistrationModel registrationModel, Long organizationId, @Nullable String role) {
+    private UUID registerValidOrganizationUser(UserRegistrationModel registrationModel, UUID organizationId, @Nullable String role) {
         UserEntity userEntity = saveUserInfo(registrationModel.getFirstName(), registrationModel.getLastName(), registrationModel.getEmail());
 
         RoleEntity roleEntity = getRoleInfo(registrationModel.getPlanType(), role);
@@ -105,7 +106,7 @@ public class UserRegistrationService {
         return userRepository.save(newUserToSave);
     }
 
-    private OrganizationAccountEntity getPlanInfo(String planName, Long organizationId) {
+    private OrganizationAccountEntity getPlanInfo(String planName, UUID organizationId) {
         return organizationAccountRepository.findFirstByOrganizationIdAndOrganizationAccountName(organizationId, planName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No plan with the name '[" + planName + "]' exists"));
     }
@@ -138,13 +139,13 @@ public class UserRegistrationService {
         }
     }
 
-    private void saveLoginInfo(Long userId, String password) {
+    private void saveLoginInfo(UUID userId, String password) {
         String encodedPassword = passwordEncoder.encode(password);
         LoginEntity newLoginToSave = new LoginEntity(null, userId, encodedPassword, null, null, 0);
         loginRepository.save(newLoginToSave);
     }
 
-    private void saveMembershipInfo(Long userId, Long organizationAccountId, Long roleId) {
+    private void saveMembershipInfo(UUID userId, UUID organizationAccountId, UUID roleId) {
         MembershipEntity newMembershipToSave = new MembershipEntity(null, userId, organizationAccountId, roleId);
         membershipRepository.save(newMembershipToSave);
     }

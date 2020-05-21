@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -49,7 +50,7 @@ public class OrganizationAccountOwnerService {
         this.membershipRetrievalService = membershipRetrievalService;
     }
 
-    public UserProfileModel getOrganizationAccountOwner(Long organizationAccountId) {
+    public UserProfileModel getOrganizationAccountOwner(UUID organizationAccountId) {
         OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -62,7 +63,7 @@ public class OrganizationAccountOwnerService {
     }
 
     @Transactional
-    public void transferOrganizationAccountOwnership(Long organizationAccountId, NewAccountOwnerRequestModel updateModel) {
+    public void transferOrganizationAccountOwnership(UUID organizationAccountId, NewAccountOwnerRequestModel updateModel) {
         OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 

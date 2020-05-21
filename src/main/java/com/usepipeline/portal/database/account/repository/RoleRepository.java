@@ -6,9 +6,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
-public interface RoleRepository extends JpaRepository<RoleEntity, Long> {
+public interface RoleRepository extends JpaRepository<RoleEntity, UUID> {
     Optional<RoleEntity> findFirstByRoleLevel(String roleLevel);
 
     List<RoleEntity> findByRoleLevelStartingWith(String roleLevelPrefix);

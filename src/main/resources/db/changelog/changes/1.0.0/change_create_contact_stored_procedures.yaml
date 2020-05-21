@@ -9,8 +9,8 @@ databaseChangeLog:
             schemaName: portal
             procedureBody: |-
               CREATE OR REPLACE FUNCTION GET_CONTACT_ID_BY_EMAIL(text)
-                          RETURNS BIGINT AS $result$
-                              DECLARE result BIGINT;
+                          RETURNS UUID AS $result$
+                              DECLARE result UUID;
                               BEGIN
                                   select contact_id
                                   into result
@@ -30,8 +30,8 @@ databaseChangeLog:
             schemaName: portal
             procedureBody: |-
               CREATE OR REPLACE FUNCTION GET_CONTACT_ADDRESS_ID_BY_EMAIL(text)
-                          RETURNS BIGINT AS $result$
-                              DECLARE result BIGINT;
+                          RETURNS UUID AS $result$
+                              DECLARE result UUID;
                               BEGIN
                                   select addr.address_id
                                   into result

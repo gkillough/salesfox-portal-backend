@@ -16,10 +16,9 @@ import java.util.UUID;
 @Table(schema = "portal", name = "licenses")
 public class LicenseEntity implements Serializable {
     @Id
-    @SequenceGenerator(schema = "portal", name = "licenses_license_id_seq_generator", sequenceName = "licenses_license_id_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "licenses_license_id_seq_generator")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "license_id")
-    private Long licenseId;
+    private UUID licenseId;
 
     @Column(name = "license_hash")
     private UUID licenseHash;

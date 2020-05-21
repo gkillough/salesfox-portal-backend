@@ -21,6 +21,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,7 +40,7 @@ public class LicenseService {
         this.organizationAccountRepository = organizationAccountRepository;
     }
 
-    public LicenseModel getLicense(Long licenseId) {
+    public LicenseModel getLicense(UUID licenseId) {
         return licenseRepository.findById(licenseId)
                 .map(this::convertToLicenseModel)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -63,7 +64,7 @@ public class LicenseService {
     }
 
     @Transactional
-    public void updateLicense(Long licenseId, LicenseCreationRequestModel requestModel) {
+    public void updateLicense(UUID licenseId, LicenseCreationRequestModel requestModel) {
         LicenseEntity existingLicense = licenseRepository.findById(licenseId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -78,7 +79,7 @@ public class LicenseService {
         setMaxLicenseSeats(savedLicense.getLicenseId(), new LicenseSeatUpdateModel(requestModel.getLicenseSeats()));
     }
 
-    public void setActiveStatus(Long licenseId, ActiveStatusPatchModel activeStatusModel) {
+    public void setActiveStatus(UUID licenseId, ActiveStatusPatchModel activeStatusModel) {
         LicenseEntity licenseEntity = licenseRepository.findById(licenseId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -94,7 +95,7 @@ public class LicenseService {
         licenseRepository.save(licenseEntity);
     }
 
-    public void setMaxLicenseSeats(Long licenseId, LicenseSeatUpdateModel licenseSeatUpdateModel) {
+    public void setMaxLicenseSeats(UUID licenseId, LicenseSeatUpdateModel licenseSeatUpdateModel) {
         LicenseEntity licenseEntity = licenseRepository.findById(licenseId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -114,8 +115,8 @@ public class LicenseService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'maxLicenseSeats' cannot be less than the number of license seats in use");
         }
 
-        Long netNewLicenseSeats = Math.abs(currentMaxLicenseSeats - licenseSeatUpdateModel.getMaxLicenseSeats());
-        Long newAvailableLicenseSeats = currentAvailableLicenseSeats + netNewLicenseSeats;
+        Long differenceInLicenseSeats = currentMaxLicenseSeats - licenseSeatUpdateModel.getMaxLicenseSeats();
+        Long newAvailableLicenseSeats = Math.subtractExact(currentAvailableLicenseSeats, differenceInLicenseSeats);
 
         licenseEntity.setMaxLicenseSeats(licenseSeatUpdateModel.getMaxLicenseSeats());
         licenseEntity.setAvailableLicenseSeats(newAvailableLicenseSeats);

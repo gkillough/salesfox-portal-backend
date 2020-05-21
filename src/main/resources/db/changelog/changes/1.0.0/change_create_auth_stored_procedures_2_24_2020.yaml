@@ -9,8 +9,8 @@ databaseChangeLog:
             schemaName: portal
             procedureBody: |-
               CREATE OR REPLACE FUNCTION GET_LICENSE_ID_BY_HASH(uuid)
-                          RETURNS BIGINT AS $result$
-                              DECLARE result BIGINT;
+                          RETURNS UUID AS $result$
+                              DECLARE result UUID;
                               BEGIN
                                   select license_id
                                   into result
@@ -30,8 +30,8 @@ databaseChangeLog:
             schemaName: portal
             procedureBody: |-
               CREATE OR REPLACE FUNCTION GET_ORGANIZATION_ID_BY_NAME(text)
-                          RETURNS BIGINT AS $result$
-                              DECLARE result BIGINT;
+                          RETURNS UUID AS $result$
+                              DECLARE result UUID;
                               BEGIN
                                   select organization_id
                                   into result
@@ -51,8 +51,8 @@ databaseChangeLog:
             schemaName: portal
             procedureBody: |-
               CREATE OR REPLACE FUNCTION GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME(text, text)
-                          RETURNS BIGINT AS $result$
-                              DECLARE result BIGINT;
+                          RETURNS UUID AS $result$
+                              DECLARE result UUID;
                               BEGIN
                                   select organization_account_id
                                   into result
@@ -74,8 +74,8 @@ databaseChangeLog:
             schemaName: portal
             procedureBody: |-
               CREATE OR REPLACE FUNCTION GET_ROLE_ID_BY_ROLE_LEVEL(text)
-                          RETURNS BIGINT AS $result$
-                              DECLARE result BIGINT;
+                          RETURNS UUID AS $result$
+                              DECLARE result UUID;
                               BEGIN
                                   select role_id
                                   into result
@@ -95,8 +95,8 @@ databaseChangeLog:
             schemaName: portal
             procedureBody: |-
               CREATE OR REPLACE FUNCTION GET_USER_ID_BY_EMAIL(text)
-                          RETURNS BIGINT AS $result$
-                              DECLARE result BIGINT;
+                          RETURNS UUID AS $result$
+                              DECLARE result UUID;
                               BEGIN
                                   select user_id
                                   into result
@@ -116,8 +116,8 @@ databaseChangeLog:
             schemaName: portal
             procedureBody: |-
               CREATE OR REPLACE FUNCTION GET_USER_ADDRESS_ID_BY_USER_EMAIL(text)
-                          RETURNS BIGINT AS $result$
-                              DECLARE result BIGINT;
+                          RETURNS UUID AS $result$
+                              DECLARE result UUID;
                               BEGIN
                                   select addr.user_address_id
                                   into result
@@ -139,8 +139,8 @@ databaseChangeLog:
             schemaName: portal
             procedureBody: |-
               CREATE OR REPLACE FUNCTION GET_ORG_ACCT_ADDRESS_ID_BY_ORG_NAME_AND_ACCT_NAME(text, text)
-                          RETURNS BIGINT AS $result$
-                              DECLARE result BIGINT;
+                          RETURNS UUID AS $result$
+                              DECLARE result UUID;
                               BEGIN
                                   select organization_account_address_id
                                   into result

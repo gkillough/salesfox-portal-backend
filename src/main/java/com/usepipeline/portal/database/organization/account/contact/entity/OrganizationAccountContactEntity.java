@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -15,14 +16,13 @@ import java.io.Serializable;
 @Table(schema = "portal", name = "organization_account_contacts")
 public class OrganizationAccountContactEntity implements Serializable, Contactable {
     @Id
-    @SequenceGenerator(schema = "portal", name = "org_account_contacts_contact_id_seq_generator", sequenceName = "org_account_contacts_contact_id_seq", allocationSize = 100, initialValue = 100)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "org_account_contacts_contact_id_seq_generator")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "contact_id")
-    private Long contactId;
+    private UUID contactId;
 
     @PrimaryKeyJoinColumn
     @Column(name = "organization_account_id")
-    private Long organizationAccountId;
+    private UUID organizationAccountId;
 
     @Column(name = "first_name")
     private String firstName;

@@ -4,6 +4,10 @@ databaseChangeLog:
       relativeToChangelogFile: true
 
   - include:
+      file: changelog_create_uuid_extension_5_19_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
       file: change_create_auth_tables_2_19_2020.yaml
       relativeToChangelogFile: true
 

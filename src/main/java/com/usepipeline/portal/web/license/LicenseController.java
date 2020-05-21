@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping(LicenseController.BASE_ENDPOINT)
 @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_AUTH_CHECK)
@@ -29,7 +31,7 @@ public class LicenseController {
     }
 
     @GetMapping("/{licenseId}")
-    public LicenseModel getLicense(@PathVariable Long licenseId) {
+    public LicenseModel getLicense(@PathVariable UUID licenseId) {
         return licenseService.getLicense(licenseId);
     }
 
@@ -39,17 +41,17 @@ public class LicenseController {
     }
 
     @PutMapping("/{licenseId}")
-    public void updateLicense(@PathVariable Long licenseId, @RequestBody LicenseCreationRequestModel requestModel) {
+    public void updateLicense(@PathVariable UUID licenseId, @RequestBody LicenseCreationRequestModel requestModel) {
         licenseService.updateLicense(licenseId, requestModel);
     }
 
     @PatchMapping("/{licenseId}/active")
-    public void setActiveStatus(@PathVariable Long licenseId, @RequestBody ActiveStatusPatchModel updateModel) {
+    public void setActiveStatus(@PathVariable UUID licenseId, @RequestBody ActiveStatusPatchModel updateModel) {
         licenseService.setActiveStatus(licenseId, updateModel);
     }
 
     @PatchMapping("/{licenseId}/seats")
-    public void setMaxLicenseSeats(@PathVariable Long licenseId, @RequestBody LicenseSeatUpdateModel updateModel) {
+    public void setMaxLicenseSeats(@PathVariable UUID licenseId, @RequestBody LicenseSeatUpdateModel updateModel) {
         licenseService.setMaxLicenseSeats(licenseId, updateModel);
     }
 

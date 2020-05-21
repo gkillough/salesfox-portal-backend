@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import java.util.UUID;
 
 @Component
 public class UserActiveService {
@@ -34,7 +35,7 @@ public class UserActiveService {
     }
 
     @Transactional
-    public void updateUserActiveStatus(Long userId, ActiveStatusPatchModel updateModel) {
+    public void updateUserActiveStatus(UUID userId, ActiveStatusPatchModel updateModel) {
         if (updateModel.getActiveStatus() == null) {
             throw createBadRequest("The field 'activeStatus' cannot be null");
         }
@@ -47,7 +48,7 @@ public class UserActiveService {
     }
 
     @Transactional
-    public void updateUserActiveStatusWithoutPermissionCheck(Long userId, boolean activeStatus) {
+    public void updateUserActiveStatusWithoutPermissionCheck(UUID userId, boolean activeStatus) {
         if (userId == null) {
             throw createBadRequest("The field 'userId' cannot be null");
         }

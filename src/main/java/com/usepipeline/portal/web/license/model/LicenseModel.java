@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LicenseModel {
-    private Long licenseId;
+    private UUID licenseId;
     private UUID licenseHash;
     private LocalDate expirationDate;
     private String type;

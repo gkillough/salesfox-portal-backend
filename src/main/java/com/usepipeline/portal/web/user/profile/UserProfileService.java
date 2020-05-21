@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 @Slf4j
@@ -43,15 +44,15 @@ public class UserProfileService {
      * @return an optional profile id if a profile was created
      */
     @Transactional
-    public Optional<Long> initializeProfile(Long userId) {
+    public Optional<UUID> initializeProfile(UUID userId) {
         if (userId == null) {
             return Optional.empty();
         }
-        Long profileId = getOrInitializeProfile(userId).getProfileId();
+        UUID profileId = getOrInitializeProfile(userId).getProfileId();
         return Optional.of(profileId);
     }
 
-    public UserProfileModel retrieveProfile(Long userId) {
+    public UserProfileModel retrieveProfile(UUID userId) {
         validateUserId(userId);
         return retrieveProfileWithoutPermissionCheck(userId);
     }
@@ -60,7 +61,7 @@ public class UserProfileService {
      * For use when permission to perform this action has already been validated, but that
      * validation is not reflected in the HTTP Session (e.g. during Organization Account Owner retrieval).
      */
-    public UserProfileModel retrieveProfileWithoutPermissionCheck(Long userId) {
+    public UserProfileModel retrieveProfileWithoutPermissionCheck(UUID userId) {
         // Any failed lookups after the above validation are fatal.
         Supplier<ResponseStatusException> internalServerError = () -> {
             log.error("Missing database entity when attempting to retrieve a user profile");
@@ -91,7 +92,7 @@ public class UserProfileService {
     }
 
     @Transactional
-    public void updateProfile(Long userId, UserProfileUpdateModel updateModel) {
+    public void updateProfile(UUID userId, UserProfileUpdateModel updateModel) {
         validateUserId(userId);
         updateProfileWithoutPermissionsCheck(userId, updateModel);
     }
@@ -101,7 +102,7 @@ public class UserProfileService {
      * validation is not reflected in the HTTP Session (e.g. during Organization Account creation).
      */
     @Transactional
-    public void updateProfileWithoutPermissionsCheck(@NotNull Long userId, UserProfileUpdateModel updateModel) {
+    public void updateProfileWithoutPermissionsCheck(@NotNull UUID userId, UserProfileUpdateModel updateModel) {
         validateUpdateRequest(updateModel);
 
         // Any failed lookups after the above validation are fatal.
@@ -143,7 +144,7 @@ public class UserProfileService {
         return userRepository.findFirstByEmail(emailAddress).isPresent();
     }
 
-    private ProfileEntity getOrInitializeProfile(Long userId) {
+    private ProfileEntity getOrInitializeProfile(UUID userId) {
         Optional<ProfileEntity> existingProfile = profileRepository.findFirstByUserId(userId);
         if (existingProfile.isPresent()) {
             return existingProfile.get();
@@ -164,7 +165,7 @@ public class UserProfileService {
         return savedProfile;
     }
 
-    private void validateUserId(Long userId) {
+    private void validateUserId(UUID userId) {
         if (userId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }

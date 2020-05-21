@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -21,7 +22,7 @@ public class OrganizationAccountInviteTokenEntity {
     @Column(name = "token")
     private String token;
     @Column(name = "organization_account_id")
-    private Long organizationAccountId;
+    private UUID organizationAccountId;
     @Column(name = "role_level")
     private String roleLevel;
     @Column(name = "date_generated")

@@ -8,11 +8,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrganizationUserAdminViewModel {
-    private Long userId;
+    private UUID userId;
     private String firstName;
     private String lastName;
     private String email;
@@ -23,7 +25,7 @@ public class OrganizationUserAdminViewModel {
     private UserRoleModel role;
     private UserLoginInfoModel loginInfo;
 
-    public static OrganizationUserAdminViewModel fromProfile(Long userId, UserProfileModel profile, Boolean isActive, UserRoleModel role, UserLoginInfoModel loginInfo) {
+    public static OrganizationUserAdminViewModel fromProfile(UUID userId, UserProfileModel profile, Boolean isActive, UserRoleModel role, UserLoginInfoModel loginInfo) {
         return new OrganizationUserAdminViewModel(
                 userId,
                 profile.getFirstName(),

@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,7 @@ public class OrganizationActivationService {
     }
 
     @Transactional
-    public void updateOrganizationAccountActiveStatus(Long organizationAccountId, ActiveStatusPatchModel activeStatusModel) {
+    public void updateOrganizationAccountActiveStatus(UUID organizationAccountId, ActiveStatusPatchModel activeStatusModel) {
         validateUpdatePermission(organizationAccountId);
         if (activeStatusModel.getActiveStatus() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'activeStatus' cannot be null");
@@ -62,7 +63,7 @@ public class OrganizationActivationService {
         organizationAccountRepository.save(orgAccountEntity);
     }
 
-    private void validateUpdatePermission(Long organizationAccountId) {
+    private void validateUpdatePermission(UUID organizationAccountId) {
         if (!membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
             UserEntity authenticatedUserEntity = membershipRetrievalService.getAuthenticatedUserEntity();
             MembershipEntity membershipEntity = membershipRetrievalService.getMembershipEntity(authenticatedUserEntity);
@@ -72,9 +73,9 @@ public class OrganizationActivationService {
         }
     }
 
-    private void setActiveStatusForOrgUsers(Long orgAccountId, boolean activeStatus) {
+    private void setActiveStatusForOrgUsers(UUID orgAccountId, boolean activeStatus) {
         Function<PageRequest, Page<MembershipEntity>> requestPageOfMemberships = pageRequest -> membershipRepository.findByOrganizationAccountId(orgAccountId, pageRequest);
-        List<Long> orgMemberUserIds = PageUtils.retrieveAll(requestPageOfMemberships)
+        List<UUID> orgMemberUserIds = PageUtils.retrieveAll(requestPageOfMemberships)
                 .stream()
                 .map(MembershipEntity::getUserId)
                 .collect(Collectors.toList());
