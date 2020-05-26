@@ -1,0 +1,208 @@
+databaseChangeLog:
+  - changeSet:
+      id: inventory-tables-1
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: catalogue_item_icons
+            columns:
+              - column:
+                  name: icon_id
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: location_uri
+                  type: character varying
+              - column:
+                  name: external
+                  type: boolean
+
+  - changeSet:
+      id: inventory-tables-2
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: catalogue_items
+            columns:
+              - column:
+                  name: item_id
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: character varying
+              - column:
+                  name: price
+                  type: double precision
+              - column:
+                  name: quantity
+                  type: bigint
+              - column:
+                  name: restricted
+                  type: boolean
+              - column:
+                  name: icon_id
+                  type: UUID
+                  constraints:
+                    foreignKeyName: catalogue_items_icon_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: catalogue_item_icons
+                    referencedColumnNames: icon_id
+
+  - changeSet:
+      id: inventory-tables-3
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: catalogue_item_restrictions
+            columns:
+              - column:
+                  name: restriction_id
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: item_id
+                  type: UUID
+              - column:
+                  name: organization_account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: catalogue_item_restrictions_org_account_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: organization_accounts
+                    referencedColumnNames: organization_account_id
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    foreignKeyName: catalogue_item_restrictions_user_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: users
+                    referencedColumnNames: user_id
+
+  - changeSet:
+      id: inventory-tables-4
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: inventories
+            columns:
+              - column:
+                  name: inventory_id
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: organization_account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: inventories_org_account_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: organization_accounts
+                    referencedColumnNames: organization_account_id
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    foreignKeyName: inventories_user_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: users
+                    referencedColumnNames: user_id
+
+  - changeSet:
+      id: inventory-tables-5
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: inventory_items
+            columns:
+              - column:
+                  name: catalogue_item_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: inventory_items_catalogue_item_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: catalogue_items
+                    referencedColumnNames: item_id
+              - column:
+                  name: inventory_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: inventory_items_inventory_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: inventories
+                    referencedColumnNames: inventory_id
+              - column:
+                  name: quantity
+                  type: bigint
+
+  - changeSet:
+      id: inventory-tables-6
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: order_requests
+            columns:
+              - column:
+                  name: order_id
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: catalogue_item_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: order_requests_catalogue_item_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: catalogue_items
+                    referencedColumnNames: item_id
+              - column:
+                  name: organization_account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: order_requests_org_account_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: organization_accounts
+                    referencedColumnNames: organization_account_id
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    foreignKeyName: order_requests_user_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: users
+                    referencedColumnNames: user_id
+              - column:
+                  name: requesting_user_id
+                  type: UUID
+                  constraints:
+                    foreignKeyName: order_requests_requesting_user_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: users
+                    referencedColumnNames: user_id
+              - column:
+                  name: quantity
+                  type: integer
+              - column:
+                  name: total_order_price
+                  type: double precision
