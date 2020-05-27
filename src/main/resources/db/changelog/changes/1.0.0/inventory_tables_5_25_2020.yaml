@@ -176,7 +176,6 @@ databaseChangeLog:
                   name: catalogue_item_id
                   type: UUID
                   constraints:
-                    primaryKey: true
                     foreignKeyName: order_requests_catalogue_item_id_fk
                     referencedTableSchemaName: portal
                     referencedTableName: catalogue_items
