@@ -72,6 +72,12 @@ databaseChangeLog:
               - column:
                   name: item_id
                   type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: catalogue_item_restrictions_item_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: catalogue_items
+                    referencedColumnNames: item_id
               - column:
                   name: organization_account_id
                   type: UUID
