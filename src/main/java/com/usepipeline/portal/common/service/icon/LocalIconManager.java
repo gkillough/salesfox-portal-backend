@@ -3,9 +3,9 @@ package com.usepipeline.portal.common.service.icon;
 import com.usepipeline.portal.common.exception.PortalFileSystemException;
 import com.usepipeline.portal.common.file_system.ResourceDirectoryConfiguration;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.tomcat.util.security.MD5Encoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -32,7 +32,7 @@ public class LocalIconManager {
 
         try {
             String contentType = Files.probeContentType(imageFile.toPath());
-            return "image".equals(contentType) && ImageIO.read(imageFile) != null;
+            return contentType.startsWith("image") && ImageIO.read(imageFile) != null;
         } catch (IOException e) {
             throw new PortalFileSystemException(e);
         }
@@ -72,6 +72,7 @@ public class LocalIconManager {
     private File retrieveIconDirAsFile() throws PortalFileSystemException {
         String iconDirName = resourceDirConfig.getIconDir();
         File iconDir = new File(iconDirName);
+
         if (iconDir.exists() && iconDir.isDirectory()) {
             return iconDir;
         }
@@ -82,15 +83,14 @@ public class LocalIconManager {
         String imageExtension = getImageExtension(imageFile);
         BufferedImage bufferedImage = ImageIO.read(imageFile);
 
-        byte[] imageBytes;
         ByteArrayOutputStream imageByteArrayOutputStream = new ByteArrayOutputStream();
         boolean hadAppropriateWriter = ImageIO.write(bufferedImage, imageExtension, imageByteArrayOutputStream);
         if (!hadAppropriateWriter) {
             throw new PortalFileSystemException("No appropriate image writer");
         }
 
-        imageBytes = imageByteArrayOutputStream.toByteArray();
-        String hashedImage = MD5Encoder.encode(imageBytes);
+        byte[] imageBytes = imageByteArrayOutputStream.toByteArray();
+        String hashedImage = DigestUtils.md5DigestAsHex(imageBytes);
         String outputImageName = String.format("%s.%s", hashedImage, imageExtension);
 
         File iconDir = retrieveIconDirAsFile();
