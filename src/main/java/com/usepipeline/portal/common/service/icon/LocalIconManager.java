@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Optional;
 
 @Component
 public class LocalIconManager {
@@ -49,7 +50,24 @@ public class LocalIconManager {
         }
     }
 
-    // TODO retrieveIcon
+    public Optional<File> retrieveIcon(String iconFileName) throws PortalFileSystemException {
+        File iconDir = retrieveIconDirAsFile();
+        File iconFile = new File(iconDir, iconFileName);
+        if (iconFile.exists()) {
+            return Optional.of(iconFile);
+        }
+        return Optional.empty();
+    }
+
+    public boolean deleteIcon(String iconFileName) throws PortalFileSystemException {
+        File iconDir = retrieveIconDirAsFile();
+
+        File iconFile = new File(iconDir, iconFileName);
+        if (iconFile.exists() && iconFile.canWrite()) {
+            return iconFile.delete();
+        }
+        return false;
+    }
 
     private File retrieveIconDirAsFile() throws PortalFileSystemException {
         String iconDirName = resourceDirConfig.getIconDir();
