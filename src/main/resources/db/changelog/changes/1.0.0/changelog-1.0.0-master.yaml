@@ -39,6 +39,10 @@ databaseChangeLog:
       file: change_create_contact_stored_procedures.yaml
       relativeToChangelogFile: true
 
+  - include:
+      file: inventory_tables_5_25_2020.yaml
+      relativeToChangelogFile: true
+
   # TODO REMOVE DEVELOPMENT DATA BEFORE RELEASE
   - include:
       file: development/change_add_test_users_3_22_2020.yaml
