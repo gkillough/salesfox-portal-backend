@@ -9,6 +9,8 @@ import com.usepipeline.portal.database.organization.account.contact.entity.Organ
 import com.usepipeline.portal.database.organization.account.contact.repository.OrganizationAccountContactProfileRepository;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 
+import java.util.UUID;
+
 public class ContactAccessOperationUtility<E extends Throwable> {
     private AbstractMembershipRetrievalService<E> membershipRetrievalService;
     private OrganizationAccountContactProfileRepository contactProfileRepository;
@@ -43,7 +45,9 @@ public class ContactAccessOperationUtility<E extends Throwable> {
             case READ:
                 return true;
             case UPDATE:
-                return isUserPointOfContact(userRequestingAccess, contact);
+                OrganizationAccountContactProfileEntity contactProfile = getPointOfContactProfile(contact);
+                UUID pointOfContactUserId = contactProfile.getOrganizationPointOfContactUserId();
+                return pointOfContactUserId == null || userRequestingAccess.getUserId().equals(pointOfContactUserId);
             default:
                 return false;
         }
@@ -51,19 +55,16 @@ public class ContactAccessOperationUtility<E extends Throwable> {
 
     private boolean canNonOrganizationUserAccessContact(UserEntity userRequestingAccess, String userRoleLevel, OrganizationAccountContactEntity contact) throws E {
         if (PortalAuthorityConstants.PIPELINE_PREMIUM_USER.equals(userRoleLevel) || PortalAuthorityConstants.PIPELINE_BASIC_USER.equals(userRoleLevel)) {
-            return isUserPointOfContact(userRequestingAccess, contact);
+            OrganizationAccountContactProfileEntity contactProfile = getPointOfContactProfile(contact);
+            return userRequestingAccess.getUserId().equals(contactProfile.getOrganizationPointOfContactUserId());
         }
         // In the future, there may be other pipeline roles that require granular access control (e.g. Pipeline support or beta testers).
         return false;
     }
 
-    private boolean isUserPointOfContact(UserEntity userRequestingAccess, OrganizationAccountContactEntity contact) throws E {
-        OrganizationAccountContactProfileEntity contactProfile = contactProfileRepository.findById(contact.getContactId())
+    private OrganizationAccountContactProfileEntity getPointOfContactProfile(OrganizationAccountContactEntity contact) throws E {
+        return contactProfileRepository.findById(contact.getContactId())
                 .orElseThrow(membershipRetrievalService::unexpectedErrorDuringRetrieval);
-        if (userRequestingAccess.getUserId().equals(contactProfile.getOrganizationPointOfContactUserId())) {
-            return true;
-        }
-        return false;
     }
 
 }

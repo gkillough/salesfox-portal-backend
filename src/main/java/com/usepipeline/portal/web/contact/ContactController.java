@@ -2,13 +2,12 @@ package com.usepipeline.portal.web.contact;
 
 import com.usepipeline.portal.web.common.model.request.ActiveStatusPatchModel;
 import com.usepipeline.portal.web.common.page.PageMetadata;
-import com.usepipeline.portal.web.contact.model.ContactUpdateModel;
-import com.usepipeline.portal.web.contact.model.MultiContactModel;
-import com.usepipeline.portal.web.contact.model.PointOfContactAssignmentModel;
+import com.usepipeline.portal.web.contact.model.*;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -19,11 +18,13 @@ public class ContactController {
 
     private ContactService contactService;
     private ContactInteractionsService contactInteractionsService;
+    private ContactBulkUploadService contactBulkUploadService;
 
     @Autowired
-    public ContactController(ContactService contactService, ContactInteractionsService contactInteractionsService) {
+    public ContactController(ContactService contactService, ContactInteractionsService contactInteractionsService, ContactBulkUploadService contactBulkUploadService) {
         this.contactService = contactService;
         this.contactInteractionsService = contactInteractionsService;
+        this.contactBulkUploadService = contactBulkUploadService;
     }
 
     @GetMapping
@@ -32,12 +33,22 @@ public class ContactController {
     }
 
     @PostMapping
-    public void createContact(@RequestBody ContactUpdateModel requestModel) {
+    public void createContact(@RequestBody ContactUploadModel requestModel) {
         contactService.createContact(requestModel);
     }
 
+    @PostMapping("/bulk")
+    public ContactBulkUploadResponse createContactsInBulk(@RequestBody ContactBulkUploadModel contactBulkUploadModel) {
+        return contactBulkUploadService.createContactsInBulk(contactBulkUploadModel);
+    }
+
+    @PostMapping("/csv")
+    public ContactBulkUploadResponse createContactsFromCsv(@RequestParam MultipartFile csvFile) {
+        return contactBulkUploadService.createContactsFromCsvFile(csvFile);
+    }
+
     @PutMapping("/{contactId}")
-    public void updateContact(@PathVariable UUID contactId, @RequestBody ContactUpdateModel requestModel) {
+    public void updateContact(@PathVariable UUID contactId, @RequestBody ContactUploadModel requestModel) {
         contactService.updateContact(contactId, requestModel);
     }
 
