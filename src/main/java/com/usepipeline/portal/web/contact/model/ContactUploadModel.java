@@ -10,7 +10,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContactUpdateModel {
+public class ContactUploadModel {
     private String firstName;
     private String lastName;
     private String email;
