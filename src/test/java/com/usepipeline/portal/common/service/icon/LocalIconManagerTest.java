@@ -38,6 +38,10 @@ public class LocalIconManagerTest {
     @AfterAll
     public static void cleanup() throws URISyntaxException {
         URL ignoredTestOutputDir = classLoader.getResource(TEST_ICON_OUTPUT_DIR_NAME);
+        if (ignoredTestOutputDir == null) {
+            return;
+        }
+        
         File outputDir = new File(ignoredTestOutputDir.toURI());
         if (!outputDir.canWrite()) {
             return;
