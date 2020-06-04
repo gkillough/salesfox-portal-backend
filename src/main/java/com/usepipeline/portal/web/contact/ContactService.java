@@ -1,8 +1,8 @@
 package com.usepipeline.portal.web.contact;
 
-import com.usepipeline.portal.common.FieldValidationUtils;
 import com.usepipeline.portal.common.enumeration.AccessOperation;
 import com.usepipeline.portal.common.service.contact.ContactAccessOperationUtility;
+import com.usepipeline.portal.common.service.contact.ContactFieldValidationUtils;
 import com.usepipeline.portal.database.account.entity.MembershipEntity;
 import com.usepipeline.portal.database.account.entity.RoleEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
@@ -22,7 +22,6 @@ import com.usepipeline.portal.web.contact.model.*;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import com.usepipeline.portal.web.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -94,13 +93,13 @@ public class ContactService {
     }
 
     @Transactional
-    public void createContact(ContactUpdateModel contactUpdateModel) {
-        validateContactUpdateModel(contactUpdateModel);
+    public void createContact(ContactUploadModel contactModel) {
+        ContactFieldValidationUtils.validateContactUploadModel(contactModel);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
         RoleEntity userRole = membershipRetrievalService.getRoleEntity(userMembership);
 
-        UUID pointOfContactUserId = contactUpdateModel.getPointOfContactUserId();
+        UUID pointOfContactUserId = contactModel.getPointOfContactUserId();
         if (isNonOrganizationRole(userRole.getRoleLevel())) {
             pointOfContactUserId = loggedInUser.getUserId();
         } else if (pointOfContactUserId != null) {
@@ -108,16 +107,16 @@ public class ContactService {
         }
 
         OrganizationAccountContactEntity contactToSave = new OrganizationAccountContactEntity(
-                null, userMembership.getOrganizationAccountId(), contactUpdateModel.getFirstName(), contactUpdateModel.getLastName(), contactUpdateModel.getEmail(), true);
+                null, userMembership.getOrganizationAccountId(), contactModel.getFirstName(), contactModel.getLastName(), contactModel.getEmail(), true);
         OrganizationAccountContactEntity savedContact = contactRepository.save(contactToSave);
 
         OrganizationAccountContactAddressEntity contactAddressToSave = new OrganizationAccountContactAddressEntity();
         contactAddressToSave.setContactId(savedContact.getContactId());
-        contactUpdateModel.getAddress().copyFieldsToEntity(contactAddressToSave);
+        contactModel.getAddress().copyFieldsToEntity(contactAddressToSave);
         OrganizationAccountContactAddressEntity savedContactAddress = contactAddressRepository.save(contactAddressToSave);
 
         OrganizationAccountContactProfileEntity contactProfileToSave = new OrganizationAccountContactProfileEntity(
-                null, savedContact.getContactId(), savedContactAddress.getAddressId(), pointOfContactUserId, contactUpdateModel.getContactOrganizationName(), contactUpdateModel.getTitle(), contactUpdateModel.getMobileNumber(), contactUpdateModel.getBusinessNumber());
+                null, savedContact.getContactId(), savedContactAddress.getAddressId(), pointOfContactUserId, contactModel.getContactOrganizationName(), contactModel.getTitle(), contactModel.getMobileNumber(), contactModel.getBusinessNumber());
         contactProfileRepository.save(contactProfileToSave);
 
         OrganizationAccountContactInteractionsEntity contactInteractionsToSave = new OrganizationAccountContactInteractionsEntity(savedContact.getContactId(), 0L, 0L);
@@ -125,7 +124,7 @@ public class ContactService {
     }
 
     @Transactional
-    public void updateContact(UUID contactId, ContactUpdateModel contactUpdateModel) {
+    public void updateContact(UUID contactId, ContactUploadModel contactUpdateModel) {
         OrganizationAccountContactEntity contactToUpdate = contactRepository.findById(contactId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -134,7 +133,7 @@ public class ContactService {
         if (!canUserUpdateContact) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        validateContactUpdateModel(contactUpdateModel);
+        ContactFieldValidationUtils.validateContactUploadModel(contactUpdateModel);
 
         contactToUpdate.setFirstName(contactUpdateModel.getFirstName());
         contactToUpdate.setLastName(contactUpdateModel.getLastName());
@@ -246,42 +245,6 @@ public class ContactService {
 
     private boolean isNonOrganizationRole(String roleLevel) {
         return roleLevel.equals(PortalAuthorityConstants.PIPELINE_BASIC_USER) || roleLevel.equals(PortalAuthorityConstants.PIPELINE_PREMIUM_USER);
-    }
-
-    private void validateContactUpdateModel(ContactUpdateModel contactUpdateModel) {
-        Set<String> errors = new LinkedHashSet<>();
-        if (StringUtils.isBlank(contactUpdateModel.getFirstName())) {
-            errors.add("First Name");
-        }
-
-        if (StringUtils.isBlank(contactUpdateModel.getLastName())) {
-            errors.add("Last Name");
-        }
-
-        if (StringUtils.isBlank(contactUpdateModel.getEmail())) {
-            errors.add("Email");
-        }
-
-        if (!errors.isEmpty()) {
-            String combinedErrors = String.join(", ", errors);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The following fields cannot be blank: %s", combinedErrors));
-        }
-
-        if (!FieldValidationUtils.isValidEmailAddress(contactUpdateModel.getEmail(), false)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The email is in an invalid format");
-        }
-
-        if (!FieldValidationUtils.isValidUSAddress(contactUpdateModel.getAddress(), true)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The address is invalid");
-        }
-
-        if (!FieldValidationUtils.isValidUSPhoneNumber(contactUpdateModel.getMobileNumber(), true)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The mobile phone number is invalid");
-        }
-
-        if (!FieldValidationUtils.isValidUSPhoneNumber(contactUpdateModel.getBusinessNumber(), true)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The business phone number is invalid");
-        }
     }
 
     private void validatePointOfContactUser(UUID requestingUserOrgAcctId, UUID pointOfContactUserId) {

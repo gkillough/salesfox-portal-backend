@@ -38,6 +38,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
     // Utilities
+    implementation 'org.apache.commons:commons-csv:1.8'
     implementation 'org.apache.commons:commons-lang3:3.8'
     implementation 'javax.mail:javax.mail-api:1.6.2'
     runtimeOnly 'com.sun.mail:javax.mail:1.6.2'
