@@ -1,0 +1,156 @@
+databaseChangeLog:
+  - changeSet:
+      id: test-catalogue-icons-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: catalogue_item_icons
+            columns:
+              - column:
+                  name: icon_id
+                  value: 5be2c2dc-9f93-43a5-b14b-559277825e6e
+              - column:
+                  name: file_name
+                  value: generic_book.jpg
+
+  - changeSet:
+      id: test-catalogue-items-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: catalogue_items
+            columns:
+              - column:
+                  name: name
+                  value: Get Rich Book
+              - column:
+                  name: price
+                  valueNumeric: 24.99
+              - column:
+                  name: quantity
+                  valueNumeric: 10
+              - column:
+                  name: restricted
+                  value: false
+              - column:
+                  name: icon_id
+                  value: 5be2c2dc-9f93-43a5-b14b-559277825e6e
+
+  - changeSet:
+      id: test-catalogue-icons-2
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: catalogue_item_icons
+            columns:
+              - column:
+                  name: icon_id
+                  value: 65ad1457-7959-439e-a7e2-2c0990dcf69c
+              - column:
+                  name: file_name
+                  value: generic_water_bottle.jpg
+
+  - changeSet:
+      id: test-catalogue-items-2
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: catalogue_items
+            columns:
+              - column:
+                  name: name
+                  value: Water Bottle
+              - column:
+                  name: price
+                  valueNumeric: 12.50
+              - column:
+                  name: quantity
+                  valueNumeric: 40
+              - column:
+                  name: restricted
+                  value: false
+              - column:
+                  name: icon_id
+                  value: 65ad1457-7959-439e-a7e2-2c0990dcf69c
+
+  - changeSet:
+      id: test-catalogue-icons-3
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: catalogue_item_icons
+            columns:
+              - column:
+                  name: icon_id
+                  value: 541ae772-61db-453b-8ec5-d0d31081bbfc
+              - column:
+                  name: file_name
+                  value: tote_bag_custom_text.jpg
+
+  - changeSet:
+      id: test-catalogue-items-3
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: catalogue_items
+            columns:
+              - column:
+                  name: name
+                  value: Tote Bag - Custom Text
+              - column:
+                  name: price
+                  valueNumeric: 17.00
+              - column:
+                  name: quantity
+                  valueNumeric: 100
+              - column:
+                  name: restricted
+                  value: false
+              - column:
+                  name: icon_id
+                  value: 541ae772-61db-453b-8ec5-d0d31081bbfc
+
+  - changeSet:
+      id: test-catalogue-icons-4
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: catalogue_item_icons
+            columns:
+              - column:
+                  name: icon_id
+                  value: 282444ca-28db-4db2-9706-24b6104f2c17
+              - column:
+                  name: file_name
+                  value: tumbler_custom_text.jpg
+
+  - changeSet:
+      id: test-catalogue-items-4
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: catalogue_items
+            columns:
+              - column:
+                  name: name
+                  value: Tumbler - Custom Text
+              - column:
+                  name: price
+                  valueNumeric: 19.99
+              - column:
+                  name: quantity
+                  valueNumeric: 25
+              - column:
+                  name: restricted
+                  value: false
+              - column:
+                  name: icon_id
+                  value: 282444ca-28db-4db2-9706-24b6104f2c17
