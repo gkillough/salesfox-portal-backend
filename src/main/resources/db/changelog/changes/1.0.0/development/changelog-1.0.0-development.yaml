@@ -1,0 +1,28 @@
+databaseChangeLog:
+  - include:
+      file: change_add_test_users_3_22_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: change_add_test_organizations_4_25_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: change_add_test_organization_1_users_4_25_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: change_add_test_organization_2_users_4_25_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: change_add_test_org_1_contacts_5_5_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: change_add_test_org_2_contacts_5_5_2020.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: change_add_test_catalogue.yaml
+      relativeToChangelogFile: true
