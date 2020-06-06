@@ -19,10 +19,7 @@ public class CatalogueItemIconEntity implements Serializable {
     @Column(name = "icon_id")
     private UUID iconId;
 
-    @Column(name = "location_uri")
-    private String locationUri;
-
-    @Column(name = "external")
-    private Boolean external;
+    @Column(name = "file_name")
+    private String fileName;
 
 }

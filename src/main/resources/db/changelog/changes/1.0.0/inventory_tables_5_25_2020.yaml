@@ -14,11 +14,8 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
-                  name: location_uri
+                  name: file_name
                   type: character varying
-              - column:
-                  name: external
-                  type: boolean
 
   - changeSet:
       id: inventory-tables-2
