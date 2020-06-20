@@ -7,6 +7,7 @@ import com.usepipeline.portal.web.license.model.LicenseModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -22,7 +23,7 @@ public class LicenseGenerator {
     /**
      * @return a LicenseModel corresponding to an inactive license entry in the database
      */
-    public LicenseModel generateLicense(LicenseType type, long licenseSeats, Double monthlyCost, LocalDate expirationDate) {
+    public LicenseModel generateLicense(LicenseType type, long licenseSeats, BigDecimal monthlyCost, LocalDate expirationDate) {
         UUID licenseHash = UUID.randomUUID();
 
         // Initially, the availableLicenseSeats and maxLicenseSeats are the same because no account or users will exist for the license.

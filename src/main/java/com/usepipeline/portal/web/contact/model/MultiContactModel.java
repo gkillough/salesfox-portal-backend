@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 
-import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -16,7 +15,7 @@ public class MultiContactModel extends PagedResponseModel {
     private List<ContactModel> contacts;
 
     public static MultiContactModel empty() {
-        return new MultiContactModel(Collections.emptyList(), Page.empty());
+        return new MultiContactModel(List.of(), Page.empty());
     }
 
     public MultiContactModel(List<ContactModel> contacts, Page<?> page) {

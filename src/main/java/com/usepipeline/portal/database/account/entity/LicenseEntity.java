@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -36,7 +37,7 @@ public class LicenseEntity implements Serializable {
     private Long maxLicenseSeats;
 
     @Column(name = "monthly_cost")
-    private Double monthlyCost;
+    private BigDecimal monthlyCost;
 
     @Column(name = "is_active")
     private Boolean isActive;

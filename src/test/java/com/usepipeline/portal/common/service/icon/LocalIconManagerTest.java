@@ -2,12 +2,15 @@ package com.usepipeline.portal.common.service.icon;
 
 import com.usepipeline.portal.common.exception.PortalFileSystemException;
 import com.usepipeline.portal.common.file_system.ResourceDirectoryConfiguration;
+import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Optional;
@@ -41,7 +44,7 @@ public class LocalIconManagerTest {
         if (ignoredTestOutputDir == null) {
             return;
         }
-        
+
         File outputDir = new File(ignoredTestOutputDir.toURI());
         if (!outputDir.canWrite()) {
             return;
@@ -58,28 +61,17 @@ public class LocalIconManagerTest {
     }
 
     @Test
-    public void isValidImageFileTest() throws URISyntaxException, PortalFileSystemException {
-        LocalIconManager localIconManager = new LocalIconManager(mockInputResourceDir);
-
-        URL iconUrl = classLoader.getResource(TEST_ICON_QUALIFIED_NAME);
-        assumeTrue(iconUrl != null, "Could not get test icon");
-
-        File iconFile = new File(iconUrl.toURI());
-        assertTrue(localIconManager.isValidImageFile(iconFile), "The image file validation test failed");
-    }
-
-    @Test
     public void saveAndDeleteIconTest() throws URISyntaxException, PortalFileSystemException {
         File outputIconDir = new File(mockOutputResourceDir.getIconDir());
         assumeTrue(outputIconDir.canWrite(), "Cannot write to the output directory");
 
         LocalIconManager localIconManager = new LocalIconManager(mockOutputResourceDir);
 
-        URL iconUrl = classLoader.getResource(TEST_ICON_QUALIFIED_NAME);
-        assumeTrue(iconUrl != null, "Could not get test icon");
+        InputStream iconInputStream = classLoader.getResourceAsStream(TEST_ICON_QUALIFIED_NAME);
+        assumeTrue(iconInputStream != null, "Could not get test icon");
 
-        File iconFile = new File(iconUrl.toURI());
-        File savedIconFile = localIconManager.saveIcon(iconFile);
+        String imageExt = FilenameUtils.getExtension(TEST_ICON_QUALIFIED_NAME);
+        File savedIconFile = localIconManager.saveIcon(iconInputStream, imageExt);
         assertTrue(savedIconFile.exists(), "Expected the saved icon file to exist");
         assertTrue(savedIconFile.getParent().contains(TEST_ICON_OUTPUT_DIR_NAME), "Expected the parent directory to contain the output directory name");
 
@@ -94,7 +86,7 @@ public class LocalIconManagerTest {
 
         LocalIconManager localIconManager = new LocalIconManager(mockInputResourceDir);
 
-        Optional<File> optionalIcon = localIconManager.retrieveIcon(TEST_ICON_QUALIFIED_NAME);
+        Optional<BufferedImage> optionalIcon = localIconManager.retrieveIcon(TEST_ICON_QUALIFIED_NAME);
         assertTrue(optionalIcon.isPresent(), "Expected the icon file to be present");
     }
 
