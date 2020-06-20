@@ -2,18 +2,13 @@ package com.usepipeline.portal.common.service.icon;
 
 import com.usepipeline.portal.common.exception.PortalFileSystemException;
 import com.usepipeline.portal.common.file_system.ResourceDirectoryConfiguration;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
+import java.io.*;
 import java.util.Optional;
 
 @Component
@@ -25,36 +20,24 @@ public class LocalIconManager {
         this.resourceDirConfig = resourceDirConfig;
     }
 
-    public boolean isValidImageFile(File imageFile) throws PortalFileSystemException {
-        if (imageFile == null) {
-            return false;
-        }
-
+    public File saveIcon(InputStream imageFileInputStream, String imageFileExtension) throws PortalFileSystemException {
         try {
-            String contentType = Files.probeContentType(imageFile.toPath());
-            return contentType.startsWith("image") && ImageIO.read(imageFile) != null;
+            return writeInputStreamToFile(imageFileInputStream, imageFileExtension);
         } catch (IOException e) {
-            throw new PortalFileSystemException(e);
+            throw new PortalFileSystemException("Could not read file as image", e);
         }
     }
 
-    public File saveIcon(File iconFile) throws PortalFileSystemException {
-        if (!isValidImageFile(iconFile)) {
-            throw new PortalFileSystemException("The image file is invalid");
-        }
-
-        try {
-            return writeImageFile(iconFile);
-        } catch (IOException e) {
-            throw new PortalFileSystemException("Could not write file", e);
-        }
-    }
-
-    public Optional<File> retrieveIcon(String iconFileName) throws PortalFileSystemException {
+    public Optional<BufferedImage> retrieveIcon(String iconFileName) throws PortalFileSystemException {
         File iconDir = retrieveIconDirAsFile();
         File iconFile = new File(iconDir, iconFileName);
         if (iconFile.exists()) {
-            return Optional.of(iconFile);
+            try {
+                BufferedImage iconBufferedImage = ImageIO.read(iconFile);
+                return Optional.of(iconBufferedImage);
+            } catch (IOException e) {
+                throw new PortalFileSystemException(e);
+            }
         }
         return Optional.empty();
     }
@@ -79,9 +62,8 @@ public class LocalIconManager {
         throw new PortalFileSystemException("The image directory could not be loaded");
     }
 
-    private File writeImageFile(File imageFile) throws IOException, PortalFileSystemException {
-        String imageExtension = getImageExtension(imageFile);
-        BufferedImage bufferedImage = ImageIO.read(imageFile);
+    private File writeInputStreamToFile(InputStream imageFileInputStream, String imageExtension) throws IOException, PortalFileSystemException {
+        BufferedImage bufferedImage = ImageIO.read(imageFileInputStream);
 
         ByteArrayOutputStream imageByteArrayOutputStream = new ByteArrayOutputStream();
         boolean hadAppropriateWriter = ImageIO.write(bufferedImage, imageExtension, imageByteArrayOutputStream);
@@ -99,10 +81,6 @@ public class LocalIconManager {
             imageByteArrayOutputStream.writeTo(imageFileOutputStream);
             return outputImageFile;
         }
-    }
-
-    private String getImageExtension(File imageFile) {
-        return StringUtils.substringAfterLast(imageFile.getName(), ".");
     }
 
 }

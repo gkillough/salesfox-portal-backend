@@ -39,6 +39,7 @@ dependencies {
 
     // Utilities
     implementation 'org.apache.commons:commons-csv:1.8'
+    implementation 'commons-io:commons-io:2.6'
     implementation 'org.apache.commons:commons-lang3:3.8'
     implementation 'javax.mail:javax.mail-api:1.6.2'
     runtimeOnly 'com.sun.mail:javax.mail:1.6.2'

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -159,7 +160,7 @@ public class LicenseService {
             errorFields.add("Monthly Cost is required");
         }
 
-        if (requestModel.getMonthlyCost() < 0.0) {
+        if (requestModel.getMonthlyCost().compareTo(BigDecimal.ZERO) >= 0) {
             errorFields.add("Monthly Cost cannot be negative");
         }
 

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -18,7 +19,7 @@ public class LicenseModel {
     private String type;
     private Long availableLicenseSeats;
     private Long maxLicenseSeats;
-    private Double monthlyCost;
+    private BigDecimal monthlyCost;
     private Boolean isActive;
 
     public static LicenseModel fromEntity(LicenseEntity licenseEntity) {

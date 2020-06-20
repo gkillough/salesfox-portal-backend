@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Data
@@ -13,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "order_requests")
-public class OrderRequestEntity implements Serializable {
+public class InventoryOrderRequestEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "order_id")
@@ -22,6 +23,10 @@ public class OrderRequestEntity implements Serializable {
     @PrimaryKeyJoinColumn
     @Column(name = "catalogue_item_id")
     private UUID catalogueItemId;
+
+    @PrimaryKeyJoinColumn
+    @Column(name = "inventory_id")
+    private UUID inventoryId;
 
     @PrimaryKeyJoinColumn
     @Column(name = "organization_account_id")
@@ -38,7 +43,10 @@ public class OrderRequestEntity implements Serializable {
     @Column(name = "quantity")
     private Integer quantity;
 
-    @Column(name = "total_price")
-    private Double totalPrice;
+    /**
+     * item price on order date
+     */
+    @Column(name = "item_price")
+    private BigDecimal itemPrice;
 
 }

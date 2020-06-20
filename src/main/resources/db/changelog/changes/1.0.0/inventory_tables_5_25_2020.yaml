@@ -18,7 +18,7 @@ databaseChangeLog:
                   type: character varying
 
   - changeSet:
-      id: inventory-tables-2
+      id: inventory-tables-2a
       author: gavinkillough
       changes:
         - createTable:
@@ -46,11 +46,20 @@ databaseChangeLog:
               - column:
                   name: icon_id
                   type: UUID
-                  constraints:
-                    foreignKeyName: catalogue_items_icon_id_fk
-                    referencedTableSchemaName: portal
-                    referencedTableName: catalogue_item_icons
-                    referencedColumnNames: icon_id
+
+  - changeSet:
+      id: inventory-tables-2b
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: catalogue_items_icon_id_fk
+            baseTableSchemaName: portal
+            baseTableName: catalogue_items
+            baseColumnNames: icon_id
+            referencedTableSchemaName: portal
+            referencedTableName: catalogue_item_icons
+            referencedColumnNames: icon_id
+            onDelete: SET NULL
 
   - changeSet:
       id: inventory-tables-3
@@ -75,6 +84,7 @@ databaseChangeLog:
                     referencedTableSchemaName: portal
                     referencedTableName: catalogue_items
                     referencedColumnNames: item_id
+                    deleteCascade: true
               - column:
                   name: organization_account_id
                   type: UUID
@@ -107,6 +117,9 @@ databaseChangeLog:
                   defaultValueComputed: uuid_generate_v4()
                   constraints:
                     primaryKey: true
+              - column:
+                  name: inventory_name
+                  type: character varying
               - column:
                   name: organization_account_id
                   type: UUID
@@ -142,6 +155,7 @@ databaseChangeLog:
                     referencedTableSchemaName: portal
                     referencedTableName: catalogue_items
                     referencedColumnNames: item_id
+                    deleteCascade: true
               - column:
                   name: inventory_id
                   type: UUID
@@ -156,7 +170,7 @@ databaseChangeLog:
                   type: bigint
 
   - changeSet:
-      id: inventory-tables-6
+      id: inventory-tables-6a
       author: gavinkillough
       changes:
         - createTable:
@@ -172,11 +186,14 @@ databaseChangeLog:
               - column:
                   name: catalogue_item_id
                   type: UUID
+              - column:
+                  name: inventory_id
+                  type: UUID
                   constraints:
-                    foreignKeyName: order_requests_catalogue_item_id_fk
+                    foreignKeyName: order_requests_inventory_id_fk
                     referencedTableSchemaName: portal
-                    referencedTableName: catalogue_items
-                    referencedColumnNames: item_id
+                    referencedTableName: inventories
+                    referencedColumnNames: inventory_id
               - column:
                   name: organization_account_id
                   type: UUID
@@ -206,5 +223,53 @@ databaseChangeLog:
                   name: quantity
                   type: integer
               - column:
-                  name: total_order_price
+                  name: item_price
                   type: double precision
+
+  - changeSet:
+      id: inventory-tables-6b
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: order_requests_catalogue_item_id_fk
+            baseTableSchemaName: portal
+            baseTableName: order_requests
+            baseColumnNames: catalogue_item_id
+            referencedTableSchemaName: portal
+            referencedTableName: catalogue_items
+            referencedColumnNames: item_id
+            onDelete: SET NULL
+
+  - changeSet:
+      id: inventory-tables-7
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: order_request_statuses
+            columns:
+              - column:
+                  name: status_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: order_id
+                  type: UUID
+              - column:
+                  name: changed_by_user_id
+                  type: UUID
+                  constraints:
+                    foreignKeyName: order_request_statuses_changed_by_user_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: users
+                    referencedColumnNames: user_id
+              - column:
+                  name: processing_status
+                  type: character varying
+              - column:
+                  name: date_submitted
+                  type: timestamp with timezone
+              - column:
+                  name: date_updated
+                  type: timestamp with timezone

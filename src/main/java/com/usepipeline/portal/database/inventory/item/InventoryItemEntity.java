@@ -1,6 +1,6 @@
 package com.usepipeline.portal.database.inventory.item;
 
-import lombok.AllArgsConstructor;
+import com.usepipeline.portal.database.catalogue.item.CatalogueItemEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +10,6 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @IdClass(InventoryItemPK.class)
 @Table(schema = "portal", name = "inventory_items")
@@ -27,5 +26,15 @@ public class InventoryItemEntity implements Serializable {
 
     @Column(name = "quantity")
     private Long quantity;
+
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @JoinColumn(name = "catalogue_item_id", referencedColumnName = "item_id", insertable = false, updatable = false)
+    private CatalogueItemEntity catalogueItemEntity;
+
+    public InventoryItemEntity(UUID catalogueItemId, UUID inventoryId, Long quantity) {
+        this.catalogueItemId = catalogueItemId;
+        this.inventoryId = inventoryId;
+        this.quantity = quantity;
+    }
 
 }
