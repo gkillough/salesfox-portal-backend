@@ -9,6 +9,8 @@ import com.usepipeline.portal.database.account.repository.LoginRepository;
 import com.usepipeline.portal.database.account.repository.MembershipRepository;
 import com.usepipeline.portal.database.account.repository.RoleRepository;
 import com.usepipeline.portal.database.account.repository.UserRepository;
+import com.usepipeline.portal.database.inventory.InventoryEntity;
+import com.usepipeline.portal.database.inventory.InventoryRepository;
 import com.usepipeline.portal.database.organization.OrganizationEntity;
 import com.usepipeline.portal.database.organization.OrganizationRepository;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
@@ -40,6 +42,7 @@ public class UserRegistrationService {
     private OrganizationRepository organizationRepository;
     private OrganizationAccountRepository organizationAccountRepository;
     private MembershipRepository membershipRepository;
+    private InventoryRepository inventoryRepository;
     private UserProfileService userProfileService;
     private LicenseSeatManager licenseSeatManager;
     private PasswordEncoder passwordEncoder;
@@ -47,13 +50,14 @@ public class UserRegistrationService {
     @Autowired
     public UserRegistrationService(UserRepository userRepository, LoginRepository loginRepository, RoleRepository roleRepository,
                                    OrganizationRepository organizationRepository, OrganizationAccountRepository organizationAccountRepository, MembershipRepository membershipRepository,
-                                   UserProfileService userProfileService, LicenseSeatManager licenseSeatManager, PasswordEncoder passwordEncoder) {
+                                   InventoryRepository inventoryRepository, UserProfileService userProfileService, LicenseSeatManager licenseSeatManager, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.loginRepository = loginRepository;
         this.roleRepository = roleRepository;
         this.organizationRepository = organizationRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.membershipRepository = membershipRepository;
+        this.inventoryRepository = inventoryRepository;
         this.userProfileService = userProfileService;
         this.licenseSeatManager = licenseSeatManager;
         this.passwordEncoder = passwordEncoder;
@@ -92,6 +96,8 @@ public class UserRegistrationService {
         reserveLicenseSeatForNewUser(organizationAccountEntity);
         saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
         saveMembershipInfo(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId(), roleEntity.getRoleId());
+
+        createInventoryIfNecessary(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId(), roleEntity);
         userProfileService.initializeProfile(userEntity.getUserId());
         return userEntity.getUserId();
     }
@@ -148,6 +154,14 @@ public class UserRegistrationService {
     private void saveMembershipInfo(UUID userId, UUID organizationAccountId, UUID roleId) {
         MembershipEntity newMembershipToSave = new MembershipEntity(null, userId, organizationAccountId, roleId);
         membershipRepository.save(newMembershipToSave);
+    }
+
+    private void createInventoryIfNecessary(UUID userId, UUID orgAcctId, RoleEntity roleEntity) {
+        String roleLevel = roleEntity.getRoleLevel();
+        if (PortalAuthorityConstants.PIPELINE_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PIPELINE_PREMIUM_USER.equals(roleLevel)) {
+            InventoryEntity individualUserInventoryToSave = new InventoryEntity(null, orgAcctId, userId);
+            inventoryRepository.save(individualUserInventoryToSave);
+        }
     }
 
     private void validateRegistrationModel(UserRegistrationModel registrationModel) {

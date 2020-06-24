@@ -10,12 +10,10 @@ import java.util.UUID;
 @NoArgsConstructor
 public class InventoryResponseModel {
     private UUID inventoryId;
-    private String inventoryName;
     private RestrictionModel restriction;
 
-    public InventoryResponseModel(UUID inventoryId, String inventoryName, UUID organizationAccountId, UUID userId) {
+    public InventoryResponseModel(UUID inventoryId, UUID organizationAccountId, UUID userId) {
         this.inventoryId = inventoryId;
-        this.inventoryName = inventoryName;
         this.restriction = new RestrictionModel(organizationAccountId, userId);
     }
 

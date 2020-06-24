@@ -4,6 +4,8 @@ import com.usepipeline.portal.common.FieldValidationUtils;
 import com.usepipeline.portal.common.model.PortalAddressModel;
 import com.usepipeline.portal.database.account.entity.LicenseEntity;
 import com.usepipeline.portal.database.account.repository.LicenseRepository;
+import com.usepipeline.portal.database.inventory.InventoryEntity;
+import com.usepipeline.portal.database.inventory.InventoryRepository;
 import com.usepipeline.portal.database.organization.OrganizationEntity;
 import com.usepipeline.portal.database.organization.OrganizationRepository;
 import com.usepipeline.portal.database.organization.account.OrganizationAccountEntity;
@@ -39,6 +41,7 @@ public class OrganizationAccountRegistrationService {
     private OrganizationAccountRepository organizationAccountRepository;
     private OrganizationAccountAddressRepository organizationAccountAddressRepository;
     private OrganizationAccountProfileRepository organizationAccountProfileRepository;
+    private InventoryRepository inventoryRepository;
     private OrganizationValidationService organizationValidationService;
     private UserRegistrationService userRegistrationService;
     private UserProfileService userProfileService;
@@ -49,12 +52,14 @@ public class OrganizationAccountRegistrationService {
                                                   OrganizationAccountRepository organizationAccountRepository,
                                                   OrganizationAccountAddressRepository organizationAccountAddressRepository,
                                                   OrganizationAccountProfileRepository organizationAccountProfileRepository,
+                                                  InventoryRepository inventoryRepository,
                                                   OrganizationValidationService organizationValidationService, UserRegistrationService userRegistrationService, UserProfileService userProfileService) {
         this.licenseRepository = licenseRepository;
         this.organizationRepository = organizationRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.organizationAccountAddressRepository = organizationAccountAddressRepository;
         this.organizationAccountProfileRepository = organizationAccountProfileRepository;
+        this.inventoryRepository = inventoryRepository;
         this.organizationValidationService = organizationValidationService;
         this.userRegistrationService = userRegistrationService;
         this.userProfileService = userProfileService;
@@ -98,6 +103,7 @@ public class OrganizationAccountRegistrationService {
         activateLicense(orgAccountLicense);
         registerOrganizationAccountOwner(registrationModel.getAccountOwner(), orgEntity, orgAccountEntity);
         createOrganizationAccountProfile(orgAccountEntity, orgAccountAddressEntity, registrationModel.getBusinessPhoneNumber());
+        createInventory(orgAccountEntity);
     }
 
     private LicenseEntity getAndValidateLicenseByHash(UUID licenseHash) {
@@ -151,6 +157,11 @@ public class OrganizationAccountRegistrationService {
         OrganizationAccountProfileEntity orgAccountProfileToSave = new OrganizationAccountProfileEntity(
                 null, organizationAccount.getOrganizationAccountId(), organizationAccountAddress.getOrganizationAccountAddressId(), businessPhoneNumber);
         return organizationAccountProfileRepository.save(orgAccountProfileToSave);
+    }
+
+    private void createInventory(OrganizationAccountEntity orgAccountEntity) {
+        InventoryEntity orgAcctInventoryToSave = new InventoryEntity(null, orgAccountEntity.getOrganizationAccountId(), null);
+        inventoryRepository.save(orgAcctInventoryToSave);
     }
 
     private void activateLicense(LicenseEntity license) {

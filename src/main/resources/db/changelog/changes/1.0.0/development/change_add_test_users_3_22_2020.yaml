@@ -111,6 +111,21 @@ databaseChangeLog:
                   valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('basic.user@usepipeline.com')
 
   - changeSet:
+      id: create-user-inventory-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: inventories
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pipeline for Individuals', 'Pipeline Basic')
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com')
+
+  - changeSet:
       id: create-user-2
       author: gavinkillough
       changes:
@@ -222,6 +237,21 @@ databaseChangeLog:
                   valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('premium.user@usepipeline.com')
 
   - changeSet:
+      id: create-user-inventory-2
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: inventories
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pipeline for Individuals', 'Pipeline Premium')
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com')
+
+  - changeSet:
       id: create-user-3
       author: gavinkillough
       changes:
@@ -331,3 +361,18 @@ databaseChangeLog:
               - column:
                   name: mailing_address_id
                   valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('admin@usepipeline.com')
+
+  - changeSet:
+      id: create-user-inventory-3
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: inventories
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pipeline Organization', 'Pipeline Team')
+              - column:
+                  name: user_id
+                  valueComputed: GET_USER_ID_BY_EMAIL('admin@usepipeline.com')

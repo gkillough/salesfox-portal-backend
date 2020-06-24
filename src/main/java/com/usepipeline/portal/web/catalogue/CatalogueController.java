@@ -3,6 +3,7 @@ package com.usepipeline.portal.web.catalogue;
 import com.usepipeline.portal.web.catalogue.model.CatalogueItemRequestModel;
 import com.usepipeline.portal.web.catalogue.model.CatalogueItemResponseModel;
 import com.usepipeline.portal.web.catalogue.model.MultiCatalogueItemModel;
+import com.usepipeline.portal.web.common.model.request.ActiveStatusPatchModel;
 import com.usepipeline.portal.web.common.page.PageMetadata;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,10 @@ public class CatalogueController {
         catalogueService.updateItem(itemId, requestModel);
     }
 
-    @DeleteMapping("/{itemId}")
+    @PatchMapping("/{itemId}/active")
     @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_AUTH_CHECK)
-    public void deleteItem(@PathVariable UUID itemId) {
-        catalogueService.deleteItem(itemId);
+    public void setItemActiveStatus(@PathVariable UUID itemId, @RequestBody ActiveStatusPatchModel requestModel) {
+        catalogueService.setItemActiveStatus(itemId, requestModel);
     }
 
 }

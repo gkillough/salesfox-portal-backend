@@ -14,7 +14,6 @@ public class InventoryOrderResponseModel {
     private UUID organizationAccountId;
     private UUID requestingUserId;
     private UUID inventoryId;
-    private String inventoryName;
     private UUID itemId;
     private String itemName;
     private Integer quantity;
@@ -27,7 +26,6 @@ public class InventoryOrderResponseModel {
             UUID organizationAccountId,
             UUID requestingUserId,
             UUID inventoryId,
-            String inventoryName,
             UUID itemId,
             String itemName,
             Integer quantity,
@@ -42,7 +40,6 @@ public class InventoryOrderResponseModel {
         this.organizationAccountId = organizationAccountId;
         this.requestingUserId = requestingUserId;
         this.inventoryId = inventoryId;
-        this.inventoryName = inventoryName;
         this.itemId = itemId;
         this.itemName = itemName;
         this.quantity = quantity;

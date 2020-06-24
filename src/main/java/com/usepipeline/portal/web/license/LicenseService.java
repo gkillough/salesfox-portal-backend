@@ -160,7 +160,7 @@ public class LicenseService {
             errorFields.add("Monthly Cost is required");
         }
 
-        if (requestModel.getMonthlyCost().compareTo(BigDecimal.ZERO) >= 0) {
+        if (requestModel.getMonthlyCost().compareTo(BigDecimal.ZERO) <= 0) {
             errorFields.add("Monthly Cost cannot be negative");
         }
 

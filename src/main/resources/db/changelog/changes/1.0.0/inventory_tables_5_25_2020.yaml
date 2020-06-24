@@ -46,6 +46,9 @@ databaseChangeLog:
               - column:
                   name: icon_id
                   type: UUID
+              - column:
+                  name: is_active
+                  type: boolean
 
   - changeSet:
       id: inventory-tables-2b
@@ -118,9 +121,6 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
-                  name: inventory_name
-                  type: character varying
-              - column:
                   name: organization_account_id
                   type: UUID
                   constraints:
@@ -132,7 +132,9 @@ databaseChangeLog:
               - column:
                   name: user_id
                   type: UUID
+                  defaultValue: null
                   constraints:
+                    nullable: true
                     foreignKeyName: inventories_user_id_fk
                     referencedTableSchemaName: portal
                     referencedTableName: users
