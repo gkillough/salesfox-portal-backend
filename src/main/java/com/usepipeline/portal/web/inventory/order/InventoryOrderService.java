@@ -116,16 +116,17 @@ public class InventoryOrderService {
 
     @Transactional
     public InventoryOrderResponseModel submitOrder(InventoryOrderRequestModel requestModel) {
-        validateOrderRequest(requestModel);
-
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
         String userRoleLevel = membershipRetrievalService.getRoleEntity(userMembership).getRoleLevel();
         validateSubmitOrderAccess(userRoleLevel);
 
+        validateOrderRequest(requestModel);
+
         InventoryEntity targetInventory = inventoryRepository.findById(requestModel.getInventoryId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No inventory with the id [%s] exists", requestModel.getInventoryId())));
         CatalogueItemEntity targetItem = catalogueItemRepository.findById(requestModel.getCatalogueItemId())
+                .filter(CatalogueItemEntity::getIsActive)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", requestModel.getCatalogueItemId())));
         validateInventoryAndItemAccess(userMembership, targetInventory, targetItem);
 
@@ -242,7 +243,6 @@ public class InventoryOrderService {
         }
 
         CatalogueItemRestrictionEntity itemRestriction = targetItem.getCatalogueItemRestrictionEntity();
-
         if ((targetInventory.getOrganizationAccountId() != null && !loggedInUserMembership.getOrganizationAccountId().equals(targetInventory.getOrganizationAccountId()))
                 || (targetInventory.getUserId() != null && !targetInventory.getUserId().equals(loggedInUserMembership.getUserId()))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -302,7 +302,6 @@ public class InventoryOrderService {
                 entity.getOrganizationAccountId(),
                 entity.getRequestingUserId(),
                 foundInventory.getInventoryId(),
-                foundInventory.getInventoryName(),
                 foundCatalogueItem.getItemId(),
                 foundCatalogueItem.getName(),
                 entity.getQuantity(),

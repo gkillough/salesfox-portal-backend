@@ -19,9 +19,6 @@ public class InventoryEntity implements Serializable {
     @Column(name = "inventory_id")
     private UUID inventoryId;
 
-    @Column(name = "inventory_name")
-    private String inventoryName;
-
     @Column(name = "organization_account_id")
     private UUID organizationAccountId;
 

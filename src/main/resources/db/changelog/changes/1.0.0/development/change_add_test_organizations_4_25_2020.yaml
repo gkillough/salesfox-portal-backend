@@ -126,6 +126,18 @@ databaseChangeLog:
                   name: business_number
                   value: 5555555555
 
+  - changeSet:
+      id: test-orgs-inventories-11
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: inventories
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
+
   ########################
   # TEST ORG 1 ACCOUNT 2 #
   ########################
@@ -233,9 +245,21 @@ databaseChangeLog:
                   name: business_number
                   value: 5555550005
 
-    ##############
-    # TEST ORG 2 #
-    ##############
+  - changeSet:
+      id: test-orgs-inventories-12
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: inventories
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
+
+  ##############
+  # TEST ORG 2 #
+  ##############
 
   - changeSet:
       id: test-orgs-2
@@ -359,6 +383,18 @@ databaseChangeLog:
                   name: business_number
                   value: 5555550050
 
+  - changeSet:
+      id: test-orgs-inventories-21
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: inventories
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
+
   ########################
   # TEST ORG 2 ACCOUNT 2 #
   ########################
@@ -465,3 +501,15 @@ databaseChangeLog:
               - column:
                   name: business_number
                   value: 5555550055
+
+  - changeSet:
+      id: test-orgs-inventories-22
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: inventories
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')

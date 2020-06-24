@@ -15,6 +15,7 @@ import com.usepipeline.portal.database.organization.account.OrganizationAccountR
 import com.usepipeline.portal.web.catalogue.model.CatalogueItemRequestModel;
 import com.usepipeline.portal.web.catalogue.model.CatalogueItemResponseModel;
 import com.usepipeline.portal.web.catalogue.model.MultiCatalogueItemModel;
+import com.usepipeline.portal.web.common.model.request.ActiveStatusPatchModel;
 import com.usepipeline.portal.web.common.model.request.RestrictionModel;
 import com.usepipeline.portal.web.common.page.PageRequestValidationUtils;
 import com.usepipeline.portal.web.util.HttpSafeUserMembershipRetrievalService;
@@ -91,7 +92,7 @@ public class CatalogueService {
 
         RestrictionModel restrictionRequestModel = itemRequestModel.getRestriction();
         boolean isRestricted = restrictionRequestModel != null;
-        CatalogueItemEntity newItem = new CatalogueItemEntity(null, itemRequestModel.getName(), itemRequestModel.getPrice(), itemRequestModel.getQuantity(), isRestricted, null);
+        CatalogueItemEntity newItem = new CatalogueItemEntity(null, itemRequestModel.getName(), itemRequestModel.getPrice(), itemRequestModel.getQuantity(), isRestricted, null, true);
 
         CatalogueItemEntity savedItem = catalogueItemRepository.save(newItem);
 
@@ -159,13 +160,16 @@ public class CatalogueService {
     }
 
     @Transactional
-    public void deleteItem(UUID itemId) {
+    public void setItemActiveStatus(UUID itemId, ActiveStatusPatchModel requestModel) {
         CatalogueItemEntity existingItem = catalogueItemRepository.findById(itemId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (existingItem.getQuantity() != 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot delete catalogue item if quantity is not equal to zero");
+
+        if (requestModel.getActiveStatus() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'activeStatus' cannot be null");
         }
-        catalogueItemRepository.deleteById(itemId);
+
+        existingItem.setIsActive(requestModel.getActiveStatus());
+        catalogueItemRepository.save(existingItem);
     }
 
     private Page<CatalogueItemEntity> getAccessibleItems(Integer pageOffset, Integer pageLimit) {
@@ -211,7 +215,7 @@ public class CatalogueService {
             errors.add("The field 'Item Name' cannot be blank");
         }
 
-        if (requestModel.getPrice().compareTo(BigDecimal.ZERO) >= 0) {
+        if (requestModel.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
             errors.add("The field 'Price' cannot be less than $0.00");
         }
 
@@ -238,6 +242,7 @@ public class CatalogueService {
         }
     }
 
+    // TODO consider sparse response model without restriction object included by default
     private CatalogueItemResponseModel convertToResponseModel(CatalogueItemEntity entity) {
         UUID organizationAccountId = null;
         UUID userId = null;
@@ -246,7 +251,7 @@ public class CatalogueService {
             organizationAccountId = restrictionEntity.getOrganizationAccountId();
             userId = restrictionEntity.getUserId();
         }
-        return new CatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getPrice(), entity.getQuantity(), entity.getIconId(), organizationAccountId, userId);
+        return new CatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getPrice(), entity.getQuantity(), entity.getIconId(), entity.getIsActive(), organizationAccountId, userId);
     }
 
 }

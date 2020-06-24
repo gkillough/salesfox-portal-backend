@@ -15,14 +15,16 @@ public class CatalogueItemResponseModel {
     private BigDecimal price;
     private Long quantity;
     private UUID iconId;
+    private Boolean isActive;
     private RestrictionModel restriction;
 
-    public CatalogueItemResponseModel(UUID itemId, String name, BigDecimal price, Long quantity, UUID iconId, UUID organizationAccountId, UUID userId) {
+    public CatalogueItemResponseModel(UUID itemId, String name, BigDecimal price, Long quantity, UUID iconId, Boolean isActive, UUID organizationAccountId, UUID userId) {
         this.itemId = itemId;
         this.name = name;
         this.price = price;
         this.quantity = quantity;
         this.iconId = iconId;
+        this.isActive = isActive;
         this.restriction = new RestrictionModel(organizationAccountId, userId);
     }
 

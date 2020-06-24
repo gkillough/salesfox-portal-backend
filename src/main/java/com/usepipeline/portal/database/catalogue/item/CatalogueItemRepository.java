@@ -15,12 +15,15 @@ public interface CatalogueItemRepository extends JpaRepository<CatalogueItemEnti
             " FROM CatalogueItemEntity itemRow" +
             " LEFT JOIN itemRow.catalogueItemRestrictionEntity restriction ON itemRow.itemId = restriction.itemId" +
             " WHERE (" +
-            " itemRow.restricted = FALSE" +
-            " OR (" +
-            "     restriction.organizationAccountId = :orgAcctId" +
-            "     AND (" +
-            "       restriction.userId IS NULL" +
-            "       OR restriction.userId = :userId" +
+            " itemRow.isActive = TRUE" +
+            " AND (" +
+            "   itemRow.restricted = FALSE" +
+            "   OR (" +
+            "       restriction.organizationAccountId = :orgAcctId" +
+            "       AND (" +
+            "         restriction.userId IS NULL" +
+            "         OR restriction.userId = :userId" +
+            "       )" +
             "     )" +
             "   )" +
             " )"

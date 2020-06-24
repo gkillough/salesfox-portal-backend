@@ -1,7 +1,10 @@
 package com.usepipeline.portal.web.inventory;
 
 import com.usepipeline.portal.web.common.page.PageMetadata;
-import com.usepipeline.portal.web.inventory.model.*;
+import com.usepipeline.portal.web.inventory.model.InventoryItemResponseModel;
+import com.usepipeline.portal.web.inventory.model.InventoryResponseModel;
+import com.usepipeline.portal.web.inventory.model.MultiInventoryItemModel;
+import com.usepipeline.portal.web.inventory.model.MultiInventoryModel;
 import com.usepipeline.portal.web.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,21 +34,6 @@ public class InventoryController {
     @GetMapping("/{inventoryId}")
     public InventoryResponseModel getInventory(@PathVariable UUID inventoryId) {
         return inventoryService.getInventory(inventoryId);
-    }
-
-    @PostMapping
-    public InventoryResponseModel createInventory(@RequestBody InventoryRequestModel requestModel) {
-        return inventoryService.createInventory(requestModel);
-    }
-
-    @PutMapping("/{inventoryId}")
-    public void updateInventory(@PathVariable UUID inventoryId, @RequestBody InventoryRequestModel requestModel) {
-        inventoryService.updateInventory(inventoryId, requestModel);
-    }
-
-    @DeleteMapping("/{inventoryId}")
-    public void deleteInventory(@PathVariable UUID inventoryId) {
-        inventoryService.deleteInventory(inventoryId);
     }
 
     @GetMapping("/{inventoryId}/items")

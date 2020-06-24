@@ -36,17 +36,21 @@ public class CatalogueItemEntity implements Serializable {
     @Column(name = "icon_id")
     private UUID iconId;
 
+    @Column(name = "is_active")
+    private Boolean isActive;
+
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "item_id", referencedColumnName = "item_id")
     private CatalogueItemRestrictionEntity catalogueItemRestrictionEntity;
 
-    public CatalogueItemEntity(UUID itemId, String name, BigDecimal price, Long quantity, Boolean restricted, UUID iconId) {
+    public CatalogueItemEntity(UUID itemId, String name, BigDecimal price, Long quantity, Boolean restricted, UUID iconId, Boolean isActive) {
         this.itemId = itemId;
         this.name = name;
         this.price = price;
         this.quantity = quantity;
         this.restricted = restricted;
         this.iconId = iconId;
+        this.isActive = isActive;
     }
 
 }
