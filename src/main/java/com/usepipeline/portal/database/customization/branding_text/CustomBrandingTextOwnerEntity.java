@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -12,14 +15,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@IdClass(CustomBrandingTextOwnerPK.class)
 @Table(schema = "portal", name = "custom_branding_text_owners")
 public class CustomBrandingTextOwnerEntity implements Serializable {
     @Id
     @Column(name = "custom_branding_text_id")
     private UUID customBrandingTextId;
 
-    @Id
     @Column(name = "user_id")
     private UUID userId;
 
