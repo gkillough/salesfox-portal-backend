@@ -59,7 +59,6 @@ databaseChangeLog:
                   name: user_id
                   type: UUID
                   constraints:
-                    primaryKey: true
                     foreignKeyName: custom_icon_owners_user_id_fk
                     referencedTableSchemaName: portal
                     referencedTableName: users
@@ -125,7 +124,6 @@ databaseChangeLog:
                   name: user_id
                   type: UUID
                   constraints:
-                    primaryKey: true
                     foreignKeyName: cust_brand_txt_owners_user_id_fk
                     referencedTableSchemaName: portal
                     referencedTableName: users
