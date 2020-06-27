@@ -1,0 +1,163 @@
+databaseChangeLog:
+  - changeSet:
+      id: gift-tables-1
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: gifts
+            columns:
+              - column:
+                  name: gift_id
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: organization_account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: gifts_org_account_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: organization_accounts
+                    referencedColumnNames: organization_account_id
+              - column:
+                  name: requesting_user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: gifts_requesting_user_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: users
+                    referencedColumnNames: user_id
+              - column:
+                  name: item_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: gifts_item_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: catalogue_items
+                    referencedColumnNames: item_id
+              - column:
+                  name: contact_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: gifts_contact_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: organization_account_contacts
+                    referencedColumnNames: contact_id
+
+  - changeSet:
+      id: gift-tables-2
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: gift_note_details
+            columns:
+              - column:
+                  name: gift_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: gift_note_detail_gift_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: gifts
+                    referencedColumnNames: gift_id
+              - column:
+                  name: note_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: gift_note_detail_note_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: notes
+                    referencedColumnNames: note_id
+
+  - changeSet:
+      id: gift-tables-3
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: gift_item_details
+            columns:
+              - column:
+                  name: gift_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: gift_item_detail_gift_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: gifts
+                    referencedColumnNames: gift_id
+              - column:
+                  name: custom_icon_id
+                  type: UUID
+                  constraints:
+                    foreignKeyName: gift_custom_icon_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: custom_icons
+                    referencedColumnNames: custom_icon_id
+              - column:
+                  name: custom_text_id
+                  type: UUID
+                  constraints:
+                    foreignKeyName: gift_custom_text_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: custom_branding_texts
+                    referencedColumnNames: custom_branding_text_id
+
+  - changeSet:
+      id: gift-tables-4
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: gift_tracking
+            columns:
+              - column:
+                  name: gift_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: gift_tracking_gift_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: gifts
+                    referencedColumnNames: gift_id
+              - column:
+                  name: status
+                  type: character varying
+              - column:
+                  name: updated_by_user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: gift_tracking_updated_by_user_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: users
+                    referencedColumnNames: user_id
+
+  - changeSet:
+      id: gift-tables-5
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: gift_tracking_details
+            columns:
+              - column:
+                  name: gift_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: gift_tracking_details_gift_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: gifts
+                    referencedColumnNames: gift_id
+              - column:
+                  name: tracking_number
+                  type: character varying

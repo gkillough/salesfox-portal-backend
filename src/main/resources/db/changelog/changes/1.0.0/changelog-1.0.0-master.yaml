@@ -51,6 +51,10 @@ databaseChangeLog:
       file: customization_tables_6_27_2020.yaml
       relativeToChangelogFile: true
 
+  - include:
+      file: gift_tables_6_27_2020.yaml
+      relativeToChangelogFile: true
+
   # TODO REMOVE DEVELOPMENT DATA BEFORE RELEASE
   - include:
       file: development/changelog-1.0.0-development.yaml
