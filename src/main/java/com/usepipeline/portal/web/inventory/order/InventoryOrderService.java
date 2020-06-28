@@ -166,6 +166,8 @@ public class InventoryOrderService {
 
         if (StringUtils.isBlank(requestModel.getNewStatus())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'newStatus' cannot be blank");
+        } else if (orderStatusEntity.getProcessingStatus().equals(requestModel.getNewStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'newStatus' cannot be the same as the current order status");
         } else if (!EnumUtils.isValidEnum(InventoryOrderRequestStatus.class, requestModel.getNewStatus())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The field 'newStatus' is not a valid status. Acceptable values: %s", Arrays.toString(InventoryOrderRequestStatus.values())));
         }
