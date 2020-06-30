@@ -1,6 +1,5 @@
 package com.usepipeline.portal.web.catalogue;
 
-import com.usepipeline.portal.common.exception.PortalFileSystemException;
 import com.usepipeline.portal.common.service.icon.LocalIconManager;
 import com.usepipeline.portal.database.account.entity.MembershipEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
@@ -18,6 +17,7 @@ import com.usepipeline.portal.web.catalogue.model.MultiCatalogueItemModel;
 import com.usepipeline.portal.web.common.model.request.ActiveStatusPatchModel;
 import com.usepipeline.portal.web.common.model.request.RestrictionModel;
 import com.usepipeline.portal.web.common.page.PageRequestValidationUtils;
+import com.usepipeline.portal.web.image.HttpSafeImageUtility;
 import com.usepipeline.portal.web.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -32,8 +32,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -45,18 +43,20 @@ public class CatalogueService {
     private CatalogueItemIconRepository catalogueItemIconRepository;
     private OrganizationAccountRepository organizationAccountRepository;
     private UserRepository userRepository;
+    private HttpSafeImageUtility imageUtility;
     private LocalIconManager localIconManager;
     private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
     public CatalogueService(CatalogueItemRepository catalogueItemRepository, CatalogueItemRestrictionRepository catalogueItemRestrictionRepository,
                             CatalogueItemIconRepository catalogueItemIconRepository, OrganizationAccountRepository organizationAccountRepository, UserRepository userRepository,
-                            LocalIconManager localIconManager, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+                            HttpSafeImageUtility imageUtility, LocalIconManager localIconManager, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.catalogueItemRepository = catalogueItemRepository;
         this.catalogueItemRestrictionRepository = catalogueItemRestrictionRepository;
         this.catalogueItemIconRepository = catalogueItemIconRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.userRepository = userRepository;
+        this.imageUtility = imageUtility;
         this.localIconManager = localIconManager;
         this.membershipRetrievalService = membershipRetrievalService;
     }
@@ -108,22 +108,7 @@ public class CatalogueService {
         CatalogueItemEntity exitingItem = catalogueItemRepository.findById(itemId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        if (iconFile.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The provided file cannot be empty");
-        }
-
-        File savedIcon;
-        try (InputStream fileInputStream = iconFile.getInputStream()) {
-            String iconFileExtension = FilenameUtils.getExtension(iconFile.getOriginalFilename());
-            if (StringUtils.isBlank(iconFileExtension)) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The file extension cannot be blank");
-            }
-
-            savedIcon = localIconManager.saveIcon(fileInputStream, iconFileExtension);
-        } catch (IOException | PortalFileSystemException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The provided file was an invalid image");
-        }
-
+        File savedIcon = imageUtility.saveImage(iconFile);
         String savedIconName = FilenameUtils.getName(savedIcon.getName());
         CatalogueItemIconEntity iconEntityToSave = new CatalogueItemIconEntity(null, savedIconName);
         CatalogueItemIconEntity savedIconEntity = catalogueItemIconRepository.save(iconEntityToSave);

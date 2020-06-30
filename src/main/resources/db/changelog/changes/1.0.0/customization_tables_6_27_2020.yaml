@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: customization-tables-1
+      id: customization-tables-1a
       author: gavinkillough
       changes:
         - createTable:
@@ -14,7 +14,7 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
-                  name: file_name
+                  name: label
                   type: character varying
               - column:
                   name: organization_account_id
@@ -37,6 +37,23 @@ databaseChangeLog:
               - column:
                   name: is_active
                   type: boolean
+
+  - changeSet:
+      id: customization-tables-1b
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: custom_icon_files
+            columns:
+              - column:
+                  name: custom_icon_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: file_name
+                  type: character varying
 
   - changeSet:
       id: customization-tables-2

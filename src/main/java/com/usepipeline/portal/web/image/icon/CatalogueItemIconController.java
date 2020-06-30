@@ -10,14 +10,15 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(IconController.BASE_ENDPOINT)
-public class IconController {
+@RequestMapping(CatalogueItemIconController.BASE_ENDPOINT)
+public class CatalogueItemIconController {
+    // TODO update this endpoint to make a distinction between catalogue icons and custom branding icons
     public static final String BASE_ENDPOINT = "/icons";
 
-    private IconService iconService;
+    private CatalogueItemIconService iconService;
 
     @Autowired
-    public IconController(IconService iconService) {
+    public CatalogueItemIconController(CatalogueItemIconService iconService) {
         this.iconService = iconService;
     }
 

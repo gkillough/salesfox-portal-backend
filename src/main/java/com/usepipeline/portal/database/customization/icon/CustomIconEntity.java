@@ -1,6 +1,5 @@
 package com.usepipeline.portal.database.customization.icon;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,17 +9,17 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "custom_icons")
 public class CustomIconEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @PrimaryKeyJoinColumn
     @Column(name = "custom_icon_id")
     private UUID customIconId;
 
-    @Column(name = "file_name")
-    private String fileName;
+    @Column(name = "label")
+    private String label;
 
     @PrimaryKeyJoinColumn
     @Column(name = "organization_account_id")
@@ -32,5 +31,17 @@ public class CustomIconEntity implements Serializable {
 
     @Column(name = "is_active")
     private Boolean isActive;
+
+    @OneToOne
+    @JoinColumn(name = "custom_icon_id", referencedColumnName = "custom_icon_id")
+    private CustomIconOwnerEntity customIconOwnerEntity;
+
+    public CustomIconEntity(UUID customIconId, String label, UUID organizationAccountId, UUID uploaderId, Boolean isActive) {
+        this.customIconId = customIconId;
+        this.label = label;
+        this.organizationAccountId = organizationAccountId;
+        this.uploaderId = uploaderId;
+        this.isActive = isActive;
+    }
 
 }
