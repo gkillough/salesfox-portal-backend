@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -18,6 +15,7 @@ import java.util.UUID;
 @Table(schema = "portal", name = "custom_branding_text_owners")
 public class CustomBrandingTextOwnerEntity implements Serializable {
     @Id
+    @PrimaryKeyJoinColumn
     @Column(name = "custom_branding_text_id")
     private UUID customBrandingTextId;
 
