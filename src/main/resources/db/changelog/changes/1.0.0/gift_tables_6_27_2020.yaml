@@ -32,15 +32,6 @@ databaseChangeLog:
                     referencedTableName: users
                     referencedColumnNames: user_id
               - column:
-                  name: item_id
-                  type: UUID
-                  constraints:
-                    nullable: false
-                    foreignKeyName: gifts_item_id_fk
-                    referencedTableSchemaName: portal
-                    referencedTableName: catalogue_items
-                    referencedColumnNames: item_id
-              - column:
                   name: contact_id
                   type: UUID
                   constraints:
@@ -71,7 +62,6 @@ databaseChangeLog:
                   name: note_id
                   type: UUID
                   constraints:
-                    primaryKey: true
                     foreignKeyName: gift_note_detail_note_id_fk
                     referencedTableSchemaName: portal
                     referencedTableName: notes
@@ -84,6 +74,32 @@ databaseChangeLog:
         - createTable:
             schemaName: portal
             tableName: gift_item_details
+            columns:
+              - column:
+                  name: gift_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: gift_item_detail_gift_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: gifts
+                    referencedColumnNames: gift_id
+              - column:
+                  name: item_id
+                  type: UUID
+                  constraints:
+                    foreignKeyName: gift_item_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: catalogue_items
+                    referencedColumnNames: item_id
+
+  - changeSet:
+      id: gift-tables-4
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: gift_customization_details
             columns:
               - column:
                   name: gift_id
@@ -112,7 +128,7 @@ databaseChangeLog:
                     referencedColumnNames: custom_branding_text_id
 
   - changeSet:
-      id: gift-tables-4
+      id: gift-tables-5
       author: gavinkillough
       changes:
         - createTable:
@@ -132,6 +148,12 @@ databaseChangeLog:
                   name: status
                   type: character varying
               - column:
+                  name: date_submitted
+                  type: timestamp with timezone
+              - column:
+                  name: date_updated
+                  type: timestamp with timezone
+              - column:
                   name: updated_by_user_id
                   type: UUID
                   constraints:
@@ -142,7 +164,7 @@ databaseChangeLog:
                     referencedColumnNames: user_id
 
   - changeSet:
-      id: gift-tables-5
+      id: gift-tables-6
       author: gavinkillough
       changes:
         - createTable:
@@ -158,6 +180,9 @@ databaseChangeLog:
                     referencedTableSchemaName: portal
                     referencedTableName: gifts
                     referencedColumnNames: gift_id
+              - column:
+                  name: distributor
+                  type: character varying
               - column:
                   name: tracking_number
                   type: character varying

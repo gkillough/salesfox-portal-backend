@@ -11,7 +11,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@IdClass(GiftItemDetailPK.class)
 @Table(schema = "portal", name = "gift_item_details")
 public class GiftItemDetailEntity {
     @Id
@@ -19,8 +18,6 @@ public class GiftItemDetailEntity {
     @Column(name = "gift_id")
     private UUID giftId;
 
-    @Id
-    @PrimaryKeyJoinColumn
     @Column(name = "item_id")
     private UUID itemId;
 

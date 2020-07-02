@@ -18,6 +18,9 @@ public class GiftTrackingDetailEntity {
     @Column(name = "gift_id")
     private UUID giftId;
 
+    @Column(name = "distributor")
+    private String distributor;
+
     @Column(name = "tracking_number")
     private String trackingNumber;
 

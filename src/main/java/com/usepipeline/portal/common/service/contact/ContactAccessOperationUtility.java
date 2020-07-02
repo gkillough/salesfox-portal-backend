@@ -45,6 +45,7 @@ public class ContactAccessOperationUtility<E extends Throwable> {
             case READ:
                 return true;
             case UPDATE:
+            case INTERACT:
                 OrganizationAccountContactProfileEntity contactProfile = getPointOfContactProfile(contact);
                 UUID pointOfContactUserId = contactProfile.getOrganizationPointOfContactUserId();
                 return pointOfContactUserId == null || userRequestingAccess.getUserId().equals(pointOfContactUserId);
@@ -58,12 +59,12 @@ public class ContactAccessOperationUtility<E extends Throwable> {
             OrganizationAccountContactProfileEntity contactProfile = getPointOfContactProfile(contact);
             return userRequestingAccess.getUserId().equals(contactProfile.getOrganizationPointOfContactUserId());
         }
-        // In the future, there may be other pipeline roles that require granular access control (e.g. Pipeline support or beta testers).
+        // In the future, there may be other roles that require granular access control (e.g. support or beta testers).
         return false;
     }
 
     private OrganizationAccountContactProfileEntity getPointOfContactProfile(OrganizationAccountContactEntity contact) throws E {
-        return contactProfileRepository.findById(contact.getContactId())
+        return contactProfileRepository.findByContactId(contact.getContactId())
                 .orElseThrow(membershipRetrievalService::unexpectedErrorDuringRetrieval);
     }
 

@@ -68,7 +68,7 @@ public class InventoryItemService {
         InventoryItemEntity itemToDelete = inventoryItemRepository.findById(inventoryItemPK)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         if (itemToDelete.getQuantity() > 0) {
-            throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Cannot delete inventory item if quantity is not equal to zero");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot delete inventory item if quantity is not equal to zero");
         }
         inventoryItemRepository.deleteById(inventoryItemPK);
     }
