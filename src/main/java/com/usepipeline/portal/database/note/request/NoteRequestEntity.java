@@ -12,6 +12,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "note_requests")
+@Deprecated
 public class NoteRequestEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

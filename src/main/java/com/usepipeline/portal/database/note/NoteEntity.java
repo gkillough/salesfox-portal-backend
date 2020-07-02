@@ -30,4 +30,6 @@ public class NoteEntity implements Serializable {
     @Column(name = "message")
     private String message;
 
+    // TODO add date_updated column
+
 }

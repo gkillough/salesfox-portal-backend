@@ -14,6 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "note_request_statuses")
+@Deprecated
 public class NoteRequestStatusEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

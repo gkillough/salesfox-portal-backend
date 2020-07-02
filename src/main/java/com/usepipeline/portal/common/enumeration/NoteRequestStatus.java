@@ -1,5 +1,6 @@
 package com.usepipeline.portal.common.enumeration;
 
+@Deprecated
 public enum NoteRequestStatus {
     DRAFT,
     COMPLETED,

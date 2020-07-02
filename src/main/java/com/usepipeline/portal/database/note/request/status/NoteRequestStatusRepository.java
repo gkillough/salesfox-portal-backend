@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
+@Deprecated
 public interface NoteRequestStatusRepository extends JpaRepository<NoteRequestStatusEntity, UUID> {
 
 }
