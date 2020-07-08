@@ -19,22 +19,26 @@ public class InventoryAccessService {
     }
 
     public void validateInventoryAccess(InventoryEntity inventoryEntity) {
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        validateInventoryAccess(loggedInUser, inventoryEntity);
+    }
+
+    public void validateInventoryAccess(UserEntity requestingUser, InventoryEntity inventoryEntity) {
         if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
             return;
         }
 
-        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         if (inventoryEntity.getUserId() != null) {
-            if (loggedInUser.getUserId().equals(inventoryEntity.getUserId())) {
+            if (requestingUser.getUserId().equals(inventoryEntity.getUserId())) {
                 return;
             }
         } else {
-            MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+            MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(requestingUser);
             if (userMembership.getOrganizationAccountId().equals(inventoryEntity.getOrganizationAccountId())) {
                 return;
             }
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
-    
+
 }

@@ -15,6 +15,7 @@ import com.usepipeline.portal.database.gift.item.GiftItemDetailRepository;
 import com.usepipeline.portal.database.gift.note.GiftNoteDetailEntity;
 import com.usepipeline.portal.database.gift.note.GiftNoteDetailRepository;
 import com.usepipeline.portal.database.gift.tracking.GiftTrackingRepository;
+import com.usepipeline.portal.database.note.NoteEntity;
 import com.usepipeline.portal.database.note.NoteRepository;
 import com.usepipeline.portal.database.organization.account.contact.entity.OrganizationAccountContactEntity;
 import com.usepipeline.portal.database.organization.account.contact.repository.OrganizationAccountContactRepository;
@@ -97,8 +98,8 @@ public class GiftService {
     @Transactional
     public GiftResponseModel createDraftGift(DraftGiftRequestModel requestModel) {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        validateRequestModel(loggedInUser, requestModel);
         MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+        validateRequestModel(loggedInUser, userMembership, requestModel);
 
         GiftEntity giftToSave = new GiftEntity(null, userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), requestModel.getContactId());
         GiftEntity savedGift = giftRepository.save(giftToSave);
@@ -115,7 +116,8 @@ public class GiftService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot edit a gift that has been sent");
         }
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        validateRequestModel(loggedInUser, requestModel);
+        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+        validateRequestModel(loggedInUser, userMembership, requestModel);
 
         foundGift.setContactId(requestModel.getContactId());
         saveDetails(foundGift, requestModel);
@@ -154,7 +156,8 @@ public class GiftService {
         return giftRepository.findAllByOrganizationAccountId(userMembership.getOrganizationAccountId(), pageRequest);
     }
 
-    private void validateRequestModel(UserEntity loggedInUser, DraftGiftRequestModel requestModel) {
+    // TODO clean this method up after database is normalized
+    private void validateRequestModel(UserEntity loggedInUser, MembershipEntity userMembership, DraftGiftRequestModel requestModel) {
         List<String> errors = new ArrayList<>();
         if (requestModel.getContactId() == null) {
             errors.add("The request field 'contactId' is required");
@@ -170,12 +173,25 @@ public class GiftService {
         if (requestModel.getNoteId() == null && requestModel.getItemId() == null) {
             errors.add("A gift needs at least one note or one item");
         } else {
-            if (requestModel.getNoteId() != null && !noteRepository.existsById(requestModel.getNoteId())) {
-                errors.add("The noteId provided is invalid");
+            if (requestModel.getNoteId() != null) {
+                Optional<NoteEntity> optionalNote = noteRepository.findById(requestModel.getNoteId());
+                if (optionalNote.isPresent()) {
+                    NoteEntity requestedNote = optionalNote.get();
+                    if ((membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember() && !requestedNote.getUpdatedByUserId().equals(loggedInUser.getUserId()))
+                            || !requestedNote.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
+                        errors.add("The noteId provided is not accessible by the requesting user");
+                    }
+                } else {
+                    errors.add("The noteId provided is invalid");
+                }
             }
 
-            if (requestModel.getItemId() != null && !catalogueItemRepository.existsById(requestModel.getItemId())) {
-                errors.add("The itemId provided is invalid");
+            if (requestModel.getItemId() != null) {
+                if (!catalogueItemRepository.existsById(requestModel.getItemId())) {
+                    errors.add("The itemId provided is invalid");
+                } else {
+                    giftAccessService.validateUserInventoryAccess(loggedInUser, requestModel.getItemId());
+                }
             }
         }
 

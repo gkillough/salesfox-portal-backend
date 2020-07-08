@@ -19,6 +19,6 @@ public interface InventoryRepository extends JpaRepository<InventoryEntity, UUID
             " )" +
             " OR inventory.organizationAccountId = :orgAcctId"
     )
-    Page<InventoryEntity> findAccessibleInventoryItems(@Param("orgAcctId") UUID orgAcctId, @Param("userId") UUID userId, Pageable pageable);
+    Page<InventoryEntity> findAccessibleInventories(@Param("orgAcctId") UUID orgAcctId, @Param("userId") UUID userId, Pageable pageable);
 
 }
