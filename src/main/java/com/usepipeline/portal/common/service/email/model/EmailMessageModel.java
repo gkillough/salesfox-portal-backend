@@ -12,6 +12,7 @@ import java.util.List;
 public class EmailMessageModel {
     private List<String> recipients;
     private String subjectLine;
+    private String messageTitle;
     private String primaryMessage;
 
 }

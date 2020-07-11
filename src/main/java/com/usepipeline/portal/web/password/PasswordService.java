@@ -177,7 +177,7 @@ public class PasswordService {
         log.info("*** REMOVE ME *** Password Reset Token: " + passwordResetToken);
         log.info("*** REMOVE ME *** Password Reset URL: " + passwordResetUrl);
 
-        EmailMessageModel emailMessage = new EmailMessageModel(List.of(email), "PIPELINE Password Reset", passwordResetUrl);
+        EmailMessageModel emailMessage = new EmailMessageModel(List.of(email), "BOOSTR - Password Reset", "Password Reset", passwordResetUrl);
         try {
             emailMessagingService.sendMessage(emailMessage);
             return true;

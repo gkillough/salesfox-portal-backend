@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
+import java.io.File;
 import java.util.Properties;
 
 @Data
@@ -42,6 +43,12 @@ public class EmailConfiguration {
 
     @Value("${mail.smtp.connectiontimeout:300000}")
     private Integer smtpConnectionTimeout;
+
+    @Value("classpath:/images/boostr_logo.png")
+    private File logoPng;
+
+    @Value("classpath:/images/boostr_logo.svg")
+    private File logoSvg;
 
     public Properties getSmtpProperties() {
         Properties smtpProperties = new Properties();

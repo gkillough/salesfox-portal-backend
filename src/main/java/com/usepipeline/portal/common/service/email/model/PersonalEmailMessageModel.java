@@ -11,8 +11,8 @@ public class PersonalEmailMessageModel extends EmailMessageModel {
     private String firstName;
     private String lastName;
 
-    public PersonalEmailMessageModel(List<String> recipients, String subjectLine, String primaryMessage, String firstName, String lastName) {
-        super(recipients, subjectLine, primaryMessage);
+    public PersonalEmailMessageModel(List<String> recipients, String subjectLine, String messageTitle, String primaryMessage, String firstName, String lastName) {
+        super(recipients, subjectLine, messageTitle, primaryMessage);
         this.firstName = firstName;
         this.lastName = lastName;
     }
