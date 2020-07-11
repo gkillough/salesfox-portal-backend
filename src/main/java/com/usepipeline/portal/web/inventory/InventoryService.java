@@ -61,7 +61,7 @@ public class InventoryService {
         }
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
-        return inventoryRepository.findAccessibleInventoryItems(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), pageRequest);
+        return inventoryRepository.findAccessibleInventories(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), pageRequest);
     }
 
     private InventoryResponseModel convertToResponseModel(InventoryEntity entity) {

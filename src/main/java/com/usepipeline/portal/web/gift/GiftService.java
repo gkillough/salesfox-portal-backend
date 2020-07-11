@@ -4,7 +4,9 @@ import com.usepipeline.portal.common.enumeration.AccessOperation;
 import com.usepipeline.portal.database.account.entity.MembershipEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
 import com.usepipeline.portal.database.catalogue.item.CatalogueItemRepository;
+import com.usepipeline.portal.database.customization.branding_text.CustomBrandingTextEntity;
 import com.usepipeline.portal.database.customization.branding_text.CustomBrandingTextRepository;
+import com.usepipeline.portal.database.customization.icon.CustomIconEntity;
 import com.usepipeline.portal.database.customization.icon.CustomIconRepository;
 import com.usepipeline.portal.database.gift.GiftEntity;
 import com.usepipeline.portal.database.gift.GiftRepository;
@@ -15,6 +17,7 @@ import com.usepipeline.portal.database.gift.item.GiftItemDetailRepository;
 import com.usepipeline.portal.database.gift.note.GiftNoteDetailEntity;
 import com.usepipeline.portal.database.gift.note.GiftNoteDetailRepository;
 import com.usepipeline.portal.database.gift.tracking.GiftTrackingRepository;
+import com.usepipeline.portal.database.note.NoteEntity;
 import com.usepipeline.portal.database.note.NoteRepository;
 import com.usepipeline.portal.database.organization.account.contact.entity.OrganizationAccountContactEntity;
 import com.usepipeline.portal.database.organization.account.contact.repository.OrganizationAccountContactRepository;
@@ -97,8 +100,8 @@ public class GiftService {
     @Transactional
     public GiftResponseModel createDraftGift(DraftGiftRequestModel requestModel) {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        validateRequestModel(loggedInUser, requestModel);
         MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+        validateRequestModel(loggedInUser, userMembership, requestModel);
 
         GiftEntity giftToSave = new GiftEntity(null, userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), requestModel.getContactId());
         GiftEntity savedGift = giftRepository.save(giftToSave);
@@ -115,7 +118,8 @@ public class GiftService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot edit a gift that has been sent");
         }
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        validateRequestModel(loggedInUser, requestModel);
+        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+        validateRequestModel(loggedInUser, userMembership, requestModel);
 
         foundGift.setContactId(requestModel.getContactId());
         saveDetails(foundGift, requestModel);
@@ -154,7 +158,8 @@ public class GiftService {
         return giftRepository.findAllByOrganizationAccountId(userMembership.getOrganizationAccountId(), pageRequest);
     }
 
-    private void validateRequestModel(UserEntity loggedInUser, DraftGiftRequestModel requestModel) {
+    // TODO clean this method up after database is normalized
+    private void validateRequestModel(UserEntity loggedInUser, MembershipEntity userMembership, DraftGiftRequestModel requestModel) {
         List<String> errors = new ArrayList<>();
         if (requestModel.getContactId() == null) {
             errors.add("The request field 'contactId' is required");
@@ -170,26 +175,61 @@ public class GiftService {
         if (requestModel.getNoteId() == null && requestModel.getItemId() == null) {
             errors.add("A gift needs at least one note or one item");
         } else {
-            if (requestModel.getNoteId() != null && !noteRepository.existsById(requestModel.getNoteId())) {
-                errors.add("The noteId provided is invalid");
-            }
+            validateNoteAndItem(errors, loggedInUser, userMembership, requestModel);
+        }
 
-            if (requestModel.getItemId() != null && !catalogueItemRepository.existsById(requestModel.getItemId())) {
-                errors.add("The itemId provided is invalid");
+        if (requestModel.getCustomIconId() != null) {
+            Optional<CustomIconEntity> optionalCustomIcon = customIconRepository.findById(requestModel.getCustomIconId());
+            if (optionalCustomIcon.isPresent()) {
+                CustomIconEntity customIcon = optionalCustomIcon.get();
+                if ((membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember() && !customIcon.getUploaderId().equals(loggedInUser.getUserId()))
+                        || !customIcon.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
+                    errors.add("The customIconId provided is not accessible by the requesting user");
+                }
+            } else {
+                errors.add("The customIconId provided is invalid");
             }
         }
 
-        if (requestModel.getCustomIconId() != null && !customIconRepository.existsById(requestModel.getCustomIconId())) {
-            errors.add("The customIconId provided is invalid");
-        }
-
-        if (requestModel.getCustomTextId() != null && !customBrandingTextRepository.existsById(requestModel.getCustomTextId())) {
-            errors.add("The customTextId provided is invalid");
+        if (requestModel.getCustomTextId() != null) {
+            Optional<CustomBrandingTextEntity> optionalCustomBrandingText = customBrandingTextRepository.findById(requestModel.getCustomTextId());
+            if (optionalCustomBrandingText.isPresent()) {
+                CustomBrandingTextEntity customBrandingText = optionalCustomBrandingText.get();
+                if ((membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember() && !customBrandingText.getUploaderId().equals(loggedInUser.getUserId()))
+                        || !customBrandingText.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
+                    errors.add("The customIconId provided is not accessible by the requesting user");
+                }
+            } else {
+                errors.add("The customTextId provided is invalid");
+            }
         }
 
         if (!errors.isEmpty()) {
             String combinedErrors = String.join(", ", errors);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("There were errors with the request: %s", combinedErrors));
+        }
+    }
+
+    private void validateNoteAndItem(List<String> errors, UserEntity loggedInUser, MembershipEntity userMembership, DraftGiftRequestModel requestModel) {
+        if (requestModel.getNoteId() != null) {
+            Optional<NoteEntity> optionalNote = noteRepository.findById(requestModel.getNoteId());
+            if (optionalNote.isPresent()) {
+                NoteEntity requestedNote = optionalNote.get();
+                if ((membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember() && !requestedNote.getUpdatedByUserId().equals(loggedInUser.getUserId()))
+                        || !requestedNote.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
+                    errors.add("The noteId provided is not accessible by the requesting user");
+                }
+            } else {
+                errors.add("The noteId provided is invalid");
+            }
+        }
+
+        if (requestModel.getItemId() != null) {
+            if (!catalogueItemRepository.existsById(requestModel.getItemId())) {
+                errors.add("The itemId provided is invalid");
+            } else {
+                giftAccessService.validateUserInventoryAccess(loggedInUser, requestModel.getItemId());
+            }
         }
     }
 
