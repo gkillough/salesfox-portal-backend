@@ -259,8 +259,8 @@ public class OrganizationInvitationService {
 
         log.info("*** REMOVE ME *** Invitation Link: {}", invitationUrl);
 
-        String subjectLine = String.format("Invitation to join %s on PIPELINE", organizationAccountName);
-        EmailMessageModel emailMessage = new EmailMessageModel(Collections.singletonList(email), subjectLine, invitationUrl);
+        String subjectLine = String.format("Invitation to join %s on BOOSTR", organizationAccountName);
+        EmailMessageModel emailMessage = new EmailMessageModel(List.of(email), subjectLine, subjectLine, invitationUrl);
         try {
             emailMessagingService.sendMessage(emailMessage);
         } catch (PortalEmailException e) {

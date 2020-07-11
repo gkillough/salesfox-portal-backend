@@ -43,6 +43,7 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.8'
     implementation 'javax.mail:javax.mail-api:1.6.2'
     runtimeOnly 'com.sun.mail:javax.mail:1.6.2'
+    runtimeOnly 'org.freemarker:freemarker:2.3.30'
 
     // Extras TODO determine which of these can be removed
     implementation 'io.springfox:springfox-swagger2:2.8.0'

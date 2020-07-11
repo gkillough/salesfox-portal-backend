@@ -6,10 +6,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.*;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import javax.mail.internet.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,10 +18,12 @@ import java.util.List;
 @Component
 public class EmailMessagingService {
     private EmailConfiguration emailConfiguration;
+    private EmailHtmlMessageCreator emailHtmlMessageCreator;
 
     @Autowired
-    public EmailMessagingService(EmailConfiguration emailConfiguration) {
+    public EmailMessagingService(EmailConfiguration emailConfiguration, EmailHtmlMessageCreator emailHtmlMessageCreator) {
         this.emailConfiguration = emailConfiguration;
+        this.emailHtmlMessageCreator = emailHtmlMessageCreator;
     }
 
     public void sendMessage(EmailMessageModel emailMessageModel) throws PortalEmailException {
@@ -46,6 +49,9 @@ public class EmailMessagingService {
         if (StringUtils.isBlank(emailMessageModel.getSubjectLine())) {
             throw new PortalEmailException("Cannot send an email with a blank subject line");
         }
+        if (StringUtils.isBlank(emailMessageModel.getMessageTitle())) {
+            throw new PortalEmailException("Cannot send an email with a blank title");
+        }
         if (StringUtils.isBlank(emailMessageModel.getPrimaryMessage())) {
             throw new PortalEmailException("Cannot send an email with a blank message");
         }
@@ -59,23 +65,27 @@ public class EmailMessagingService {
         mimeMessage.setSubject(emailMessageModel.getSubjectLine());
         mimeMessage.setFrom(emailConfiguration.getSmtpFrom());
 
-        String htmlMessage = createHtmlMessage(emailMessageModel);
-        mimeMessage.setContent(htmlMessage, "text/html");
-
         Address[] wrappedAddresses = createAddresses(emailMessageModel.getRecipients());
         mimeMessage.setRecipients(Message.RecipientType.TO, wrappedAddresses);
 
+        MimeMultipart mimeMultipart = new MimeMultipart();
+
+        // Message Body
+        String htmlMessage = emailHtmlMessageCreator.createHtmlMessage(EmailHtmlMessageCreator.DEFAULT_EMAIL_TEMPLATE_NAME, emailMessageModel);
+        BodyPart htmlBodyPart = new MimeBodyPart();
+        htmlBodyPart.setContent(htmlMessage, "text/html");
+        mimeMultipart.addBodyPart(htmlBodyPart);
+
+        // Image attachment
+        BodyPart imageBodyPart = new MimeBodyPart();
+        DataSource imageDataSource = new FileDataSource(emailConfiguration.getLogoPng());
+        DataHandler imageDataHandler = new DataHandler(imageDataSource);
+        imageBodyPart.setDataHandler(imageDataHandler);
+        imageBodyPart.setHeader("Content-ID", "<logoImage>");
+        mimeMultipart.addBodyPart(imageBodyPart);
+
+        mimeMessage.setContent(mimeMultipart);
         return mimeMessage;
-    }
-
-    // TODO abstract this into its own utility when full build-out is completed
-    private String createHtmlMessage(EmailMessageModel emailMessageModel) {
-        StringBuilder htmlBuilder = new StringBuilder();
-        htmlBuilder.append("<p>");
-        htmlBuilder.append(emailMessageModel.getPrimaryMessage());
-        htmlBuilder.append("</p>");
-
-        return htmlBuilder.toString();
     }
 
     private Address[] createAddresses(List<String> recipients) throws PortalEmailException, AddressException {
