@@ -32,6 +32,11 @@ public class ContactController {
         return contactService.getContacts(active, offset, limit);
     }
 
+    @GetMapping
+    public ContactResponseModel getContact(@PathVariable UUID contactId) {
+        return contactService.getContact(contactId);
+    }
+
     @PostMapping
     public void createContact(@RequestBody ContactUploadModel requestModel) {
         contactService.createContact(requestModel);

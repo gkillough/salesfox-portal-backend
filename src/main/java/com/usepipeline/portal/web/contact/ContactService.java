@@ -82,7 +82,7 @@ public class ContactService {
         List<OrganizationAccountContactAddressEntity> contactAddresses = contactAddressRepository.findAllByContactId(contactIds);
         Map<UUID, OrganizationAccountContactAddressEntity> contactIdToAddresses = createContactableIdMap(contactAddresses);
 
-        List<ContactModel> contactModels = new ArrayList<>();
+        List<ContactResponseModel> contactModels = new ArrayList<>();
         for (OrganizationAccountContactEntity contact : accessibleContacts) {
             OrganizationAccountContactProfileEntity profile = contactIdToProfile.get(contact.getContactId());
             OrganizationAccountContactInteractionsEntity interactions = contactIdToInteractions.get(contact.getContactId());
@@ -91,12 +91,43 @@ public class ContactService {
             OrganizationAccountContactAddressEntity contactAddressEntity = contactIdToAddresses.get(contact.getContactId());
             PortalAddressModel contactAddressModel = PortalAddressModel.fromEntity(contactAddressEntity);
 
-            ContactModel contactModel = new ContactModel(
-                    contact.getContactId(), contact.getFirstName(), contact.getLastName(), contactAddressModel, profile.getContactOrganizationName(), profile.getTitle(), interactions.getContactInitiations(), interactions.getEngagementsGenerated(), nullablePointOfContact);
+            ContactResponseModel contactModel = new ContactResponseModel(
+                    contact.getContactId(), contact.getFirstName(), contact.getLastName(), contact.getEmail(),
+                    profile.getMobileNumber(), profile.getBusinessNumber(), contactAddressModel, profile.getContactOrganizationName(), profile.getTitle(),
+                    interactions.getContactInitiations(), interactions.getEngagementsGenerated(), nullablePointOfContact);
             contactModels.add(contactModel);
         }
 
         return new MultiContactModel(contactModels, accessibleContacts);
+    }
+
+    public ContactResponseModel getContact(UUID contactId) {
+        OrganizationAccountContactEntity foundContact = contactRepository.findById(contactId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        boolean canUserUpdateContact = contactAccessOperationUtility.canUserAccessContact(loggedInUser, foundContact, AccessOperation.UPDATE);
+        if (!canUserUpdateContact) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        Function<String, ResponseStatusException> exceptionFunction = repositoryName -> {
+            log.error("Cannot find {} for contact with id [{}]", repositoryName, contactId);
+            return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        };
+        OrganizationAccountContactProfileEntity profile = contactProfileRepository.findByContactId(contactId)
+                .orElseThrow(() -> exceptionFunction.apply("profile"));
+
+        PointOfContactUserModel nullablePointOfContact = retrievePointOfContactIfExists(profile.getOrganizationPointOfContactUserId());
+        OrganizationAccountContactInteractionsEntity interactions = contactInteractionsRepository.findById(contactId)
+                .orElseThrow(() -> exceptionFunction.apply("interactions"));
+
+        OrganizationAccountContactAddressEntity contactAddressEntity = contactAddressRepository.findByContactId(contactId)
+                .orElseThrow(() -> exceptionFunction.apply("address"));
+        PortalAddressModel contactAddressModel = PortalAddressModel.fromEntity(contactAddressEntity);
+
+        return new ContactResponseModel(foundContact.getContactId(), foundContact.getFirstName(), foundContact.getLastName(), foundContact.getEmail(),
+                profile.getMobileNumber(), profile.getBusinessNumber(), contactAddressModel, profile.getContactOrganizationName(), profile.getTitle(),
+                interactions.getContactInitiations(), interactions.getEngagementsGenerated(), nullablePointOfContact);
     }
 
     @Transactional
