@@ -12,13 +12,13 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class MultiContactModel extends PagedResponseModel {
-    private List<ContactModel> contacts;
+    private List<ContactResponseModel> contacts;
 
     public static MultiContactModel empty() {
         return new MultiContactModel(List.of(), Page.empty());
     }
 
-    public MultiContactModel(List<ContactModel> contacts, Page<?> page) {
+    public MultiContactModel(List<ContactResponseModel> contacts, Page<?> page) {
         super(page);
         this.contacts = contacts;
     }
