@@ -1,6 +1,7 @@
 package com.usepipeline.portal.web.contact;
 
 import com.usepipeline.portal.common.enumeration.AccessOperation;
+import com.usepipeline.portal.common.model.PortalAddressModel;
 import com.usepipeline.portal.common.service.contact.ContactAccessOperationUtility;
 import com.usepipeline.portal.common.service.contact.ContactFieldValidationUtils;
 import com.usepipeline.portal.database.account.entity.MembershipEntity;
@@ -78,14 +79,20 @@ public class ContactService {
         List<OrganizationAccountContactInteractionsEntity> contactInteractions = contactInteractionsRepository.findAllById(contactIds);
         Map<UUID, OrganizationAccountContactInteractionsEntity> contactIdToInteractions = createContactableIdMap(contactInteractions);
 
+        List<OrganizationAccountContactAddressEntity> contactAddresses = contactAddressRepository.findAllByContactId(contactIds);
+        Map<UUID, OrganizationAccountContactAddressEntity> contactIdToAddresses = createContactableIdMap(contactAddresses);
+
         List<ContactModel> contactModels = new ArrayList<>();
         for (OrganizationAccountContactEntity contact : accessibleContacts) {
             OrganizationAccountContactProfileEntity profile = contactIdToProfile.get(contact.getContactId());
             OrganizationAccountContactInteractionsEntity interactions = contactIdToInteractions.get(contact.getContactId());
             PointOfContactUserModel nullablePointOfContact = retrievePointOfContactIfExists(profile.getOrganizationPointOfContactUserId());
 
+            OrganizationAccountContactAddressEntity contactAddressEntity = contactIdToAddresses.get(contact.getContactId());
+            PortalAddressModel contactAddressModel = PortalAddressModel.fromEntity(contactAddressEntity);
+
             ContactModel contactModel = new ContactModel(
-                    contact.getContactId(), contact.getFirstName(), contact.getLastName(), profile.getContactOrganizationName(), profile.getTitle(), interactions.getContactInitiations(), interactions.getEngagementsGenerated(), nullablePointOfContact);
+                    contact.getContactId(), contact.getFirstName(), contact.getLastName(), contactAddressModel, profile.getContactOrganizationName(), profile.getTitle(), interactions.getContactInitiations(), interactions.getEngagementsGenerated(), nullablePointOfContact);
             contactModels.add(contactModel);
         }
 
