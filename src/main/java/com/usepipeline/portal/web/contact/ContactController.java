@@ -32,7 +32,7 @@ public class ContactController {
         return contactService.getContacts(active, offset, limit);
     }
 
-    @GetMapping
+    @GetMapping("/{contactId}")
     public ContactResponseModel getContact(@PathVariable UUID contactId) {
         return contactService.getContact(contactId);
     }

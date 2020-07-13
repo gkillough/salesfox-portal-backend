@@ -13,6 +13,6 @@ import java.util.UUID;
 public interface OrganizationAccountContactAddressRepository extends JpaRepository<OrganizationAccountContactAddressEntity, UUID> {
     Optional<OrganizationAccountContactAddressEntity> findByContactId(UUID contactId);
 
-    List<OrganizationAccountContactAddressEntity> findAllByContactId(Collection<UUID> contactId);
+    List<OrganizationAccountContactAddressEntity> findAllByContactIdIn(Collection<UUID> contactId);
 
 }

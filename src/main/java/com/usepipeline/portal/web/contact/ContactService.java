@@ -79,7 +79,7 @@ public class ContactService {
         List<OrganizationAccountContactInteractionsEntity> contactInteractions = contactInteractionsRepository.findAllById(contactIds);
         Map<UUID, OrganizationAccountContactInteractionsEntity> contactIdToInteractions = createContactableIdMap(contactInteractions);
 
-        List<OrganizationAccountContactAddressEntity> contactAddresses = contactAddressRepository.findAllByContactId(contactIds);
+        List<OrganizationAccountContactAddressEntity> contactAddresses = contactAddressRepository.findAllByContactIdIn(contactIds);
         Map<UUID, OrganizationAccountContactAddressEntity> contactIdToAddresses = createContactableIdMap(contactAddresses);
 
         List<ContactResponseModel> contactModels = new ArrayList<>();
@@ -105,7 +105,7 @@ public class ContactService {
         OrganizationAccountContactEntity foundContact = contactRepository.findById(contactId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        boolean canUserUpdateContact = contactAccessOperationUtility.canUserAccessContact(loggedInUser, foundContact, AccessOperation.UPDATE);
+        boolean canUserUpdateContact = contactAccessOperationUtility.canUserAccessContact(loggedInUser, foundContact, AccessOperation.READ);
         if (!canUserUpdateContact) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
