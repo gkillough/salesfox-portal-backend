@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
@@ -26,6 +26,6 @@ public class OrganizationAccountInviteTokenEntity {
     @Column(name = "role_level")
     private String roleLevel;
     @Column(name = "date_generated")
-    private LocalDateTime dateGenerated;
+    private OffsetDateTime dateGenerated;
 
 }

@@ -1,5 +1,6 @@
 package com.usepipeline.portal.web.security.authentication.user;
 
+import com.usepipeline.portal.common.time.PortalDateTimeUtils;
 import com.usepipeline.portal.database.account.entity.LoginEntity;
 import com.usepipeline.portal.database.account.entity.MembershipEntity;
 import com.usepipeline.portal.database.account.entity.RoleEntity;
@@ -16,7 +17,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 
 @Component
@@ -58,9 +59,9 @@ public class PortalUserDetailsService implements UserDetailsService {
     }
 
     public boolean isUserLocked(LoginEntity userLogin) {
-        LocalDateTime lastLockedTime = userLogin.getLastLocked();
+        OffsetDateTime lastLockedTime = userLogin.getLastLocked();
         if (lastLockedTime != null) {
-            Duration timeSinceLocked = Duration.between(lastLockedTime, LocalDateTime.now());
+            Duration timeSinceLocked = Duration.between(lastLockedTime, PortalDateTimeUtils.getCurrentDateTimeUTC());
             if (timeSinceLocked.compareTo(PortalUserLoginAttemptService.DURATION_UNTIL_ACCOUNT_UNLOCKED) < 0) {
                 // If the time since the account was locked is strictly less than the time needed to unlock the account, then the account is still locked.
                 return true;

@@ -4,6 +4,7 @@ import com.usepipeline.portal.PortalConfiguration;
 import com.usepipeline.portal.common.service.email.EmailMessagingService;
 import com.usepipeline.portal.common.service.email.PortalEmailException;
 import com.usepipeline.portal.common.service.email.model.EmailMessageModel;
+import com.usepipeline.portal.common.time.PortalDateTimeUtils;
 import com.usepipeline.portal.database.account.entity.LoginEntity;
 import com.usepipeline.portal.database.account.entity.PasswordResetTokenEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -74,7 +75,7 @@ public class PasswordService {
         }
 
         String passwordResetToken = UUID.randomUUID().toString();
-        PasswordResetTokenEntity passwordResetTokenToSave = new PasswordResetTokenEntity(email, passwordResetToken, LocalDateTime.now());
+        PasswordResetTokenEntity passwordResetTokenToSave = new PasswordResetTokenEntity(email, passwordResetToken, PortalDateTimeUtils.getCurrentDateTimeUTC());
         passwordResetTokenRepository.save(passwordResetTokenToSave);
 
         return sendPasswordResetEmail(email, passwordResetToken);
@@ -91,11 +92,11 @@ public class PasswordService {
             return false;
         }
         PasswordResetTokenPK passwordResetTokenPK = new PasswordResetTokenPK(email, token);
-        Optional<LocalDateTime> optionalTimeGenerated = passwordResetTokenRepository.findById(passwordResetTokenPK)
+        Optional<OffsetDateTime> optionalTimeGenerated = passwordResetTokenRepository.findById(passwordResetTokenPK)
                 .map(PasswordResetTokenEntity::getDateGenerated);
 
         if (optionalTimeGenerated.isPresent()) {
-            Duration timeSinceTokenGenerated = Duration.between(optionalTimeGenerated.get(), LocalDateTime.now());
+            Duration timeSinceTokenGenerated = Duration.between(optionalTimeGenerated.get(), PortalDateTimeUtils.getCurrentDateTimeUTC());
             if (timeSinceTokenGenerated.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
                 grantResetPasswordAuthorityToUser(email);
                 response.setHeader("Location", PasswordController.UPDATE_ENDPOINT);
