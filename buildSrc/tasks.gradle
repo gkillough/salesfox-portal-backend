@@ -1,0 +1,3 @@
+task runServer(type: com.usepipeline.portal.build.RunServerTask, dependsOn: [build]) {
+    postgresVersion = project.ext.postgresContainerVersion
+}
