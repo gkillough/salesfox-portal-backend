@@ -1,5 +1,6 @@
 package com.usepipeline.portal.web.security.authentication.user;
 
+import com.usepipeline.portal.common.time.PortalDateTimeUtils;
 import com.usepipeline.portal.database.account.entity.LoginEntity;
 import com.usepipeline.portal.database.account.entity.UserEntity;
 import com.usepipeline.portal.database.account.repository.LoginRepository;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Component
@@ -37,7 +37,7 @@ public class PortalUserLoginAttemptService {
             if (numFailedLogins % MAX_LOGIN_ATTEMPTS == 0) {
                 // Set last locked time only when they reach exactly the max number of attempts
                 log.warn("Maximum login attempts reached for user [{}]. Locking account.", username);
-                userLogin.setLastLocked(LocalDateTime.now());
+                userLogin.setLastLocked(PortalDateTimeUtils.getCurrentDateTimeUTC());
             }
 
             loginRepository.save(userLogin);
@@ -50,7 +50,7 @@ public class PortalUserLoginAttemptService {
             LoginEntity userLogin = optionalLogin.get();
             userLogin.setNumFailedLogins(0);
             userLogin.setLastLocked(null);
-            userLogin.setLastSuccessfulLogin(LocalDateTime.now());
+            userLogin.setLastSuccessfulLogin(PortalDateTimeUtils.getCurrentDateTimeUTC());
 
             loginRepository.save(userLogin);
             log.info("Login attempts have been reset for user [{}]", username);

@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
@@ -28,10 +28,10 @@ public class LoginEntity implements Serializable {
     private String passwordHash;
 
     @Column(name = "last_successful_login")
-    private LocalDateTime lastSuccessfulLogin;
+    private OffsetDateTime lastSuccessfulLogin;
 
     @Column(name = "last_locked")
-    private LocalDateTime lastLocked;
+    private OffsetDateTime lastLocked;
 
     @Column(name = "num_failed_logins")
     private Integer numFailedLogins;
