@@ -69,18 +69,26 @@ public class RunServerTask extends Exec {
     public List<String> getApplicationVariables() {
         return List.of(
             "--server.port=8080",
-
-            "--hibernate.default_schema=portal",
             "--spring.jpa.hibernate.ddl-auto=none",
             "--spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect",
-            "--spring.datasource.username=root",
-            "--spring.datasource.password=root",
-            "--spring.datasource.driver-class-name=org.testcontainers.jdbc.ContainerDatabaseDriver",
-            String.format("--spring.datasource.url=jdbc:tc:postgresql:%s:///pipeline?TC_INITSCRIPT=file:src/test/resources/testDatabase/init_test_db.sql&TC_TMPFS=/testtmpfs:rw&TC_REUSABLE=%s",
-                postgresVersion, reuseContainer),
-            String.format("--spring.datasource.hikari.jdbc-url=jdbc:tc:postgresql:%s:///pipeline?TC_INITSCRIPT=file:src/test/resources/testDatabase/init_test_db.sql&TC_TMPFS=/testtmpfs:rw&TC_REUSABLE=%s",
-                postgresVersion, reuseContainer),
-            "--spring.test.database.replace=none"
+
+            // https://github.com/testcontainers/testcontainers-spring-boot
+            "--embedded.postgresql.enabled=true",
+            "--embedded.postgresql.dockerImage=postgres:" + postgresVersion,
+            "--embedded.postgresql.reuseContainer=" + reuseContainer,
+            "--embedded.postgresql.waitTimeoutInSeconds=20",
+            "--embedded.containers.forceShutdown=true",
+
+            "--embedded.postgresql.schema=portal",
+            "--embedded.postgresql.user=root",
+            "--embedded.postgresql.password=root",
+            "--embedded.postgresql.initScriptPath=file:src/test/resources/testDatabase/init_test_db.sql",
+
+            "--hibernate.default_schema=${embedded.postgresql.schema=portal}",
+            "--spring.datasource.username=${embedded.postgresql.user}",
+            "--spring.datasource.password=${embedded.postgresql.password}",
+            "--spring.datasource.url=jdbc:postgresql://${embedded.postgresql.host}:${embedded.postgresql.port}/pipeline",
+            "--spring.datasource.hikari.jdbc-url=jdbc:postgresql://${embedded.postgresql.host}:${embedded.postgresql.port}/pipeline"
         );
     }
 
