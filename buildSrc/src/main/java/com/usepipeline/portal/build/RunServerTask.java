@@ -6,7 +6,9 @@ import org.gradle.api.tasks.options.Option;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RunServerTask extends Exec {
     private boolean suspend = false;
@@ -32,6 +34,14 @@ public class RunServerTask extends Exec {
         if (null == postgresVersion || postgresVersion.trim().length() == 0) {
             throw new RuntimeException("You must specify a Postgres version to run with.");
         }
+
+        Map<String, String> envVars = new HashMap<>();
+        String projectPath = getProject().getPath();
+        envVars.put("PORTAL_RESOURCE_BASE_DIR", String.format("%s/src/main/resources/build/tmp", projectPath));
+        envVars.put("PORTAL_RESOURCE_ICON_DIR", String.format("%s/src/main/resources/build/tmp", projectPath));
+        envVars.put("PORTAL_RESOURCE_LOGO_PNG", String.format("%s/src/main/resources/images/boostr_logo.png", projectPath));
+        envVars.put("PORTAL_RESOURCE_LOGO_SVG", String.format("%s/src/main/resources/images/boostr_logo.png", projectPath));
+        getEnvironment().putAll(envVars);
 
         Project project = getProject();
         String buildDirectory = project.getBuildDir().getAbsolutePath();
