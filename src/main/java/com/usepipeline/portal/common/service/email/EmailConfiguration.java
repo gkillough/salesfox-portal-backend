@@ -44,10 +44,10 @@ public class EmailConfiguration {
     @Value("${mail.smtp.connectiontimeout:300000}")
     private Integer smtpConnectionTimeout;
 
-    @Value("classpath:/images/boostr_logo.png")
+    @Value("file:${com.usepipeline.portal.resource.logo.png}")
     private File logoPng;
 
-    @Value("classpath:/images/boostr_logo.svg")
+    @Value("file:${com.usepipeline.portal.resource.logo.svg}")
     private File logoSvg;
 
     public Properties getSmtpProperties() {
