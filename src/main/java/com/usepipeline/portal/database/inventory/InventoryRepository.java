@@ -17,7 +17,7 @@ public interface InventoryRepository extends JpaRepository<InventoryEntity, UUID
             "   inventory.userId IS NULL" +
             "   OR inventory.userId = :userId" +
             " )" +
-            " OR inventory.organizationAccountId = :orgAcctId"
+            " AND inventory.organizationAccountId = :orgAcctId"
     )
     Page<InventoryEntity> findAccessibleInventories(@Param("orgAcctId") UUID orgAcctId, @Param("userId") UUID userId, Pageable pageable);
 

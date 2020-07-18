@@ -59,6 +59,7 @@ public class InventoryService {
         if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
             return inventoryRepository.findAll(pageRequest);
         }
+
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
         return inventoryRepository.findAccessibleInventories(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), pageRequest);
