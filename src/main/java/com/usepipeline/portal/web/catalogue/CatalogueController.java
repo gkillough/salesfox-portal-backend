@@ -31,7 +31,7 @@ public class CatalogueController {
     }
 
     @GetMapping("/{itemId}")
-    public Object getItem(@PathVariable UUID itemId) {
+    public CatalogueItemResponseModel getItem(@PathVariable UUID itemId) {
         return catalogueService.getItem(itemId);
     }
 
