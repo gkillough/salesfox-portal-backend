@@ -3,7 +3,280 @@ databaseChangeLog:
       id: create-contact-tables-1
       author: gavinkillough
       changes:
-        - sqlFile:
-            dbms: postgresql
-            relativeToChangelogFile: true
-            path: sql/create_organization_contact_tables.sql
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: organization_account_contact_addresses_pkey
+                  defaultValueComputed: uuid_generate_v4()
+                  name: address_id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: contact_id
+                  type: UUID
+              - column:
+                  name: street_number
+                  type: INTEGER
+              - column:
+                  name: street_name
+                  type: VARCHAR
+              - column:
+                  name: apt_suite
+                  type: VARCHAR
+              - column:
+                  name: city
+                  type: VARCHAR
+              - column:
+                  name: state
+                  type: VARCHAR(2)
+              - column:
+                  name: zip_code
+                  type: VARCHAR(10)
+              - column:
+                  name: is_business
+                  type: BOOLEAN
+            schemaName: portal
+            tableName: organization_account_contact_addresses
+
+  - changeSet:
+      id: create-contact-tables-2
+      author: gavinkillough
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: organization_account_contact_interactions_pkey
+                  name: contact_id
+                  type: UUID
+              - column:
+                  defaultValueNumeric: 0
+                  name: contact_initiations
+                  type: BIGINT
+              - column:
+                  defaultValueNumeric: 0
+                  name: engagements_generated
+                  type: BIGINT
+            schemaName: portal
+            tableName: organization_account_contact_interactions
+
+  - changeSet:
+      id: create-contact-tables-3
+      author: gavinkillough
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: organization_account_contacts_pkey
+                  defaultValueComputed: uuid_generate_v4()
+                  name: contact_id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: organization_account_id
+                  type: UUID
+              - column:
+                  name: first_name
+                  type: VARCHAR
+              - column:
+                  name: last_name
+                  type: VARCHAR
+              - column:
+                  name: email
+                  type: VARCHAR
+              - column:
+                  defaultValueBoolean: true
+                  name: is_active
+                  type: BOOLEAN
+            schemaName: portal
+            tableName: organization_account_contacts
+
+  - changeSet:
+      id: create-contact-tables-4
+      author: gavinkillough
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: organization_account_contact_profiles_pkey
+                  defaultValueComputed: uuid_generate_v4()
+                  name: profile_id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: contact_id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: contact_address_id
+                  type: UUID
+              - column:
+                  name: organization_point_of_contact_user_id
+                  type: UUID
+              - column:
+                  name: contact_organization_name
+                  type: VARCHAR
+              - column:
+                  name: title
+                  type: VARCHAR
+              - column:
+                  name: business_number
+                  type: VARCHAR
+              - column:
+                  name: mobile_number
+                  type: VARCHAR
+            schemaName: portal
+            tableName: organization_account_contact_profiles
+
+  - changeSet:
+      id: create-contact-tables-5
+      author: gavinkillough
+      changes:
+        - addUniqueConstraint:
+            columnNames: contact_id
+            constraintName: organization_account_contact_addresses_contact_id_key
+            schemaName: portal
+            tableName: organization_account_contact_addresses
+
+  - changeSet:
+      id: create-contact-tables-6
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: contact_address_id
+            baseTableName: organization_account_contact_profiles
+            baseTableSchemaName: portal
+            constraintName: organization_account_contact_profiles_contact_address_id_fk
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: address_id
+            referencedTableName: organization_account_contact_addresses
+            referencedTableSchemaName: portal
+            validate: true
+
+  - changeSet:
+      id: create-contact-tables-7
+      author: gavinkillough
+      changes:
+        - addUniqueConstraint:
+            columnNames: contact_address_id
+            constraintName: organization_account_contact_profiles_contact_address_id_key
+            schemaName: portal
+            tableName: organization_account_contact_profiles
+
+  - changeSet:
+      id: create-contact-tables-8
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: contact_id
+            baseTableName: organization_account_contact_profiles
+            baseTableSchemaName: portal
+            constraintName: organization_account_contact_profiles_contact_id_fk
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: contact_id
+            referencedTableName: organization_account_contacts
+            referencedTableSchemaName: portal
+            validate: true
+
+  - changeSet:
+      id: create-contact-tables-9
+      author: gavinkillough
+      changes:
+        - addUniqueConstraint:
+            columnNames: contact_id
+            constraintName: organization_account_contact_profiles_contact_id_key
+            schemaName: portal
+            tableName: organization_account_contact_profiles
+
+  - changeSet:
+      id: create-contact-tables-10
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: organization_point_of_contact_user_id
+            baseTableName: organization_account_contact_profiles
+            baseTableSchemaName: portal
+            constraintName: organization_account_contact_profiles_organization_point_of_con
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: user_id
+            referencedTableName: users
+            referencedTableSchemaName: portal
+            validate: true
+
+  - changeSet:
+      id: create-contact-tables-11
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: contact_id
+            baseTableName: organization_account_contact_addresses
+            baseTableSchemaName: portal
+            constraintName: organization_account_contact_addresses_contact_id_fk
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: contact_id
+            referencedTableName: organization_account_contacts
+            referencedTableSchemaName: portal
+            validate: true
+
+  - changeSet:
+      id: create-contact-tables-12
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: contact_id
+            baseTableName: organization_account_contact_interactions
+            baseTableSchemaName: portal
+            constraintName: client_interaction_organization_account_contact_id_fk
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: contact_id
+            referencedTableName: organization_account_contacts
+            referencedTableSchemaName: portal
+            validate: true
+
+  - changeSet:
+      id: create-contact-tables-13
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: organization_account_id
+            baseTableName: organization_account_contacts
+            baseTableSchemaName: portal
+            constraintName: organization_account_contacts_organization_account_id_fk
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: organization_account_id
+            referencedTableName: organization_accounts
+            referencedTableSchemaName: portal
+            validate: true
