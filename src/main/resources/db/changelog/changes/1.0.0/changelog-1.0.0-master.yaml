@@ -1,42 +1,42 @@
 databaseChangeLog:
   - include:
-      file: change_create_portal_schema_2_19_2020.yaml
+      file: create_portal_schema.yaml
       relativeToChangelogFile: true
 
   - include:
-      file: changelog_create_uuid_extension_5_19_2020.yaml
+      file: create_uuid_extension.yaml
       relativeToChangelogFile: true
 
   - include:
-      file: change_create_auth_tables_2_19_2020.yaml
+      file: create_auth_tables.yaml
       relativeToChangelogFile: true
 
   - include:
-      file: change_create_auth_stored_procedures_2_24_2020.yaml
+      file: create_auth_stored_procedures.yaml
       relativeToChangelogFile: true
 
   - include:
-      file: change_insert_default_organization_accounts_2_23_2020.yaml
+      file: insert_default_organization_accounts.yaml
       relativeToChangelogFile: true
 
   - include:
-      file: change_create_organization_account_profiles_table_3_31_2020.yaml
+      file: create_organization_account_profiles_table.yaml
       relativeToChangelogFile: true
 
   - include:
-      file: change_add_organization_roles_4_1_2020.yaml
+      file: add_organization_roles.yaml
       relativeToChangelogFile: true
 
   - include:
-      file: change_create_organization_account_invite_token_table_4_6_2020.yaml
+      file: create_organization_account_invite_token_table.yaml
       relativeToChangelogFile: true
 
   - include:
-      file: change_create_contact_tables_5_3_2020.yaml
+      file: create_contact_tables.yaml
       relativeToChangelogFile: true
 
   - include:
-      file: change_create_contact_stored_procedures.yaml
+      file: create_contact_stored_procedures.yaml
       relativeToChangelogFile: true
 
   - include:

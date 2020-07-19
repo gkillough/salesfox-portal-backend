@@ -1,0 +1,64 @@
+databaseChangeLog:
+    - changeSet:
+        id: create-org-acct-profiles-tables-1
+        author: gavinkillough
+        changes:
+        - createTable:
+            columns:
+            - column:
+                constraints:
+                  nullable: false
+                  primaryKey: true
+                  primaryKeyName: organization_account_profiles_pkey
+                defaultValueComputed: uuid_generate_v4()
+                name: profile_id
+                type: UUID
+            - column:
+                constraints:
+                  nullable: false
+                name: organization_account_id
+                type: UUID
+            - column:
+                constraints:
+                  nullable: false
+                name: mailing_address_id
+                type: UUID
+            - column:
+                name: business_number
+                type: VARCHAR
+            tableName: organization_account_profiles
+            schemaName: portal
+    - changeSet:
+        id: create-org-acct-profiles-tables-2
+        author: gavinkillough
+        changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: mailing_address_id
+            baseTableName: organization_account_profiles
+            baseTableSchemaName: portal
+            constraintName: organization_account_profiles_mailing_address_id_fk
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: organization_account_address_id
+            referencedTableName: organization_account_addresses
+            referencedTableSchemaName: portal
+            validate: true
+    - changeSet:
+        id: create-org-acct-profiles-tables-3
+        author: gavinkillough
+        changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: organization_account_id
+            baseTableName: organization_account_profiles
+            baseTableSchemaName: portal
+            constraintName: organization_account_profile_organization_account_id_fk
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedColumnNames: organization_account_id
+            referencedTableName: organization_accounts
+            referencedTableSchemaName: portal
+            validate: true
