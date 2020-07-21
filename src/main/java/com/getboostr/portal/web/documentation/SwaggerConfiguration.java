@@ -21,7 +21,7 @@ public class SwaggerConfiguration implements AdminOnlyAccessible {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.usepipeline.portal.web"))
+                .apis(RequestHandlerSelectors.basePackage("com.getboostr.portal.web"))
                 .build()
                 .produces(Set.of("application/json"))
                 .consumes(Set.of("application/json"))
@@ -31,7 +31,7 @@ public class SwaggerConfiguration implements AdminOnlyAccessible {
 
     private ApiInfo apiEndPointsInfo() {
         return new ApiInfoBuilder()
-                .title("Use Pipeline Portal - REST API")
+                .title("Boostr Portal - REST API")
                 .build();
     }
 
