@@ -97,8 +97,8 @@ public class RunServerTask extends Exec {
             "--hibernate.default_schema=${embedded.postgresql.schema=portal}",
             "--spring.datasource.username=${embedded.postgresql.user}",
             "--spring.datasource.password=${embedded.postgresql.password}",
-            "--spring.datasource.url=jdbc:postgresql://${embedded.postgresql.host}:${embedded.postgresql.port}/pipeline",
-            "--spring.datasource.hikari.jdbc-url=jdbc:postgresql://${embedded.postgresql.host}:${embedded.postgresql.port}/pipeline"
+            "--spring.datasource.url=jdbc:postgresql://${embedded.postgresql.host}:${embedded.postgresql.port}/boostr",
+            "--spring.datasource.hikari.jdbc-url=jdbc:postgresql://${embedded.postgresql.host}:${embedded.postgresql.port}/boostr"
         );
     }
 

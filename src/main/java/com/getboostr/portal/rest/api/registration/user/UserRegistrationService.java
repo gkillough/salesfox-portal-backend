@@ -69,10 +69,10 @@ public class UserRegistrationService {
      */
     @Transactional
     public UUID registerUser(UserRegistrationModel registrationModel) {
-        UUID defaultPipelineOrganizationId = organizationRepository.findFirstByOrganizationName(OrganizationConstants.PLAN_BOOSTR_BASIC_OR_PREMIUM_DEFAULT_ORG_NAME)
+        UUID defaultOrganizationId = organizationRepository.findFirstByOrganizationName(OrganizationConstants.PLAN_BOOSTR_BASIC_OR_PREMIUM_DEFAULT_ORG_NAME)
                 .map(OrganizationEntity::getOrganizationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
-        return registerOrganizationUser(registrationModel, defaultPipelineOrganizationId, null);
+        return registerOrganizationUser(registrationModel, defaultOrganizationId, null);
     }
 
     /**

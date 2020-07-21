@@ -194,7 +194,7 @@ public class InventoryOrderService {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
         String roleLevel = membershipRetrievalService.getRoleEntity(userMembership).getRoleLevel();
-        if (isPipelineIndividual(roleLevel)) {
+        if (isPortalIndividualAccount(roleLevel)) {
             return orderRequestRepository.findByOrganizationAccountIdAndRequestingUserId(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), pageRequest);
         }
         return orderRequestRepository.findByOrganizationAccountId(userMembership.getOrganizationAccountId(), pageRequest);
@@ -208,7 +208,7 @@ public class InventoryOrderService {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
         String roleLevel = membershipRetrievalService.getRoleEntity(userMembership).getRoleLevel();
-        if (isPipelineIndividual(roleLevel)) {
+        if (isPortalIndividualAccount(roleLevel)) {
             if (loggedInUser.getUserId().equals(order.getRequestingUserId())) {
                 return;
             }
@@ -232,7 +232,7 @@ public class InventoryOrderService {
             return;
         }
 
-        boolean hasIndividualMembership = isPipelineIndividual(loggedInUserRoleLevel);
+        boolean hasIndividualMembership = isPortalIndividualAccount(loggedInUserRoleLevel);
         boolean hasOrganizationManagementMembership = PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER.equals(loggedInUserRoleLevel) || PortalAuthorityConstants.ORGANIZATION_ACCOUNT_MANAGER.equals(loggedInUserRoleLevel);
         if (!hasIndividualMembership && !hasOrganizationManagementMembership) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -255,7 +255,7 @@ public class InventoryOrderService {
         }
     }
 
-    private boolean isPipelineIndividual(String roleLevel) {
+    private boolean isPortalIndividualAccount(String roleLevel) {
         return PortalAuthorityConstants.PORTAL_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(roleLevel);
     }
 

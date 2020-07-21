@@ -44,7 +44,7 @@ public class UserAccessService {
                     // If the logged in user is the requested user, grant access.
                     return true;
                 } else {
-                    // If the logged in user is a pipeline admin, grant access.
+                    // If the logged in user is a portal admin, grant access.
                     return userDetails.getAuthorities()
                             .stream()
                             .map(GrantedAuthority::getAuthority)

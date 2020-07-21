@@ -15,7 +15,7 @@ public class DefaultLocationsController implements AnonymouslyAccessible {
     @GetMapping(ROOT_ENDPOINT)
     public String landingPage() {
         // TODO point this to the react home location
-        return "Pipeline Portal";
+        return "Portal";
     }
 
     @Override
