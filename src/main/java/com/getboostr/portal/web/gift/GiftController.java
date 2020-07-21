@@ -3,7 +3,6 @@ package com.getboostr.portal.web.gift;
 import com.getboostr.portal.web.common.page.PageMetadata;
 import com.getboostr.portal.web.gift.model.*;
 import com.getboostr.portal.web.security.authorization.PortalAuthorityConstants;
-import com.usepipeline.portal.web.gift.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

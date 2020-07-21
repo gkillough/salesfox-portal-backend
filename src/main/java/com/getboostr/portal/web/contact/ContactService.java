@@ -21,7 +21,6 @@ import com.getboostr.portal.database.organization.account.contact.repository.Org
 import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactRepository;
 import com.getboostr.portal.web.common.model.request.ActiveStatusPatchModel;
 import com.getboostr.portal.web.common.page.PageRequestValidationUtils;
-import com.usepipeline.portal.web.contact.model.*;
 import com.getboostr.portal.web.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

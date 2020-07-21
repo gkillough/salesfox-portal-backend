@@ -4,7 +4,6 @@ import com.getboostr.portal.web.contact.model.*;
 import com.getboostr.portal.web.security.authorization.PortalAuthorityConstants;
 import com.getboostr.portal.web.common.model.request.ActiveStatusPatchModel;
 import com.getboostr.portal.web.common.page.PageMetadata;
-import com.usepipeline.portal.web.contact.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

@@ -11,7 +11,6 @@ import com.getboostr.portal.database.organization.account.OrganizationAccountEnt
 import com.getboostr.portal.web.license.model.*;
 import com.getboostr.portal.database.organization.account.OrganizationAccountRepository;
 import com.getboostr.portal.web.common.model.request.ActiveStatusPatchModel;
-import com.usepipeline.portal.web.license.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

@@ -15,7 +15,6 @@ import com.getboostr.portal.database.organization.OrganizationEntity;
 import com.getboostr.portal.database.organization.OrganizationRepository;
 import com.getboostr.portal.database.organization.account.OrganizationAccountEntity;
 import com.getboostr.portal.web.registration.organization.OrganizationConstants;
-import com.usepipeline.portal.database.account.entity.*;
 import com.getboostr.portal.database.organization.account.OrganizationAccountRepository;
 import com.getboostr.portal.web.security.authorization.PortalAuthorityConstants;
 import com.getboostr.portal.web.user.profile.UserProfileService;
