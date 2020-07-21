@@ -36,25 +36,25 @@ public class CatalogueController {
     }
 
     @PostMapping
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
     public CatalogueItemResponseModel addItem(@RequestBody CatalogueItemRequestModel requestModel) {
         return catalogueService.addItem(requestModel);
     }
 
     @PostMapping("/{itemId}/icon")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
     public void setItemIcon(@PathVariable UUID itemId, @RequestParam MultipartFile iconFile) {
         catalogueService.setItemIcon(itemId, iconFile);
     }
 
     @PutMapping("/{itemId}")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
     public void updateItem(@PathVariable UUID itemId, @RequestBody CatalogueItemRequestModel requestModel) {
         catalogueService.updateItem(itemId, requestModel);
     }
 
     @PatchMapping("/{itemId}/active")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
     public void setItemActiveStatus(@PathVariable UUID itemId, @RequestBody ActiveStatusPatchModel requestModel) {
         catalogueService.setItemActiveStatus(itemId, requestModel);
     }

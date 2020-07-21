@@ -32,7 +32,7 @@ public class EmailConfiguration {
     @Value("${mail.smtp.password:}")
     private String smtpPassword;
 
-    @Value("${mail.smtp.from:noreply@usepipeline.com}")
+    @Value("${mail.smtp.from:noreply@getboostr.com}")
     private String smtpFrom;
 
     @Value("${mail.smtp.sendpartial:true}")

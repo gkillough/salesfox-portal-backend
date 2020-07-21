@@ -30,25 +30,25 @@ public class OrganizationUsersController {
     }
 
     @GetMapping("/users")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     public OrganizationMultiUsersModel getOrganizationAccountUsers(@PathVariable UUID accountId, @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset, @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit) {
         return organizationUsersService.getOrganizationAccountUsers(accountId, offset, limit);
     }
 
     @GetMapping("/users/{userId}")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     public OrganizationUserAdminViewModel getOrganizationAccountUser(@PathVariable UUID accountId, @PathVariable UUID userId) {
         return organizationUsersService.getOrganizationAccountUser(accountId, userId);
     }
 
     @PatchMapping("/users/{userId}/active")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     public void setOrganizationAccountUserActiveStatus(@PathVariable UUID accountId, @PathVariable UUID userId, @RequestBody ActiveStatusPatchModel updateModel) {
         organizationUsersService.setOrganizationAccountUserActiveStatus(accountId, userId, updateModel);
     }
 
     @PostMapping("/users/{userId}/unlock")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     public void unlockOrganizationAccountUser(@PathVariable UUID accountId, @PathVariable UUID userId) {
         organizationUsersService.unlockOrganizationAccountUser(accountId, userId);
     }
@@ -59,7 +59,7 @@ public class OrganizationUsersController {
     }
 
     @PostMapping("/account_owner")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK)
     public void transferOrganizationAccountOwnership(@PathVariable UUID accountId, @RequestBody NewAccountOwnerRequestModel requestModel) {
         organizationAccountOwnerService.transferOrganizationAccountOwnership(accountId, requestModel);
     }

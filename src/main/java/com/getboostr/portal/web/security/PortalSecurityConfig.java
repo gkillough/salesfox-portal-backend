@@ -119,7 +119,7 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     private HttpSecurity configureAdminPermissions(HttpSecurity security) throws Exception {
         return security.authorizeRequests()
                 .antMatchers(collectAdminOnlyEndpoints())
-                .hasAuthority(PortalAuthorityConstants.PIPELINE_ADMIN)
+                .hasAuthority(PortalAuthorityConstants.PORTAL_ADMIN)
                 .and();
     }
 

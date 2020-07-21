@@ -28,7 +28,7 @@ public class CatalogueItemIconController {
     }
 
     @DeleteMapping("/{iconId}")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
     public void deleteIcon(@PathVariable UUID iconId) {
         iconService.deleteIcon(iconId);
     }

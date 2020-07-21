@@ -20,7 +20,7 @@ public class OrganizationAccountActivationController {
     }
 
     @PatchMapping("/{accountId}/active")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK)
     public void setOrganizationAccountActiveStatus(@PathVariable UUID accountId, @RequestBody ActiveStatusPatchModel requestModel) {
         organizationActivationService.updateOrganizationAccountActiveStatus(accountId, requestModel);
     }

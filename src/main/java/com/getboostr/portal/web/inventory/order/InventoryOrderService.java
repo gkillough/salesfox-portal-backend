@@ -256,7 +256,7 @@ public class InventoryOrderService {
     }
 
     private boolean isPipelineIndividual(String roleLevel) {
-        return PortalAuthorityConstants.PIPELINE_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PIPELINE_PREMIUM_USER.equals(roleLevel);
+        return PortalAuthorityConstants.PORTAL_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(roleLevel);
     }
 
     private void validateOrderRequest(InventoryOrderRequestModel requestModel) {

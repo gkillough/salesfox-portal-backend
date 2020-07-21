@@ -283,7 +283,7 @@ public class ContactService {
     }
 
     private boolean isNonOrganizationRole(String roleLevel) {
-        return roleLevel.equals(PortalAuthorityConstants.PIPELINE_BASIC_USER) || roleLevel.equals(PortalAuthorityConstants.PIPELINE_PREMIUM_USER);
+        return roleLevel.equals(PortalAuthorityConstants.PORTAL_BASIC_USER) || roleLevel.equals(PortalAuthorityConstants.PORTAL_PREMIUM_USER);
     }
 
     private void validatePointOfContactUser(UUID requestingUserOrgAcctId, UUID pointOfContactUserId) {

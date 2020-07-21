@@ -22,7 +22,7 @@ public class OrganizationAccessService {
         MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(requestingUser);
         String userRoleLevel = membershipRetrievalService.getRoleEntity(userMembership).getRoleLevel();
 
-        if (PortalAuthorityConstants.PIPELINE_ADMIN.equals(userRoleLevel)) {
+        if (PortalAuthorityConstants.PORTAL_ADMIN.equals(userRoleLevel)) {
             return true;
         } else if (userRoleLevel.startsWith(PortalAuthorityConstants.ORGANIZATION_ROLE_PREFIX) && userMembership.getOrganizationAccountId().equals(requestedAccount.getOrganizationAccountId())) {
             return canOrganizationUserAccessRequestedAccount(userRoleLevel, requestedAccessOperation);

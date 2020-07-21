@@ -42,7 +42,7 @@ public class HttpSafeUserMembershipRetrievalService extends AbstractMembershipRe
                 .getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
-                .anyMatch(PortalAuthorityConstants.PIPELINE_ADMIN::equals);
+                .anyMatch(PortalAuthorityConstants.PORTAL_ADMIN::equals);
     }
 
     public boolean isAuthenticateUserBasicOrPremiumMember() {
@@ -51,8 +51,8 @@ public class HttpSafeUserMembershipRetrievalService extends AbstractMembershipRe
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(authority ->
-                        PortalAuthorityConstants.PIPELINE_BASIC_USER.equals(authority)
-                                || PortalAuthorityConstants.PIPELINE_PREMIUM_USER.equals(authority)
+                        PortalAuthorityConstants.PORTAL_BASIC_USER.equals(authority)
+                                || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(authority)
                 );
     }
 

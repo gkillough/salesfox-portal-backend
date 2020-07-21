@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(LicenseController.BASE_ENDPOINT)
-@PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_AUTH_CHECK)
+@PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
 public class LicenseController {
     public static final String BASE_ENDPOINT = "/licenses";
 

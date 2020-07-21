@@ -123,9 +123,9 @@ public class UserRegistrationService {
         if (role != null) {
             portalRole = role;
         } else if (OrganizationConstants.PLAN_PIPELINE_BASIC_DISPLAY_NAME.equals(planName)) {
-            portalRole = PortalAuthorityConstants.PIPELINE_BASIC_USER;
+            portalRole = PortalAuthorityConstants.PORTAL_BASIC_USER;
         } else if (OrganizationConstants.PLAN_PIPELINE_PREMIUM_DISPLAY_NAME.equals(planName)) {
-            portalRole = PortalAuthorityConstants.PIPELINE_PREMIUM_USER;
+            portalRole = PortalAuthorityConstants.PORTAL_PREMIUM_USER;
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid plan selected. To create a business account please contact us.");
         }
@@ -159,7 +159,7 @@ public class UserRegistrationService {
 
     private void createInventoryIfNecessary(UUID userId, UUID orgAcctId, RoleEntity roleEntity) {
         String roleLevel = roleEntity.getRoleLevel();
-        if (PortalAuthorityConstants.PIPELINE_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PIPELINE_PREMIUM_USER.equals(roleLevel)) {
+        if (PortalAuthorityConstants.PORTAL_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(roleLevel)) {
             InventoryEntity individualUserInventoryToSave = new InventoryEntity(null, orgAcctId, userId);
             inventoryRepository.save(individualUserInventoryToSave);
         }

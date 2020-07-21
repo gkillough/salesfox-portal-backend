@@ -5,21 +5,21 @@ public final class PortalAuthorityConstants {
     // Even a String returned by a static method is not allowed here.
 
     // Prefixes
-    public static final String PIPELINE_ROLE_PREFIX = "PIPELINE_";
+    public static final String PORTAL_ROLE_PREFIX = "PORTAL_";
     public static final String ORGANIZATION_ROLE_PREFIX = "ORGANIZATION_";
     public static final String TEMPORARY_AUTHORITY_PREFIX = "TEMPORARY_";
 
     // User Roles
     public static final String ANONYMOUS = "ANONYMOUS";
 
-    public static final String PIPELINE_ADMIN = PIPELINE_ROLE_PREFIX + "ADMIN";
-    public static final String PIPELINE_ADMIN_AUTH_CHECK = "hasAuthority('" + PIPELINE_ADMIN + "')";
+    public static final String PORTAL_ADMIN = PORTAL_ROLE_PREFIX + "ADMIN";
+    public static final String PORTAL_ADMIN_AUTH_CHECK = "hasAuthority('" + PORTAL_ADMIN + "')";
 
-    public static final String PIPELINE_BASIC_USER = PIPELINE_ROLE_PREFIX + "BASIC_USER";
-    public static final String PIPELINE_BASIC_USER_AUTH_CHECK = "hasAuthority('" + PIPELINE_BASIC_USER + "')";
+    public static final String PORTAL_BASIC_USER = PORTAL_ROLE_PREFIX + "BASIC_USER";
+    public static final String PORTAL_BASIC_USER_AUTH_CHECK = "hasAuthority('" + PORTAL_BASIC_USER + "')";
 
-    public static final String PIPELINE_PREMIUM_USER = PIPELINE_ROLE_PREFIX + "PREMIUM_USER";
-    public static final String PIPELINE_PREMIUM_USER_AUTH_CHECK = "hasAuthority('" + PIPELINE_PREMIUM_USER + "')";
+    public static final String PORTAL_PREMIUM_USER = PORTAL_ROLE_PREFIX + "PREMIUM_USER";
+    public static final String PORTAL_PREMIUM_USER_AUTH_CHECK = "hasAuthority('" + PORTAL_PREMIUM_USER + "')";
 
     public static final String ORGANIZATION_ACCOUNT_OWNER = ORGANIZATION_ROLE_PREFIX + "ACCOUNT_OWNER";
     public static final String ORGANIZATION_ACCOUNT_OWNER_AUTH_CHECK = "hasAuthority('" + ORGANIZATION_ACCOUNT_OWNER + "')";
@@ -38,9 +38,9 @@ public final class PortalAuthorityConstants {
     public static final String CREATE_ORGANIZATION_ACCOUNT_PERMISSION_AUTH_CHECK = "hasAuthority('" + CREATE_ORGANIZATION_ACCOUNT_PERMISSION + "')";
 
     // Common Auth Checks
-    public static final String PIPELINE_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK = "hasAnyAuthority('" + PIPELINE_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "')";
-    public static final String PIPELINE_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK = "hasAnyAuthority('" + PIPELINE_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "','" + ORGANIZATION_ACCOUNT_MANAGER + "')";
-    public static final String PIPELINE_ADMIN_OR_ORG_ACCT_MEMBER_AUTH_CHECK = "hasAnyAuthority('" + PIPELINE_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "','" + ORGANIZATION_ACCOUNT_MANAGER + "','" + ORGANIZATION_ACCOUNT_REP + "')";
-    public static final String NON_ACCOUNT_REP_AUTH_CHECK = "hasAnyAuthority('" + PIPELINE_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "','" + ORGANIZATION_ACCOUNT_MANAGER + "','" + PIPELINE_BASIC_USER + "','" + PIPELINE_PREMIUM_USER + "')";
+    public static final String PORTAL_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK = "hasAnyAuthority('" + PORTAL_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "')";
+    public static final String PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK = "hasAnyAuthority('" + PORTAL_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "','" + ORGANIZATION_ACCOUNT_MANAGER + "')";
+    public static final String PORTAL_ADMIN_OR_ORG_ACCT_MEMBER_AUTH_CHECK = "hasAnyAuthority('" + PORTAL_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "','" + ORGANIZATION_ACCOUNT_MANAGER + "','" + ORGANIZATION_ACCOUNT_REP + "')";
+    public static final String NON_ACCOUNT_REP_AUTH_CHECK = "hasAnyAuthority('" + PORTAL_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "','" + ORGANIZATION_ACCOUNT_MANAGER + "','" + PORTAL_BASIC_USER + "','" + PORTAL_PREMIUM_USER + "')";
 
 }

@@ -91,7 +91,7 @@ public class NoteService {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
         String roleLevel = membershipRetrievalService.getRoleEntity(userMembership).getRoleLevel();
-        if (PortalAuthorityConstants.PIPELINE_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PIPELINE_PREMIUM_USER.equals(roleLevel)) {
+        if (PortalAuthorityConstants.PORTAL_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(roleLevel)) {
             return noteRepository.findAllByUpdatedByUserId(loggedInUser.getUserId(), pageRequest);
         }
         return noteRepository.findAllByOrganizationAccountId(userMembership.getOrganizationAccountId(), pageRequest);
@@ -108,8 +108,8 @@ public class NoteService {
         } else {
             MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
             String roleLevel = membershipRetrievalService.getRoleEntity(userMembership).getRoleLevel();
-            if (!PortalAuthorityConstants.PIPELINE_BASIC_USER.equals(roleLevel)
-                    && !PortalAuthorityConstants.PIPELINE_PREMIUM_USER.equals(roleLevel)
+            if (!PortalAuthorityConstants.PORTAL_BASIC_USER.equals(roleLevel)
+                    && !PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(roleLevel)
                     && noteEntity.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
                 return;
             }

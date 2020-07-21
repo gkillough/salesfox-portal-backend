@@ -50,13 +50,13 @@ public class GiftController {
     }
 
     @PostMapping("/{giftId}/status")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
     public GiftResponseModel updateGiftStatus(@PathVariable UUID giftId, @RequestBody UpdateGiftStatusRequestModel requestModel) {
         return giftProcessingService.updateGiftStatus(giftId, requestModel);
     }
 
     @PostMapping("/{giftId}/tracking")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
     public GiftResponseModel updateGiftTrackingDetail(@PathVariable UUID giftId, @RequestBody UpdateGiftTrackingDetailRequestModel requestModel) {
         return giftProcessingService.updateGiftTrackingDetail(giftId, requestModel);
     }

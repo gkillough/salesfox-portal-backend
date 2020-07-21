@@ -47,7 +47,7 @@ public class InventoryController {
     }
 
     @DeleteMapping("/{inventoryId}/items/{catalogueItemId}")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     public void deleteInventoryItem(@PathVariable UUID inventoryId, @PathVariable UUID catalogueItemId) {
         inventoryItemService.deleteInventoryItem(inventoryId, catalogueItemId);
     }

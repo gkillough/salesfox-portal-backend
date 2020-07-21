@@ -41,7 +41,7 @@ public class InventoryOrderController {
     }
 
     @PostMapping("/{orderId}")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
     public void processOrder(@PathVariable UUID orderId, @RequestBody InventoryOrderProcessingRequestModel requestModel) {
         inventoryOrderService.processOrder(orderId, requestModel);
     }

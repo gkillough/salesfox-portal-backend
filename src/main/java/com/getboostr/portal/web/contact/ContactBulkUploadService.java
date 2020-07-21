@@ -76,7 +76,7 @@ public class ContactBulkUploadService {
 
         UUID pointOfContactUserId = null;
         String userRoleLevel = userRole.getRoleLevel();
-        if (PortalAuthorityConstants.PIPELINE_BASIC_USER.equals(userRoleLevel) || PortalAuthorityConstants.PIPELINE_PREMIUM_USER.equals(userRoleLevel)) {
+        if (PortalAuthorityConstants.PORTAL_BASIC_USER.equals(userRoleLevel) || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(userRoleLevel)) {
             pointOfContactUserId = loggedInUser.getUserId();
         }
 

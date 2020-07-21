@@ -24,7 +24,7 @@ public class ContactAccessOperationUtility<E extends Throwable> {
         MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(userRequestingAccess);
 
         String userRoleLevel = membershipRetrievalService.getRoleEntity(userMembership).getRoleLevel();
-        if (PortalAuthorityConstants.PIPELINE_ADMIN.equals(userRoleLevel)) {
+        if (PortalAuthorityConstants.PORTAL_ADMIN.equals(userRoleLevel)) {
             return true;
         } else if (userMembership.getOrganizationAccountId().equals(contact.getOrganizationAccountId())) {
             if (userRoleLevel.startsWith(PortalAuthorityConstants.ORGANIZATION_ROLE_PREFIX)) {
@@ -55,7 +55,7 @@ public class ContactAccessOperationUtility<E extends Throwable> {
     }
 
     private boolean canNonOrganizationUserAccessContact(UserEntity userRequestingAccess, String userRoleLevel, OrganizationAccountContactEntity contact) throws E {
-        if (PortalAuthorityConstants.PIPELINE_PREMIUM_USER.equals(userRoleLevel) || PortalAuthorityConstants.PIPELINE_BASIC_USER.equals(userRoleLevel)) {
+        if (PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(userRoleLevel) || PortalAuthorityConstants.PORTAL_BASIC_USER.equals(userRoleLevel)) {
             OrganizationAccountContactProfileEntity contactProfile = getPointOfContactProfile(contact);
             return userRequestingAccess.getUserId().equals(contactProfile.getOrganizationPointOfContactUserId());
         }

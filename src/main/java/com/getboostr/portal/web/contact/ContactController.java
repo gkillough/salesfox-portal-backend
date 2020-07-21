@@ -64,7 +64,7 @@ public class ContactController {
     }
 
     @PostMapping("/{contactId}/assign")
-    @PreAuthorize(PortalAuthorityConstants.PIPELINE_ADMIN_OR_ORG_ACCT_MEMBER_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCT_MEMBER_AUTH_CHECK)
     public void assignContact(@PathVariable UUID contactId, @RequestBody PointOfContactAssignmentModel requestModel) {
         contactService.assignContactToUser(contactId, requestModel);
     }

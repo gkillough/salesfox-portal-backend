@@ -48,7 +48,7 @@ public class UserAccessService {
                     return userDetails.getAuthorities()
                             .stream()
                             .map(GrantedAuthority::getAuthority)
-                            .anyMatch(PortalAuthorityConstants.PIPELINE_ADMIN::equals);
+                            .anyMatch(PortalAuthorityConstants.PORTAL_ADMIN::equals);
                 }
             }
         }
