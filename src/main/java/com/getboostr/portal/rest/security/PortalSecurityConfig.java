@@ -2,7 +2,7 @@ package com.getboostr.portal.rest.security;
 
 import com.getboostr.portal.database.account.entity.RoleEntity;
 import com.getboostr.portal.database.account.repository.RoleRepository;
-import com.getboostr.portal.rest.registration.RegistrationController;
+import com.getboostr.portal.rest.api.registration.RegistrationController;
 import com.getboostr.portal.rest.security.authentication.AnonymouslyAccessible;
 import com.getboostr.portal.rest.security.authentication.DefaultAuthenticationHandlers;
 import com.getboostr.portal.rest.security.authorization.AdminOnlyAccessible;
@@ -10,7 +10,7 @@ import com.getboostr.portal.rest.security.authorization.CsrfIgnorable;
 import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import com.getboostr.portal.rest.security.common.DefaultAllowedEndpoints;
 import com.getboostr.portal.rest.security.common.SecurityInterface;
-import com.getboostr.portal.rest.password.PasswordController;
+import com.getboostr.portal.rest.api.password.PasswordController;
 import com.getboostr.portal.rest.security.authentication.user.PortalUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;

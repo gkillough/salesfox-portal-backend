@@ -1,7 +1,7 @@
 package com.getboostr.portal.common.service.contact;
 
 import com.getboostr.portal.common.FieldValidationUtils;
-import com.getboostr.portal.rest.contact.model.ContactUploadModel;
+import com.getboostr.portal.rest.api.contact.model.ContactUploadModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
