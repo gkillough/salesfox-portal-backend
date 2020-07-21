@@ -7,7 +7,7 @@ import com.getboostr.portal.common.service.auth.AbstractMembershipRetrievalServi
 import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactEntity;
 import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactProfileEntity;
 import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactProfileRepository;
-import com.getboostr.portal.web.security.authorization.PortalAuthorityConstants;
+import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 
 import java.util.UUID;
 

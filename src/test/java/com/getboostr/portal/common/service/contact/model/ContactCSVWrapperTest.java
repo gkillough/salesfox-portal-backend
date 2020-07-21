@@ -2,7 +2,7 @@ package com.getboostr.portal.common.service.contact.model;
 
 import com.getboostr.portal.common.service.contact.ContactCSVFileUtils;
 import com.getboostr.portal.common.service.contact.ContactFieldValidationUtils;
-import com.getboostr.portal.web.contact.model.ContactUploadModel;
+import com.getboostr.portal.rest.contact.model.ContactUploadModel;
 import com.getboostr.portal.common.service.contact.ContactCSVFileUtilsTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;

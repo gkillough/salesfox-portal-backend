@@ -1,7 +1,7 @@
 package com.getboostr.portal.common.service.contact.model;
 
 import com.getboostr.portal.common.model.PortalAddressModel;
-import com.getboostr.portal.web.contact.model.ContactUploadModel;
+import com.getboostr.portal.rest.contact.model.ContactUploadModel;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;

@@ -3,7 +3,7 @@ package com.getboostr.portal.common.service.license;
 import com.getboostr.portal.common.enumeration.LicenseType;
 import com.getboostr.portal.database.account.entity.LicenseEntity;
 import com.getboostr.portal.database.account.repository.LicenseRepository;
-import com.getboostr.portal.web.license.model.LicenseModel;
+import com.getboostr.portal.rest.license.model.LicenseModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
