@@ -112,7 +112,7 @@ public class CustomBrandingTextService {
 
     private Page<CustomBrandingTextEntity> getAccessibleCustomBrandingTexts(Integer pageOffset, Integer pageLimit) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return customBrandingTextRepository.findAll(pageRequest);
         }
 
@@ -126,7 +126,7 @@ public class CustomBrandingTextService {
     }
 
     private void validateAccess(CustomBrandingTextEntity customBrandingTextEntity, @Nullable CustomBrandingTextOwnerEntity owner) {
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return;
         }
 

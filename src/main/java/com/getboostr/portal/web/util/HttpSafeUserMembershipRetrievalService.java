@@ -37,7 +37,7 @@ public class HttpSafeUserMembershipRetrievalService extends AbstractMembershipRe
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }
 
-    public boolean isAuthenticatedUserPipelineAdmin() {
+    public boolean isAuthenticatedUserPortalAdmin() {
         return getAuthenticatedUserDetails()
                 .getAuthorities()
                 .stream()

@@ -159,7 +159,7 @@ public class CatalogueService {
 
     private Page<CatalogueItemEntity> getAccessibleItems(Integer pageOffset, Integer pageLimit) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return catalogueItemRepository.findAll(pageRequest);
         }
 
@@ -169,7 +169,7 @@ public class CatalogueService {
     }
 
     private void validateItemAccess(UUID itemId) {
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return;
         }
 

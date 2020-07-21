@@ -246,7 +246,7 @@ public class ContactService {
 
     private Page<OrganizationAccountContactEntity> getAccessibleContacts(UserEntity user, MembershipEntity userMembership, boolean isActive, Integer pageOffset, Integer pageLimit) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return contactRepository.findAllByIsActive(isActive, pageRequest);
         }
 

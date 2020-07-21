@@ -187,7 +187,7 @@ public class InventoryOrderService {
 
     private Page<InventoryOrderRequestEntity> getAccessibleOrderRequests(Integer pageOffset, Integer pageLimit) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return orderRequestRepository.findAll(pageRequest);
         }
 
@@ -201,7 +201,7 @@ public class InventoryOrderService {
     }
 
     private void validateReadAccess(InventoryOrderRequestEntity order) {
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return;
         }
 
@@ -228,7 +228,7 @@ public class InventoryOrderService {
     }
 
     private void validateSubmitOrderAccess(String loggedInUserRoleLevel) {
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return;
         }
 
@@ -240,7 +240,7 @@ public class InventoryOrderService {
     }
 
     private void validateInventoryAndItemAccess(MembershipEntity loggedInUserMembership, InventoryEntity targetInventory, CatalogueItemEntity targetItem) {
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return;
         }
 

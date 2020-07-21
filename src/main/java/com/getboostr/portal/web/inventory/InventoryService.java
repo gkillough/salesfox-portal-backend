@@ -56,7 +56,7 @@ public class InventoryService {
 
     private Page<InventoryEntity> getAccessibleInventories(Integer pageOffset, Integer pageLimit) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return inventoryRepository.findAll(pageRequest);
         }
 

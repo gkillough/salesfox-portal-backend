@@ -24,7 +24,7 @@ public class InventoryAccessService {
     }
 
     public void validateInventoryAccess(UserEntity requestingUser, InventoryEntity inventoryEntity) {
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return;
         }
 

@@ -75,7 +75,7 @@ public class GiftAccessService {
     }
 
     private void validateGiftEntityAccess(GiftEntity entity, UserEntity loggedInUser) {
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return;
         }
 

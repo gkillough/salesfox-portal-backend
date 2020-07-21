@@ -84,7 +84,7 @@ public class NoteService {
 
     private Page<NoteEntity> getAccessibleNotes(Integer pageOffset, Integer pageLimit) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return noteRepository.findAll(pageRequest);
         }
 
@@ -98,7 +98,7 @@ public class NoteService {
     }
 
     private void validateNoteAccess(NoteEntity noteEntity) {
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return;
         }
 

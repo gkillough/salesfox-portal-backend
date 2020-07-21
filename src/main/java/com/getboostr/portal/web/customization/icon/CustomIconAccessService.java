@@ -30,7 +30,7 @@ public class CustomIconAccessService {
     }
 
     public void validateImageAccess(CustomIconEntity customIcon, @Nullable CustomIconOwnerEntity nullableOwner) {
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return;
         }
 

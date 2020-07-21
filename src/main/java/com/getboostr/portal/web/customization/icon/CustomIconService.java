@@ -113,7 +113,7 @@ public class CustomIconService {
 
     private Page<CustomIconEntity> getAccessibleCustomIcons(Integer pageOffset, Integer pageLimit) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return customIconRepository.findAll(pageRequest);
         }
 

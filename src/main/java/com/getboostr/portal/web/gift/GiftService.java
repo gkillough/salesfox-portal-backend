@@ -145,7 +145,7 @@ public class GiftService {
 
     private Page<GiftEntity> getAccessibleGifts(Integer pageOffset, Integer pageLimit) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
-        if (membershipRetrievalService.isAuthenticatedUserPipelineAdmin()) {
+        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return giftRepository.findAll(pageRequest);
         }
 
