@@ -7,10 +7,10 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 public class ResourceDirectoryConfiguration {
-    @Value("${com.usepipeline.portal.resource.baseDir:}")
+    @Value("${com.getboostr.portal.resource.baseDir:}")
     private String resourceBaseDir;
 
-    @Value("${com.usepipeline.portal.resource.iconDir:}")
+    @Value("${com.getboostr.portal.resource.iconDir:}")
     private String iconDir;
 
 }

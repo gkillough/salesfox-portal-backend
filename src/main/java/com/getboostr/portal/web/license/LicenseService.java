@@ -186,7 +186,7 @@ public class LicenseService {
     private boolean isValidLicenseType(String licenseType) {
         return Stream
                 .of(LicenseType.values())
-                .filter(type -> !type.equals(LicenseType.PIPELINE_TEAM))
+                .filter(type -> !type.equals(LicenseType.BOOSTR_TEAM))
                 .map(LicenseType::name)
                 .anyMatch(licenseType::equals);
     }
