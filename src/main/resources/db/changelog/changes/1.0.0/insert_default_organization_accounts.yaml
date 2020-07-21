@@ -45,7 +45,7 @@ databaseChangeLog:
                   valueDate: 2099-12-31
               - column:
                   name: type
-                  value: PIPELINE_BASIC
+                  value: PORTAL_BASIC
               - column:
                   name: available_license_seats
                   valueNumeric: 999999999998
@@ -75,7 +75,7 @@ databaseChangeLog:
                   valueDate: 2099-12-31
               - column:
                   name: type
-                  value: PIPELINE_PREMIUM
+                  value: PORTAL_PREMIUM
               - column:
                   name: available_license_seats
                   valueNumeric: 999999999998
@@ -105,7 +105,7 @@ databaseChangeLog:
                   valueDate: 2099-12-31
               - column:
                   name: type
-                  value: PIPELINE_TEAM
+                  value: PORTAL_TEAM
               - column:
                   name: available_license_seats
                   valueNumeric: 49
@@ -192,7 +192,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: role_level
-                  value: PIPELINE_ADMIN
+                  value: PORTAL_ADMIN
               - column:
                   name: role_description
                   value: A Pipeline Organization member who can manage the application.
@@ -205,7 +205,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: role_level
-                  value: PIPELINE_BASIC_USER
+                  value: PORTAL_BASIC_USER
               - column:
                   name: role_description
                   value: A free user with a gift inventory size of 20.
@@ -218,7 +218,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: role_level
-                  value: PIPELINE_PREMIUM_USER
+                  value: PORTAL_PREMIUM_USER
               - column:
                   name: role_description
                   value: A paid user with a gift inventory size of 50.

@@ -54,7 +54,7 @@ databaseChangeLog:
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pipeline for Individuals', 'Pipeline Basic')
               - column:
                   name: role_id
-                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PIPELINE_BASIC_USER')
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PORTAL_BASIC_USER')
 
   - changeSet:
       id: create-user-address-1
@@ -180,7 +180,7 @@ databaseChangeLog:
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pipeline for Individuals', 'Pipeline Premium')
               - column:
                   name: role_id
-                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PIPELINE_PREMIUM_USER')
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PORTAL_PREMIUM_USER')
 
   - changeSet:
       id: create-user-address-2
@@ -306,7 +306,7 @@ databaseChangeLog:
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pipeline Organization', 'Pipeline Team')
               - column:
                   name: role_id
-                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PIPELINE_ADMIN')
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PORTAL_ADMIN')
 
   - changeSet:
       id: create-user-address-3
