@@ -9,7 +9,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: organization_name
-                  value: Pipeline Organization
+                  value: Boostr Organization
               - column:
                   name: is_active
                   valueBoolean: true
@@ -24,7 +24,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: organization_name
-                  value: Pipeline for Individuals
+                  value: Boostr for Individuals
               - column:
                   name: is_active
                   valueBoolean: true
@@ -129,13 +129,13 @@ databaseChangeLog:
             columns:
               - column:
                   name: organization_account_name
-                  value: Pipeline Basic
+                  value: Boostr Basic
               - column:
                   name: license_id
                   valueComputed: GET_LICENSE_ID_BY_HASH('dbf2c289-7ffb-4b66-9162-457bc5743023')
               - column:
                   name: organization_id
-                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pipeline for Individuals')
+                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Boostr for Individuals')
               - column:
                   name: is_active
                   valueBoolean: true
@@ -150,13 +150,13 @@ databaseChangeLog:
             columns:
               - column:
                   name: organization_account_name
-                  value: Pipeline Premium
+                  value: Boostr Premium
               - column:
                   name: license_id
                   valueComputed: GET_LICENSE_ID_BY_HASH('e65000ad-c9c2-49ad-9622-a033c7b7d74a')
               - column:
                   name: organization_id
-                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pipeline for Individuals')
+                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Boostr for Individuals')
               - column:
                   name: is_active
                   valueBoolean: true
@@ -171,13 +171,13 @@ databaseChangeLog:
             columns:
               - column:
                   name: organization_account_name
-                  value: Pipeline Team
+                  value: Boostr Team
               - column:
                   name: license_id
                   valueComputed: GET_LICENSE_ID_BY_HASH('d393f36b-23de-4b5e-a27f-96f2dc1bc814')
               - column:
                   name: organization_id
-                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pipeline Organization')
+                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Boostr Organization')
               - column:
                   name: is_active
                   valueBoolean: true
@@ -195,7 +195,7 @@ databaseChangeLog:
                   value: PORTAL_ADMIN
               - column:
                   name: role_description
-                  value: A Pipeline Organization member who can manage the application.
+                  value: A Boostr Organization member who can manage the application.
               - column:
                   name: is_role_restricted
                   valueBoolean: true

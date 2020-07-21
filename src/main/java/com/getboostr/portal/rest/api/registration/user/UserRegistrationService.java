@@ -69,7 +69,7 @@ public class UserRegistrationService {
      */
     @Transactional
     public UUID registerUser(UserRegistrationModel registrationModel) {
-        UUID defaultPipelineOrganizationId = organizationRepository.findFirstByOrganizationName(OrganizationConstants.PLAN_PIPELINE_BASIC_OR_PREMIUM_DEFAULT_ORG_NAME)
+        UUID defaultPipelineOrganizationId = organizationRepository.findFirstByOrganizationName(OrganizationConstants.PLAN_BOOSTR_BASIC_OR_PREMIUM_DEFAULT_ORG_NAME)
                 .map(OrganizationEntity::getOrganizationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
         return registerOrganizationUser(registrationModel, defaultPipelineOrganizationId, null);
@@ -121,9 +121,9 @@ public class UserRegistrationService {
         String portalRole;
         if (role != null) {
             portalRole = role;
-        } else if (OrganizationConstants.PLAN_PIPELINE_BASIC_DISPLAY_NAME.equals(planName)) {
+        } else if (OrganizationConstants.PLAN_BOOSTR_BASIC_DISPLAY_NAME.equals(planName)) {
             portalRole = PortalAuthorityConstants.PORTAL_BASIC_USER;
-        } else if (OrganizationConstants.PLAN_PIPELINE_PREMIUM_DISPLAY_NAME.equals(planName)) {
+        } else if (OrganizationConstants.PLAN_BOOSTR_PREMIUM_DISPLAY_NAME.equals(planName)) {
             portalRole = PortalAuthorityConstants.PORTAL_PREMIUM_USER;
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid plan selected. To create a business account please contact us.");

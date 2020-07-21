@@ -39,7 +39,7 @@ databaseChangeLog:
                   valueDate: 2021-12-31
               - column:
                   name: type
-                  value: PIPELINE_BUSINESS
+                  value: PORTAL_BUSINESS
               - column:
                   # 4 initial users
                   name: available_license_seats
@@ -158,7 +158,7 @@ databaseChangeLog:
                   valueDate: 2021-12-31
               - column:
                   name: type
-                  value: PIPELINE_BUSINESS
+                  value: PORTAL_BUSINESS
               - column:
                   # 4 initial users
                   name: available_license_seats
@@ -296,7 +296,7 @@ databaseChangeLog:
                   valueDate: 2021-12-31
               - column:
                   name: type
-                  value: PIPELINE_BUSINESS
+                  value: PORTAL_BUSINESS
               - column:
                   # 4 initial users
                   name: available_license_seats
@@ -415,7 +415,7 @@ databaseChangeLog:
                   valueDate: 2021-12-31
               - column:
                   name: type
-                  value: PIPELINE_BUSINESS
+                  value: PORTAL_BUSINESS
               - column:
                   # 4 initial users
                   name: available_license_seats

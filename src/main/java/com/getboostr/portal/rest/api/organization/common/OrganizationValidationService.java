@@ -22,7 +22,7 @@ public class OrganizationValidationService {
     }
 
     public boolean isOrganizationRestricted(String organizationName) {
-        return OrganizationConstants.INTERNAL_PIPELINE_ORG_NAME.equals(organizationName) || OrganizationConstants.PLAN_PIPELINE_BASIC_OR_PREMIUM_DEFAULT_ORG_NAME.equals(organizationName);
+        return OrganizationConstants.INTERNAL_BOOSTR_ORG_NAME.equals(organizationName) || OrganizationConstants.PLAN_BOOSTR_BASIC_OR_PREMIUM_DEFAULT_ORG_NAME.equals(organizationName);
     }
 
     public boolean isOrganizationAccountNameInUse(String organizationName, String organizationAccountName) {
