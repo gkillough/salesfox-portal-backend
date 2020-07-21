@@ -23,7 +23,7 @@ databaseChangeLog:
                   value: One
               - column:
                   name: email
-                  value: contact1@usepipeline.com
+                  value: contact1@getboostr.com
 
   - changeSet:
       id: test-contacts-address-111
@@ -35,7 +35,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@getboostr.com')
               - column:
                   name: street_number
                   valueNumeric: 1
@@ -68,13 +68,13 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@getboostr.com')
               - column:
                   name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact1@usepipeline.com')
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact1@getboostr.com')
               - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test3@usepipeline.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test3@getboostr.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
@@ -98,7 +98,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@getboostr.com')
 
   ##################################
   # TEST ORG 1 ACCOUNT 1 CONTACT 2 #
@@ -123,7 +123,7 @@ databaseChangeLog:
                   value: Two
               - column:
                   name: email
-                  value: contact2@usepipeline.com
+                  value: contact2@getboostr.com
 
   - changeSet:
       id: test-contacts-address-112
@@ -135,7 +135,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@getboostr.com')
               - column:
                   name: street_number
                   valueNumeric: 2
@@ -168,13 +168,13 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@getboostr.com')
               - column:
                   name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact2@usepipeline.com')
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact2@getboostr.com')
               - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test3@usepipeline.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test3@getboostr.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
@@ -198,7 +198,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@getboostr.com')
 
   ##################################
   # TEST ORG 1 ACCOUNT 1 CONTACT 3 #
@@ -223,7 +223,7 @@ databaseChangeLog:
                   value: Three
               - column:
                   name: email
-                  value: contact3@usepipeline.com
+                  value: contact3@getboostr.com
 
   - changeSet:
       id: test-contacts-address-113
@@ -235,7 +235,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@getboostr.com')
               - column:
                   name: street_number
                   valueNumeric: 3
@@ -268,13 +268,13 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@getboostr.com')
               - column:
                   name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact3@usepipeline.com')
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact3@getboostr.com')
               - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test4@usepipeline.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test4@getboostr.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
@@ -298,7 +298,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@getboostr.com')
 
   ##################################
   # TEST ORG 1 ACCOUNT 1 CONTACT 4 #
@@ -323,7 +323,7 @@ databaseChangeLog:
                   value: Four
               - column:
                   name: email
-                  value: contact4@usepipeline.com
+                  value: contact4@getboostr.com
 
   - changeSet:
       id: test-contacts-address-114
@@ -335,7 +335,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@getboostr.com')
               - column:
                   name: street_number
                   valueNumeric: 4
@@ -368,13 +368,13 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@getboostr.com')
               - column:
                   name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact4@usepipeline.com')
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact4@getboostr.com')
               - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test4@usepipeline.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test4@getboostr.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
@@ -398,7 +398,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@getboostr.com')
 
   ##################################
   # TEST ORG 1 ACCOUNT 2 CONTACT 1 #
@@ -423,7 +423,7 @@ databaseChangeLog:
                   value: Five
               - column:
                   name: email
-                  value: contact5@usepipeline.com
+                  value: contact5@getboostr.com
 
   - changeSet:
       id: test-contacts-address-121
@@ -435,7 +435,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@getboostr.com')
               - column:
                   name: street_number
                   valueNumeric: 5
@@ -468,13 +468,13 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@getboostr.com')
               - column:
                   name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact5@usepipeline.com')
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact5@getboostr.com')
               - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test7@usepipeline.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test7@getboostr.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
@@ -498,7 +498,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@getboostr.com')
 
   ##################################
   # TEST ORG 1 ACCOUNT 2 CONTACT 2 #
@@ -523,7 +523,7 @@ databaseChangeLog:
                   value: Six
               - column:
                   name: email
-                  value: contact6@usepipeline.com
+                  value: contact6@getboostr.com
 
   - changeSet:
       id: test-contacts-address-122
@@ -535,7 +535,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@getboostr.com')
               - column:
                   name: street_number
                   valueNumeric: 6
@@ -568,13 +568,13 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@getboostr.com')
               - column:
                   name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact6@usepipeline.com')
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact6@getboostr.com')
               - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test7@usepipeline.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test7@getboostr.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
@@ -598,7 +598,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@getboostr.com')
 
   ##################################
   # TEST ORG 1 ACCOUNT 2 CONTACT 3 #
@@ -623,7 +623,7 @@ databaseChangeLog:
                   value: Seven
               - column:
                   name: email
-                  value: contact7@usepipeline.com
+                  value: contact7@getboostr.com
 
   - changeSet:
       id: test-contacts-address-123
@@ -635,7 +635,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@getboostr.com')
               - column:
                   name: street_number
                   valueNumeric: 7
@@ -668,13 +668,13 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@getboostr.com')
               - column:
                   name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact7@usepipeline.com')
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact7@getboostr.com')
               - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test8@usepipeline.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test8@getboostr.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
@@ -698,7 +698,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@getboostr.com')
 
   ##################################
   # TEST ORG 1 ACCOUNT 2 CONTACT 4 #
@@ -723,7 +723,7 @@ databaseChangeLog:
                   value: Eight
               - column:
                   name: email
-                  value: contact8@usepipeline.com
+                  value: contact8@getboostr.com
 
   - changeSet:
       id: test-contacts-address-124
@@ -735,7 +735,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@getboostr.com')
               - column:
                   name: street_number
                   valueNumeric: 8
@@ -768,13 +768,13 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@getboostr.com')
               - column:
                   name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact8@usepipeline.com')
+                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact8@getboostr.com')
               - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test8@usepipeline.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test8@getboostr.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
@@ -798,4 +798,4 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@usepipeline.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@getboostr.com')

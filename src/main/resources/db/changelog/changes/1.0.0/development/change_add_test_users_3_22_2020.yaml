@@ -51,10 +51,10 @@ databaseChangeLog:
                   valueComputed: GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com')
               - column:
                   name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pipeline for Individuals', 'Pipeline Basic')
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Boostr for Individuals', 'Boostr Basic')
               - column:
                   name: role_id
-                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PIPELINE_BASIC_USER')
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PORTAL_BASIC_USER')
 
   - changeSet:
       id: create-user-address-1
@@ -120,7 +120,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pipeline for Individuals', 'Pipeline Basic')
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Boostr for Individuals', 'Boostr Basic')
               - column:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com')
@@ -177,10 +177,10 @@ databaseChangeLog:
                   valueComputed: GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com')
               - column:
                   name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pipeline for Individuals', 'Pipeline Premium')
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Boostr for Individuals', 'Boostr Premium')
               - column:
                   name: role_id
-                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PIPELINE_PREMIUM_USER')
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PORTAL_PREMIUM_USER')
 
   - changeSet:
       id: create-user-address-2
@@ -246,7 +246,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pipeline for Individuals', 'Pipeline Premium')
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Boostr for Individuals', 'Boostr Premium')
               - column:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com')
@@ -303,10 +303,10 @@ databaseChangeLog:
                   valueComputed: GET_USER_ID_BY_EMAIL('admin@usepipeline.com')
               - column:
                   name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pipeline Organization', 'Pipeline Team')
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Boostr Organization', 'Boostr Team')
               - column:
                   name: role_id
-                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PIPELINE_ADMIN')
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PORTAL_ADMIN')
 
   - changeSet:
       id: create-user-address-3
@@ -372,7 +372,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pipeline Organization', 'Pipeline Team')
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Boostr Organization', 'Boostr Team')
               - column:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('admin@usepipeline.com')
