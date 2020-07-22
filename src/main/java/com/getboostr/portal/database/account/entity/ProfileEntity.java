@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "portal", name = "profiles")
+@Table(schema = "portal", name = "user_profiles")
 public class ProfileEntity implements Serializable {
     @Id
     @PrimaryKeyJoinColumn

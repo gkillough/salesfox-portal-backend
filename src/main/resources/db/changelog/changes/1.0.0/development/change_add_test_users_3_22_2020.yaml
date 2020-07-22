@@ -95,7 +95,7 @@ databaseChangeLog:
       changes:
         - insert:
             schemaName: portal
-            tableName: profiles
+            tableName: user_profiles
             columns:
               - column:
                   name: user_id
@@ -218,7 +218,7 @@ databaseChangeLog:
       changes:
         - insert:
             schemaName: portal
-            tableName: profiles
+            tableName: user_profiles
             columns:
               - column:
                   name: user_id
@@ -341,7 +341,7 @@ databaseChangeLog:
       changes:
         - insert:
             schemaName: portal
-            tableName: profiles
+            tableName: user_profiles
             columns:
               - column:
                   name: user_id

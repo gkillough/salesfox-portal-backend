@@ -262,7 +262,7 @@ databaseChangeLog:
               - column:
                   name: business_number
                   type: VARCHAR
-            tableName: profiles
+            tableName: user_profiles
             schemaName: portal
 
   - changeSet:
