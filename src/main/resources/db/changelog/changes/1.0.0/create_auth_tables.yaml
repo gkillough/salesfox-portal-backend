@@ -168,9 +168,13 @@ databaseChangeLog:
               - column:
                   name: organization_account_id
                   type: UUID
+                  constraints:
+                    nullable: false
               - column:
                   name: role_id
                   type: UUID
+                  constraints:
+                    nullable: false
             tableName: memberships
             schemaName: portal
 
