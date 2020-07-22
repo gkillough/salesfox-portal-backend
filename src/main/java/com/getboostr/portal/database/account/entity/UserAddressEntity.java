@@ -17,10 +17,6 @@ import java.util.UUID;
 @Table(schema = "portal", name = "user_addresses")
 public class UserAddressEntity extends AbstractAddressEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "user_address_id")
-    private UUID userAddressId;
-
     @PrimaryKeyJoinColumn
     @Column(name = "user_id")
     private UUID userId;

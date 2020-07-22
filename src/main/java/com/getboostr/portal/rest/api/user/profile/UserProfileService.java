@@ -8,9 +8,9 @@ import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.account.repository.ProfileRepository;
 import com.getboostr.portal.database.account.repository.UserAddressRepository;
 import com.getboostr.portal.database.account.repository.UserRepository;
+import com.getboostr.portal.rest.api.user.common.UserAccessService;
 import com.getboostr.portal.rest.api.user.profile.model.UserProfileModel;
 import com.getboostr.portal.rest.api.user.profile.model.UserProfileUpdateModel;
-import com.getboostr.portal.rest.api.user.common.UserAccessService;
 import com.getboostr.portal.rest.api.user.role.model.UserRoleModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +27,10 @@ import java.util.function.Supplier;
 @Slf4j
 @Component
 public class UserProfileService {
-    private ProfileRepository profileRepository;
-    private UserAddressRepository userAddressRepository;
-    private UserRepository userRepository;
-    private UserAccessService userAccessService;
+    private final ProfileRepository profileRepository;
+    private final UserAddressRepository userAddressRepository;
+    private final UserRepository userRepository;
+    private final UserAccessService userAccessService;
 
     @Autowired
     public UserProfileService(ProfileRepository profileRepository, UserAddressRepository userAddressRepository, UserRepository userRepository, UserAccessService userAccessService) {
@@ -40,16 +40,11 @@ public class UserProfileService {
         this.userAccessService = userAccessService;
     }
 
-    /**
-     * @return an optional profile id if a profile was created
-     */
     @Transactional
-    public Optional<UUID> initializeProfile(UUID userId) {
-        if (userId == null) {
-            return Optional.empty();
+    public void initializeProfile(UUID userId) {
+        if (userId != null) {
+            getOrInitializeProfile(userId);
         }
-        UUID profileId = getOrInitializeProfile(userId).getProfileId();
-        return Optional.of(profileId);
     }
 
     public UserProfileModel retrieveProfile(UUID userId) {
@@ -73,7 +68,7 @@ public class UserProfileService {
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(internalServerError);
 
-        PortalAddressModel portalAddressModel = userAddressRepository.findById(profileEntity.getMailingAddressId())
+        PortalAddressModel portalAddressModel = userAddressRepository.findById(userEntity.getUserId())
                 .map(PortalAddressModel::fromEntity)
                 .orElseThrow(internalServerError);
 
@@ -123,19 +118,15 @@ public class UserProfileService {
         UserEntity userToSave = new UserEntity(oldUser.getUserId(), updateModel.getEmail(), updateModel.getFirstName(), updateModel.getLastName(), oldUser.getIsActive());
         userRepository.save(userToSave);
 
-        ProfileEntity oldProfile = getOrInitializeProfile(userId);
-
         ProfileEntity profileEntityToSave = new ProfileEntity(
-                oldProfile.getProfileId(),
                 oldUser.getUserId(),
                 updateModel.getMobileNumber(),
-                updateModel.getBusinessNumber(),
-                oldProfile.getMailingAddressId()
+                updateModel.getBusinessNumber()
         );
         profileRepository.save(profileEntityToSave);
 
         PortalAddressModel addressModel = updateModel.getAddress();
-        UserAddressEntity userAddressToSave = new UserAddressEntity(oldProfile.getMailingAddressId(), oldUser.getUserId());
+        UserAddressEntity userAddressToSave = new UserAddressEntity(oldUser.getUserId());
         addressModel.copyFieldsToEntity(userAddressToSave);
         userAddressRepository.save(userAddressToSave);
     }
@@ -145,12 +136,12 @@ public class UserProfileService {
     }
 
     private ProfileEntity getOrInitializeProfile(UUID userId) {
-        Optional<ProfileEntity> existingProfile = profileRepository.findFirstByUserId(userId);
+        Optional<ProfileEntity> existingProfile = profileRepository.findById(userId);
         if (existingProfile.isPresent()) {
             return existingProfile.get();
         }
 
-        UserAddressEntity newAddress = new UserAddressEntity(null, userId);
+        UserAddressEntity newAddress = new UserAddressEntity(userId);
         newAddress.setStreetNumber(0);
         newAddress.setStreetName("");
         newAddress.setAptSuite("");
@@ -158,11 +149,10 @@ public class UserProfileService {
         newAddress.setState("");
         newAddress.setZipCode("");
         newAddress.setIsBusiness(false);
-        UserAddressEntity savedAddress = userAddressRepository.save(newAddress);
+        userAddressRepository.save(newAddress);
 
-        ProfileEntity newProfile = new ProfileEntity(null, userId, "", "", savedAddress.getUserAddressId());
-        ProfileEntity savedProfile = profileRepository.save(newProfile);
-        return savedProfile;
+        ProfileEntity newProfile = new ProfileEntity(userId, "", "");
+        return profileRepository.save(newProfile);
     }
 
     private void validateUserId(UUID userId) {

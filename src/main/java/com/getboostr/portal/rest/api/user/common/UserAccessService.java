@@ -57,8 +57,7 @@ public class UserAccessService {
 
     public UserRoleModel findRoleByUserId(UUID userId) {
         return membershipRepository.findById(userId)
-                .map(MembershipEntity::getRoleId)
-                .flatMap(roleRepository::findById)
+                .map(MembershipEntity::getRoleEntity)
                 .map(roleEntity -> new UserRoleModel(roleEntity.getRoleLevel(), roleEntity.getDescription()))
                 .orElse(UserRoleModel.ANONYMOUS_ROLE);
     }
