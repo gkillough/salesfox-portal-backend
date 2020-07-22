@@ -135,10 +135,6 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
                     primaryKeyName: logins_pkey
-                  defaultValueComputed: uuid_generate_v4()
-                  name: login_id
-                  type: UUID
-              - column:
                   name: user_id
                   type: UUID
               - column:

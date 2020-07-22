@@ -14,10 +14,10 @@ import com.getboostr.portal.database.inventory.InventoryRepository;
 import com.getboostr.portal.database.organization.OrganizationEntity;
 import com.getboostr.portal.database.organization.OrganizationRepository;
 import com.getboostr.portal.database.organization.account.OrganizationAccountEntity;
-import com.getboostr.portal.rest.api.registration.organization.OrganizationConstants;
 import com.getboostr.portal.database.organization.account.OrganizationAccountRepository;
-import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
+import com.getboostr.portal.rest.api.registration.organization.OrganizationConstants;
 import com.getboostr.portal.rest.api.user.profile.UserProfileService;
+import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,16 +36,16 @@ import java.util.UUID;
 @Slf4j
 @Component
 public class UserRegistrationService {
-    private UserRepository userRepository;
-    private LoginRepository loginRepository;
-    private RoleRepository roleRepository;
-    private OrganizationRepository organizationRepository;
-    private OrganizationAccountRepository organizationAccountRepository;
-    private MembershipRepository membershipRepository;
-    private InventoryRepository inventoryRepository;
-    private UserProfileService userProfileService;
-    private LicenseSeatManager licenseSeatManager;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final LoginRepository loginRepository;
+    private final RoleRepository roleRepository;
+    private final OrganizationRepository organizationRepository;
+    private final OrganizationAccountRepository organizationAccountRepository;
+    private final MembershipRepository membershipRepository;
+    private final InventoryRepository inventoryRepository;
+    private final UserProfileService userProfileService;
+    private final LicenseSeatManager licenseSeatManager;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserRegistrationService(UserRepository userRepository, LoginRepository loginRepository, RoleRepository roleRepository,
@@ -147,7 +147,7 @@ public class UserRegistrationService {
 
     private void saveLoginInfo(UUID userId, String password) {
         String encodedPassword = passwordEncoder.encode(password);
-        LoginEntity newLoginToSave = new LoginEntity(null, userId, encodedPassword, null, null, 0);
+        LoginEntity newLoginToSave = new LoginEntity(userId, encodedPassword, null, null, 0);
         loginRepository.save(newLoginToSave);
     }
 
