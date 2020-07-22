@@ -15,10 +15,6 @@ import java.util.UUID;
 @Table(schema = "portal", name = "memberships")
 public class MembershipEntity implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "membership_id")
-    private UUID membershipId;
-
     @PrimaryKeyJoinColumn
     @Column(name = "user_id")
     private UUID userId;

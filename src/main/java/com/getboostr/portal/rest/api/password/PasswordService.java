@@ -5,6 +5,8 @@ import com.getboostr.portal.common.service.email.EmailMessagingService;
 import com.getboostr.portal.common.service.email.PortalEmailException;
 import com.getboostr.portal.common.service.email.model.EmailMessageModel;
 import com.getboostr.portal.common.time.PortalDateTimeUtils;
+import com.getboostr.portal.database.account.entity.LoginEntity;
+import com.getboostr.portal.database.account.entity.PasswordResetTokenEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.account.key.PasswordResetTokenPK;
 import com.getboostr.portal.database.account.repository.LoginRepository;
@@ -13,8 +15,6 @@ import com.getboostr.portal.database.account.repository.UserRepository;
 import com.getboostr.portal.rest.security.authentication.SecurityContextUtils;
 import com.getboostr.portal.rest.security.authentication.user.PortalUserDetailsService;
 import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
-import com.getboostr.portal.database.account.entity.LoginEntity;
-import com.getboostr.portal.database.account.entity.PasswordResetTokenEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,13 +39,13 @@ import java.util.UUID;
 public class PasswordService {
     public static final Duration DURATION_OF_TOKEN_VALIDITY = Duration.ofMinutes(30);
 
-    private PortalConfiguration portalConfiguration;
-    private PasswordResetTokenRepository passwordResetTokenRepository;
-    private UserRepository userRepository;
-    private LoginRepository loginRepository;
-    private PortalUserDetailsService userDetailsService;
-    private PasswordEncoder passwordEncoder;
-    private EmailMessagingService emailMessagingService;
+    private final PortalConfiguration portalConfiguration;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final UserRepository userRepository;
+    private final LoginRepository loginRepository;
+    private final PortalUserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
+    private final EmailMessagingService emailMessagingService;
 
     @Autowired
     public PasswordService(PortalConfiguration portalConfiguration, PasswordResetTokenRepository passwordResetTokenRepository,
@@ -141,7 +141,7 @@ public class PasswordService {
     private boolean persistPasswordUpdate(String email, String password) {
         Optional<LoginEntity> optionalLoginEntity = userRepository.findFirstByEmail(email)
                 .map(UserEntity::getUserId)
-                .map(loginRepository::findFirstByUserId)
+                .map(loginRepository::findById)
                 .filter(Optional::isPresent)
                 .map(Optional::get);
         if (optionalLoginEntity.isPresent()) {

@@ -17,11 +17,11 @@ import javax.validation.constraints.NotNull;
 
 @Slf4j
 public abstract class AbstractMembershipRetrievalService<E extends Throwable> {
-    private UserRepository userRepository;
-    private MembershipRepository membershipRepository;
-    private RoleRepository roleRepository;
-    private OrganizationRepository organizationRepository;
-    private OrganizationAccountRepository organizationAccountRepository;
+    private final UserRepository userRepository;
+    private final MembershipRepository membershipRepository;
+    private final RoleRepository roleRepository;
+    private final OrganizationRepository organizationRepository;
+    private final OrganizationAccountRepository organizationAccountRepository;
 
     @Autowired
     public AbstractMembershipRetrievalService(UserRepository userRepository, MembershipRepository membershipRepository,
@@ -44,13 +44,13 @@ public abstract class AbstractMembershipRetrievalService<E extends Throwable> {
     public UserEntity getExistingUserFromMembership(@NotNull MembershipEntity membershipEntity) throws E {
         return userRepository.findById(membershipEntity.getUserId())
                 .orElseThrow(() -> {
-                    log.error("Expected user with id [{}] and membership id [{}] to exist in the database", membershipEntity.getUserId(), membershipEntity.getMembershipId());
+                    log.error("Expected user with id [{}] to exist in the database", membershipEntity.getUserId());
                     return unexpectedErrorDuringRetrieval();
                 });
     }
 
     public MembershipEntity getMembershipEntity(@NotNull UserEntity userEntity) throws E {
-        return membershipRepository.findFirstByUserId(userEntity.getUserId())
+        return membershipRepository.findById(userEntity.getUserId())
                 .orElseThrow(() -> {
                     log.error("Expected membership for user with id [{}] to exist in the database", userEntity.getUserId());
                     return unexpectedErrorDuringRetrieval();
@@ -60,7 +60,7 @@ public abstract class AbstractMembershipRetrievalService<E extends Throwable> {
     public RoleEntity getRoleEntity(@NotNull MembershipEntity membershipEntity) throws E {
         return roleRepository.findById(membershipEntity.getRoleId())
                 .orElseThrow(() -> {
-                    log.error("Expected role with id [{}] for user id [{}] and membership id [{}] to exist in the database", membershipEntity.getRoleId(), membershipEntity.getUserId(), membershipEntity.getMembershipId());
+                    log.error("Expected role with id [{}] for user id [{}] to exist in the database", membershipEntity.getRoleId(), membershipEntity.getUserId());
                     return unexpectedErrorDuringRetrieval();
                 });
     }
@@ -68,7 +68,7 @@ public abstract class AbstractMembershipRetrievalService<E extends Throwable> {
     public OrganizationAccountEntity getOrganizationAccountEntity(@NotNull MembershipEntity membershipEntity) throws E {
         return organizationAccountRepository.findById(membershipEntity.getOrganizationAccountId())
                 .orElseThrow(() -> {
-                    log.error("Expected organization account for user with id [{}], with membership id [{}] to exist in the database", membershipEntity.getUserId(), membershipEntity.getMembershipId());
+                    log.error("Expected organization account for user with id [{}] to exist in the database", membershipEntity.getUserId());
                     return unexpectedErrorDuringRetrieval();
                 });
     }

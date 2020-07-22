@@ -5,9 +5,9 @@ import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.account.repository.MembershipRepository;
 import com.getboostr.portal.database.account.repository.RoleRepository;
 import com.getboostr.portal.database.account.repository.UserRepository;
+import com.getboostr.portal.rest.api.user.role.model.UserRoleModel;
 import com.getboostr.portal.rest.security.authentication.SecurityContextUtils;
 import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
-import com.getboostr.portal.rest.api.user.role.model.UserRoleModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,9 +19,9 @@ import java.util.UUID;
 
 @Component
 public class UserAccessService {
-    private UserRepository userRepository;
-    private MembershipRepository membershipRepository;
-    private RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final MembershipRepository membershipRepository;
+    private final RoleRepository roleRepository;
 
     @Autowired
     public UserAccessService(UserRepository userRepository, MembershipRepository membershipRepository, RoleRepository roleRepository) {
@@ -56,7 +56,7 @@ public class UserAccessService {
     }
 
     public UserRoleModel findRoleByUserId(UUID userId) {
-        return membershipRepository.findFirstByUserId(userId)
+        return membershipRepository.findById(userId)
                 .map(MembershipEntity::getRoleId)
                 .flatMap(roleRepository::findById)
                 .map(roleEntity -> new UserRoleModel(roleEntity.getRoleLevel(), roleEntity.getDescription()))

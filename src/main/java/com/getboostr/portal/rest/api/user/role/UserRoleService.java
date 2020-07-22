@@ -16,8 +16,8 @@ import java.util.UUID;
 
 @Component
 public class UserRoleService {
-    private RoleRepository roleRepository;
-    private MembershipRepository membershipRepository;
+    private final RoleRepository roleRepository;
+    private final MembershipRepository membershipRepository;
 
     @Autowired
     public UserRoleService(RoleRepository roleRepository, MembershipRepository membershipRepository) {
@@ -35,7 +35,7 @@ public class UserRoleService {
             throw createBadRequest("The field 'level' cannot be blank");
         }
 
-        MembershipEntity membershipEntity = membershipRepository.findFirstByUserId(userId)
+        MembershipEntity membershipEntity = membershipRepository.findById(userId)
                 .orElseThrow(() -> createBadRequest(String.format("A membership with the user id ['%s'] does not exist", userId)));
 
         RoleEntity roleEntity = roleRepository.findFirstByRoleLevel(updateModel.getLevel())

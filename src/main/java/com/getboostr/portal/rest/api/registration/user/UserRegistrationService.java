@@ -152,7 +152,7 @@ public class UserRegistrationService {
     }
 
     private void saveMembershipInfo(UUID userId, UUID organizationAccountId, UUID roleId) {
-        MembershipEntity newMembershipToSave = new MembershipEntity(null, userId, organizationAccountId, roleId);
+        MembershipEntity newMembershipToSave = new MembershipEntity(userId, organizationAccountId, roleId);
         membershipRepository.save(newMembershipToSave);
     }
 

@@ -1,10 +1,10 @@
 package com.getboostr.portal.rest.security.authentication.user;
 
 import com.getboostr.portal.common.time.PortalDateTimeUtils;
+import com.getboostr.portal.database.account.entity.LoginEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.account.repository.LoginRepository;
 import com.getboostr.portal.database.account.repository.UserRepository;
-import com.getboostr.portal.database.account.entity.LoginEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +65,7 @@ public class PortalUserLoginAttemptService {
         return userRepository
                 .findFirstByEmail(username)
                 .map(UserEntity::getUserId)
-                .flatMap(loginRepository::findFirstByUserId);
+                .flatMap(loginRepository::findById);
     }
 
 }
