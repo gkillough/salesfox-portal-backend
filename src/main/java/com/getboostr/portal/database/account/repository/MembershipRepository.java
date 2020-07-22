@@ -7,13 +7,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Component
 public interface MembershipRepository extends JpaRepository<MembershipEntity, UUID> {
-    Optional<MembershipEntity> findFirstByUserId(UUID userId);
-
     Page<MembershipEntity> findByOrganizationAccountId(UUID organizationAccountId, Pageable pageable);
 
     List<MembershipEntity> findByRoleIdAndOrganizationAccountId(UUID roleId, UUID organizationAccountId);

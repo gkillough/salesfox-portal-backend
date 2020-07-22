@@ -100,7 +100,7 @@ databaseChangeLog:
       changes:
         - insert:
             schemaName: portal
-            tableName: profiles
+            tableName: user_profiles
             columns:
               - column:
                   name: user_id
@@ -111,9 +111,6 @@ databaseChangeLog:
               - column:
                   name: business_number
                   valueComputed: 5555555111
-              - column:
-                  name: mailing_address_id
-                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test1@usepipeline.com')
 
   ###############################
   # TEST ORG 1 ACCOUNT 1 USER 2 #
@@ -215,7 +212,7 @@ databaseChangeLog:
       changes:
         - insert:
             schemaName: portal
-            tableName: profiles
+            tableName: user_profiles
             columns:
               - column:
                   name: user_id
@@ -226,9 +223,6 @@ databaseChangeLog:
               - column:
                   name: business_number
                   valueComputed: 5555555112
-              - column:
-                  name: mailing_address_id
-                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test2@usepipeline.com')
 
   ###############################
   # TEST ORG 1 ACCOUNT 1 USER 3 #
@@ -330,7 +324,7 @@ databaseChangeLog:
       changes:
         - insert:
             schemaName: portal
-            tableName: profiles
+            tableName: user_profiles
             columns:
               - column:
                   name: user_id
@@ -341,9 +335,6 @@ databaseChangeLog:
               - column:
                   name: business_number
                   valueComputed: 5555555113
-              - column:
-                  name: mailing_address_id
-                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test3@usepipeline.com')
 
   ###############################
   # TEST ORG 1 ACCOUNT 1 USER 4 #
@@ -445,7 +436,7 @@ databaseChangeLog:
       changes:
         - insert:
             schemaName: portal
-            tableName: profiles
+            tableName: user_profiles
             columns:
               - column:
                   name: user_id
@@ -456,9 +447,6 @@ databaseChangeLog:
               - column:
                   name: business_number
                   valueComputed: 5555555114
-              - column:
-                  name: mailing_address_id
-                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test4@usepipeline.com')
 
   ###############################
   # TEST ORG 1 ACCOUNT 2 USER 1 #
@@ -560,7 +548,7 @@ databaseChangeLog:
       changes:
         - insert:
             schemaName: portal
-            tableName: profiles
+            tableName: user_profiles
             columns:
               - column:
                   name: user_id
@@ -571,9 +559,6 @@ databaseChangeLog:
               - column:
                   name: business_number
                   valueComputed: 5555555121
-              - column:
-                  name: mailing_address_id
-                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test5@usepipeline.com')
 
   ###############################
   # TEST ORG 1 ACCOUNT 2 USER 2 #
@@ -675,7 +660,7 @@ databaseChangeLog:
       changes:
         - insert:
             schemaName: portal
-            tableName: profiles
+            tableName: user_profiles
             columns:
               - column:
                   name: user_id
@@ -686,9 +671,6 @@ databaseChangeLog:
               - column:
                   name: business_number
                   valueComputed: 5555555122
-              - column:
-                  name: mailing_address_id
-                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test2@usepipeline.com')
 
   ###############################
   # TEST ORG 1 ACCOUNT 2 USER 3 #
@@ -790,7 +772,7 @@ databaseChangeLog:
       changes:
         - insert:
             schemaName: portal
-            tableName: profiles
+            tableName: user_profiles
             columns:
               - column:
                   name: user_id
@@ -801,9 +783,6 @@ databaseChangeLog:
               - column:
                   name: business_number
                   valueComputed: 5555555123
-              - column:
-                  name: mailing_address_id
-                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test3@usepipeline.com')
 
   ###############################
   # TEST ORG 1 ACCOUNT 2 USER 4 #
@@ -905,7 +884,7 @@ databaseChangeLog:
       changes:
         - insert:
             schemaName: portal
-            tableName: profiles
+            tableName: user_profiles
             columns:
               - column:
                   name: user_id
@@ -916,6 +895,3 @@ databaseChangeLog:
               - column:
                   name: business_number
                   valueComputed: 5555555124
-              - column:
-                  name: mailing_address_id
-                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('test4@usepipeline.com')

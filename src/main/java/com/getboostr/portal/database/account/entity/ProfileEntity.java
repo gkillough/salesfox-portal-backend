@@ -12,13 +12,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "portal", name = "profiles")
+@Table(schema = "portal", name = "user_profiles")
 public class ProfileEntity implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "profile_id")
-    private UUID profileId;
-
     @PrimaryKeyJoinColumn
     @Column(name = "user_id")
     private UUID userId;
@@ -28,9 +24,5 @@ public class ProfileEntity implements Serializable {
 
     @Column(name = "business_number")
     private String businessNumber;
-
-    @PrimaryKeyJoinColumn
-    @Column(name = "mailing_address_id")
-    private UUID mailingAddressId;
 
 }

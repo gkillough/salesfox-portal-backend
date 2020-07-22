@@ -95,7 +95,7 @@ databaseChangeLog:
       changes:
         - insert:
             schemaName: portal
-            tableName: profiles
+            tableName: user_profiles
             columns:
               - column:
                   name: user_id
@@ -106,9 +106,6 @@ databaseChangeLog:
               - column:
                   name: business_number
                   valueComputed: 5555550002
-              - column:
-                  name: mailing_address_id
-                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('basic.user@usepipeline.com')
 
   - changeSet:
       id: create-user-inventory-1
@@ -221,7 +218,7 @@ databaseChangeLog:
       changes:
         - insert:
             schemaName: portal
-            tableName: profiles
+            tableName: user_profiles
             columns:
               - column:
                   name: user_id
@@ -232,9 +229,6 @@ databaseChangeLog:
               - column:
                   name: business_number
                   valueComputed: 5555550004
-              - column:
-                  name: mailing_address_id
-                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('premium.user@usepipeline.com')
 
   - changeSet:
       id: create-user-inventory-2
@@ -347,7 +341,7 @@ databaseChangeLog:
       changes:
         - insert:
             schemaName: portal
-            tableName: profiles
+            tableName: user_profiles
             columns:
               - column:
                   name: user_id
@@ -358,9 +352,6 @@ databaseChangeLog:
               - column:
                   name: business_number
                   valueComputed: 5555550006
-              - column:
-                  name: mailing_address_id
-                  valueComputed: GET_USER_ADDRESS_ID_BY_USER_EMAIL('admin@usepipeline.com')
 
   - changeSet:
       id: create-user-inventory-3

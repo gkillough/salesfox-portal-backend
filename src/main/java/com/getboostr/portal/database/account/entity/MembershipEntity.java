@@ -1,6 +1,6 @@
 package com.getboostr.portal.database.account.entity;
 
-import lombok.AllArgsConstructor;
+import com.getboostr.portal.database.organization.account.OrganizationAccountEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,15 +10,10 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "memberships")
 public class MembershipEntity implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "membership_id")
-    private UUID membershipId;
-
     @PrimaryKeyJoinColumn
     @Column(name = "user_id")
     private UUID userId;
@@ -30,5 +25,19 @@ public class MembershipEntity implements Serializable {
     @PrimaryKeyJoinColumn
     @Column(name = "role_id")
     private UUID roleId;
+
+    @OneToOne(optional = false, fetch = FetchType.EAGER)
+    @JoinColumn(name = "organization_account_id", referencedColumnName = "organization_account_id", insertable = false, updatable = false)
+    private OrganizationAccountEntity organizationAccountEntity;
+
+    @OneToOne(optional = false, fetch = FetchType.EAGER)
+    @JoinColumn(name = "role_id", referencedColumnName = "role_id", insertable = false, updatable = false)
+    private RoleEntity roleEntity;
+
+    public MembershipEntity(UUID userId, UUID organizationAccountId, UUID roleId) {
+        this.userId = userId;
+        this.organizationAccountId = organizationAccountId;
+        this.roleId = roleId;
+    }
 
 }

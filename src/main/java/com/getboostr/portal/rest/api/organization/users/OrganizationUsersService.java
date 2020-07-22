@@ -1,6 +1,7 @@
 package com.getboostr.portal.rest.api.organization.users;
 
 import com.getboostr.portal.common.enumeration.AccessOperation;
+import com.getboostr.portal.database.account.entity.LoginEntity;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.RoleEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
@@ -9,20 +10,19 @@ import com.getboostr.portal.database.account.repository.MembershipRepository;
 import com.getboostr.portal.database.account.repository.RoleRepository;
 import com.getboostr.portal.database.account.repository.UserRepository;
 import com.getboostr.portal.database.organization.account.OrganizationAccountEntity;
-import com.getboostr.portal.rest.api.organization.common.OrganizationAccessService;
-import com.getboostr.portal.rest.api.organization.users.model.OrganizationMultiUsersModel;
-import com.getboostr.portal.rest.api.organization.users.model.OrganizationUserAdminViewModel;
-import com.getboostr.portal.database.account.entity.LoginEntity;
 import com.getboostr.portal.database.organization.account.OrganizationAccountRepository;
 import com.getboostr.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
-import com.getboostr.portal.rest.security.authentication.user.PortalUserDetailsService;
-import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
+import com.getboostr.portal.rest.api.organization.common.OrganizationAccessService;
+import com.getboostr.portal.rest.api.organization.users.model.OrganizationMultiUsersModel;
+import com.getboostr.portal.rest.api.organization.users.model.OrganizationUserAdminViewModel;
 import com.getboostr.portal.rest.api.user.active.UserActiveService;
 import com.getboostr.portal.rest.api.user.common.model.UserLoginInfoModel;
 import com.getboostr.portal.rest.api.user.profile.UserProfileService;
 import com.getboostr.portal.rest.api.user.profile.model.UserProfileModel;
 import com.getboostr.portal.rest.api.user.role.model.UserRoleModel;
+import com.getboostr.portal.rest.security.authentication.user.PortalUserDetailsService;
+import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,16 +41,16 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class OrganizationUsersService {
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private OrganizationAccessService organizationAccessService;
-    private UserProfileService userProfileService;
-    private UserActiveService userActiveService;
-    private PortalUserDetailsService portalUserDetailsService;
-    private OrganizationAccountRepository organizationAccountRepository;
-    private RoleRepository roleRepository;
-    private MembershipRepository membershipRepository;
-    private UserRepository userRepository;
-    private LoginRepository loginRepository;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final OrganizationAccessService organizationAccessService;
+    private final UserProfileService userProfileService;
+    private final UserActiveService userActiveService;
+    private final PortalUserDetailsService portalUserDetailsService;
+    private final OrganizationAccountRepository organizationAccountRepository;
+    private final RoleRepository roleRepository;
+    private final MembershipRepository membershipRepository;
+    private final UserRepository userRepository;
+    private final LoginRepository loginRepository;
 
     @Autowired
     public OrganizationUsersService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccessService organizationAccessService, UserProfileService userProfileService, UserActiveService userActiveService,
@@ -135,7 +135,7 @@ public class OrganizationUsersService {
         validateUserHasAccessToOrgAccount(authenticatedUserEntity, orgAccountEntity, AccessOperation.UPDATE);
         validateUserIsAMemberOfOrgAccount(organizationAccountId, userToBeUnlocked);
 
-        LoginEntity loginEntity = loginRepository.findFirstByUserId(userId)
+        LoginEntity loginEntity = loginRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
         boolean isUserLocked = portalUserDetailsService.isUserLocked(loginEntity);
         if (isUserLocked) {
@@ -191,7 +191,7 @@ public class OrganizationUsersService {
 
         UserLoginInfoModel loginInfo = null;
         if (includeLoginInfo) {
-            LoginEntity loginEntity = loginRepository.findFirstByUserId(userEntity.getUserId())
+            LoginEntity loginEntity = loginRepository.findById(userEntity.getUserId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
             boolean isUserLocked = portalUserDetailsService.isUserLocked(loginEntity);
             loginInfo = new UserLoginInfoModel(loginEntity.getLastSuccessfulLogin(), loginEntity.getLastLocked(), isUserLocked);
@@ -201,8 +201,8 @@ public class OrganizationUsersService {
     }
 
     private static class UserRoleModelCache {
-        private RoleRepository roleRepository;
-        private Map<UUID, UserRoleModel> roleIdToModelMap = new HashMap<>();
+        private final RoleRepository roleRepository;
+        private final Map<UUID, UserRoleModel> roleIdToModelMap = new HashMap<>();
 
         private UserRoleModelCache(RoleRepository roleRepository) {
             this.roleRepository = roleRepository;

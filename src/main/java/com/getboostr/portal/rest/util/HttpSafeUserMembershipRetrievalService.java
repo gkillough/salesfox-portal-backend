@@ -6,9 +6,9 @@ import com.getboostr.portal.database.account.repository.MembershipRepository;
 import com.getboostr.portal.database.account.repository.RoleRepository;
 import com.getboostr.portal.database.account.repository.UserRepository;
 import com.getboostr.portal.database.organization.OrganizationRepository;
+import com.getboostr.portal.database.organization.account.OrganizationAccountRepository;
 import com.getboostr.portal.rest.security.authentication.SecurityContextUtils;
 import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
-import com.getboostr.portal.database.organization.account.OrganizationAccountRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class HttpSafeUserMembershipRetrievalService extends AbstractMembershipRe
     @Autowired
     public HttpSafeUserMembershipRetrievalService(UserRepository userRepository, MembershipRepository membershipRepository,
                                                   RoleRepository roleRepository, OrganizationRepository organizationRepository, OrganizationAccountRepository organizationAccountRepository) {
-        super(userRepository, membershipRepository, roleRepository, organizationRepository, organizationAccountRepository);
+        super(userRepository, organizationRepository);
     }
 
     public UserDetails getAuthenticatedUserDetails() {

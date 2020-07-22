@@ -1,6 +1,7 @@
 package com.getboostr.portal.rest.security.authentication.user;
 
 import com.getboostr.portal.common.time.PortalDateTimeUtils;
+import com.getboostr.portal.database.account.entity.LoginEntity;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.RoleEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
@@ -8,7 +9,6 @@ import com.getboostr.portal.database.account.repository.LoginRepository;
 import com.getboostr.portal.database.account.repository.MembershipRepository;
 import com.getboostr.portal.database.account.repository.RoleRepository;
 import com.getboostr.portal.database.account.repository.UserRepository;
-import com.getboostr.portal.database.account.entity.LoginEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,10 +23,10 @@ import java.util.ArrayList;
 @Component
 @Slf4j
 public class PortalUserDetailsService implements UserDetailsService {
-    private MembershipRepository membershipRepository;
-    private LoginRepository loginRepository;
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
+    private final MembershipRepository membershipRepository;
+    private final LoginRepository loginRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
     @Autowired
     public PortalUserDetailsService(MembershipRepository membershipRepository, LoginRepository loginRepository, UserRepository userRepository, RoleRepository roleRepository) {
@@ -38,13 +38,10 @@ public class PortalUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // FIXME replace with reasonable joins
         UserEntity user = userRepository.findFirstByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("No user"));
-        LoginEntity userLogin = loginRepository.findFirstByUserId(user.getUserId())
-                .orElseThrow(() -> new UsernameNotFoundException("No login"));
-        MembershipEntity membership = membershipRepository.findFirstByUserId(userLogin.getUserId())
-                .orElseThrow(() -> new UsernameNotFoundException("No membership"));
+        LoginEntity userLogin = user.getLoginEntity();
+        MembershipEntity membership = user.getMembershipEntity();
 
         ArrayList<String> userRoles = new ArrayList<>();
         roleRepository.findById(membership.getRoleId())

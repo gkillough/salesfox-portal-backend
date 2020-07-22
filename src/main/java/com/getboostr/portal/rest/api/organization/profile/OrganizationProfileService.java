@@ -6,8 +6,6 @@ import com.getboostr.portal.common.model.PortalAddressModel;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.organization.OrganizationEntity;
 import com.getboostr.portal.database.organization.account.OrganizationAccountEntity;
-import com.getboostr.portal.rest.api.organization.profile.model.OrganizationAccountProfileModel;
-import com.getboostr.portal.rest.api.organization.profile.model.OrganizationAccountProfileUpdateModel;
 import com.getboostr.portal.database.organization.account.OrganizationAccountRepository;
 import com.getboostr.portal.database.organization.account.address.OrganizationAccountAddressEntity;
 import com.getboostr.portal.database.organization.account.address.OrganizationAccountAddressRepository;
@@ -15,6 +13,8 @@ import com.getboostr.portal.database.organization.account.profile.OrganizationAc
 import com.getboostr.portal.database.organization.account.profile.OrganizationAccountProfileRepository;
 import com.getboostr.portal.rest.api.organization.common.OrganizationAccessService;
 import com.getboostr.portal.rest.api.organization.common.OrganizationValidationService;
+import com.getboostr.portal.rest.api.organization.profile.model.OrganizationAccountProfileModel;
+import com.getboostr.portal.rest.api.organization.profile.model.OrganizationAccountProfileUpdateModel;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -32,12 +32,12 @@ import java.util.UUID;
 @Slf4j
 @Component
 public class OrganizationProfileService {
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private OrganizationAccessService organizationAccessService;
-    private OrganizationValidationService organizationValidationService;
-    private OrganizationAccountRepository organizationAccountRepository;
-    private OrganizationAccountProfileRepository organizationAccountProfileRepository;
-    private OrganizationAccountAddressRepository organizationAccountAddressRepository;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final OrganizationAccessService organizationAccessService;
+    private final OrganizationValidationService organizationValidationService;
+    private final OrganizationAccountRepository organizationAccountRepository;
+    private final OrganizationAccountProfileRepository organizationAccountProfileRepository;
+    private final OrganizationAccountAddressRepository organizationAccountAddressRepository;
 
     @Autowired
     public OrganizationProfileService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccessService organizationAccessService, OrganizationValidationService organizationValidationService,
@@ -100,7 +100,7 @@ public class OrganizationProfileService {
     }
 
     private OrganizationAccountAddressEntity getOrgAccountAddressEntity(OrganizationAccountProfileEntity profileEntity) {
-        return organizationAccountAddressRepository.findById(profileEntity.getMailingAddressId())
+        return organizationAccountAddressRepository.findById(profileEntity.getOrganizationAccountId())
                 .orElseThrow(() -> {
                     log.error("Missing organization account profile for organizationProfileId: [{}]", profileEntity.getProfileId());
                     return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);

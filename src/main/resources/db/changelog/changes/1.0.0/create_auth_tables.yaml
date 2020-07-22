@@ -1,402 +1,367 @@
 databaseChangeLog:
-    - changeSet:
-        id: create-auth-tables-1
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-1
+      author: gavinkillough
+      changes:
         - createTable:
             columns:
-            - column:
-                constraints:
-                  nullable: false
-                  primaryKey: true
-                  primaryKeyName: licenses_pkey
-                defaultValueComputed: uuid_generate_v4()
-                name: license_id
-                type: UUID
-            - column:
-                name: license_hash
-                type: UUID
-            - column:
-                name: expiration_date
-                type: date
-            - column:
-                name: type
-                type: VARCHAR
-            - column:
-                name: available_license_seats
-                type: BIGINT
-            - column:
-                name: max_license_seats
-                type: BIGINT
-            - column:
-                name: monthly_cost
-                type: DOUBLE PRECISION
-            - column:
-                defaultValueBoolean: true
-                name: is_active
-                type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: licenses_pkey
+                  defaultValueComputed: uuid_generate_v4()
+                  name: license_id
+                  type: UUID
+              - column:
+                  name: license_hash
+                  type: UUID
+              - column:
+                  name: expiration_date
+                  type: date
+              - column:
+                  name: type
+                  type: VARCHAR
+              - column:
+                  name: available_license_seats
+                  type: BIGINT
+              - column:
+                  name: max_license_seats
+                  type: BIGINT
+              - column:
+                  name: monthly_cost
+                  type: DOUBLE PRECISION
+              - column:
+                  defaultValueBoolean: true
+                  name: is_active
+                  type: BOOLEAN
             tableName: licenses
             schemaName: portal
 
-    - changeSet:
-        id: create-auth-tables-2
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-2
+      author: gavinkillough
+      changes:
         - createTable:
             columns:
-            - column:
-                constraints:
-                  nullable: false
-                  primaryKey: true
-                  primaryKeyName: organization_accounts_pkey
-                defaultValueComputed: uuid_generate_v4()
-                name: organization_account_id
-                type: UUID
-            - column:
-                name: organization_account_name
-                type: VARCHAR
-            - column:
-                name: license_id
-                type: UUID
-            - column:
-                name: organization_id
-                type: UUID
-            - column:
-                defaultValueBoolean: true
-                name: is_active
-                type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: organization_accounts_pkey
+                  defaultValueComputed: uuid_generate_v4()
+                  name: organization_account_id
+                  type: UUID
+              - column:
+                  name: organization_account_name
+                  type: VARCHAR
+              - column:
+                  name: license_id
+                  type: UUID
+              - column:
+                  name: organization_id
+                  type: UUID
+              - column:
+                  defaultValueBoolean: true
+                  name: is_active
+                  type: BOOLEAN
             tableName: organization_accounts
             schemaName: portal
 
-    - changeSet:
-        id: create-auth-tables-3
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-3
+      author: gavinkillough
+      changes:
         - createTable:
             columns:
-            - column:
-                constraints:
-                  nullable: false
-                  primaryKey: true
-                  primaryKeyName: organizations_pkey
-                defaultValueComputed: uuid_generate_v4()
-                name: organization_id
-                type: UUID
-            - column:
-                name: organization_name
-                type: VARCHAR
-            - column:
-                defaultValueBoolean: true
-                name: is_active
-                type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: organizations_pkey
+                  defaultValueComputed: uuid_generate_v4()
+                  name: organization_id
+                  type: UUID
+              - column:
+                  name: organization_name
+                  type: VARCHAR
+              - column:
+                  defaultValueBoolean: true
+                  name: is_active
+                  type: BOOLEAN
             tableName: organizations
             schemaName: portal
 
-    - changeSet:
-        id: create-auth-tables-4
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-4
+      author: gavinkillough
+      changes:
         - createTable:
             columns:
-            - column:
-                constraints:
-                  nullable: false
-                  primaryKey: true
-                  primaryKeyName: users_pkey
-                defaultValueComputed: uuid_generate_v4()
-                name: user_id
-                type: UUID
-            - column:
-                constraints:
-                  nullable: false
-                name: email
-                type: VARCHAR
-            - column:
-                name: first_name
-                type: VARCHAR
-            - column:
-                name: last_name
-                type: VARCHAR
-            - column:
-                defaultValueBoolean: true
-                name: is_active
-                type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: users_pkey
+                  defaultValueComputed: uuid_generate_v4()
+                  name: user_id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: email
+                  type: VARCHAR
+              - column:
+                  name: first_name
+                  type: VARCHAR
+              - column:
+                  name: last_name
+                  type: VARCHAR
+              - column:
+                  defaultValueBoolean: true
+                  name: is_active
+                  type: BOOLEAN
             tableName: users
             schemaName: portal
 
-    - changeSet:
-        id: create-auth-tables-5
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-5
+      author: gavinkillough
+      changes:
         - createTable:
             columns:
-            - column:
-                constraints:
-                  nullable: false
-                  primaryKey: true
-                  primaryKeyName: logins_pkey
-                defaultValueComputed: uuid_generate_v4()
-                name: login_id
-                type: UUID
-            - column:
-                name: user_id
-                type: UUID
-            - column:
-                name: password_hash
-                type: VARCHAR
-            - column:
-                name: last_successful_login
-                type: TIMESTAMP WITHOUT TIME ZONE
-            - column:
-                name: last_locked
-                type: TIMESTAMP WITHOUT TIME ZONE
-            - column:
-                name: num_failed_logins
-                type: INTEGER
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: logins_pkey
+                  name: user_id
+                  type: UUID
+              - column:
+                  name: password_hash
+                  type: VARCHAR
+              - column:
+                  name: last_successful_login
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: last_locked
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: num_failed_logins
+                  type: INTEGER
             tableName: logins
             schemaName: portal
 
-    - changeSet:
-        id: create-auth-tables-6
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-6
+      author: gavinkillough
+      changes:
         - createTable:
             columns:
-            - column:
-                constraints:
-                  nullable: false
-                  primaryKey: true
-                  primaryKeyName: memberships_pkey
-                defaultValueComputed: uuid_generate_v4()
-                name: membership_id
-                type: UUID
-            - column:
-                name: user_id
-                type: UUID
-            - column:
-                name: organization_account_id
-                type: UUID
-            - column:
-                name: role_id
-                type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: memberships_pkey
+                  name: user_id
+                  type: UUID
+              - column:
+                  name: organization_account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: UUID
+                  constraints:
+                    nullable: false
             tableName: memberships
             schemaName: portal
 
-    - changeSet:
-        id: create-auth-tables-7
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-7
+      author: gavinkillough
+      changes:
         - createTable:
             columns:
-            - column:
-                constraints:
-                  nullable: false
-                  primaryKey: true
-                  primaryKeyName: organization_account_addresses_pkey
-                defaultValueComputed: uuid_generate_v4()
-                name: organization_account_address_id
-                type: UUID
-            - column:
-                constraints:
-                  nullable: false
-                name: organization_account_id
-                type: UUID
-            - column:
-                name: street_number
-                type: INTEGER
-            - column:
-                name: street_name
-                type: VARCHAR
-            - column:
-                name: apt_suite
-                type: VARCHAR
-            - column:
-                name: city
-                type: VARCHAR
-            - column:
-                name: state
-                type: VARCHAR(2)
-            - column:
-                name: zip_code
-                type: VARCHAR(10)
-            - column:
-                name: is_business
-                type: BOOLEAN
+              - column:
+                  name: organization_account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: organization_account_addresses_pkey
+              - column:
+                  name: street_number
+                  type: INTEGER
+              - column:
+                  name: street_name
+                  type: VARCHAR
+              - column:
+                  name: apt_suite
+                  type: VARCHAR
+              - column:
+                  name: city
+                  type: VARCHAR
+              - column:
+                  name: state
+                  type: VARCHAR(2)
+              - column:
+                  name: zip_code
+                  type: VARCHAR(10)
+              - column:
+                  name: is_business
+                  type: BOOLEAN
             tableName: organization_account_addresses
             schemaName: portal
 
-    - changeSet:
-        id: create-auth-tables-8
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-8
+      author: gavinkillough
+      changes:
         - createTable:
             columns:
-            - column:
-                constraints:
-                  nullable: false
-                  primaryKey: true
-                  primaryKeyName: password_reset_tokens_pkey
-                name: email
-                type: VARCHAR
-            - column:
-                constraints:
-                  nullable: false
-                  primaryKey: true
-                  primaryKeyName: password_reset_tokens_pkey
-                name: token
-                type: VARCHAR
-            - column:
-                constraints:
-                  nullable: false
-                name: date_generated
-                type: TIMESTAMP WITHOUT TIME ZONE
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: password_reset_tokens_pkey
+                  name: email
+                  type: VARCHAR
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: password_reset_tokens_pkey
+                  name: token
+                  type: VARCHAR
+              - column:
+                  constraints:
+                    nullable: false
+                  name: date_generated
+                  type: TIMESTAMP WITH TIME ZONE
             tableName: password_reset_tokens
             schemaName: portal
 
-    - changeSet:
-        id: create-auth-tables-9
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-9
+      author: gavinkillough
+      changes:
         - createTable:
             columns:
-            - column:
-                constraints:
-                  nullable: false
-                  primaryKey: true
-                  primaryKeyName: profiles_pkey
-                defaultValueComputed: uuid_generate_v4()
-                name: profile_id
-                type: UUID
-            - column:
-                constraints:
-                  nullable: false
-                name: user_id
-                type: UUID
-            - column:
-                name: mobile_number
-                type: VARCHAR
-            - column:
-                name: business_number
-                type: VARCHAR
-            - column:
-                name: mailing_address_id
-                type: UUID
-            tableName: profiles
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: profiles_pkey
+                  name: user_id
+                  type: UUID
+              - column:
+                  name: mobile_number
+                  type: VARCHAR
+              - column:
+                  name: business_number
+                  type: VARCHAR
+            tableName: user_profiles
             schemaName: portal
 
-    - changeSet:
-        id: create-auth-tables-10
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-10
+      author: gavinkillough
+      changes:
         - createTable:
             columns:
-            - column:
-                constraints:
-                  nullable: false
-                  primaryKey: true
-                  primaryKeyName: roles_pkey
-                defaultValueComputed: uuid_generate_v4()
-                name: role_id
-                type: UUID
-            - column:
-                name: role_level
-                type: VARCHAR
-            - column:
-                name: role_description
-                type: VARCHAR
-            - column:
-                name: is_role_restricted
-                type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: roles_pkey
+                  defaultValueComputed: uuid_generate_v4()
+                  name: role_id
+                  type: UUID
+              - column:
+                  name: role_level
+                  type: VARCHAR
+              - column:
+                  name: role_description
+                  type: VARCHAR
+              - column:
+                  name: is_role_restricted
+                  type: BOOLEAN
             tableName: roles
             schemaName: portal
 
-    - changeSet:
-        id: create-auth-tables-11
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-11
+      author: gavinkillough
+      changes:
         - createTable:
             columns:
-            - column:
-                constraints:
-                  nullable: false
-                  primaryKey: true
-                  primaryKeyName: user_addresses_pkey
-                defaultValueComputed: uuid_generate_v4()
-                name: user_address_id
-                type: UUID
-            - column:
-                constraints:
-                  nullable: false
-                name: user_id
-                type: UUID
-            - column:
-                name: street_number
-                type: INTEGER
-            - column:
-                name: street_name
-                type: VARCHAR
-            - column:
-                name: apt_suite
-                type: VARCHAR
-            - column:
-                name: city
-                type: VARCHAR
-            - column:
-                name: state
-                type: VARCHAR(2)
-            - column:
-                name: zip_code
-                type: VARCHAR(10)
-            - column:
-                name: is_business
-                type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: user_addresses_pkey
+                  name: user_id
+                  type: UUID
+              - column:
+                  name: street_number
+                  type: INTEGER
+              - column:
+                  name: street_name
+                  type: VARCHAR
+              - column:
+                  name: apt_suite
+                  type: VARCHAR
+              - column:
+                  name: city
+                  type: VARCHAR
+              - column:
+                  name: state
+                  type: VARCHAR(2)
+              - column:
+                  name: zip_code
+                  type: VARCHAR(10)
+              - column:
+                  name: is_business
+                  type: BOOLEAN
             tableName: user_addresses
             schemaName: portal
 
-    - changeSet:
-        id: create-auth-tables-12
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-12
+      author: gavinkillough
+      changes:
         - addUniqueConstraint:
             columnNames: license_hash
             constraintName: licenses_license_hash_key
             tableName: licenses
             schemaName: portal
 
-    - changeSet:
-        id: create-auth-tables-13
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-13
+      author: gavinkillough
+      changes:
         - addUniqueConstraint:
             columnNames: organization_id, organization_account_name
             constraintName: organization_accounts_organization_account_name_with_id_key
             tableName: organization_accounts
             schemaName: portal
 
-    - changeSet:
-        id: create-auth-tables-14
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-14
+      author: gavinkillough
+      changes:
         - addUniqueConstraint:
             columnNames: email
             constraintName: users_email_key
             tableName: users
             schemaName: portal
 
-    - changeSet:
-        id: create-auth-tables-15
-        author: gavinkillough
-        changes:
-        - addUniqueConstraint:
-            columnNames: organization_account_id
-            constraintName: organization_account_addresses_organization_account_id_key
-            tableName: organization_account_addresses
-            schemaName: portal
-
-    - changeSet:
-        id: create-auth-tables-16
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-16
+      author: gavinkillough
+      changes:
         - addForeignKeyConstraint:
             baseColumnNames: organization_account_id
             baseTableName: organization_account_addresses
@@ -411,40 +376,20 @@ databaseChangeLog:
             referencedTableSchemaName: portal
             validate: true
 
-    - changeSet:
-        id: create-auth-tables-17
-        author: gavinkillough
-        changes:
-        - addUniqueConstraint:
-            columnNames: user_id
-            constraintName: profiles_user_id_key
-            tableName: profiles
-            schemaName: portal
-
-    - changeSet:
-        id: create-auth-tables-18
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-18
+      author: gavinkillough
+      changes:
         - addUniqueConstraint:
             columnNames: role_level
             constraintName: roles_role_level_key
             tableName: roles
             schemaName: portal
 
-    - changeSet:
-        id: create-auth-tables-19
-        author: gavinkillough
-        changes:
-        - addUniqueConstraint:
-            columnNames: user_id
-            constraintName: user_addresses_user_id_key
-            tableName: user_addresses
-            schemaName: portal
-
-    - changeSet:
-        id: create-auth-tables-20
-        author: gavinkillough
-        changes:
+  - changeSet:
+      id: create-auth-tables-20
+      author: gavinkillough
+      changes:
         - addForeignKeyConstraint:
             baseColumnNames: user_id
             baseTableName: user_addresses
