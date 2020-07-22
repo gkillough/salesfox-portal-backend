@@ -1,6 +1,5 @@
 package com.getboostr.portal.database.account.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +9,6 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "users")
 public class UserEntity implements Serializable {
@@ -30,5 +28,21 @@ public class UserEntity implements Serializable {
 
     @Column(name = "is_active")
     private Boolean isActive;
+
+    @OneToOne(optional = false, fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
+    private LoginEntity loginEntity;
+
+    @OneToOne(optional = false, fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
+    private MembershipEntity membershipEntity;
+
+    public UserEntity(UUID userId, String email, String firstName, String lastName, Boolean isActive) {
+        this.userId = userId;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.isActive = isActive;
+    }
 
 }
