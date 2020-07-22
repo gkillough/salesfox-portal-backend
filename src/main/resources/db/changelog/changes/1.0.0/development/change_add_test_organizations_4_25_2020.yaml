@@ -120,9 +120,6 @@ databaseChangeLog:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
               - column:
-                  name: mailing_address_id
-                  valueComputed: GET_ORG_ACCT_ADDRESS_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
-              - column:
                   name: business_number
                   value: 5555555555
 
@@ -238,9 +235,6 @@ databaseChangeLog:
               - column:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
-              - column:
-                  name: mailing_address_id
-                  valueComputed: GET_ORG_ACCT_ADDRESS_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
               - column:
                   name: business_number
                   value: 5555550005
@@ -377,9 +371,6 @@ databaseChangeLog:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
               - column:
-                  name: mailing_address_id
-                  valueComputed: GET_ORG_ACCT_ADDRESS_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
-              - column:
                   name: business_number
                   value: 5555550050
 
@@ -495,9 +486,6 @@ databaseChangeLog:
               - column:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
-              - column:
-                  name: mailing_address_id
-                  valueComputed: GET_ORG_ACCT_ADDRESS_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
               - column:
                   name: business_number
                   value: 5555550055

@@ -22,10 +22,6 @@ public class OrganizationAccountProfileEntity {
     @Column(name = "organization_account_id")
     private UUID organizationAccountId;
 
-    @PrimaryKeyJoinColumn(referencedColumnName = "organization_account_address_id")
-    @Column(name = "mailing_address_id")
-    private UUID mailingAddressId;
-
     @Column(name = "business_number")
     private String businessNumber;
 

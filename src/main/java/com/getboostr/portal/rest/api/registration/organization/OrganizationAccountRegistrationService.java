@@ -9,9 +9,6 @@ import com.getboostr.portal.database.inventory.InventoryRepository;
 import com.getboostr.portal.database.organization.OrganizationEntity;
 import com.getboostr.portal.database.organization.OrganizationRepository;
 import com.getboostr.portal.database.organization.account.OrganizationAccountEntity;
-import com.getboostr.portal.rest.api.registration.organization.model.OrganizationAccountNameToValidateModel;
-import com.getboostr.portal.rest.api.registration.organization.model.OrganizationAccountRegistrationModel;
-import com.getboostr.portal.rest.api.registration.organization.model.OrganizationAccountUserRegistrationModel;
 import com.getboostr.portal.database.organization.account.OrganizationAccountRepository;
 import com.getboostr.portal.database.organization.account.address.OrganizationAccountAddressEntity;
 import com.getboostr.portal.database.organization.account.address.OrganizationAccountAddressRepository;
@@ -20,11 +17,14 @@ import com.getboostr.portal.database.organization.account.profile.OrganizationAc
 import com.getboostr.portal.rest.api.common.model.request.EmailToValidateModel;
 import com.getboostr.portal.rest.api.common.model.response.ValidationResponseModel;
 import com.getboostr.portal.rest.api.organization.common.OrganizationValidationService;
+import com.getboostr.portal.rest.api.registration.organization.model.OrganizationAccountNameToValidateModel;
+import com.getboostr.portal.rest.api.registration.organization.model.OrganizationAccountRegistrationModel;
+import com.getboostr.portal.rest.api.registration.organization.model.OrganizationAccountUserRegistrationModel;
 import com.getboostr.portal.rest.api.registration.user.UserRegistrationModel;
 import com.getboostr.portal.rest.api.registration.user.UserRegistrationService;
-import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import com.getboostr.portal.rest.api.user.profile.UserProfileService;
 import com.getboostr.portal.rest.api.user.profile.model.UserProfileUpdateModel;
+import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,15 +36,15 @@ import java.util.*;
 
 @Component
 public class OrganizationAccountRegistrationService {
-    private LicenseRepository licenseRepository;
-    private OrganizationRepository organizationRepository;
-    private OrganizationAccountRepository organizationAccountRepository;
-    private OrganizationAccountAddressRepository organizationAccountAddressRepository;
-    private OrganizationAccountProfileRepository organizationAccountProfileRepository;
-    private InventoryRepository inventoryRepository;
-    private OrganizationValidationService organizationValidationService;
-    private UserRegistrationService userRegistrationService;
-    private UserProfileService userProfileService;
+    private final LicenseRepository licenseRepository;
+    private final OrganizationRepository organizationRepository;
+    private final OrganizationAccountRepository organizationAccountRepository;
+    private final OrganizationAccountAddressRepository organizationAccountAddressRepository;
+    private final OrganizationAccountProfileRepository organizationAccountProfileRepository;
+    private final InventoryRepository inventoryRepository;
+    private final OrganizationValidationService organizationValidationService;
+    private final UserRegistrationService userRegistrationService;
+    private final UserProfileService userProfileService;
 
     @Autowired
     public OrganizationAccountRegistrationService(LicenseRepository licenseRepository,
@@ -102,7 +102,7 @@ public class OrganizationAccountRegistrationService {
 
         activateLicense(orgAccountLicense);
         registerOrganizationAccountOwner(registrationModel.getAccountOwner(), orgEntity, orgAccountEntity);
-        createOrganizationAccountProfile(orgAccountEntity, orgAccountAddressEntity, registrationModel.getBusinessPhoneNumber());
+        createOrganizationAccountProfile(orgAccountEntity, registrationModel.getBusinessPhoneNumber());
         createInventory(orgAccountEntity);
     }
 
@@ -136,10 +136,9 @@ public class OrganizationAccountRegistrationService {
     }
 
     private OrganizationAccountAddressEntity createOrganizationAccountAddress(PortalAddressModel addressModel, OrganizationAccountEntity organizationAccount) {
-        OrganizationAccountAddressEntity orgAccountAddressEntityToSave = new OrganizationAccountAddressEntity(
-                null, organizationAccount.getOrganizationAccountId());
-        addressModel.copyFieldsToEntity(orgAccountAddressEntityToSave);
-        return organizationAccountAddressRepository.save(orgAccountAddressEntityToSave);
+        OrganizationAccountAddressEntity orgAcctAddressToSave = new OrganizationAccountAddressEntity(organizationAccount.getOrganizationAccountId());
+        addressModel.copyFieldsToEntity(orgAcctAddressToSave);
+        return organizationAccountAddressRepository.save(orgAcctAddressToSave);
     }
 
     private void registerOrganizationAccountOwner(OrganizationAccountUserRegistrationModel accountOwnerModel, OrganizationEntity organization, OrganizationAccountEntity organizationAccount) {
@@ -153,9 +152,8 @@ public class OrganizationAccountRegistrationService {
         userProfileService.updateProfileWithoutPermissionsCheck(registeredUserId, accountOwnerProfileUpdateModel);
     }
 
-    private OrganizationAccountProfileEntity createOrganizationAccountProfile(OrganizationAccountEntity organizationAccount, OrganizationAccountAddressEntity organizationAccountAddress, String businessPhoneNumber) {
-        OrganizationAccountProfileEntity orgAccountProfileToSave = new OrganizationAccountProfileEntity(
-                null, organizationAccount.getOrganizationAccountId(), organizationAccountAddress.getOrganizationAccountAddressId(), businessPhoneNumber);
+    private OrganizationAccountProfileEntity createOrganizationAccountProfile(OrganizationAccountEntity organizationAccount, String businessPhoneNumber) {
+        OrganizationAccountProfileEntity orgAccountProfileToSave = new OrganizationAccountProfileEntity(null, organizationAccount.getOrganizationAccountId(), businessPhoneNumber);
         return organizationAccountProfileRepository.save(orgAccountProfileToSave);
     }
 
