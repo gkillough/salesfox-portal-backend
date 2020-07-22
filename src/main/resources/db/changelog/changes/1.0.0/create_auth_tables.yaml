@@ -254,12 +254,6 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
                     primaryKeyName: profiles_pkey
-                  defaultValueComputed: uuid_generate_v4()
-                  name: profile_id
-                  type: UUID
-              - column:
-                  constraints:
-                    nullable: false
                   name: user_id
                   type: UUID
               - column:
@@ -383,16 +377,6 @@ databaseChangeLog:
             validate: true
 
   - changeSet:
-      id: create-auth-tables-17
-      author: gavinkillough
-      changes:
-        - addUniqueConstraint:
-            columnNames: user_id
-            constraintName: profiles_user_id_key
-            tableName: profiles
-            schemaName: portal
-
-  - changeSet:
       id: create-auth-tables-18
       author: gavinkillough
       changes:
@@ -400,16 +384,6 @@ databaseChangeLog:
             columnNames: role_level
             constraintName: roles_role_level_key
             tableName: roles
-            schemaName: portal
-
-  - changeSet:
-      id: create-auth-tables-19
-      author: gavinkillough
-      changes:
-        - addUniqueConstraint:
-            columnNames: user_id
-            constraintName: user_addresses_user_id_key
-            tableName: user_addresses
             schemaName: portal
 
   - changeSet:
