@@ -6,20 +6,20 @@ import com.getboostr.portal.common.service.contact.model.ContactCSVWrapper;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.RoleEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
+import com.getboostr.portal.database.contact.entity.OrganizationAccountContactAddressEntity;
+import com.getboostr.portal.database.contact.entity.OrganizationAccountContactEntity;
+import com.getboostr.portal.database.contact.entity.OrganizationAccountContactInteractionsEntity;
+import com.getboostr.portal.database.contact.entity.OrganizationAccountContactProfileEntity;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactAddressRepository;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactInteractionsRepository;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactProfileRepository;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactRepository;
 import com.getboostr.portal.database.organization.account.OrganizationAccountEntity;
 import com.getboostr.portal.rest.api.contact.model.ContactBulkUploadFieldStatus;
 import com.getboostr.portal.rest.api.contact.model.ContactBulkUploadModel;
 import com.getboostr.portal.rest.api.contact.model.ContactBulkUploadResponse;
 import com.getboostr.portal.rest.api.contact.model.ContactUploadModel;
 import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
-import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactAddressEntity;
-import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactEntity;
-import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactInteractionsEntity;
-import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactProfileEntity;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactAddressRepository;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactInteractionsRepository;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactProfileRepository;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactRepository;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -43,11 +43,11 @@ public class ContactBulkUploadService {
     public static final String UPLOAD_INPUT_TYPE_MANUAL = "MANUAL";
     public static final String UPLOAD_INPUT_TYPE_CSV = "CSV";
 
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private OrganizationAccountContactRepository contactRepository;
-    private OrganizationAccountContactAddressRepository contactAddressRepository;
-    private OrganizationAccountContactProfileRepository contactProfileRepository;
-    private OrganizationAccountContactInteractionsRepository contactInteractionsRepository;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final OrganizationAccountContactRepository contactRepository;
+    private final OrganizationAccountContactAddressRepository contactAddressRepository;
+    private final OrganizationAccountContactProfileRepository contactProfileRepository;
+    private final OrganizationAccountContactInteractionsRepository contactInteractionsRepository;
 
     @Autowired
     public ContactBulkUploadService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccountContactRepository contactRepository, OrganizationAccountContactAddressRepository contactAddressRepository,

@@ -1,7 +1,7 @@
-package com.getboostr.portal.database.organization.account.contact.entity;
+package com.getboostr.portal.database.contact.entity;
 
 import com.getboostr.portal.database.common.AbstractAddressEntity;
-import com.getboostr.portal.database.organization.account.contact.Contactable;
+import com.getboostr.portal.database.contact.Contactable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

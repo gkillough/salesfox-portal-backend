@@ -4,6 +4,12 @@ import com.getboostr.portal.common.enumeration.AccessOperation;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.catalogue.item.CatalogueItemRepository;
+import com.getboostr.portal.database.contact.entity.OrganizationAccountContactEntity;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactRepository;
+import com.getboostr.portal.database.customization.branding_text.CustomBrandingTextEntity;
+import com.getboostr.portal.database.customization.branding_text.CustomBrandingTextRepository;
+import com.getboostr.portal.database.customization.icon.CustomIconEntity;
+import com.getboostr.portal.database.customization.icon.CustomIconRepository;
 import com.getboostr.portal.database.gift.GiftEntity;
 import com.getboostr.portal.database.gift.GiftRepository;
 import com.getboostr.portal.database.gift.customization.GiftCustomizationDetailEntity;
@@ -22,12 +28,6 @@ import com.getboostr.portal.rest.api.gift.model.MultiGiftModel;
 import com.getboostr.portal.rest.api.gift.util.GiftAccessService;
 import com.getboostr.portal.rest.api.gift.util.GiftResponseModelUtils;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
-import com.getboostr.portal.database.customization.branding_text.CustomBrandingTextEntity;
-import com.getboostr.portal.database.customization.branding_text.CustomBrandingTextRepository;
-import com.getboostr.portal.database.customization.icon.CustomIconEntity;
-import com.getboostr.portal.database.customization.icon.CustomIconRepository;
-import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactEntity;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,18 +44,18 @@ import java.util.stream.Collectors;
 
 @Component
 public class GiftService {
-    private GiftRepository giftRepository;
-    private GiftNoteDetailRepository noteDetailRepository;
-    private GiftItemDetailRepository itemDetailRepository;
-    private GiftCustomizationDetailRepository customizationDetailRepository;
-    private GiftTrackingRepository giftTrackingRepository;
-    private OrganizationAccountContactRepository contactRepository;
-    private NoteRepository noteRepository;
-    private CatalogueItemRepository catalogueItemRepository;
-    private CustomIconRepository customIconRepository;
-    private CustomBrandingTextRepository customBrandingTextRepository;
-    private GiftAccessService giftAccessService;
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final GiftRepository giftRepository;
+    private final GiftNoteDetailRepository noteDetailRepository;
+    private final GiftItemDetailRepository itemDetailRepository;
+    private final GiftCustomizationDetailRepository customizationDetailRepository;
+    private final GiftTrackingRepository giftTrackingRepository;
+    private final OrganizationAccountContactRepository contactRepository;
+    private final NoteRepository noteRepository;
+    private final CatalogueItemRepository catalogueItemRepository;
+    private final CustomIconRepository customIconRepository;
+    private final CustomBrandingTextRepository customBrandingTextRepository;
+    private final GiftAccessService giftAccessService;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
     public GiftService(GiftRepository giftRepository, GiftNoteDetailRepository noteDetailRepository, GiftItemDetailRepository itemDetailRepository, GiftCustomizationDetailRepository customizationDetailRepository,

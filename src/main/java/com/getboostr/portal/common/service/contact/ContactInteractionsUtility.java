@@ -1,16 +1,16 @@
 package com.getboostr.portal.common.service.contact;
 
 import com.getboostr.portal.common.service.auth.AbstractMembershipRetrievalService;
-import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactEntity;
-import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactInteractionsEntity;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactInteractionsRepository;
+import com.getboostr.portal.database.contact.entity.OrganizationAccountContactEntity;
+import com.getboostr.portal.database.contact.entity.OrganizationAccountContactInteractionsEntity;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactInteractionsRepository;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class ContactInteractionsUtility<E extends Throwable> {
-    private AbstractMembershipRetrievalService<E> membershipRetrievalService;
-    private OrganizationAccountContactInteractionsRepository contactInteractionsRepository;
+    private final AbstractMembershipRetrievalService<E> membershipRetrievalService;
+    private final OrganizationAccountContactInteractionsRepository contactInteractionsRepository;
 
     public ContactInteractionsUtility(AbstractMembershipRetrievalService<E> membershipRetrievalService, OrganizationAccountContactInteractionsRepository contactInteractionsRepository) {
         this.membershipRetrievalService = membershipRetrievalService;
