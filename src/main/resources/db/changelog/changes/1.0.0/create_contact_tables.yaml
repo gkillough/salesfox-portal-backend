@@ -152,7 +152,7 @@ databaseChangeLog:
             baseColumnNames: organization_point_of_contact_user_id
             baseTableName: organization_account_contact_profiles
             baseTableSchemaName: portal
-            constraintName: organization_account_contact_profiles_organization_point_of_con
+            constraintName: org_acct_contact_profiles_org_point_of_contact_fk
             deferrable: false
             initiallyDeferred: false
             onDelete: NO ACTION
