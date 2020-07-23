@@ -13,9 +13,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -24,6 +21,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact9@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-211
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact9@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
 
   - changeSet:
       id: test-contacts-address-211
@@ -110,9 +122,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -121,6 +130,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact10@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-212
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact10@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
 
   - changeSet:
       id: test-contacts-address-212
@@ -207,9 +231,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -218,6 +239,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact11@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-213
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact11@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
 
   - changeSet:
       id: test-contacts-address-213
@@ -304,9 +340,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -315,6 +348,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact12@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-214
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact12@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
 
   - changeSet:
       id: test-contacts-address-214
@@ -401,9 +449,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -412,6 +457,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact13@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-221
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact13@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
 
   - changeSet:
       id: test-contacts-address-221
@@ -498,9 +558,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -509,6 +566,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact14@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-222
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact14@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
 
   - changeSet:
       id: test-contacts-address-222
@@ -595,9 +667,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -606,6 +675,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact15@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-223
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact15@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
 
   - changeSet:
       id: test-contacts-address-223
@@ -692,9 +776,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -703,6 +784,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact16@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-224
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact16@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
 
   - changeSet:
       id: test-contacts-address-224

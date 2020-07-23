@@ -75,11 +75,6 @@ databaseChangeLog:
                   name: contact_id
                   type: UUID
               - column:
-                  constraints:
-                    nullable: false
-                  name: organization_account_id
-                  type: UUID
-              - column:
                   name: first_name
                   type: VARCHAR
               - column:
@@ -94,6 +89,100 @@ databaseChangeLog:
                   type: BOOLEAN
             schemaName: portal
             tableName: organization_account_contacts
+
+  - changeSet:
+      id: create-contact-tables-3a
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: contact_organization_account_restrictions_pkey
+              - column:
+                  name: organization_account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+        - createTable:
+            schemaName: portal
+            tableName: contact_user_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: contact_user_restrictions_pkey
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: create-contact-tables-3b
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: contact_organization_account_restrictions
+            baseColumnNames: contact_id
+            constraintName: contact_organization_account_restrictions_contact_id_fk
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedTableSchemaName: portal
+            referencedTableName: organization_account_contacts
+            referencedColumnNames: contact_id
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: contact_organization_account_restrictions
+            baseColumnNames: organization_account_id
+            constraintName: contact_org_acct_restrictions_organization_account_id_fk
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedTableSchemaName: portal
+            referencedTableName: organization_accounts
+            referencedColumnNames: organization_account_id
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: contact_user_restrictions
+            baseColumnNames: contact_id
+            constraintName: contact_user_restrictions_contact_id_fk
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedTableSchemaName: portal
+            referencedTableName: organization_account_contacts
+            referencedColumnNames: contact_id
+            validate: true
+        - addForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: contact_user_restrictions
+            baseColumnNames: user_id
+            constraintName: contact_user_restrictions_user_id_fk
+            deferrable: false
+            initiallyDeferred: false
+            onDelete: NO ACTION
+            onUpdate: NO ACTION
+            referencedTableSchemaName: portal
+            referencedTableName: users
+            referencedColumnNames: user_id
+            validate: true
 
   - changeSet:
       id: create-contact-tables-4
@@ -195,23 +284,5 @@ databaseChangeLog:
             onUpdate: NO ACTION
             referencedColumnNames: contact_id
             referencedTableName: organization_account_contacts
-            referencedTableSchemaName: portal
-            validate: true
-
-  - changeSet:
-      id: create-contact-tables-13
-      author: gavinkillough
-      changes:
-        - addForeignKeyConstraint:
-            baseColumnNames: organization_account_id
-            baseTableName: organization_account_contacts
-            baseTableSchemaName: portal
-            constraintName: organization_account_contacts_organization_account_id_fk
-            deferrable: false
-            initiallyDeferred: false
-            onDelete: NO ACTION
-            onUpdate: NO ACTION
-            referencedColumnNames: organization_account_id
-            referencedTableName: organization_accounts
             referencedTableSchemaName: portal
             validate: true

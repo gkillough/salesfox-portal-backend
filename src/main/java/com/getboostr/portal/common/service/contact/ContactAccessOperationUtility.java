@@ -4,6 +4,8 @@ import com.getboostr.portal.common.enumeration.AccessOperation;
 import com.getboostr.portal.common.service.auth.AbstractMembershipRetrievalService;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
+import com.getboostr.portal.database.contact.entity.ContactOrganizationAccountRestrictionEntity;
+import com.getboostr.portal.database.contact.entity.ContactUserRestrictionEntity;
 import com.getboostr.portal.database.contact.entity.OrganizationAccountContactEntity;
 import com.getboostr.portal.database.contact.entity.OrganizationAccountContactProfileEntity;
 import com.getboostr.portal.database.contact.repository.OrganizationAccountContactProfileRepository;
@@ -21,19 +23,18 @@ public class ContactAccessOperationUtility<E extends Throwable> {
     }
 
     public boolean canUserAccessContact(UserEntity userRequestingAccess, OrganizationAccountContactEntity contact, AccessOperation requestedAccessOperation) throws E {
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(userRequestingAccess);
-
-        String userRoleLevel = membershipRetrievalService.getRoleEntity(userMembership).getRoleLevel();
+        MembershipEntity userMembership = userRequestingAccess.getMembershipEntity();
+        String userRoleLevel = userMembership.getRoleEntity().getRoleLevel();
         if (PortalAuthorityConstants.PORTAL_ADMIN.equals(userRoleLevel)) {
             return true;
-        } else if (userMembership.getOrganizationAccountId().equals(contact.getOrganizationAccountId())) {
-            if (userRoleLevel.startsWith(PortalAuthorityConstants.ORGANIZATION_ROLE_PREFIX)) {
-                return canOrganizationUserAccessContact(userRequestingAccess, userRoleLevel, contact, requestedAccessOperation);
-            } else {
-                return canNonOrganizationUserAccessContact(userRequestingAccess, userRoleLevel, contact);
-            }
         }
-        return false;
+
+        ContactOrganizationAccountRestrictionEntity contactOrgAcctRestriction = contact.getContactOrganizationAccountRestrictionEntity();
+        ContactUserRestrictionEntity contactUserRestriction = contact.getContactUserRestrictionEntity();
+        if (contactOrgAcctRestriction != null && userMembership.getOrganizationAccountId().equals(contactOrgAcctRestriction.getOrganizationAccountId())) {
+            return canOrganizationUserAccessContact(userRequestingAccess, userRoleLevel, contact, requestedAccessOperation);
+        }
+        return contactUserRestriction != null && userRequestingAccess.getUserId().equals(contactUserRestriction.getUserId());
     }
 
     private boolean canOrganizationUserAccessContact(UserEntity userRequestingAccess, String userRoleLevel, OrganizationAccountContactEntity contact, AccessOperation requestedAccessOperation) throws E {
@@ -52,15 +53,6 @@ public class ContactAccessOperationUtility<E extends Throwable> {
             default:
                 return false;
         }
-    }
-
-    private boolean canNonOrganizationUserAccessContact(UserEntity userRequestingAccess, String userRoleLevel, OrganizationAccountContactEntity contact) throws E {
-        if (PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(userRoleLevel) || PortalAuthorityConstants.PORTAL_BASIC_USER.equals(userRoleLevel)) {
-            OrganizationAccountContactProfileEntity contactProfile = getPointOfContactProfile(contact);
-            return userRequestingAccess.getUserId().equals(contactProfile.getOrganizationPointOfContactUserId());
-        }
-        // In the future, there may be other roles that require granular access control (e.g. support or beta testers).
-        return false;
     }
 
     private OrganizationAccountContactProfileEntity getPointOfContactProfile(OrganizationAccountContactEntity contact) throws E {

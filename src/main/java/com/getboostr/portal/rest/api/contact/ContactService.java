@@ -5,22 +5,14 @@ import com.getboostr.portal.common.model.PortalAddressModel;
 import com.getboostr.portal.common.service.contact.ContactAccessOperationUtility;
 import com.getboostr.portal.common.service.contact.ContactFieldValidationUtils;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
-import com.getboostr.portal.database.account.entity.RoleEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.account.repository.UserRepository;
 import com.getboostr.portal.database.contact.Contactable;
-import com.getboostr.portal.database.contact.entity.OrganizationAccountContactAddressEntity;
-import com.getboostr.portal.database.contact.entity.OrganizationAccountContactEntity;
-import com.getboostr.portal.database.contact.entity.OrganizationAccountContactInteractionsEntity;
-import com.getboostr.portal.database.contact.entity.OrganizationAccountContactProfileEntity;
-import com.getboostr.portal.database.contact.repository.OrganizationAccountContactAddressRepository;
-import com.getboostr.portal.database.contact.repository.OrganizationAccountContactInteractionsRepository;
-import com.getboostr.portal.database.contact.repository.OrganizationAccountContactProfileRepository;
-import com.getboostr.portal.database.contact.repository.OrganizationAccountContactRepository;
+import com.getboostr.portal.database.contact.entity.*;
+import com.getboostr.portal.database.contact.repository.*;
 import com.getboostr.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import com.getboostr.portal.rest.api.contact.model.*;
-import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +33,8 @@ public class ContactService {
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private final UserRepository userRepository;
     private final OrganizationAccountContactRepository contactRepository;
+    private final ContactUserRestrictionRepository contactUserRestrictionRepository;
+    private final ContactOrganizationAccountRestrictionRepository contactOrgAcctRestrictionRepository;
     private final OrganizationAccountContactAddressRepository contactAddressRepository;
     private final OrganizationAccountContactProfileRepository contactProfileRepository;
     private final OrganizationAccountContactInteractionsRepository contactInteractionsRepository;
@@ -48,10 +42,13 @@ public class ContactService {
 
     @Autowired
     public ContactService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, UserRepository userRepository, OrganizationAccountContactRepository contactRepository,
+                          ContactUserRestrictionRepository contactUserRestrictionRepository, ContactOrganizationAccountRestrictionRepository contactOrgAcctRestrictionRepository,
                           OrganizationAccountContactAddressRepository contactAddressRepository, OrganizationAccountContactProfileRepository contactProfileRepository, OrganizationAccountContactInteractionsRepository contactInteractionsRepository) {
         this.membershipRetrievalService = membershipRetrievalService;
         this.userRepository = userRepository;
         this.contactRepository = contactRepository;
+        this.contactUserRestrictionRepository = contactUserRestrictionRepository;
+        this.contactOrgAcctRestrictionRepository = contactOrgAcctRestrictionRepository;
         this.contactAddressRepository = contactAddressRepository;
         this.contactProfileRepository = contactProfileRepository;
         this.contactInteractionsRepository = contactInteractionsRepository;
@@ -61,9 +58,8 @@ public class ContactService {
     public MultiContactModel getContacts(boolean contactActiveStatus, Integer pageOffset, Integer pageLimit) {
         PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
 
-        Page<OrganizationAccountContactEntity> accessibleContacts = getAccessibleContacts(loggedInUser, userMembership, contactActiveStatus, pageOffset, pageLimit);
+        Page<OrganizationAccountContactEntity> accessibleContacts = getAccessibleContacts(loggedInUser, contactActiveStatus, pageOffset, pageLimit);
         if (accessibleContacts.isEmpty()) {
             return MultiContactModel.empty();
         }
@@ -134,19 +130,25 @@ public class ContactService {
     public void createContact(ContactUploadModel contactModel) {
         ContactFieldValidationUtils.validateContactUploadModel(contactModel);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
-        RoleEntity userRole = membershipRetrievalService.getRoleEntity(userMembership);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
 
         UUID pointOfContactUserId = contactModel.getPointOfContactUserId();
-        if (isNonOrganizationRole(userRole.getRoleLevel())) {
+        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
             pointOfContactUserId = loggedInUser.getUserId();
         } else if (pointOfContactUserId != null) {
             validatePointOfContactUser(userMembership.getOrganizationAccountId(), pointOfContactUserId);
         }
 
-        OrganizationAccountContactEntity contactToSave = new OrganizationAccountContactEntity(
-                null, userMembership.getOrganizationAccountId(), contactModel.getFirstName(), contactModel.getLastName(), contactModel.getEmail(), true);
+        OrganizationAccountContactEntity contactToSave = new OrganizationAccountContactEntity(null, contactModel.getFirstName(), contactModel.getLastName(), contactModel.getEmail(), true);
         OrganizationAccountContactEntity savedContact = contactRepository.save(contactToSave);
+
+        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
+            ContactUserRestrictionEntity contactUserRestriction = new ContactUserRestrictionEntity(savedContact.getContactId(), loggedInUser.getUserId());
+            contactUserRestrictionRepository.save(contactUserRestriction);
+        } else {
+            ContactOrganizationAccountRestrictionEntity contactOrgAcctRestriction = new ContactOrganizationAccountRestrictionEntity(savedContact.getContactId(), userMembership.getOrganizationAccountId());
+            contactOrgAcctRestrictionRepository.save(contactOrgAcctRestriction);
+        }
 
         OrganizationAccountContactAddressEntity contactAddressToSave = new OrganizationAccountContactAddressEntity();
         contactAddressToSave.setContactId(savedContact.getContactId());
@@ -212,7 +214,7 @@ public class ContactService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'userId' cannot be null");
         }
 
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         validatePointOfContactUser(userMembership.getOrganizationAccountId(), pocAssignmentModel.getUserId());
 
         OrganizationAccountContactProfileEntity contactToUpdateProfile = contactProfileRepository.findByContactId(contactId)
@@ -244,23 +246,13 @@ public class ContactService {
         contactRepository.save(contactToUpdate);
     }
 
-    private Page<OrganizationAccountContactEntity> getAccessibleContacts(UserEntity user, MembershipEntity userMembership, boolean isActive, Integer pageOffset, Integer pageLimit) {
+    private Page<OrganizationAccountContactEntity> getAccessibleContacts(UserEntity user, boolean isActive, Integer pageOffset, Integer pageLimit) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
         if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return contactRepository.findAllByIsActive(isActive, pageRequest);
         }
-
-        String roleLevel = membershipRetrievalService.getRoleEntity(userMembership).getRoleLevel();
-        if (roleLevel.startsWith(PortalAuthorityConstants.ORGANIZATION_ROLE_PREFIX)) {
-            return contactRepository.findByOrganizationAccountIdAndIsActive(userMembership.getOrganizationAccountId(), isActive, pageRequest);
-        } else if (isNonOrganizationRole(roleLevel)) {
-            Set<UUID> userContactIds = contactProfileRepository.findByOrganizationPointOfContactUserId(user.getUserId())
-                    .stream()
-                    .map(OrganizationAccountContactProfileEntity::getContactId)
-                    .collect(Collectors.toSet());
-            return contactRepository.findAllByContactIdInAndIsActive(userContactIds, isActive, pageRequest);
-        }
-        return Page.empty();
+        MembershipEntity userMembership = user.getMembershipEntity();
+        return contactRepository.findByUserIdAndOrganizationAccountIdAndIsActive(user.getUserId(), userMembership.getOrganizationAccountId(), isActive, pageRequest);
     }
 
     private <T extends Contactable> Map<UUID, T> createContactableIdMap(Collection<T> contactables) {
@@ -281,14 +273,10 @@ public class ContactService {
         return null;
     }
 
-    private boolean isNonOrganizationRole(String roleLevel) {
-        return roleLevel.equals(PortalAuthorityConstants.PORTAL_BASIC_USER) || roleLevel.equals(PortalAuthorityConstants.PORTAL_PREMIUM_USER);
-    }
-
     private void validatePointOfContactUser(UUID requestingUserOrgAcctId, UUID pointOfContactUserId) {
         UserEntity pocUser = userRepository.findById(pointOfContactUserId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Point of Contact User specified does not exist"));
-        MembershipEntity pocUserMembership = membershipRetrievalService.getMembershipEntity(pocUser);
+        MembershipEntity pocUserMembership = pocUser.getMembershipEntity();
         if (!requestingUserOrgAcctId.equals(pocUserMembership.getOrganizationAccountId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Point of Contact User specified cannot be assigned to this Organization Account");
         }

@@ -13,9 +13,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -24,6 +21,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact1@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-111
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
 
   - changeSet:
       id: test-contacts-address-111
@@ -110,9 +122,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -121,6 +130,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact2@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-112
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
 
   - changeSet:
       id: test-contacts-address-112
@@ -207,9 +231,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -218,6 +239,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact3@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-113
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
 
   - changeSet:
       id: test-contacts-address-113
@@ -304,9 +340,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -315,6 +348,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact4@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-114
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
 
   - changeSet:
       id: test-contacts-address-114
@@ -401,9 +449,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -412,6 +457,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact5@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-121
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
 
   - changeSet:
       id: test-contacts-address-121
@@ -498,9 +558,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -509,6 +566,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact6@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-122
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
 
   - changeSet:
       id: test-contacts-address-122
@@ -595,9 +667,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -606,6 +675,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact7@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-123
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
 
   - changeSet:
       id: test-contacts-address-123
@@ -692,9 +776,6 @@ databaseChangeLog:
             tableName: organization_account_contacts
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
-              - column:
                   name: first_name
                   value: Contact
               - column:
@@ -703,6 +784,21 @@ databaseChangeLog:
               - column:
                   name: email
                   value: contact8@getboostr.com
+
+  - changeSet:
+      id: test-contact-restrictions-124
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: contact_organization_account_restrictions
+            columns:
+              - column:
+                  name: contact_id
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@getboostr.com')
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
 
   - changeSet:
       id: test-contacts-address-124
