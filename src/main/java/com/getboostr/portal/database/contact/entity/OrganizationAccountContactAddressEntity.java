@@ -18,10 +18,6 @@ import java.util.UUID;
 @Table(schema = "portal", name = "organization_account_contact_addresses")
 public class OrganizationAccountContactAddressEntity extends AbstractAddressEntity implements Contactable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "address_id")
-    private UUID addressId;
-
     @PrimaryKeyJoinColumn
     @Column(name = "contact_id")
     private UUID contactId;

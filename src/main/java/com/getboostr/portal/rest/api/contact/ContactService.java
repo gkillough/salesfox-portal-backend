@@ -79,7 +79,7 @@ public class ContactService {
         List<OrganizationAccountContactInteractionsEntity> contactInteractions = contactInteractionsRepository.findAllById(contactIds);
         Map<UUID, OrganizationAccountContactInteractionsEntity> contactIdToInteractions = createContactableIdMap(contactInteractions);
 
-        List<OrganizationAccountContactAddressEntity> contactAddresses = contactAddressRepository.findAllByContactIdIn(contactIds);
+        List<OrganizationAccountContactAddressEntity> contactAddresses = contactAddressRepository.findAllById(contactIds);
         Map<UUID, OrganizationAccountContactAddressEntity> contactIdToAddresses = createContactableIdMap(contactAddresses);
 
         List<ContactResponseModel> contactModels = new ArrayList<>();
@@ -121,7 +121,7 @@ public class ContactService {
         OrganizationAccountContactInteractionsEntity interactions = contactInteractionsRepository.findById(contactId)
                 .orElseThrow(() -> exceptionFunction.apply("interactions"));
 
-        OrganizationAccountContactAddressEntity contactAddressEntity = contactAddressRepository.findByContactId(contactId)
+        OrganizationAccountContactAddressEntity contactAddressEntity = contactAddressRepository.findById(contactId)
                 .orElseThrow(() -> exceptionFunction.apply("address"));
         PortalAddressModel contactAddressModel = PortalAddressModel.fromEntity(contactAddressEntity);
 
@@ -151,10 +151,10 @@ public class ContactService {
         OrganizationAccountContactAddressEntity contactAddressToSave = new OrganizationAccountContactAddressEntity();
         contactAddressToSave.setContactId(savedContact.getContactId());
         contactModel.getAddress().copyFieldsToEntity(contactAddressToSave);
-        OrganizationAccountContactAddressEntity savedContactAddress = contactAddressRepository.save(contactAddressToSave);
+        contactAddressRepository.save(contactAddressToSave);
 
         OrganizationAccountContactProfileEntity contactProfileToSave = new OrganizationAccountContactProfileEntity(
-                null, savedContact.getContactId(), savedContactAddress.getAddressId(), pointOfContactUserId, contactModel.getContactOrganizationName(), contactModel.getTitle(), contactModel.getMobileNumber(), contactModel.getBusinessNumber());
+                savedContact.getContactId(), pointOfContactUserId, contactModel.getContactOrganizationName(), contactModel.getTitle(), contactModel.getMobileNumber(), contactModel.getBusinessNumber());
         contactProfileRepository.save(contactProfileToSave);
 
         OrganizationAccountContactInteractionsEntity contactInteractionsToSave = new OrganizationAccountContactInteractionsEntity(savedContact.getContactId(), 0L, 0L);
@@ -178,7 +178,7 @@ public class ContactService {
         contactToUpdate.setEmail(contactUpdateModel.getEmail());
         OrganizationAccountContactEntity updatedContact = contactRepository.save(contactToUpdate);
 
-        OrganizationAccountContactAddressEntity contactAddressToUpdate = contactAddressRepository.findByContactId(updatedContact.getContactId())
+        OrganizationAccountContactAddressEntity contactAddressToUpdate = contactAddressRepository.findById(updatedContact.getContactId())
                 .orElseThrow(() -> {
                     log.error("Missing organization account contact address for contactId: [{}]", updatedContact.getContactId());
                     return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);

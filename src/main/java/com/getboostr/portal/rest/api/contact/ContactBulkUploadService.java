@@ -98,15 +98,13 @@ public class ContactBulkUploadService {
                         contactToSaveId, userOrgAccount.getOrganizationAccountId(), contactUploadCandidate.getFirstName(), contactUploadCandidate.getLastName(), contactUploadCandidate.getEmail(), true);
                 contactsToSave.add(contactToSave);
 
-                UUID addressToSaveId = UUID.randomUUID();
                 OrganizationAccountContactAddressEntity contactAddressToSave = new OrganizationAccountContactAddressEntity();
-                contactAddressToSave.setAddressId(addressToSaveId);
                 contactAddressToSave.setContactId(contactToSaveId);
                 contactUploadCandidate.getAddress().copyFieldsToEntity(contactAddressToSave);
                 contactAddressesToSave.add(contactAddressToSave);
 
                 OrganizationAccountContactProfileEntity contactProfileToSave = new OrganizationAccountContactProfileEntity(
-                        null, contactToSaveId, addressToSaveId, pointOfContactUserId, contactUploadCandidate.getContactOrganizationName(), contactUploadCandidate.getTitle(), contactUploadCandidate.getMobileNumber(), contactUploadCandidate.getBusinessNumber());
+                        contactToSaveId, pointOfContactUserId, contactUploadCandidate.getContactOrganizationName(), contactUploadCandidate.getTitle(), contactUploadCandidate.getMobileNumber(), contactUploadCandidate.getBusinessNumber());
                 contactProfilesToSave.add(contactProfileToSave);
 
                 OrganizationAccountContactInteractionsEntity contactInteractionsEntityToSave = new OrganizationAccountContactInteractionsEntity(contactToSaveId, 0L, 0L);
