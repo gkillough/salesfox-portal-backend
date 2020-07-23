@@ -5,7 +5,6 @@ import com.getboostr.portal.common.model.PortalAddressModel;
 import com.getboostr.portal.common.service.contact.ContactAccessOperationUtility;
 import com.getboostr.portal.common.service.contact.ContactFieldValidationUtils;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
-import com.getboostr.portal.database.account.entity.RoleEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.account.repository.UserRepository;
 import com.getboostr.portal.database.contact.Contactable;
@@ -14,7 +13,6 @@ import com.getboostr.portal.database.contact.repository.*;
 import com.getboostr.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import com.getboostr.portal.rest.api.contact.model.*;
-import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,10 +131,9 @@ public class ContactService {
         ContactFieldValidationUtils.validateContactUploadModel(contactModel);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
-        RoleEntity userRole = userMembership.getRoleEntity();
 
         UUID pointOfContactUserId = contactModel.getPointOfContactUserId();
-        if (isNonOrganizationRole(userRole.getRoleLevel())) {
+        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
             pointOfContactUserId = loggedInUser.getUserId();
         } else if (pointOfContactUserId != null) {
             validatePointOfContactUser(userMembership.getOrganizationAccountId(), pointOfContactUserId);
@@ -217,7 +214,7 @@ public class ContactService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'userId' cannot be null");
         }
 
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         validatePointOfContactUser(userMembership.getOrganizationAccountId(), pocAssignmentModel.getUserId());
 
         OrganizationAccountContactProfileEntity contactToUpdateProfile = contactProfileRepository.findByContactId(contactId)
@@ -276,14 +273,10 @@ public class ContactService {
         return null;
     }
 
-    private boolean isNonOrganizationRole(String roleLevel) {
-        return roleLevel.equals(PortalAuthorityConstants.PORTAL_BASIC_USER) || roleLevel.equals(PortalAuthorityConstants.PORTAL_PREMIUM_USER);
-    }
-
     private void validatePointOfContactUser(UUID requestingUserOrgAcctId, UUID pointOfContactUserId) {
         UserEntity pocUser = userRepository.findById(pointOfContactUserId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Point of Contact User specified does not exist"));
-        MembershipEntity pocUserMembership = membershipRetrievalService.getMembershipEntity(pocUser);
+        MembershipEntity pocUserMembership = pocUser.getMembershipEntity();
         if (!requestingUserOrgAcctId.equals(pocUserMembership.getOrganizationAccountId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Point of Contact User specified cannot be assigned to this Organization Account");
         }
