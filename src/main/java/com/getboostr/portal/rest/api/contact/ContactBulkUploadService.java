@@ -6,15 +6,8 @@ import com.getboostr.portal.common.service.contact.model.ContactCSVWrapper;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.RoleEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
-import com.getboostr.portal.database.contact.entity.OrganizationAccountContactAddressEntity;
-import com.getboostr.portal.database.contact.entity.OrganizationAccountContactEntity;
-import com.getboostr.portal.database.contact.entity.OrganizationAccountContactInteractionsEntity;
-import com.getboostr.portal.database.contact.entity.OrganizationAccountContactProfileEntity;
-import com.getboostr.portal.database.contact.repository.OrganizationAccountContactAddressRepository;
-import com.getboostr.portal.database.contact.repository.OrganizationAccountContactInteractionsRepository;
-import com.getboostr.portal.database.contact.repository.OrganizationAccountContactProfileRepository;
-import com.getboostr.portal.database.contact.repository.OrganizationAccountContactRepository;
-import com.getboostr.portal.database.organization.account.OrganizationAccountEntity;
+import com.getboostr.portal.database.contact.entity.*;
+import com.getboostr.portal.database.contact.repository.*;
 import com.getboostr.portal.rest.api.contact.model.ContactBulkUploadFieldStatus;
 import com.getboostr.portal.rest.api.contact.model.ContactBulkUploadModel;
 import com.getboostr.portal.rest.api.contact.model.ContactBulkUploadResponse;
@@ -45,15 +38,20 @@ public class ContactBulkUploadService {
 
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private final OrganizationAccountContactRepository contactRepository;
+    private final ContactUserRestrictionRepository contactUserRestrictionRepository;
+    private final ContactOrganizationAccountRestrictionRepository contactOrgAcctRestrictionRepository;
     private final OrganizationAccountContactAddressRepository contactAddressRepository;
     private final OrganizationAccountContactProfileRepository contactProfileRepository;
     private final OrganizationAccountContactInteractionsRepository contactInteractionsRepository;
 
     @Autowired
-    public ContactBulkUploadService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccountContactRepository contactRepository, OrganizationAccountContactAddressRepository contactAddressRepository,
-                                    OrganizationAccountContactProfileRepository contactProfileRepository, OrganizationAccountContactInteractionsRepository contactInteractionsRepository) {
+    public ContactBulkUploadService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccountContactRepository contactRepository,
+                                    ContactUserRestrictionRepository contactUserRestrictionRepository, ContactOrganizationAccountRestrictionRepository contactOrgAcctRestrictionRepository,
+                                    OrganizationAccountContactAddressRepository contactAddressRepository, OrganizationAccountContactProfileRepository contactProfileRepository, OrganizationAccountContactInteractionsRepository contactInteractionsRepository) {
         this.membershipRetrievalService = membershipRetrievalService;
         this.contactRepository = contactRepository;
+        this.contactUserRestrictionRepository = contactUserRestrictionRepository;
+        this.contactOrgAcctRestrictionRepository = contactOrgAcctRestrictionRepository;
         this.contactAddressRepository = contactAddressRepository;
         this.contactProfileRepository = contactProfileRepository;
         this.contactInteractionsRepository = contactInteractionsRepository;
@@ -70,19 +68,20 @@ public class ContactBulkUploadService {
         }
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
-        RoleEntity userRole = membershipRetrievalService.getRoleEntity(userMembership);
-        OrganizationAccountEntity userOrgAccount = membershipRetrievalService.getOrganizationAccountEntity(userMembership);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
+        RoleEntity userRole = userMembership.getRoleEntity();
 
-        UUID pointOfContactUserId = null;
+        UUID restrictedUserId = null;
         String userRoleLevel = userRole.getRoleLevel();
         if (PortalAuthorityConstants.PORTAL_BASIC_USER.equals(userRoleLevel) || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(userRoleLevel)) {
-            pointOfContactUserId = loggedInUser.getUserId();
+            restrictedUserId = loggedInUser.getUserId();
         }
 
         List<ContactBulkUploadFieldStatus> contactUploadStatuses = new ArrayList<>(contactsUploadCandidates.size());
 
         List<OrganizationAccountContactEntity> contactsToSave = new ArrayList<>(contactsUploadCandidates.size());
+        List<ContactOrganizationAccountRestrictionEntity> contactOrgAcctRestrictionsToSave = new ArrayList<>(contactsUploadCandidates.size());
+        List<ContactUserRestrictionEntity> contactUserRestrictionsToSave = new ArrayList<>(contactsUploadCandidates.size());
         List<OrganizationAccountContactAddressEntity> contactAddressesToSave = new ArrayList<>(contactsUploadCandidates.size());
         List<OrganizationAccountContactProfileEntity> contactProfilesToSave = new ArrayList<>(contactsUploadCandidates.size());
         List<OrganizationAccountContactInteractionsEntity> contactInteractionsToSave = new ArrayList<>(contactsUploadCandidates.size());
@@ -94,9 +93,16 @@ public class ContactBulkUploadService {
 
             if (StringUtils.isBlank(candidateStatus.getErrorMessage())) {
                 UUID contactToSaveId = UUID.randomUUID();
-                OrganizationAccountContactEntity contactToSave = new OrganizationAccountContactEntity(
-                        contactToSaveId, userOrgAccount.getOrganizationAccountId(), contactUploadCandidate.getFirstName(), contactUploadCandidate.getLastName(), contactUploadCandidate.getEmail(), true);
+                OrganizationAccountContactEntity contactToSave = new OrganizationAccountContactEntity(contactToSaveId, contactUploadCandidate.getFirstName(), contactUploadCandidate.getLastName(), contactUploadCandidate.getEmail(), true);
                 contactsToSave.add(contactToSave);
+
+                if (restrictedUserId != null) {
+                    ContactUserRestrictionEntity contactUserRestrictionToSave = new ContactUserRestrictionEntity(contactToSaveId, restrictedUserId);
+                    contactUserRestrictionsToSave.add(contactUserRestrictionToSave);
+                } else {
+                    ContactOrganizationAccountRestrictionEntity contactOrgAcctRestrictionToSave = new ContactOrganizationAccountRestrictionEntity(contactToSaveId, userMembership.getOrganizationAccountId());
+                    contactOrgAcctRestrictionsToSave.add(contactOrgAcctRestrictionToSave);
+                }
 
                 OrganizationAccountContactAddressEntity contactAddressToSave = new OrganizationAccountContactAddressEntity();
                 contactAddressToSave.setContactId(contactToSaveId);
@@ -104,7 +110,7 @@ public class ContactBulkUploadService {
                 contactAddressesToSave.add(contactAddressToSave);
 
                 OrganizationAccountContactProfileEntity contactProfileToSave = new OrganizationAccountContactProfileEntity(
-                        contactToSaveId, pointOfContactUserId, contactUploadCandidate.getContactOrganizationName(), contactUploadCandidate.getTitle(), contactUploadCandidate.getMobileNumber(), contactUploadCandidate.getBusinessNumber());
+                        contactToSaveId, restrictedUserId, contactUploadCandidate.getContactOrganizationName(), contactUploadCandidate.getTitle(), contactUploadCandidate.getMobileNumber(), contactUploadCandidate.getBusinessNumber());
                 contactProfilesToSave.add(contactProfileToSave);
 
                 OrganizationAccountContactInteractionsEntity contactInteractionsEntityToSave = new OrganizationAccountContactInteractionsEntity(contactToSaveId, 0L, 0L);
@@ -114,6 +120,8 @@ public class ContactBulkUploadService {
 
         log.info("Saving {} valid contacts out of {} to the database", contactsToSave.size(), contactsUploadCandidates.size());
         contactRepository.saveAll(contactsToSave);
+        contactUserRestrictionRepository.saveAll(contactUserRestrictionsToSave);
+        contactOrgAcctRestrictionRepository.saveAll(contactOrgAcctRestrictionsToSave);
         contactAddressRepository.saveAll(contactAddressesToSave);
         contactProfileRepository.saveAll(contactProfilesToSave);
         contactInteractionsRepository.saveAll(contactInteractionsToSave);
