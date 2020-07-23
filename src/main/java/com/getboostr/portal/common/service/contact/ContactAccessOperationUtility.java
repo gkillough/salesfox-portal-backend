@@ -1,19 +1,19 @@
 package com.getboostr.portal.common.service.contact;
 
 import com.getboostr.portal.common.enumeration.AccessOperation;
+import com.getboostr.portal.common.service.auth.AbstractMembershipRetrievalService;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
-import com.getboostr.portal.common.service.auth.AbstractMembershipRetrievalService;
-import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactEntity;
-import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactProfileEntity;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactProfileRepository;
+import com.getboostr.portal.database.contact.entity.OrganizationAccountContactEntity;
+import com.getboostr.portal.database.contact.entity.OrganizationAccountContactProfileEntity;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactProfileRepository;
 import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 
 import java.util.UUID;
 
 public class ContactAccessOperationUtility<E extends Throwable> {
-    private AbstractMembershipRetrievalService<E> membershipRetrievalService;
-    private OrganizationAccountContactProfileRepository contactProfileRepository;
+    private final AbstractMembershipRetrievalService<E> membershipRetrievalService;
+    private final OrganizationAccountContactProfileRepository contactProfileRepository;
 
     public ContactAccessOperationUtility(AbstractMembershipRetrievalService<E> membershipRetrievalService, OrganizationAccountContactProfileRepository contactProfileRepository) {
         this.membershipRetrievalService = membershipRetrievalService;

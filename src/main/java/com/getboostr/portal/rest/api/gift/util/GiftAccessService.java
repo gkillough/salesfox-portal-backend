@@ -4,6 +4,9 @@ import com.getboostr.portal.common.enumeration.AccessOperation;
 import com.getboostr.portal.common.service.contact.ContactAccessOperationUtility;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
+import com.getboostr.portal.database.contact.entity.OrganizationAccountContactEntity;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactProfileRepository;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactRepository;
 import com.getboostr.portal.database.gift.GiftEntity;
 import com.getboostr.portal.database.inventory.InventoryEntity;
 import com.getboostr.portal.database.inventory.InventoryRepository;
@@ -11,9 +14,6 @@ import com.getboostr.portal.database.inventory.item.InventoryItemPK;
 import com.getboostr.portal.database.inventory.item.InventoryItemRepository;
 import com.getboostr.portal.rest.api.inventory.InventoryAccessService;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
-import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactEntity;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactProfileRepository;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -25,12 +25,12 @@ import java.util.UUID;
 
 @Component
 public class GiftAccessService {
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private OrganizationAccountContactRepository contactRepository;
-    private ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
-    private InventoryRepository inventoryRepository;
-    private InventoryItemRepository inventoryItemRepository;
-    private InventoryAccessService inventoryAccessService;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final OrganizationAccountContactRepository contactRepository;
+    private final ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
+    private final InventoryRepository inventoryRepository;
+    private final InventoryItemRepository inventoryItemRepository;
+    private final InventoryAccessService inventoryAccessService;
 
     @Autowired
     public GiftAccessService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccountContactRepository contactRepository, OrganizationAccountContactProfileRepository contactProfileRepository,

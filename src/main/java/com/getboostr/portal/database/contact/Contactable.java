@@ -1,4 +1,4 @@
-package com.getboostr.portal.database.organization.account.contact;
+package com.getboostr.portal.database.contact;
 
 import java.util.UUID;
 

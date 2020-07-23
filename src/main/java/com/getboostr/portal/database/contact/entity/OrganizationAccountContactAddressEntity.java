@@ -1,7 +1,7 @@
-package com.getboostr.portal.database.organization.account.contact.entity;
+package com.getboostr.portal.database.contact.entity;
 
 import com.getboostr.portal.database.common.AbstractAddressEntity;
-import com.getboostr.portal.database.organization.account.contact.Contactable;
+import com.getboostr.portal.database.contact.Contactable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,10 +18,6 @@ import java.util.UUID;
 @Table(schema = "portal", name = "organization_account_contact_addresses")
 public class OrganizationAccountContactAddressEntity extends AbstractAddressEntity implements Contactable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "address_id")
-    private UUID addressId;
-
     @PrimaryKeyJoinColumn
     @Column(name = "contact_id")
     private UUID contactId;

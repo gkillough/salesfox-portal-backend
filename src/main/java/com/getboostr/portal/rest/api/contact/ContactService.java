@@ -8,19 +8,19 @@ import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.RoleEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.account.repository.UserRepository;
-import com.getboostr.portal.rest.api.contact.model.*;
-import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
-import com.getboostr.portal.database.organization.account.contact.Contactable;
-import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactAddressEntity;
-import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactEntity;
-import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactInteractionsEntity;
-import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactProfileEntity;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactAddressRepository;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactInteractionsRepository;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactProfileRepository;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactRepository;
+import com.getboostr.portal.database.contact.Contactable;
+import com.getboostr.portal.database.contact.entity.OrganizationAccountContactAddressEntity;
+import com.getboostr.portal.database.contact.entity.OrganizationAccountContactEntity;
+import com.getboostr.portal.database.contact.entity.OrganizationAccountContactInteractionsEntity;
+import com.getboostr.portal.database.contact.entity.OrganizationAccountContactProfileEntity;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactAddressRepository;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactInteractionsRepository;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactProfileRepository;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactRepository;
 import com.getboostr.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
+import com.getboostr.portal.rest.api.contact.model.*;
+import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +38,13 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class ContactService {
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private UserRepository userRepository;
-    private OrganizationAccountContactRepository contactRepository;
-    private OrganizationAccountContactAddressRepository contactAddressRepository;
-    private OrganizationAccountContactProfileRepository contactProfileRepository;
-    private OrganizationAccountContactInteractionsRepository contactInteractionsRepository;
-    private ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final UserRepository userRepository;
+    private final OrganizationAccountContactRepository contactRepository;
+    private final OrganizationAccountContactAddressRepository contactAddressRepository;
+    private final OrganizationAccountContactProfileRepository contactProfileRepository;
+    private final OrganizationAccountContactInteractionsRepository contactInteractionsRepository;
+    private final ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
 
     @Autowired
     public ContactService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, UserRepository userRepository, OrganizationAccountContactRepository contactRepository,
@@ -79,7 +79,7 @@ public class ContactService {
         List<OrganizationAccountContactInteractionsEntity> contactInteractions = contactInteractionsRepository.findAllById(contactIds);
         Map<UUID, OrganizationAccountContactInteractionsEntity> contactIdToInteractions = createContactableIdMap(contactInteractions);
 
-        List<OrganizationAccountContactAddressEntity> contactAddresses = contactAddressRepository.findAllByContactIdIn(contactIds);
+        List<OrganizationAccountContactAddressEntity> contactAddresses = contactAddressRepository.findAllById(contactIds);
         Map<UUID, OrganizationAccountContactAddressEntity> contactIdToAddresses = createContactableIdMap(contactAddresses);
 
         List<ContactResponseModel> contactModels = new ArrayList<>();
@@ -121,7 +121,7 @@ public class ContactService {
         OrganizationAccountContactInteractionsEntity interactions = contactInteractionsRepository.findById(contactId)
                 .orElseThrow(() -> exceptionFunction.apply("interactions"));
 
-        OrganizationAccountContactAddressEntity contactAddressEntity = contactAddressRepository.findByContactId(contactId)
+        OrganizationAccountContactAddressEntity contactAddressEntity = contactAddressRepository.findById(contactId)
                 .orElseThrow(() -> exceptionFunction.apply("address"));
         PortalAddressModel contactAddressModel = PortalAddressModel.fromEntity(contactAddressEntity);
 
@@ -151,10 +151,10 @@ public class ContactService {
         OrganizationAccountContactAddressEntity contactAddressToSave = new OrganizationAccountContactAddressEntity();
         contactAddressToSave.setContactId(savedContact.getContactId());
         contactModel.getAddress().copyFieldsToEntity(contactAddressToSave);
-        OrganizationAccountContactAddressEntity savedContactAddress = contactAddressRepository.save(contactAddressToSave);
+        contactAddressRepository.save(contactAddressToSave);
 
         OrganizationAccountContactProfileEntity contactProfileToSave = new OrganizationAccountContactProfileEntity(
-                null, savedContact.getContactId(), savedContactAddress.getAddressId(), pointOfContactUserId, contactModel.getContactOrganizationName(), contactModel.getTitle(), contactModel.getMobileNumber(), contactModel.getBusinessNumber());
+                savedContact.getContactId(), pointOfContactUserId, contactModel.getContactOrganizationName(), contactModel.getTitle(), contactModel.getMobileNumber(), contactModel.getBusinessNumber());
         contactProfileRepository.save(contactProfileToSave);
 
         OrganizationAccountContactInteractionsEntity contactInteractionsToSave = new OrganizationAccountContactInteractionsEntity(savedContact.getContactId(), 0L, 0L);
@@ -178,7 +178,7 @@ public class ContactService {
         contactToUpdate.setEmail(contactUpdateModel.getEmail());
         OrganizationAccountContactEntity updatedContact = contactRepository.save(contactToUpdate);
 
-        OrganizationAccountContactAddressEntity contactAddressToUpdate = contactAddressRepository.findByContactId(updatedContact.getContactId())
+        OrganizationAccountContactAddressEntity contactAddressToUpdate = contactAddressRepository.findById(updatedContact.getContactId())
                 .orElseThrow(() -> {
                     log.error("Missing organization account contact address for contactId: [{}]", updatedContact.getContactId());
                     return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);

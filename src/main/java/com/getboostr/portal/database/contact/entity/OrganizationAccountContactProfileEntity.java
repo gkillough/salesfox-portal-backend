@@ -1,6 +1,6 @@
-package com.getboostr.portal.database.organization.account.contact.entity;
+package com.getboostr.portal.database.contact.entity;
 
-import com.getboostr.portal.database.organization.account.contact.Contactable;
+import com.getboostr.portal.database.contact.Contactable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,17 +16,9 @@ import java.util.UUID;
 @Table(schema = "portal", name = "organization_account_contact_profiles")
 public class OrganizationAccountContactProfileEntity implements Serializable, Contactable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "profile_id")
-    private UUID profileId;
-
     @PrimaryKeyJoinColumn
     @Column(name = "contact_id")
     private UUID contactId;
-
-    @PrimaryKeyJoinColumn
-    @Column(name = "contact_address_id")
-    private UUID contactAddressId;
 
     @Column(name = "organization_point_of_contact_user_id")
     private UUID organizationPointOfContactUserId;

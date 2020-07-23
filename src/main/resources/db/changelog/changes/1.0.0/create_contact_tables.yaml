@@ -10,12 +10,6 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
                     primaryKeyName: organization_account_contact_addresses_pkey
-                  defaultValueComputed: uuid_generate_v4()
-                  name: address_id
-                  type: UUID
-              - column:
-                  constraints:
-                    nullable: false
                   name: contact_id
                   type: UUID
               - column:
@@ -112,18 +106,7 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
                     primaryKeyName: organization_account_contact_profiles_pkey
-                  defaultValueComputed: uuid_generate_v4()
-                  name: profile_id
-                  type: UUID
-              - column:
-                  constraints:
-                    nullable: false
                   name: contact_id
-                  type: UUID
-              - column:
-                  constraints:
-                    nullable: false
-                  name: contact_address_id
                   type: UUID
               - column:
                   name: organization_point_of_contact_user_id
@@ -140,44 +123,6 @@ databaseChangeLog:
               - column:
                   name: mobile_number
                   type: VARCHAR
-            schemaName: portal
-            tableName: organization_account_contact_profiles
-
-  - changeSet:
-      id: create-contact-tables-5
-      author: gavinkillough
-      changes:
-        - addUniqueConstraint:
-            columnNames: contact_id
-            constraintName: organization_account_contact_addresses_contact_id_key
-            schemaName: portal
-            tableName: organization_account_contact_addresses
-
-  - changeSet:
-      id: create-contact-tables-6
-      author: gavinkillough
-      changes:
-        - addForeignKeyConstraint:
-            baseColumnNames: contact_address_id
-            baseTableName: organization_account_contact_profiles
-            baseTableSchemaName: portal
-            constraintName: organization_account_contact_profiles_contact_address_id_fk
-            deferrable: false
-            initiallyDeferred: false
-            onDelete: NO ACTION
-            onUpdate: NO ACTION
-            referencedColumnNames: address_id
-            referencedTableName: organization_account_contact_addresses
-            referencedTableSchemaName: portal
-            validate: true
-
-  - changeSet:
-      id: create-contact-tables-7
-      author: gavinkillough
-      changes:
-        - addUniqueConstraint:
-            columnNames: contact_address_id
-            constraintName: organization_account_contact_profiles_contact_address_id_key
             schemaName: portal
             tableName: organization_account_contact_profiles
 
@@ -200,16 +145,6 @@ databaseChangeLog:
             validate: true
 
   - changeSet:
-      id: create-contact-tables-9
-      author: gavinkillough
-      changes:
-        - addUniqueConstraint:
-            columnNames: contact_id
-            constraintName: organization_account_contact_profiles_contact_id_key
-            schemaName: portal
-            tableName: organization_account_contact_profiles
-
-  - changeSet:
       id: create-contact-tables-10
       author: gavinkillough
       changes:
@@ -217,7 +152,7 @@ databaseChangeLog:
             baseColumnNames: organization_point_of_contact_user_id
             baseTableName: organization_account_contact_profiles
             baseTableSchemaName: portal
-            constraintName: organization_account_contact_profiles_organization_point_of_con
+            constraintName: org_acct_contact_profiles_org_point_of_contact_fk
             deferrable: false
             initiallyDeferred: false
             onDelete: NO ACTION

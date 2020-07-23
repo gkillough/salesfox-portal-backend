@@ -4,10 +4,10 @@ import com.getboostr.portal.common.enumeration.AccessOperation;
 import com.getboostr.portal.common.service.contact.ContactAccessOperationUtility;
 import com.getboostr.portal.common.service.contact.ContactInteractionsUtility;
 import com.getboostr.portal.database.account.entity.UserEntity;
-import com.getboostr.portal.database.organization.account.contact.entity.OrganizationAccountContactEntity;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactInteractionsRepository;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactProfileRepository;
-import com.getboostr.portal.database.organization.account.contact.repository.OrganizationAccountContactRepository;
+import com.getboostr.portal.database.contact.entity.OrganizationAccountContactEntity;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactInteractionsRepository;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactProfileRepository;
+import com.getboostr.portal.database.contact.repository.OrganizationAccountContactRepository;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,10 +19,10 @@ import java.util.function.Consumer;
 
 @Component
 public class ContactInteractionsService {
-    private OrganizationAccountContactRepository contactRepository;
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
-    private ContactInteractionsUtility<ResponseStatusException> contactInteractionsUtility;
+    private final OrganizationAccountContactRepository contactRepository;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
+    private final ContactInteractionsUtility<ResponseStatusException> contactInteractionsUtility;
 
     @Autowired
     public ContactInteractionsService(OrganizationAccountContactRepository contactRepository, OrganizationAccountContactProfileRepository contactProfileRepository,

@@ -70,11 +70,8 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact9@getboostr.com')
               - column:
-                  name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact9@getboostr.com')
-              - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test11@getboostr.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test11@usepipeline.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
@@ -170,11 +167,8 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact10@getboostr.com')
               - column:
-                  name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact10@getboostr.com')
-              - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test11@getboostr.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test11@usepipeline.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
@@ -270,11 +264,8 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact11@getboostr.com')
               - column:
-                  name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact11@getboostr.com')
-              - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test12@getboostr.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test12@usepipeline.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
@@ -370,11 +361,8 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact12@getboostr.com')
               - column:
-                  name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact12@getboostr.com')
-              - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test12@getboostr.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test12@usepipeline.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
@@ -470,11 +458,8 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact13@getboostr.com')
               - column:
-                  name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact13@getboostr.com')
-              - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test15@getboostr.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test15@usepipeline.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
@@ -570,11 +555,8 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact14@getboostr.com')
               - column:
-                  name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact14@getboostr.com')
-              - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test15@getboostr.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test15@usepipeline.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
@@ -670,11 +652,8 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact15@getboostr.com')
               - column:
-                  name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact15@getboostr.com')
-              - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test16@getboostr.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test16@usepipeline.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
@@ -770,11 +749,8 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact16@getboostr.com')
               - column:
-                  name: contact_address_id
-                  valueComputed: GET_CONTACT_ADDRESS_ID_BY_EMAIL('contact16@getboostr.com')
-              - column:
                   name: organization_point_of_contact_user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('test16@getboostr.com')
+                  valueComputed: GET_USER_ID_BY_EMAIL('test16@usepipeline.com')
               - column:
                   name: contact_organization_name
                   value: A Random Org
