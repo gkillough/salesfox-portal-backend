@@ -1,6 +1,6 @@
 package com.getboostr.portal.rest.documentation;
 
-import com.getboostr.portal.rest.security.authorization.AdminOnlyAccessible;
+import com.getboostr.portal.rest.security.authentication.AnonymouslyAccessible;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -16,12 +16,12 @@ import java.util.Set;
 
 @Configuration
 @EnableSwagger2
-public class SwaggerConfiguration implements AdminOnlyAccessible {
+public class SwaggerConfiguration implements AnonymouslyAccessible {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.getboostr.portal.web"))
+                .apis(RequestHandlerSelectors.basePackage("com.getboostr.portal.rest.api"))
                 .build()
                 .produces(Set.of("application/json"))
                 .consumes(Set.of("application/json"))
@@ -35,7 +35,8 @@ public class SwaggerConfiguration implements AdminOnlyAccessible {
                 .build();
     }
 
-    @Override
+    // FIXME fix this before release and make this class implement AdminOnlyAccessible
+//    @Override
     public String[] adminOnlyEndpointAntMatchers() {
         return new String[]{
                 "/swagger-ui.html",
@@ -45,6 +46,11 @@ public class SwaggerConfiguration implements AdminOnlyAccessible {
                 createSubDirectoryPattern("/swagger-resources"),
                 "/v2/api-docs"
         };
+    }
+
+    @Override
+    public String[] allowedEndpointAntMatchers() {
+        return adminOnlyEndpointAntMatchers();
     }
 
 }
