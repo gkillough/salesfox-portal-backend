@@ -1,5 +1,6 @@
 package com.getboostr.portal.rest.api.catalogue;
 
+import com.getboostr.portal.common.service.catalogue.CatalogueItemAccessUtils;
 import com.getboostr.portal.common.service.icon.LocalIconManager;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
@@ -8,12 +9,14 @@ import com.getboostr.portal.database.catalogue.icon.CatalogueItemIconEntity;
 import com.getboostr.portal.database.catalogue.icon.CatalogueItemIconRepository;
 import com.getboostr.portal.database.catalogue.item.CatalogueItemEntity;
 import com.getboostr.portal.database.catalogue.item.CatalogueItemRepository;
-import com.getboostr.portal.database.catalogue.restriction.CatalogueItemRestrictionEntity;
-import com.getboostr.portal.database.catalogue.restriction.CatalogueItemRestrictionRepository;
+import com.getboostr.portal.database.catalogue.restriction.CatalogueItemOrganizationAccountRestrictionEntity;
+import com.getboostr.portal.database.catalogue.restriction.CatalogueItemOrganizationAccountRestrictionRepository;
+import com.getboostr.portal.database.catalogue.restriction.CatalogueItemUserRestrictionEntity;
+import com.getboostr.portal.database.catalogue.restriction.CatalogueItemUserRestrictionRepository;
+import com.getboostr.portal.database.organization.account.OrganizationAccountRepository;
 import com.getboostr.portal.rest.api.catalogue.model.CatalogueItemRequestModel;
 import com.getboostr.portal.rest.api.catalogue.model.CatalogueItemResponseModel;
 import com.getboostr.portal.rest.api.catalogue.model.MultiCatalogueItemModel;
-import com.getboostr.portal.database.organization.account.OrganizationAccountRepository;
 import com.getboostr.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import com.getboostr.portal.rest.api.common.model.request.RestrictionModel;
 import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
@@ -38,21 +41,24 @@ import java.util.*;
 @Slf4j
 @Component
 public class CatalogueService {
-    private CatalogueItemRepository catalogueItemRepository;
-    private CatalogueItemRestrictionRepository catalogueItemRestrictionRepository;
-    private CatalogueItemIconRepository catalogueItemIconRepository;
-    private OrganizationAccountRepository organizationAccountRepository;
-    private UserRepository userRepository;
-    private HttpSafeImageUtility imageUtility;
-    private LocalIconManager localIconManager;
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final CatalogueItemRepository catalogueItemRepository;
+    private final CatalogueItemOrganizationAccountRestrictionRepository catItemOrgAcctRestrictionRepository;
+    private final CatalogueItemUserRestrictionRepository catItemUserRestrictionRepository;
+    private final CatalogueItemIconRepository catalogueItemIconRepository;
+    private final OrganizationAccountRepository organizationAccountRepository;
+    private final UserRepository userRepository;
+    private final HttpSafeImageUtility imageUtility;
+    private final LocalIconManager localIconManager;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
-    public CatalogueService(CatalogueItemRepository catalogueItemRepository, CatalogueItemRestrictionRepository catalogueItemRestrictionRepository,
-                            CatalogueItemIconRepository catalogueItemIconRepository, OrganizationAccountRepository organizationAccountRepository, UserRepository userRepository,
+    public CatalogueService(CatalogueItemRepository catalogueItemRepository, CatalogueItemOrganizationAccountRestrictionRepository catItemOrgAcctRestrictionRepository,
+                            CatalogueItemUserRestrictionRepository catItemUserRestrictionRepository, CatalogueItemIconRepository catalogueItemIconRepository,
+                            OrganizationAccountRepository organizationAccountRepository, UserRepository userRepository,
                             HttpSafeImageUtility imageUtility, LocalIconManager localIconManager, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.catalogueItemRepository = catalogueItemRepository;
-        this.catalogueItemRestrictionRepository = catalogueItemRestrictionRepository;
+        this.catItemOrgAcctRestrictionRepository = catItemOrgAcctRestrictionRepository;
+        this.catItemUserRestrictionRepository = catItemUserRestrictionRepository;
         this.catalogueItemIconRepository = catalogueItemIconRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.userRepository = userRepository;
@@ -80,9 +86,7 @@ public class CatalogueService {
     public CatalogueItemResponseModel getItem(UUID itemId) {
         CatalogueItemEntity foundItem = catalogueItemRepository.findById(itemId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (foundItem.getRestricted()) {
-            validateItemAccess(itemId);
-        }
+        validateItemAccess(foundItem);
         return convertToResponseModel(foundItem);
     }
 
@@ -92,13 +96,20 @@ public class CatalogueService {
 
         RestrictionModel restrictionRequestModel = itemRequestModel.getRestriction();
         boolean isRestricted = restrictionRequestModel != null;
-        CatalogueItemEntity newItem = new CatalogueItemEntity(null, itemRequestModel.getName(), itemRequestModel.getPrice(), itemRequestModel.getQuantity(), isRestricted, null, true);
+        CatalogueItemEntity newItem = new CatalogueItemEntity(null, itemRequestModel.getName(), itemRequestModel.getPrice(), itemRequestModel.getQuantity(), null, true);
 
         CatalogueItemEntity savedItem = catalogueItemRepository.save(newItem);
 
         if (isRestricted) {
-            CatalogueItemRestrictionEntity newRestriction = new CatalogueItemRestrictionEntity(null, savedItem.getItemId(), restrictionRequestModel.getOrganizationAccountId(), restrictionRequestModel.getUserId());
-            catalogueItemRestrictionRepository.save(newRestriction);
+            if (null != restrictionRequestModel.getOrganizationAccountId()) {
+                CatalogueItemOrganizationAccountRestrictionEntity orgAcctRestriction = new CatalogueItemOrganizationAccountRestrictionEntity(savedItem.getItemId(), restrictionRequestModel.getOrganizationAccountId());
+                catItemOrgAcctRestrictionRepository.save(orgAcctRestriction);
+            }
+
+            if (null != restrictionRequestModel.getUserId()) {
+                CatalogueItemUserRestrictionEntity userRestriction = new CatalogueItemUserRestrictionEntity(savedItem.getItemId(), restrictionRequestModel.getUserId());
+                catItemUserRestrictionRepository.save(userRestriction);
+            }
         }
         return convertToResponseModel(savedItem);
     }
@@ -129,18 +140,28 @@ public class CatalogueService {
         existingItem.setName(itemRequestModel.getName());
         existingItem.setPrice(itemRequestModel.getPrice());
         existingItem.setQuantity(itemRequestModel.getQuantity());
-        existingItem.setRestricted(isRestricted);
-        catalogueItemRepository.save(existingItem);
+        CatalogueItemEntity savedItem = catalogueItemRepository.save(existingItem);
 
-        Optional<CatalogueItemRestrictionEntity> optionalRestriction = catalogueItemRestrictionRepository.findByItemId(itemId);
         if (isRestricted) {
-            CatalogueItemRestrictionEntity restrictionToSave = optionalRestriction.orElseGet(CatalogueItemRestrictionEntity::new);
-            restrictionToSave.setItemId(itemId);
-            restrictionToSave.setOrganizationAccountId(restrictionRequestModel.getOrganizationAccountId());
-            restrictionToSave.setUserId(restrictionRequestModel.getUserId());
-            catalogueItemRestrictionRepository.save(restrictionToSave);
-        } else {
-            optionalRestriction.ifPresent(catalogueItemRestrictionRepository::delete);
+            CatalogueItemOrganizationAccountRestrictionEntity orgAcctRestriction = savedItem.getCatalogueItemOrganizationAccountRestrictionEntity();
+            if (null != restrictionRequestModel.getOrganizationAccountId()) {
+                CatalogueItemOrganizationAccountRestrictionEntity orgAcctRestrictionToSave = Optional.ofNullable(orgAcctRestriction).orElseGet(CatalogueItemOrganizationAccountRestrictionEntity::new);
+                orgAcctRestrictionToSave.setItemId(itemId);
+                orgAcctRestrictionToSave.setOrganizationAccountId(restrictionRequestModel.getOrganizationAccountId());
+                catItemOrgAcctRestrictionRepository.save(orgAcctRestrictionToSave);
+            } else if (null != orgAcctRestriction) {
+                catItemOrgAcctRestrictionRepository.delete(orgAcctRestriction);
+            }
+
+            CatalogueItemUserRestrictionEntity userRestriction = savedItem.getCatalogueItemUserRestrictionEntity();
+            if (null != restrictionRequestModel.getUserId()) {
+                CatalogueItemUserRestrictionEntity userRestrictionToSave = Optional.ofNullable(userRestriction).orElseGet(CatalogueItemUserRestrictionEntity::new);
+                userRestrictionToSave.setItemId(itemId);
+                userRestrictionToSave.setUserId(restrictionRequestModel.getUserId());
+                catItemUserRestrictionRepository.save(userRestrictionToSave);
+            } else if (null != userRestriction) {
+                catItemUserRestrictionRepository.delete(userRestriction);
+            }
         }
     }
 
@@ -164,33 +185,14 @@ public class CatalogueService {
         }
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         return catalogueItemRepository.findAccessibleCatalogueItems(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), pageRequest);
     }
 
-    private void validateItemAccess(UUID itemId) {
-        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
-            return;
-        }
-
-        Optional<CatalogueItemRestrictionEntity> optionalRestriction = catalogueItemRestrictionRepository.findByItemId(itemId);
-        if (optionalRestriction.isPresent()) {
-            CatalogueItemRestrictionEntity restriction = optionalRestriction.get();
-            UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-            if (restriction.getUserId() != null) {
-                if (loggedInUser.getUserId().equals(restriction.getUserId())) {
-                    return;
-                }
-            } else {
-                MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
-                if (userMembership.getOrganizationAccountId().equals(restriction.getOrganizationAccountId())) {
-                    return;
-                }
-            }
+    private void validateItemAccess(CatalogueItemEntity itemEntity) {
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        if (!CatalogueItemAccessUtils.doesUserHaveItemAccess(loggedInUser, itemEntity)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        } else {
-            log.error("No restrictions found for item with id [{}] despite the item being restricted", itemId);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cannot verify access to item");
         }
     }
 
@@ -231,10 +233,15 @@ public class CatalogueService {
     private CatalogueItemResponseModel convertToResponseModel(CatalogueItemEntity entity) {
         UUID organizationAccountId = null;
         UUID userId = null;
-        if (entity.getRestricted()) {
-            CatalogueItemRestrictionEntity restrictionEntity = entity.getCatalogueItemRestrictionEntity();
-            organizationAccountId = restrictionEntity.getOrganizationAccountId();
-            userId = restrictionEntity.getUserId();
+
+        CatalogueItemOrganizationAccountRestrictionEntity orgAcctRestriction = entity.getCatalogueItemOrganizationAccountRestrictionEntity();
+        if (null != orgAcctRestriction) {
+            organizationAccountId = orgAcctRestriction.getOrganizationAccountId();
+        }
+
+        CatalogueItemUserRestrictionEntity userRestriction = entity.getCatalogueItemUserRestrictionEntity();
+        if (null != userRestriction) {
+            userId = userRestriction.getUserId();
         }
         return new CatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getPrice(), entity.getQuantity(), entity.getIconId(), entity.getIsActive(), organizationAccountId, userId);
     }

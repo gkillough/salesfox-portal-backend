@@ -1,13 +1,13 @@
 package com.getboostr.portal.rest.api.inventory.order;
 
 import com.getboostr.portal.common.enumeration.InventoryOrderRequestStatus;
+import com.getboostr.portal.common.service.catalogue.CatalogueItemAccessUtils;
 import com.getboostr.portal.common.time.PortalDateTimeUtils;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.catalogue.item.CatalogueItemEntity;
 import com.getboostr.portal.database.catalogue.item.CatalogueItemRepository;
-import com.getboostr.portal.database.catalogue.restriction.CatalogueItemRestrictionEntity;
-import com.getboostr.portal.database.catalogue.restriction.CatalogueItemRestrictionRepository;
+import com.getboostr.portal.database.catalogue.restriction.CatalogueItemOrganizationAccountRestrictionRepository;
 import com.getboostr.portal.database.inventory.InventoryEntity;
 import com.getboostr.portal.database.inventory.InventoryRepository;
 import com.getboostr.portal.database.inventory.item.InventoryItemEntity;
@@ -49,7 +49,7 @@ public class InventoryOrderService {
     private final InventoryOrderRequestRepository orderRequestRepository;
     private final InventoryOrderRequestStatusRepository orderRequestStatusRepository;
     private final CatalogueItemRepository catalogueItemRepository;
-    private final CatalogueItemRestrictionRepository catalogueItemRestrictionRepository;
+    private final CatalogueItemOrganizationAccountRestrictionRepository catalogueItemOrganizationAccountRestrictionRepository;
     private final InventoryRepository inventoryRepository;
     private final InventoryItemRepository inventoryItemRepository;
     private final InventoryAccessService inventoryAccessService;
@@ -57,12 +57,12 @@ public class InventoryOrderService {
 
     @Autowired
     public InventoryOrderService(InventoryOrderRequestRepository orderRequestRepository, InventoryOrderRequestStatusRepository orderRequestStatusRepository,
-                                 CatalogueItemRepository catalogueItemRepository, CatalogueItemRestrictionRepository catalogueItemRestrictionRepository,
+                                 CatalogueItemRepository catalogueItemRepository, CatalogueItemOrganizationAccountRestrictionRepository catalogueItemOrganizationAccountRestrictionRepository,
                                  InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository, InventoryAccessService inventoryAccessService, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.orderRequestRepository = orderRequestRepository;
         this.orderRequestStatusRepository = orderRequestStatusRepository;
         this.catalogueItemRepository = catalogueItemRepository;
-        this.catalogueItemRestrictionRepository = catalogueItemRestrictionRepository;
+        this.catalogueItemOrganizationAccountRestrictionRepository = catalogueItemOrganizationAccountRestrictionRepository;
         this.inventoryRepository = inventoryRepository;
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryAccessService = inventoryAccessService;
@@ -103,16 +103,16 @@ public class InventoryOrderService {
         InventoryEntity foundInventory = findInventoryAndValidateAccess(inventoryId);
         InventoryOrderRequestEntity foundOrder = orderRequestRepository.findById(orderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        validateReadAccess(foundOrder);
 
         CatalogueItemEntity targetItem = catalogueItemRepository.findById(foundOrder.getCatalogueItemId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", foundOrder.getCatalogueItemId())));
+        validateReadAccess(foundOrder, targetItem);
+
         InventoryOrderRequestStatusEntity targetStatus = orderRequestStatusRepository.findByOrderId(foundOrder.getOrderId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No order request status item with the id [%s] exists", foundOrder.getOrderId())));
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
-        validateItemAccess(userMembership, targetItem);
+        validateItemAccess(loggedInUser, targetItem);
 
         return convertToResponseModel(foundOrder, foundInventory, targetItem, targetStatus);
     }
@@ -130,7 +130,7 @@ public class InventoryOrderService {
         CatalogueItemEntity targetItem = catalogueItemRepository.findById(requestModel.getCatalogueItemId())
                 .filter(CatalogueItemEntity::getIsActive)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", requestModel.getCatalogueItemId())));
-        validateItemAccess(userMembership, targetItem);
+        validateItemAccess(loggedInUser, targetItem);
 
         InventoryOrderRequestEntity orderToSave = new InventoryOrderRequestEntity(
                 null,
@@ -204,28 +204,19 @@ public class InventoryOrderService {
         return orderRequestRepository.findByInventoryId(inventoryId, pageRequest);
     }
 
-    private void validateReadAccess(InventoryOrderRequestEntity order) {
+    private void validateReadAccess(InventoryOrderRequestEntity order, CatalogueItemEntity catalogueItem) {
         if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return;
         }
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
-        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
-            if (loggedInUser.getUserId().equals(order.getRequestingUserId())) {
-                return;
-            }
-        } else if (userMembership.getOrganizationAccountId().equals(order.getOrganizationAccountId())) {
-            Optional<CatalogueItemRestrictionEntity> optionalItemRestriction = catalogueItemRestrictionRepository.findByItemId(order.getCatalogueItemId());
-            if (optionalItemRestriction.isPresent()) {
-                CatalogueItemRestrictionEntity restriction = optionalItemRestriction.get();
-                if (userMembership.getOrganizationAccountId().equals(restriction.getOrganizationAccountId())
-                        && (restriction.getUserId() == null || loggedInUser.getUserId().equals(restriction.getUserId()))) {
-                    return;
-                }
-            } else {
-                return;
-            }
+        if (loggedInUser.getUserId().equals(order.getRequestingUserId())) {
+            // The user who created the order should have access to view it, even if the item is restricted now.
+            return;
+        }
+
+        if (CatalogueItemAccessUtils.doesUserHaveItemAccess(loggedInUser, catalogueItem)) {
+            return;
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
@@ -242,15 +233,8 @@ public class InventoryOrderService {
         }
     }
 
-    private void validateItemAccess(MembershipEntity loggedInUserMembership, CatalogueItemEntity targetItem) {
-        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
-            return;
-        }
-
-        CatalogueItemRestrictionEntity itemRestriction = targetItem.getCatalogueItemRestrictionEntity();
-        if (targetItem.getRestricted()
-                && (!itemRestriction.getOrganizationAccountId().equals(loggedInUserMembership.getOrganizationAccountId())
-                || (itemRestriction.getUserId() != null && !itemRestriction.getUserId().equals(loggedInUserMembership.getUserId())))) {
+    private void validateItemAccess(UserEntity userRequestingAccess, CatalogueItemEntity targetItem) {
+        if (!CatalogueItemAccessUtils.doesUserHaveItemAccess(null, targetItem)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
     }

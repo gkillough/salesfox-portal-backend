@@ -138,7 +138,7 @@ databaseChangeLog:
             constraintName: contact_organization_account_restrictions_contact_id_fk
             deferrable: false
             initiallyDeferred: false
-            onDelete: NO ACTION
+            onDelete: CASCADE
             onUpdate: NO ACTION
             referencedTableSchemaName: portal
             referencedTableName: organization_account_contacts
@@ -151,7 +151,7 @@ databaseChangeLog:
             constraintName: contact_org_acct_restrictions_organization_account_id_fk
             deferrable: false
             initiallyDeferred: false
-            onDelete: NO ACTION
+            onDelete: CASCADE
             onUpdate: NO ACTION
             referencedTableSchemaName: portal
             referencedTableName: organization_accounts
@@ -164,7 +164,7 @@ databaseChangeLog:
             constraintName: contact_user_restrictions_contact_id_fk
             deferrable: false
             initiallyDeferred: false
-            onDelete: NO ACTION
+            onDelete: CASCADE
             onUpdate: NO ACTION
             referencedTableSchemaName: portal
             referencedTableName: organization_account_contacts
@@ -177,7 +177,7 @@ databaseChangeLog:
             constraintName: contact_user_restrictions_user_id_fk
             deferrable: false
             initiallyDeferred: false
-            onDelete: NO ACTION
+            onDelete: CASCADE
             onUpdate: NO ACTION
             referencedTableSchemaName: portal
             referencedTableName: users
