@@ -11,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class InventoryAccessService {
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
     public InventoryAccessService(HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
@@ -33,7 +33,7 @@ public class InventoryAccessService {
                 return;
             }
         } else {
-            MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(requestingUser);
+            MembershipEntity userMembership = requestingUser.getMembershipEntity();
             if (userMembership.getOrganizationAccountId().equals(inventoryEntity.getOrganizationAccountId())) {
                 return;
             }

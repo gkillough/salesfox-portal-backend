@@ -1,11 +1,11 @@
 package com.getboostr.portal.rest.api.inventory.order;
 
+import com.getboostr.portal.rest.api.common.page.PageMetadata;
+import com.getboostr.portal.rest.api.inventory.InventoryController;
 import com.getboostr.portal.rest.api.inventory.order.model.InventoryOrderProcessingRequestModel;
 import com.getboostr.portal.rest.api.inventory.order.model.InventoryOrderRequestModel;
 import com.getboostr.portal.rest.api.inventory.order.model.InventoryOrderResponseModel;
 import com.getboostr.portal.rest.api.inventory.order.model.MultiInventoryOrderModel;
-import com.getboostr.portal.rest.api.common.page.PageMetadata;
-import com.getboostr.portal.rest.api.inventory.InventoryController;
 import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,36 +14,34 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(InventoryOrderController.BASE_ENDPOINT)
+@RequestMapping(InventoryController.BASE_ENDPOINT)
 public class InventoryOrderController {
-    public static final String BASE_ENDPOINT = InventoryController.BASE_ENDPOINT + "/orders";
-
-    private InventoryOrderService inventoryOrderService;
+    private final InventoryOrderService inventoryOrderService;
 
     @Autowired
     public InventoryOrderController(InventoryOrderService inventoryOrderService) {
         this.inventoryOrderService = inventoryOrderService;
     }
 
-    @GetMapping
-    public MultiInventoryOrderModel getOrders(@RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset, @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit) {
-        return inventoryOrderService.getOrders(offset, limit);
+    @GetMapping("/{inventoryId}/orders")
+    public MultiInventoryOrderModel getOrders(@PathVariable UUID inventoryId, @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset, @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit) {
+        return inventoryOrderService.getOrders(inventoryId, offset, limit);
     }
 
-    @GetMapping("/{orderId}")
-    public InventoryOrderResponseModel getOrder(@PathVariable UUID orderId) {
-        return inventoryOrderService.getOrder(orderId);
+    @GetMapping("/{inventoryId}/orders/{orderId}")
+    public InventoryOrderResponseModel getOrder(@PathVariable UUID inventoryId, @PathVariable UUID orderId) {
+        return inventoryOrderService.getOrder(inventoryId, orderId);
     }
 
-    @PostMapping
-    public InventoryOrderResponseModel submitOrder(@RequestBody InventoryOrderRequestModel requestModel) {
-        return inventoryOrderService.submitOrder(requestModel);
+    @PostMapping("/{inventoryId}/orders")
+    public InventoryOrderResponseModel submitOrder(@PathVariable UUID inventoryId, @RequestBody InventoryOrderRequestModel requestModel) {
+        return inventoryOrderService.submitOrder(inventoryId, requestModel);
     }
 
-    @PostMapping("/{orderId}")
+    @PostMapping("/{inventoryId}/orders/{orderId}")
     @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
-    public void processOrder(@PathVariable UUID orderId, @RequestBody InventoryOrderProcessingRequestModel requestModel) {
-        inventoryOrderService.processOrder(orderId, requestModel);
+    public void processOrder(@PathVariable UUID inventoryId, @PathVariable UUID orderId, @RequestBody InventoryOrderProcessingRequestModel requestModel) {
+        inventoryOrderService.processOrder(inventoryId, orderId, requestModel);
     }
 
 }

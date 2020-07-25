@@ -10,8 +10,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InventoryOrderRequestModel {
-    private UUID inventoryId;
     private UUID catalogueItemId;
     private Integer quantity;
-    
+
 }

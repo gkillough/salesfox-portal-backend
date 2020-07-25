@@ -17,11 +17,12 @@ import com.getboostr.portal.database.order.InventoryOrderRequestEntity;
 import com.getboostr.portal.database.order.InventoryOrderRequestRepository;
 import com.getboostr.portal.database.order.status.InventoryOrderRequestStatusEntity;
 import com.getboostr.portal.database.order.status.InventoryOrderRequestStatusRepository;
+import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
+import com.getboostr.portal.rest.api.inventory.InventoryAccessService;
 import com.getboostr.portal.rest.api.inventory.order.model.InventoryOrderProcessingRequestModel;
 import com.getboostr.portal.rest.api.inventory.order.model.InventoryOrderRequestModel;
 import com.getboostr.portal.rest.api.inventory.order.model.InventoryOrderResponseModel;
 import com.getboostr.portal.rest.api.inventory.order.model.MultiInventoryOrderModel;
-import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
@@ -45,32 +46,35 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class InventoryOrderService {
-    private InventoryOrderRequestRepository orderRequestRepository;
-    private InventoryOrderRequestStatusRepository orderRequestStatusRepository;
-    private CatalogueItemRepository catalogueItemRepository;
-    private CatalogueItemRestrictionRepository catalogueItemRestrictionRepository;
-    private InventoryRepository inventoryRepository;
-    private InventoryItemRepository inventoryItemRepository;
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final InventoryOrderRequestRepository orderRequestRepository;
+    private final InventoryOrderRequestStatusRepository orderRequestStatusRepository;
+    private final CatalogueItemRepository catalogueItemRepository;
+    private final CatalogueItemRestrictionRepository catalogueItemRestrictionRepository;
+    private final InventoryRepository inventoryRepository;
+    private final InventoryItemRepository inventoryItemRepository;
+    private final InventoryAccessService inventoryAccessService;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
     public InventoryOrderService(InventoryOrderRequestRepository orderRequestRepository, InventoryOrderRequestStatusRepository orderRequestStatusRepository,
                                  CatalogueItemRepository catalogueItemRepository, CatalogueItemRestrictionRepository catalogueItemRestrictionRepository,
-                                 InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+                                 InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository, InventoryAccessService inventoryAccessService, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.orderRequestRepository = orderRequestRepository;
         this.orderRequestStatusRepository = orderRequestStatusRepository;
         this.catalogueItemRepository = catalogueItemRepository;
         this.catalogueItemRestrictionRepository = catalogueItemRestrictionRepository;
         this.inventoryRepository = inventoryRepository;
         this.inventoryItemRepository = inventoryItemRepository;
+        this.inventoryAccessService = inventoryAccessService;
         this.membershipRetrievalService = membershipRetrievalService;
     }
 
     // TODO consider adding an option to filter by requesting-user
-    public MultiInventoryOrderModel getOrders(Integer pageOffset, Integer pageLimit) {
+    public MultiInventoryOrderModel getOrders(UUID inventoryId, Integer pageOffset, Integer pageLimit) {
+        findInventoryAndValidateAccess(inventoryId);
         PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
 
-        Page<InventoryOrderRequestEntity> accessibleOrderRequests = getAccessibleOrderRequests(pageOffset, pageLimit);
+        Page<InventoryOrderRequestEntity> accessibleOrderRequests = getAccessibleOrderRequests(inventoryId, pageOffset, pageLimit);
         if (accessibleOrderRequests.isEmpty()) {
             return MultiInventoryOrderModel.empty();
         }
@@ -86,7 +90,7 @@ public class InventoryOrderService {
 
         Map<UUID, InventoryEntity> inventoryCache = createIdToEntityCache(() -> inventoryRepository.findAllById(relatedInventoryIds), InventoryEntity::getInventoryId);
         Map<UUID, CatalogueItemEntity> catalogueItemCache = createIdToEntityCache(() -> catalogueItemRepository.findAllById(relatedCatalogueItemIds), CatalogueItemEntity::getItemId);
-        Map<UUID, InventoryOrderRequestStatusEntity> orderStatusCache = createIdToEntityCache(() -> orderRequestStatusRepository.findAllByOrderIdIn(relatedOrderStatuses), InventoryOrderRequestStatusEntity::getStatusId);
+        Map<UUID, InventoryOrderRequestStatusEntity> orderStatusCache = createIdToEntityCache(() -> orderRequestStatusRepository.findAllByOrderIdIn(relatedOrderStatuses), InventoryOrderRequestStatusEntity::getOrderId);
 
         List<InventoryOrderResponseModel> responseModels = accessibleOrderRequests
                 .stream()
@@ -95,45 +99,43 @@ public class InventoryOrderService {
         return new MultiInventoryOrderModel(responseModels, accessibleOrderRequests);
     }
 
-    public InventoryOrderResponseModel getOrder(UUID orderId) {
+    public InventoryOrderResponseModel getOrder(UUID inventoryId, UUID orderId) {
+        InventoryEntity foundInventory = findInventoryAndValidateAccess(inventoryId);
         InventoryOrderRequestEntity foundOrder = orderRequestRepository.findById(orderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         validateReadAccess(foundOrder);
 
-        InventoryEntity targetInventory = inventoryRepository.findById(foundOrder.getInventoryId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No inventory with the id [%s] exists", foundOrder.getInventoryId())));
         CatalogueItemEntity targetItem = catalogueItemRepository.findById(foundOrder.getCatalogueItemId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", foundOrder.getCatalogueItemId())));
         InventoryOrderRequestStatusEntity targetStatus = orderRequestStatusRepository.findByOrderId(foundOrder.getOrderId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No order request status item with the id [%s] exists", foundOrder.getOrderId())));
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
-        validateInventoryAndItemAccess(userMembership, targetInventory, targetItem);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
+        validateItemAccess(userMembership, targetItem);
 
-        return convertToResponseModel(foundOrder, targetInventory, targetItem, targetStatus);
+        return convertToResponseModel(foundOrder, foundInventory, targetItem, targetStatus);
     }
 
     @Transactional
-    public InventoryOrderResponseModel submitOrder(InventoryOrderRequestModel requestModel) {
+    public InventoryOrderResponseModel submitOrder(UUID inventoryId, InventoryOrderRequestModel requestModel) {
+        InventoryEntity foundInventory = findInventoryAndValidateAccess(inventoryId);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
-        String userRoleLevel = membershipRetrievalService.getRoleEntity(userMembership).getRoleLevel();
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
+        String userRoleLevel = userMembership.getRoleEntity().getRoleLevel();
         validateSubmitOrderAccess(userRoleLevel);
 
         validateOrderRequest(requestModel);
 
-        InventoryEntity targetInventory = inventoryRepository.findById(requestModel.getInventoryId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No inventory with the id [%s] exists", requestModel.getInventoryId())));
         CatalogueItemEntity targetItem = catalogueItemRepository.findById(requestModel.getCatalogueItemId())
                 .filter(CatalogueItemEntity::getIsActive)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", requestModel.getCatalogueItemId())));
-        validateInventoryAndItemAccess(userMembership, targetInventory, targetItem);
+        validateItemAccess(userMembership, targetItem);
 
         InventoryOrderRequestEntity orderToSave = new InventoryOrderRequestEntity(
                 null,
                 targetItem.getItemId(),
-                targetInventory.getInventoryId(),
+                foundInventory.getInventoryId(),
                 userMembership.getOrganizationAccountId(),
                 loggedInUser.getUserId(),
                 loggedInUser.getUserId(),
@@ -147,11 +149,12 @@ public class InventoryOrderService {
         InventoryOrderRequestStatusEntity statusToSave = new InventoryOrderRequestStatusEntity(null, savedOrder.getOrderId(), loggedInUser.getUserId(), processingStatus, orderDateTime, orderDateTime);
         InventoryOrderRequestStatusEntity savedStatus = orderRequestStatusRepository.save(statusToSave);
 
-        return convertToResponseModel(savedOrder, targetInventory, targetItem, savedStatus);
+        return convertToResponseModel(savedOrder, foundInventory, targetItem, savedStatus);
     }
 
     @Transactional
-    public void processOrder(UUID orderId, InventoryOrderProcessingRequestModel requestModel) {
+    public void processOrder(UUID inventoryId, UUID orderId, InventoryOrderProcessingRequestModel requestModel) {
+        findInventoryAndValidateAccess(inventoryId);
         InventoryOrderRequestEntity foundOrder = orderRequestRepository.findById(orderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -185,19 +188,20 @@ public class InventoryOrderService {
         orderRequestStatusRepository.save(orderStatusEntity);
     }
 
-    private Page<InventoryOrderRequestEntity> getAccessibleOrderRequests(Integer pageOffset, Integer pageLimit) {
+    private InventoryEntity findInventoryAndValidateAccess(UUID inventoryId) {
+        InventoryEntity foundInventory = inventoryRepository.findById(inventoryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        inventoryAccessService.validateInventoryAccess(foundInventory);
+        return foundInventory;
+    }
+
+    private Page<InventoryOrderRequestEntity> getAccessibleOrderRequests(UUID inventoryId, Integer pageOffset, Integer pageLimit) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
         if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return orderRequestRepository.findAll(pageRequest);
         }
-
-        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
-        String roleLevel = membershipRetrievalService.getRoleEntity(userMembership).getRoleLevel();
-        if (isPortalIndividualAccount(roleLevel)) {
-            return orderRequestRepository.findByOrganizationAccountIdAndRequestingUserId(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), pageRequest);
-        }
-        return orderRequestRepository.findByOrganizationAccountId(userMembership.getOrganizationAccountId(), pageRequest);
+        // TODO should viewing orders be restricted for non org acct owners/managers?
+        return orderRequestRepository.findByInventoryId(inventoryId, pageRequest);
     }
 
     private void validateReadAccess(InventoryOrderRequestEntity order) {
@@ -206,9 +210,8 @@ public class InventoryOrderService {
         }
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
-        String roleLevel = membershipRetrievalService.getRoleEntity(userMembership).getRoleLevel();
-        if (isPortalIndividualAccount(roleLevel)) {
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
+        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
             if (loggedInUser.getUserId().equals(order.getRequestingUserId())) {
                 return;
             }
@@ -239,16 +242,13 @@ public class InventoryOrderService {
         }
     }
 
-    private void validateInventoryAndItemAccess(MembershipEntity loggedInUserMembership, InventoryEntity targetInventory, CatalogueItemEntity targetItem) {
+    private void validateItemAccess(MembershipEntity loggedInUserMembership, CatalogueItemEntity targetItem) {
         if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return;
         }
 
         CatalogueItemRestrictionEntity itemRestriction = targetItem.getCatalogueItemRestrictionEntity();
-        if ((targetInventory.getOrganizationAccountId() != null && !loggedInUserMembership.getOrganizationAccountId().equals(targetInventory.getOrganizationAccountId()))
-                || (targetInventory.getUserId() != null && !targetInventory.getUserId().equals(loggedInUserMembership.getUserId()))) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        } else if (targetItem.getRestricted()
+        if (targetItem.getRestricted()
                 && (!itemRestriction.getOrganizationAccountId().equals(loggedInUserMembership.getOrganizationAccountId())
                 || (itemRestriction.getUserId() != null && !itemRestriction.getUserId().equals(loggedInUserMembership.getUserId())))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -261,10 +261,6 @@ public class InventoryOrderService {
 
     private void validateOrderRequest(InventoryOrderRequestModel requestModel) {
         Set<String> errors = new LinkedHashSet<>();
-        if (requestModel.getInventoryId() == null) {
-            errors.add("The field 'inventoryId' is required");
-        }
-
         if (requestModel.getCatalogueItemId() == null) {
             errors.add("The field 'catalogueItemId' is required");
         }
