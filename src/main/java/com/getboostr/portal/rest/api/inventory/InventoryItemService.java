@@ -6,9 +6,9 @@ import com.getboostr.portal.database.inventory.InventoryRepository;
 import com.getboostr.portal.database.inventory.item.InventoryItemEntity;
 import com.getboostr.portal.database.inventory.item.InventoryItemPK;
 import com.getboostr.portal.database.inventory.item.InventoryItemRepository;
+import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import com.getboostr.portal.rest.api.inventory.model.InventoryItemResponseModel;
 import com.getboostr.portal.rest.api.inventory.model.MultiInventoryItemModel;
-import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
 
 @Component
 public class InventoryItemService {
-    private InventoryRepository inventoryRepository;
-    private InventoryItemRepository inventoryItemRepository;
-    private InventoryAccessService inventoryAccessService;
+    private final InventoryRepository inventoryRepository;
+    private final InventoryItemRepository inventoryItemRepository;
+    private final InventoryAccessService inventoryAccessService;
 
     @Autowired
     public InventoryItemService(InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository, InventoryAccessService inventoryAccessService) {

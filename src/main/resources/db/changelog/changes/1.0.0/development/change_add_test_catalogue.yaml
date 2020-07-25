@@ -32,9 +32,6 @@ databaseChangeLog:
                   name: quantity
                   valueNumeric: 10
               - column:
-                  name: restricted
-                  value: false
-              - column:
                   name: icon_id
                   value: 5be2c2dc-9f93-43a5-b14b-559277825e6e
               - column:
@@ -73,9 +70,6 @@ databaseChangeLog:
               - column:
                   name: quantity
                   valueNumeric: 40
-              - column:
-                  name: restricted
-                  value: false
               - column:
                   name: icon_id
                   value: 65ad1457-7959-439e-a7e2-2c0990dcf69c
@@ -116,9 +110,6 @@ databaseChangeLog:
                   name: quantity
                   valueNumeric: 100
               - column:
-                  name: restricted
-                  value: false
-              - column:
                   name: icon_id
                   value: 541ae772-61db-453b-8ec5-d0d31081bbfc
               - column:
@@ -149,6 +140,9 @@ databaseChangeLog:
             tableName: catalogue_items
             columns:
               - column:
+                  name: item_id
+                  value: 933f942f-1b11-49b9-9c09-6b34148f5c0f
+              - column:
                   name: name
                   value: Tumbler - Custom Text
               - column:
@@ -158,11 +152,23 @@ databaseChangeLog:
                   name: quantity
                   valueNumeric: 25
               - column:
-                  name: restricted
-                  value: false
-              - column:
                   name: icon_id
                   value: 282444ca-28db-4db2-9706-24b6104f2c17
               - column:
                   name: is_active
                   value: true
+
+  - changeSet:
+      id: test-catalogue-item-restriction-4
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: catalogue_item_organization_account_restrictions
+            columns:
+              - column:
+                  name: item_id
+                  value: 933f942f-1b11-49b9-9c09-6b34148f5c0f
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')

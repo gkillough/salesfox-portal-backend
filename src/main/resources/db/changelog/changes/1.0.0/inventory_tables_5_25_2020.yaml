@@ -41,9 +41,6 @@ databaseChangeLog:
                   name: quantity
                   type: bigint
               - column:
-                  name: restricted
-                  type: boolean
-              - column:
                   name: icon_id
                   type: UUID
               - column:
@@ -65,25 +62,20 @@ databaseChangeLog:
             onDelete: SET NULL
 
   - changeSet:
-      id: inventory-tables-3
+      id: inventory-tables-3a
       author: gavinkillough
       changes:
         - createTable:
             schemaName: portal
-            tableName: catalogue_item_restrictions
+            tableName: catalogue_item_organization_account_restrictions
             columns:
-              - column:
-                  name: restriction_id
-                  type: UUID
-                  defaultValueComputed: uuid_generate_v4()
-                  constraints:
-                    primaryKey: true
               - column:
                   name: item_id
                   type: UUID
                   constraints:
+                    primaryKey: true
                     nullable: false
-                    foreignKeyName: catalogue_item_restrictions_item_id_fk
+                    foreignKeyName: catalog_item_org_acct_restrictions_item_id_fk
                     referencedTableSchemaName: portal
                     referencedTableName: catalogue_items
                     referencedColumnNames: item_id
@@ -93,18 +85,39 @@ databaseChangeLog:
                   type: UUID
                   constraints:
                     nullable: false
-                    foreignKeyName: catalogue_item_restrictions_org_account_id_fk
+                    foreignKeyName: catalog_item_org_acct_restrictions_org_account_id_fk
                     referencedTableSchemaName: portal
                     referencedTableName: organization_accounts
                     referencedColumnNames: organization_account_id
+
+  - changeSet:
+      id: inventory-tables-3b
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: catalogue_item_user_restrictions
+            columns:
+              - column:
+                  name: item_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: catalogue_item_user_restrictions_item_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: catalogue_items
+                    referencedColumnNames: item_id
+                    deleteCascade: true
               - column:
                   name: user_id
                   type: UUID
                   constraints:
-                    foreignKeyName: catalogue_item_restrictions_user_id_fk
+                    foreignKeyName: catalogue_item_user_restrictions_user_id_fk
                     referencedTableSchemaName: portal
                     referencedTableName: users
                     referencedColumnNames: user_id
+                    deleteCascade: true
 
   - changeSet:
       id: inventory-tables-4

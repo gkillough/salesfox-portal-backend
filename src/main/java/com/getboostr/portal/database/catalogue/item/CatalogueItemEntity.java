@@ -1,6 +1,7 @@
 package com.getboostr.portal.database.catalogue.item;
 
-import com.getboostr.portal.database.catalogue.restriction.CatalogueItemRestrictionEntity;
+import com.getboostr.portal.database.catalogue.restriction.CatalogueItemOrganizationAccountRestrictionEntity;
+import com.getboostr.portal.database.catalogue.restriction.CatalogueItemUserRestrictionEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -29,9 +30,6 @@ public class CatalogueItemEntity implements Serializable {
     @Column(name = "quantity")
     private Long quantity;
 
-    @Column(name = "restricted")
-    private Boolean restricted;
-
     @PrimaryKeyJoinColumn
     @Column(name = "icon_id")
     private UUID iconId;
@@ -40,17 +38,24 @@ public class CatalogueItemEntity implements Serializable {
     private Boolean isActive;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "item_id", referencedColumnName = "item_id")
-    private CatalogueItemRestrictionEntity catalogueItemRestrictionEntity;
+    @JoinColumn(name = "item_id", referencedColumnName = "item_id", insertable = false, updatable = false)
+    private CatalogueItemOrganizationAccountRestrictionEntity catalogueItemOrganizationAccountRestrictionEntity;
 
-    public CatalogueItemEntity(UUID itemId, String name, BigDecimal price, Long quantity, Boolean restricted, UUID iconId, Boolean isActive) {
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "item_id", referencedColumnName = "item_id", insertable = false, updatable = false)
+    private CatalogueItemUserRestrictionEntity catalogueItemUserRestrictionEntity;
+
+    public CatalogueItemEntity(UUID itemId, String name, BigDecimal price, Long quantity, UUID iconId, Boolean isActive) {
         this.itemId = itemId;
         this.name = name;
         this.price = price;
         this.quantity = quantity;
-        this.restricted = restricted;
         this.iconId = iconId;
         this.isActive = isActive;
+    }
+
+    public boolean hasRestriction() {
+        return null != catalogueItemOrganizationAccountRestrictionEntity || null != catalogueItemUserRestrictionEntity;
     }
 
 }
