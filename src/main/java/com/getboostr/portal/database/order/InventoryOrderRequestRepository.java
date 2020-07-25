@@ -9,8 +9,6 @@ import java.util.UUID;
 
 @Component
 public interface InventoryOrderRequestRepository extends JpaRepository<InventoryOrderRequestEntity, UUID> {
-    Page<InventoryOrderRequestEntity> findByOrganizationAccountId(UUID organizationAccountId, Pageable pageable);
-
-    Page<InventoryOrderRequestEntity> findByOrganizationAccountIdAndRequestingUserId(UUID organizationAccountId, UUID requestingUserId, Pageable pageable);
+    Page<InventoryOrderRequestEntity> findByInventoryId(UUID inventoryId, Pageable pageable);
 
 }
