@@ -200,6 +200,7 @@ public class InventoryOrderService {
         if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return orderRequestRepository.findAll(pageRequest);
         }
+        // TODO should viewing orders be restricted for non org acct owners/managers?
         return orderRequestRepository.findByInventoryId(inventoryId, pageRequest);
     }
 
