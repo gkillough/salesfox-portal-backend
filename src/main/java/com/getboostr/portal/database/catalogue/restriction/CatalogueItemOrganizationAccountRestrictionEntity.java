@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "portal", name = "catalogue_item_restrictions")
+@Table(schema = "portal", name = "catalogue_item_organization_account_restrictions")
 public class CatalogueItemOrganizationAccountRestrictionEntity implements Serializable {
     @Id
     @PrimaryKeyJoinColumn
