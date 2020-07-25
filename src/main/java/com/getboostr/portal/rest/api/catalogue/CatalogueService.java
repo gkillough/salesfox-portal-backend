@@ -162,6 +162,11 @@ public class CatalogueService {
             } else if (null != userRestriction) {
                 catItemUserRestrictionRepository.delete(userRestriction);
             }
+        } else {
+            Optional.ofNullable(savedItem.getCatalogueItemOrganizationAccountRestrictionEntity())
+                    .ifPresent(catItemOrgAcctRestrictionRepository::delete);
+            Optional.ofNullable(savedItem.getCatalogueItemUserRestrictionEntity())
+                    .ifPresent(catItemUserRestrictionRepository::delete);
         }
     }
 
