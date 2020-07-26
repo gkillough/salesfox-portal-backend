@@ -1,6 +1,5 @@
-package com.getboostr.portal.database.contact.repository;
+package com.getboostr.portal.database.contact.restriction;
 
-import com.getboostr.portal.database.contact.entity.ContactOrganizationAccountRestrictionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 

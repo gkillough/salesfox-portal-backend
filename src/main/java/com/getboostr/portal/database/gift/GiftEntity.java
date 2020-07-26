@@ -35,23 +35,23 @@ public class GiftEntity implements Serializable {
     private UUID contactId;
 
     @OneToOne
-    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id")
+    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
     private GiftNoteDetailEntity giftNoteDetailEntity;
 
     @OneToOne
-    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id")
+    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
     private GiftItemDetailEntity giftItemDetailEntity;
 
     @OneToOne
-    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id")
+    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
     private GiftCustomizationDetailEntity giftCustomizationDetailEntity;
 
     @OneToOne
-    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id")
+    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
     private GiftTrackingEntity giftTrackingEntity;
 
     @OneToOne
-    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id")
+    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
     private GiftTrackingDetailEntity giftTrackingDetailEntity;
 
     public GiftEntity(UUID giftId, UUID organizationAccountId, UUID requestingUserId, UUID contactId) {

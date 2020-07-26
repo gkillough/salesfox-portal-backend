@@ -6,8 +6,16 @@ import com.getboostr.portal.common.service.contact.model.ContactCSVWrapper;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.RoleEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
-import com.getboostr.portal.database.contact.entity.*;
-import com.getboostr.portal.database.contact.repository.*;
+import com.getboostr.portal.database.contact.OrganizationAccountContactEntity;
+import com.getboostr.portal.database.contact.OrganizationAccountContactRepository;
+import com.getboostr.portal.database.contact.address.OrganizationAccountContactAddressEntity;
+import com.getboostr.portal.database.contact.address.OrganizationAccountContactAddressRepository;
+import com.getboostr.portal.database.contact.profile.OrganizationAccountContactProfileEntity;
+import com.getboostr.portal.database.contact.profile.OrganizationAccountContactProfileRepository;
+import com.getboostr.portal.database.contact.restriction.ContactOrganizationAccountRestrictionEntity;
+import com.getboostr.portal.database.contact.restriction.ContactOrganizationAccountRestrictionRepository;
+import com.getboostr.portal.database.contact.restriction.ContactUserRestrictionEntity;
+import com.getboostr.portal.database.contact.restriction.ContactUserRestrictionRepository;
 import com.getboostr.portal.rest.api.contact.model.ContactBulkUploadFieldStatus;
 import com.getboostr.portal.rest.api.contact.model.ContactBulkUploadModel;
 import com.getboostr.portal.rest.api.contact.model.ContactBulkUploadResponse;
@@ -42,19 +50,17 @@ public class ContactBulkUploadService {
     private final ContactOrganizationAccountRestrictionRepository contactOrgAcctRestrictionRepository;
     private final OrganizationAccountContactAddressRepository contactAddressRepository;
     private final OrganizationAccountContactProfileRepository contactProfileRepository;
-    private final OrganizationAccountContactInteractionsRepository contactInteractionsRepository;
 
     @Autowired
     public ContactBulkUploadService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccountContactRepository contactRepository,
                                     ContactUserRestrictionRepository contactUserRestrictionRepository, ContactOrganizationAccountRestrictionRepository contactOrgAcctRestrictionRepository,
-                                    OrganizationAccountContactAddressRepository contactAddressRepository, OrganizationAccountContactProfileRepository contactProfileRepository, OrganizationAccountContactInteractionsRepository contactInteractionsRepository) {
+                                    OrganizationAccountContactAddressRepository contactAddressRepository, OrganizationAccountContactProfileRepository contactProfileRepository) {
         this.membershipRetrievalService = membershipRetrievalService;
         this.contactRepository = contactRepository;
         this.contactUserRestrictionRepository = contactUserRestrictionRepository;
         this.contactOrgAcctRestrictionRepository = contactOrgAcctRestrictionRepository;
         this.contactAddressRepository = contactAddressRepository;
         this.contactProfileRepository = contactProfileRepository;
-        this.contactInteractionsRepository = contactInteractionsRepository;
     }
 
     // TODO consider a response model with the upload session id
@@ -84,7 +90,6 @@ public class ContactBulkUploadService {
         List<ContactUserRestrictionEntity> contactUserRestrictionsToSave = new ArrayList<>(contactsUploadCandidates.size());
         List<OrganizationAccountContactAddressEntity> contactAddressesToSave = new ArrayList<>(contactsUploadCandidates.size());
         List<OrganizationAccountContactProfileEntity> contactProfilesToSave = new ArrayList<>(contactsUploadCandidates.size());
-        List<OrganizationAccountContactInteractionsEntity> contactInteractionsToSave = new ArrayList<>(contactsUploadCandidates.size());
 
         for (int i = 0; i < contactsUploadCandidates.size(); i++) {
             ContactUploadModel contactUploadCandidate = contactsUploadCandidates.get(i);
@@ -112,9 +117,6 @@ public class ContactBulkUploadService {
                 OrganizationAccountContactProfileEntity contactProfileToSave = new OrganizationAccountContactProfileEntity(
                         contactToSaveId, restrictedUserId, contactUploadCandidate.getContactOrganizationName(), contactUploadCandidate.getTitle(), contactUploadCandidate.getMobileNumber(), contactUploadCandidate.getBusinessNumber());
                 contactProfilesToSave.add(contactProfileToSave);
-
-                OrganizationAccountContactInteractionsEntity contactInteractionsEntityToSave = new OrganizationAccountContactInteractionsEntity(contactToSaveId, 0L, 0L);
-                contactInteractionsToSave.add(contactInteractionsEntityToSave);
             }
         }
 
@@ -124,8 +126,6 @@ public class ContactBulkUploadService {
         contactOrgAcctRestrictionRepository.saveAll(contactOrgAcctRestrictionsToSave);
         contactAddressRepository.saveAll(contactAddressesToSave);
         contactProfileRepository.saveAll(contactProfilesToSave);
-        contactInteractionsRepository.saveAll(contactInteractionsToSave);
-
         return new ContactBulkUploadResponse(contactsUploadCandidates.size(), contactsToSave.size(), contactUploadStatuses);
     }
 

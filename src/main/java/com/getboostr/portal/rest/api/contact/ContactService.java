@@ -8,8 +8,16 @@ import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.account.repository.UserRepository;
 import com.getboostr.portal.database.contact.Contactable;
-import com.getboostr.portal.database.contact.entity.*;
-import com.getboostr.portal.database.contact.repository.*;
+import com.getboostr.portal.database.contact.OrganizationAccountContactEntity;
+import com.getboostr.portal.database.contact.OrganizationAccountContactRepository;
+import com.getboostr.portal.database.contact.address.OrganizationAccountContactAddressEntity;
+import com.getboostr.portal.database.contact.address.OrganizationAccountContactAddressRepository;
+import com.getboostr.portal.database.contact.profile.OrganizationAccountContactProfileEntity;
+import com.getboostr.portal.database.contact.profile.OrganizationAccountContactProfileRepository;
+import com.getboostr.portal.database.contact.restriction.ContactOrganizationAccountRestrictionEntity;
+import com.getboostr.portal.database.contact.restriction.ContactOrganizationAccountRestrictionRepository;
+import com.getboostr.portal.database.contact.restriction.ContactUserRestrictionEntity;
+import com.getboostr.portal.database.contact.restriction.ContactUserRestrictionRepository;
 import com.getboostr.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import com.getboostr.portal.rest.api.contact.model.*;
@@ -37,13 +45,12 @@ public class ContactService {
     private final ContactOrganizationAccountRestrictionRepository contactOrgAcctRestrictionRepository;
     private final OrganizationAccountContactAddressRepository contactAddressRepository;
     private final OrganizationAccountContactProfileRepository contactProfileRepository;
-    private final OrganizationAccountContactInteractionsRepository contactInteractionsRepository;
     private final ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
 
     @Autowired
     public ContactService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, UserRepository userRepository, OrganizationAccountContactRepository contactRepository,
                           ContactUserRestrictionRepository contactUserRestrictionRepository, ContactOrganizationAccountRestrictionRepository contactOrgAcctRestrictionRepository,
-                          OrganizationAccountContactAddressRepository contactAddressRepository, OrganizationAccountContactProfileRepository contactProfileRepository, OrganizationAccountContactInteractionsRepository contactInteractionsRepository) {
+                          OrganizationAccountContactAddressRepository contactAddressRepository, OrganizationAccountContactProfileRepository contactProfileRepository) {
         this.membershipRetrievalService = membershipRetrievalService;
         this.userRepository = userRepository;
         this.contactRepository = contactRepository;
@@ -51,7 +58,6 @@ public class ContactService {
         this.contactOrgAcctRestrictionRepository = contactOrgAcctRestrictionRepository;
         this.contactAddressRepository = contactAddressRepository;
         this.contactProfileRepository = contactProfileRepository;
-        this.contactInteractionsRepository = contactInteractionsRepository;
         this.contactAccessOperationUtility = new ContactAccessOperationUtility<>(membershipRetrievalService, contactProfileRepository);
     }
 
@@ -72,28 +78,21 @@ public class ContactService {
         List<OrganizationAccountContactProfileEntity> contactProfiles = contactProfileRepository.findAllByContactIdIn(contactIds);
         Map<UUID, OrganizationAccountContactProfileEntity> contactIdToProfile = createContactableIdMap(contactProfiles);
 
-        List<OrganizationAccountContactInteractionsEntity> contactInteractions = contactInteractionsRepository.findAllById(contactIds);
-        Map<UUID, OrganizationAccountContactInteractionsEntity> contactIdToInteractions = createContactableIdMap(contactInteractions);
-
         List<OrganizationAccountContactAddressEntity> contactAddresses = contactAddressRepository.findAllById(contactIds);
         Map<UUID, OrganizationAccountContactAddressEntity> contactIdToAddresses = createContactableIdMap(contactAddresses);
 
         List<ContactResponseModel> contactModels = new ArrayList<>();
         for (OrganizationAccountContactEntity contact : accessibleContacts) {
             OrganizationAccountContactProfileEntity profile = contactIdToProfile.get(contact.getContactId());
-            OrganizationAccountContactInteractionsEntity interactions = contactIdToInteractions.get(contact.getContactId());
             PointOfContactUserModel nullablePointOfContact = retrievePointOfContactIfExists(profile.getOrganizationPointOfContactUserId());
 
             OrganizationAccountContactAddressEntity contactAddressEntity = contactIdToAddresses.get(contact.getContactId());
             PortalAddressModel contactAddressModel = PortalAddressModel.fromEntity(contactAddressEntity);
 
-            ContactResponseModel contactModel = new ContactResponseModel(
-                    contact.getContactId(), contact.getFirstName(), contact.getLastName(), contact.getEmail(),
-                    profile.getMobileNumber(), profile.getBusinessNumber(), contactAddressModel, profile.getContactOrganizationName(), profile.getTitle(),
-                    interactions.getContactInitiations(), interactions.getEngagementsGenerated(), nullablePointOfContact);
+            ContactResponseModel contactModel = new ContactResponseModel(contact.getContactId(), contact.getFirstName(), contact.getLastName(), contact.getEmail(),
+                    profile.getMobileNumber(), profile.getBusinessNumber(), contactAddressModel, profile.getContactOrganizationName(), profile.getTitle(), nullablePointOfContact);
             contactModels.add(contactModel);
         }
-
         return new MultiContactModel(contactModels, accessibleContacts);
     }
 
@@ -114,16 +113,13 @@ public class ContactService {
                 .orElseThrow(() -> exceptionFunction.apply("profile"));
 
         PointOfContactUserModel nullablePointOfContact = retrievePointOfContactIfExists(profile.getOrganizationPointOfContactUserId());
-        OrganizationAccountContactInteractionsEntity interactions = contactInteractionsRepository.findById(contactId)
-                .orElseThrow(() -> exceptionFunction.apply("interactions"));
 
         OrganizationAccountContactAddressEntity contactAddressEntity = contactAddressRepository.findById(contactId)
                 .orElseThrow(() -> exceptionFunction.apply("address"));
         PortalAddressModel contactAddressModel = PortalAddressModel.fromEntity(contactAddressEntity);
 
         return new ContactResponseModel(foundContact.getContactId(), foundContact.getFirstName(), foundContact.getLastName(), foundContact.getEmail(),
-                profile.getMobileNumber(), profile.getBusinessNumber(), contactAddressModel, profile.getContactOrganizationName(), profile.getTitle(),
-                interactions.getContactInitiations(), interactions.getEngagementsGenerated(), nullablePointOfContact);
+                profile.getMobileNumber(), profile.getBusinessNumber(), contactAddressModel, profile.getContactOrganizationName(), profile.getTitle(), nullablePointOfContact);
     }
 
     @Transactional
@@ -158,9 +154,6 @@ public class ContactService {
         OrganizationAccountContactProfileEntity contactProfileToSave = new OrganizationAccountContactProfileEntity(
                 savedContact.getContactId(), pointOfContactUserId, contactModel.getContactOrganizationName(), contactModel.getTitle(), contactModel.getMobileNumber(), contactModel.getBusinessNumber());
         contactProfileRepository.save(contactProfileToSave);
-
-        OrganizationAccountContactInteractionsEntity contactInteractionsToSave = new OrganizationAccountContactInteractionsEntity(savedContact.getContactId(), 0L, 0L);
-        contactInteractionsRepository.save(contactInteractionsToSave);
     }
 
     @Transactional

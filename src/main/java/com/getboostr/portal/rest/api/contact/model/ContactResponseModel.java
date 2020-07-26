@@ -20,8 +20,6 @@ public class ContactResponseModel {
     private PortalAddressModel address;
     private String contactOrganizationName;
     private String title;
-    private Long contactInitiations;
-    private Long engagementsGenerated;
     private PointOfContactUserModel pointOfContact;
 
 }

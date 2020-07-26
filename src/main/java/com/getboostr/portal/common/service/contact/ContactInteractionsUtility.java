@@ -1,36 +1,36 @@
 package com.getboostr.portal.common.service.contact;
 
+import com.getboostr.portal.common.enumeration.InteractionClassification;
+import com.getboostr.portal.common.enumeration.InteractionMedium;
 import com.getboostr.portal.common.service.auth.AbstractMembershipRetrievalService;
-import com.getboostr.portal.database.contact.entity.OrganizationAccountContactEntity;
-import com.getboostr.portal.database.contact.entity.OrganizationAccountContactInteractionsEntity;
-import com.getboostr.portal.database.contact.repository.OrganizationAccountContactInteractionsRepository;
+import com.getboostr.portal.database.account.entity.UserEntity;
+import com.getboostr.portal.database.contact.OrganizationAccountContactEntity;
+import com.getboostr.portal.database.contact.OrganizationAccountContactRepository;
+import com.getboostr.portal.database.contact.interaction.ContactInteractionRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.UUID;
 
 public class ContactInteractionsUtility<E extends Throwable> {
     private final AbstractMembershipRetrievalService<E> membershipRetrievalService;
-    private final OrganizationAccountContactInteractionsRepository contactInteractionsRepository;
+    private final OrganizationAccountContactRepository contactRepository;
+    private final ContactInteractionRepository contactInteractionRepository;
 
-    public ContactInteractionsUtility(AbstractMembershipRetrievalService<E> membershipRetrievalService, OrganizationAccountContactInteractionsRepository contactInteractionsRepository) {
+    public ContactInteractionsUtility(AbstractMembershipRetrievalService<E> membershipRetrievalService, OrganizationAccountContactRepository contactRepository, ContactInteractionRepository contactInteractionRepository) {
         this.membershipRetrievalService = membershipRetrievalService;
-        this.contactInteractionsRepository = contactInteractionsRepository;
+        this.contactRepository = contactRepository;
+        this.contactInteractionRepository = contactInteractionRepository;
     }
 
-    public void incrementContactInitiations(OrganizationAccountContactEntity contact) throws E {
-        increment(contact, OrganizationAccountContactInteractionsEntity::getContactInitiations, OrganizationAccountContactInteractionsEntity::setContactInitiations);
+    public void addContactInteraction(UserEntity interactingUser, UUID contactId, InteractionMedium medium, InteractionClassification classification, String note) {
+        OrganizationAccountContactEntity foundContact = contactRepository.findById(contactId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        addContactInteraction(interactingUser, foundContact, medium, classification, note);
     }
 
-    public void incrementEngagementsGenerated(OrganizationAccountContactEntity contact) throws E {
-        increment(contact, OrganizationAccountContactInteractionsEntity::getEngagementsGenerated, OrganizationAccountContactInteractionsEntity::setEngagementsGenerated);
-    }
-
-    private void increment(OrganizationAccountContactEntity contact, Function<OrganizationAccountContactInteractionsEntity, Long> getter, BiConsumer<OrganizationAccountContactInteractionsEntity, Long> setter) throws E {
-        OrganizationAccountContactInteractionsEntity contactInteractions = contactInteractionsRepository.findById(contact.getContactId())
-                .orElseThrow(membershipRetrievalService::unexpectedErrorDuringRetrieval);
-        Long incrementedValue = getter.apply(contactInteractions) + 1L;
-        setter.accept(contactInteractions, incrementedValue);
-        contactInteractionsRepository.save(contactInteractions);
+    public void addContactInteraction(UserEntity interactingUser, OrganizationAccountContactEntity contact, InteractionMedium medium, InteractionClassification classification, String note) {
+        // FIXME implement
     }
 
 }

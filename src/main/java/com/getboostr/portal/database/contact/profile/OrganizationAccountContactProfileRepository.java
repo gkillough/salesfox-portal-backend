@@ -1,6 +1,5 @@
-package com.getboostr.portal.database.contact.repository;
+package com.getboostr.portal.database.contact.profile;
 
-import com.getboostr.portal.database.contact.entity.OrganizationAccountContactProfileEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 

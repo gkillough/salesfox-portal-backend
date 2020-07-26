@@ -37,28 +37,56 @@ databaseChangeLog:
             tableName: organization_account_contact_addresses
 
   - changeSet:
-      id: create-contact-tables-2
+      id: create-contact-tables-2a
       author: gavinkillough
       changes:
         - createTable:
+            schemaName: portal
+            tableName: contact_interactions
             columns:
               - column:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    primaryKeyName: organization_account_contact_interactions_pkey
+                    primaryKeyName: contact_interactions_pkey
                   name: contact_id
                   type: UUID
               - column:
-                  defaultValueNumeric: 0
-                  name: contact_initiations
-                  type: BIGINT
-              - column:
-                  defaultValueNumeric: 0
-                  name: engagements_generated
-                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: contact_interactions_pkey
+                  name: interactions_id
+                  type: UUID
+
+  - changeSet:
+      id: create-contact-tables-2b
+      author: gavinkillough
+      changes:
+        - createTable:
             schemaName: portal
-            tableName: organization_account_contact_interactions
+            tableName: interactions
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: contact_interactions_pkey
+                  name: interactions_id
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
+              - column:
+                  name: medium
+                  type: VARCHAR
+              - column:
+                  name: classification
+                  type: VARCHAR
+              - column:
+                  name: date
+                  type: timestamp with timezone
+              - column:
+                  name: note
+                  type: VARCHAR
 
   - changeSet:
       id: create-contact-tables-3
@@ -277,7 +305,7 @@ databaseChangeLog:
             baseColumnNames: contact_id
             baseTableName: organization_account_contact_interactions
             baseTableSchemaName: portal
-            constraintName: client_interaction_organization_account_contact_id_fk
+            constraintName: contact_interaction_org_acct_contact_id_fk
             deferrable: false
             initiallyDeferred: false
             onDelete: NO ACTION

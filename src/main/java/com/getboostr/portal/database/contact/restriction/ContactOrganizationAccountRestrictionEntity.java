@@ -1,4 +1,4 @@
-package com.getboostr.portal.database.contact.entity;
+package com.getboostr.portal.database.contact.restriction;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,15 +11,15 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "portal", name = "contact_user_restrictions")
-public class ContactUserRestrictionEntity {
+@Table(schema = "portal", name = "contact_organization_account_restrictions")
+public class ContactOrganizationAccountRestrictionEntity {
     @Id
     @PrimaryKeyJoinColumn
     @Column(name = "contact_id")
     private UUID contactId;
 
     @PrimaryKeyJoinColumn
-    @Column(name = "user_id")
-    private UUID userId;
+    @Column(name = "organization_account_id")
+    private UUID organizationAccountId;
 
 }

@@ -1,6 +1,7 @@
-package com.getboostr.portal.database.contact.entity;
+package com.getboostr.portal.database.contact;
 
-import com.getboostr.portal.database.contact.Contactable;
+import com.getboostr.portal.database.contact.restriction.ContactOrganizationAccountRestrictionEntity;
+import com.getboostr.portal.database.contact.restriction.ContactUserRestrictionEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
