@@ -132,6 +132,21 @@ databaseChangeLog:
             tableName: inventories
             columns:
               - column:
+                  name: inventory_id
+                  value: 0a253233-f4e7-4df9-8247-fb204146f496
+
+  - changeSet:
+      id: test-orgs-inventory-restrictions-11
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: inventory_organization_account_restrictions
+            columns:
+              - column:
+                  name: inventory_id
+                  value: 0a253233-f4e7-4df9-8247-fb204146f496
+              - column:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
 
@@ -247,6 +262,21 @@ databaseChangeLog:
             schemaName: portal
             tableName: inventories
             columns:
+              - column:
+                  name: inventory_id
+                  value: 7971b436-9fab-4a71-b7ea-209ad1b287ed
+
+  - changeSet:
+      id: test-orgs-inventory-restrictions-12
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: inventory_organization_account_restrictions
+            columns:
+              - column:
+                  name: inventory_id
+                  value: 7971b436-9fab-4a71-b7ea-209ad1b287ed
               - column:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
@@ -383,6 +413,21 @@ databaseChangeLog:
             tableName: inventories
             columns:
               - column:
+                  name: inventory_id
+                  value: a26be5ef-0ea2-45ba-b52e-0766f5d8d137
+
+  - changeSet:
+      id: test-orgs-inventory-restrictions-21
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: inventory_organization_account_restrictions
+            columns:
+              - column:
+                  name: inventory_id
+                  value: a26be5ef-0ea2-45ba-b52e-0766f5d8d137
+              - column:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
 
@@ -498,6 +543,21 @@ databaseChangeLog:
             schemaName: portal
             tableName: inventories
             columns:
+              - column:
+                  name: inventory_id
+                  value: 6d1e7ecf-8c4b-4c6a-9fd1-1441674164aa
+
+  - changeSet:
+      id: test-orgs-inventory-restrictions-22
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: inventory_organization_account_restrictions
+            columns:
+              - column:
+                  name: inventory_id
+                  value: 6d1e7ecf-8c4b-4c6a-9fd1-1441674164aa
               - column:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')

@@ -116,8 +116,20 @@ databaseChangeLog:
             tableName: inventories
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Boostr for Individuals', 'Boostr Basic')
+                  name: inventory_id
+                  value: 1a0c6260-712e-4753-9cf4-4eb80faf8b50
+
+  - changeSet:
+      id: create-user-inventory-restriction-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: inventory_user_restrictions
+            columns:
+              - column:
+                  name: inventory_id
+                  value: 1a0c6260-712e-4753-9cf4-4eb80faf8b50
               - column:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com')
@@ -239,8 +251,20 @@ databaseChangeLog:
             tableName: inventories
             columns:
               - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Boostr for Individuals', 'Boostr Premium')
+                  name: inventory_id
+                  value: 6d57f19b-c14a-4dcd-bc25-6b92ee8b6852
+
+  - changeSet:
+      id: create-user-inventory-restriction-2
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: inventory_user_restrictions
+            columns:
+              - column:
+                  name: inventory_id
+                  value: 6d57f19b-c14a-4dcd-bc25-6b92ee8b6852
               - column:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com')
@@ -353,17 +377,30 @@ databaseChangeLog:
                   name: business_number
                   valueComputed: 5555550006
 
-  - changeSet:
-      id: create-user-inventory-3
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: inventories
-            columns:
-              - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Boostr Organization', 'Boostr Team')
-              - column:
-                  name: user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('admin@usepipeline.com')
+  #  - changeSet:
+  #      id: create-user-inventory-3
+  #      author: gavinkillough
+  #      changes:
+  #        - insert:
+  #            schemaName: portal
+  #            tableName: inventories
+  #            columns:
+  #              - column:
+  #                  name: inventory_id
+  #                  value: 8c1a2762-422a-4c2e-8173-53453a90d15e
+
+  #  - changeSet:
+  #      id: create-user-inventory-restriction-3
+  #      author: gavinkillough
+  #      changes:
+  #        - insert:
+  #            schemaName: portal
+  #            tableName: inventory_user_restrictions
+  #            columns:
+  #              - column:
+  #                  name: inventory_id
+  #                  value: 8c1a2762-422a-4c2e-8173-53453a90d15e
+  #              - column:
+  #                  name: user_id
+  #                  valueComputed: GET_USER_ID_BY_EMAIL('admin@usepipeline.com')
+

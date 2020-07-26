@@ -120,7 +120,7 @@ databaseChangeLog:
                     deleteCascade: true
 
   - changeSet:
-      id: inventory-tables-4
+      id: inventory-tables-4a
       author: gavinkillough
       changes:
         - createTable:
@@ -133,22 +133,60 @@ databaseChangeLog:
                   defaultValueComputed: uuid_generate_v4()
                   constraints:
                     primaryKey: true
+
+  - changeSet:
+      id: inventory-tables-4b
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: inventory_organization_account_restrictions
+            columns:
+              - column:
+                  name: inventory_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: inventory_org_acct_restrictions_inventory_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: inventories
+                    referencedColumnNames: inventory_id
               - column:
                   name: organization_account_id
                   type: UUID
                   constraints:
                     nullable: false
-                    foreignKeyName: inventories_org_account_id_fk
+                    foreignKeyName: inventory_org_acct_restrictions_org_acct_id_fk
                     referencedTableSchemaName: portal
                     referencedTableName: organization_accounts
                     referencedColumnNames: organization_account_id
+
+  - changeSet:
+      id: inventory-tables-4c
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: inventory_user_restrictions
+            columns:
+              - column:
+                  name: inventory_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: inventory_user_restrictions_inventory_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: inventories
+                    referencedColumnNames: inventory_id
               - column:
                   name: user_id
                   type: UUID
                   defaultValue: null
                   constraints:
-                    nullable: true
-                    foreignKeyName: inventories_user_id_fk
+                    nullable: false
+                    foreignKeyName: inventory_user_restrictions_user_id_fk
                     referencedTableSchemaName: portal
                     referencedTableName: users
                     referencedColumnNames: user_id

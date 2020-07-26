@@ -11,6 +11,8 @@ import com.getboostr.portal.database.account.repository.RoleRepository;
 import com.getboostr.portal.database.account.repository.UserRepository;
 import com.getboostr.portal.database.inventory.InventoryEntity;
 import com.getboostr.portal.database.inventory.InventoryRepository;
+import com.getboostr.portal.database.inventory.restriction.InventoryUserRestrictionEntity;
+import com.getboostr.portal.database.inventory.restriction.InventoryUserRestrictionRepository;
 import com.getboostr.portal.database.organization.OrganizationEntity;
 import com.getboostr.portal.database.organization.OrganizationRepository;
 import com.getboostr.portal.database.organization.account.OrganizationAccountEntity;
@@ -43,14 +45,15 @@ public class UserRegistrationService {
     private final OrganizationAccountRepository organizationAccountRepository;
     private final MembershipRepository membershipRepository;
     private final InventoryRepository inventoryRepository;
+    private final InventoryUserRestrictionRepository inventoryUserRestrictionRepository;
     private final UserProfileService userProfileService;
     private final LicenseSeatManager licenseSeatManager;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserRegistrationService(UserRepository userRepository, LoginRepository loginRepository, RoleRepository roleRepository,
-                                   OrganizationRepository organizationRepository, OrganizationAccountRepository organizationAccountRepository, MembershipRepository membershipRepository,
-                                   InventoryRepository inventoryRepository, UserProfileService userProfileService, LicenseSeatManager licenseSeatManager, PasswordEncoder passwordEncoder) {
+    public UserRegistrationService(UserRepository userRepository, LoginRepository loginRepository, RoleRepository roleRepository, OrganizationRepository organizationRepository, OrganizationAccountRepository organizationAccountRepository,
+                                   MembershipRepository membershipRepository, InventoryRepository inventoryRepository, InventoryUserRestrictionRepository inventoryUserRestrictionRepository,
+                                   UserProfileService userProfileService, LicenseSeatManager licenseSeatManager, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.loginRepository = loginRepository;
         this.roleRepository = roleRepository;
@@ -58,6 +61,7 @@ public class UserRegistrationService {
         this.organizationAccountRepository = organizationAccountRepository;
         this.membershipRepository = membershipRepository;
         this.inventoryRepository = inventoryRepository;
+        this.inventoryUserRestrictionRepository = inventoryUserRestrictionRepository;
         this.userProfileService = userProfileService;
         this.licenseSeatManager = licenseSeatManager;
         this.passwordEncoder = passwordEncoder;
@@ -97,7 +101,7 @@ public class UserRegistrationService {
         saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
         saveMembershipInfo(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId(), roleEntity.getRoleId());
 
-        createInventoryIfNecessary(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId(), roleEntity);
+        createInventoryIfNecessary(userEntity.getUserId(), roleEntity);
         userProfileService.initializeProfile(userEntity.getUserId());
         return userEntity.getUserId();
     }
@@ -156,11 +160,13 @@ public class UserRegistrationService {
         membershipRepository.save(newMembershipToSave);
     }
 
-    private void createInventoryIfNecessary(UUID userId, UUID orgAcctId, RoleEntity roleEntity) {
+    private void createInventoryIfNecessary(UUID userId, RoleEntity roleEntity) {
         String roleLevel = roleEntity.getRoleLevel();
         if (PortalAuthorityConstants.PORTAL_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(roleLevel)) {
-            InventoryEntity individualUserInventoryToSave = new InventoryEntity(null, orgAcctId, userId);
-            inventoryRepository.save(individualUserInventoryToSave);
+            InventoryEntity individualUserInventoryToSave = new InventoryEntity();
+            InventoryEntity savedInventory = inventoryRepository.save(individualUserInventoryToSave);
+            InventoryUserRestrictionEntity restrictionToSave = new InventoryUserRestrictionEntity(savedInventory.getInventoryId(), userId);
+            inventoryUserRestrictionRepository.save(restrictionToSave);
         }
     }
 
