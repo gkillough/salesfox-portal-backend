@@ -234,7 +234,7 @@ public class InventoryOrderService {
     }
 
     private void validateItemAccess(UserEntity userRequestingAccess, CatalogueItemEntity targetItem) {
-        if (!CatalogueItemAccessUtils.doesUserHaveItemAccess(null, targetItem)) {
+        if (!CatalogueItemAccessUtils.doesUserHaveItemAccess(userRequestingAccess, targetItem)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
     }

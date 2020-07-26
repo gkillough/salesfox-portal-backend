@@ -4,9 +4,11 @@ import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.inventory.InventoryEntity;
 import com.getboostr.portal.database.inventory.InventoryRepository;
+import com.getboostr.portal.database.inventory.restriction.InventoryOrganizationAccountRestrictionEntity;
+import com.getboostr.portal.database.inventory.restriction.InventoryUserRestrictionEntity;
+import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import com.getboostr.portal.rest.api.inventory.model.InventoryResponseModel;
 import com.getboostr.portal.rest.api.inventory.model.MultiInventoryModel;
-import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,14 +18,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 public class InventoryService {
-    private InventoryRepository inventoryRepository;
-    private InventoryAccessService inventoryAccessService;
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final InventoryRepository inventoryRepository;
+    private final InventoryAccessService inventoryAccessService;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
     public InventoryService(InventoryRepository inventoryRepository,
@@ -66,7 +69,13 @@ public class InventoryService {
     }
 
     private InventoryResponseModel convertToResponseModel(InventoryEntity entity) {
-        return new InventoryResponseModel(entity.getInventoryId(), entity.getOrganizationAccountId(), entity.getUserId());
+        UUID restrictionOrgAcctId = Optional.ofNullable(entity.getInventoryOrganizationAccountRestrictionEntity())
+                .map(InventoryOrganizationAccountRestrictionEntity::getOrganizationAccountId)
+                .orElse(null);
+        UUID restrictionUserId = Optional.ofNullable(entity.getInventoryUserRestrictionEntity())
+                .map(InventoryUserRestrictionEntity::getUserId)
+                .orElse(null);
+        return new InventoryResponseModel(entity.getInventoryId(), restrictionOrgAcctId, restrictionUserId);
     }
 
 }

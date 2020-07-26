@@ -29,11 +29,11 @@ public class UserEntity implements Serializable {
     @Column(name = "is_active")
     private Boolean isActive;
 
-    @OneToOne(optional = false, fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
     private LoginEntity loginEntity;
 
-    @OneToOne(optional = false, fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
     private MembershipEntity membershipEntity;
 

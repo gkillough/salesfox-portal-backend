@@ -3,6 +3,8 @@ package com.getboostr.portal.rest.api.inventory;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.inventory.InventoryEntity;
+import com.getboostr.portal.database.inventory.restriction.InventoryOrganizationAccountRestrictionEntity;
+import com.getboostr.portal.database.inventory.restriction.InventoryUserRestrictionEntity;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,13 +30,13 @@ public class InventoryAccessService {
             return;
         }
 
-        if (inventoryEntity.getUserId() != null) {
-            if (requestingUser.getUserId().equals(inventoryEntity.getUserId())) {
-                return;
-            }
-        } else {
+        if (inventoryEntity.hasRestriction()) {
             MembershipEntity userMembership = requestingUser.getMembershipEntity();
-            if (userMembership.getOrganizationAccountId().equals(inventoryEntity.getOrganizationAccountId())) {
+            InventoryOrganizationAccountRestrictionEntity orgAcctRestriction = inventoryEntity.getInventoryOrganizationAccountRestrictionEntity();
+            InventoryUserRestrictionEntity userRestriction = inventoryEntity.getInventoryUserRestrictionEntity();
+            if (orgAcctRestriction != null && orgAcctRestriction.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
+                return;
+            } else if (userRestriction != null && userRestriction.getUserId().equals(requestingUser.getUserId())) {
                 return;
             }
         }

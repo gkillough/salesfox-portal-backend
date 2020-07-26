@@ -1,6 +1,7 @@
 package com.getboostr.portal.database.inventory;
 
-import lombok.AllArgsConstructor;
+import com.getboostr.portal.database.inventory.restriction.InventoryOrganizationAccountRestrictionEntity;
+import com.getboostr.portal.database.inventory.restriction.InventoryUserRestrictionEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +11,6 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "inventories")
 public class InventoryEntity implements Serializable {
@@ -19,10 +19,20 @@ public class InventoryEntity implements Serializable {
     @Column(name = "inventory_id")
     private UUID inventoryId;
 
-    @Column(name = "organization_account_id")
-    private UUID organizationAccountId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "inventory_id", referencedColumnName = "inventory_id", insertable = false, updatable = false)
+    private InventoryOrganizationAccountRestrictionEntity inventoryOrganizationAccountRestrictionEntity;
 
-    @Column(name = "user_id")
-    private UUID userId;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "inventory_id", referencedColumnName = "inventory_id", insertable = false, updatable = false)
+    private InventoryUserRestrictionEntity inventoryUserRestrictionEntity;
+
+    public InventoryEntity(UUID inventoryId) {
+        this.inventoryId = inventoryId;
+    }
+
+    public boolean hasRestriction() {
+        return null != inventoryOrganizationAccountRestrictionEntity || null != inventoryUserRestrictionEntity;
+    }
 
 }

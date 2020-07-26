@@ -6,6 +6,8 @@ import com.getboostr.portal.database.account.entity.LicenseEntity;
 import com.getboostr.portal.database.account.repository.LicenseRepository;
 import com.getboostr.portal.database.inventory.InventoryEntity;
 import com.getboostr.portal.database.inventory.InventoryRepository;
+import com.getboostr.portal.database.inventory.restriction.InventoryOrganizationAccountRestrictionEntity;
+import com.getboostr.portal.database.inventory.restriction.InventoryOrganizationAccountRestrictionRepository;
 import com.getboostr.portal.database.organization.OrganizationEntity;
 import com.getboostr.portal.database.organization.OrganizationRepository;
 import com.getboostr.portal.database.organization.account.OrganizationAccountEntity;
@@ -42,6 +44,7 @@ public class OrganizationAccountRegistrationService {
     private final OrganizationAccountAddressRepository organizationAccountAddressRepository;
     private final OrganizationAccountProfileRepository organizationAccountProfileRepository;
     private final InventoryRepository inventoryRepository;
+    private final InventoryOrganizationAccountRestrictionRepository inventoryOrgAcctRestrictionRepository;
     private final OrganizationValidationService organizationValidationService;
     private final UserRegistrationService userRegistrationService;
     private final UserProfileService userProfileService;
@@ -52,7 +55,7 @@ public class OrganizationAccountRegistrationService {
                                                   OrganizationAccountRepository organizationAccountRepository,
                                                   OrganizationAccountAddressRepository organizationAccountAddressRepository,
                                                   OrganizationAccountProfileRepository organizationAccountProfileRepository,
-                                                  InventoryRepository inventoryRepository,
+                                                  InventoryRepository inventoryRepository, InventoryOrganizationAccountRestrictionRepository inventoryOrgAcctRestrictionRepository,
                                                   OrganizationValidationService organizationValidationService, UserRegistrationService userRegistrationService, UserProfileService userProfileService) {
         this.licenseRepository = licenseRepository;
         this.organizationRepository = organizationRepository;
@@ -60,6 +63,7 @@ public class OrganizationAccountRegistrationService {
         this.organizationAccountAddressRepository = organizationAccountAddressRepository;
         this.organizationAccountProfileRepository = organizationAccountProfileRepository;
         this.inventoryRepository = inventoryRepository;
+        this.inventoryOrgAcctRestrictionRepository = inventoryOrgAcctRestrictionRepository;
         this.organizationValidationService = organizationValidationService;
         this.userRegistrationService = userRegistrationService;
         this.userProfileService = userProfileService;
@@ -98,7 +102,7 @@ public class OrganizationAccountRegistrationService {
 
         OrganizationEntity orgEntity = getOrCreateOrganizationWithName(registrationModel.getOrganizationName());
         OrganizationAccountEntity orgAccountEntity = createOrganizationAccount(registrationModel, orgAccountLicense, orgEntity);
-        OrganizationAccountAddressEntity orgAccountAddressEntity = createOrganizationAccountAddress(registrationModel.getOrganizationAddress(), orgAccountEntity);
+        createOrganizationAccountAddress(registrationModel.getOrganizationAddress(), orgAccountEntity);
 
         activateLicense(orgAccountLicense);
         registerOrganizationAccountOwner(registrationModel.getAccountOwner(), orgEntity, orgAccountEntity);
@@ -135,10 +139,10 @@ public class OrganizationAccountRegistrationService {
         return organizationAccountRepository.save(orgAccountToSave);
     }
 
-    private OrganizationAccountAddressEntity createOrganizationAccountAddress(PortalAddressModel addressModel, OrganizationAccountEntity organizationAccount) {
+    private void createOrganizationAccountAddress(PortalAddressModel addressModel, OrganizationAccountEntity organizationAccount) {
         OrganizationAccountAddressEntity orgAcctAddressToSave = new OrganizationAccountAddressEntity(organizationAccount.getOrganizationAccountId());
         addressModel.copyFieldsToEntity(orgAcctAddressToSave);
-        return organizationAccountAddressRepository.save(orgAcctAddressToSave);
+        organizationAccountAddressRepository.save(orgAcctAddressToSave);
     }
 
     private void registerOrganizationAccountOwner(OrganizationAccountUserRegistrationModel accountOwnerModel, OrganizationEntity organization, OrganizationAccountEntity organizationAccount) {
@@ -152,14 +156,16 @@ public class OrganizationAccountRegistrationService {
         userProfileService.updateProfileWithoutPermissionsCheck(registeredUserId, accountOwnerProfileUpdateModel);
     }
 
-    private OrganizationAccountProfileEntity createOrganizationAccountProfile(OrganizationAccountEntity organizationAccount, String businessPhoneNumber) {
+    private void createOrganizationAccountProfile(OrganizationAccountEntity organizationAccount, String businessPhoneNumber) {
         OrganizationAccountProfileEntity orgAccountProfileToSave = new OrganizationAccountProfileEntity(null, organizationAccount.getOrganizationAccountId(), businessPhoneNumber);
-        return organizationAccountProfileRepository.save(orgAccountProfileToSave);
+        organizationAccountProfileRepository.save(orgAccountProfileToSave);
     }
 
     private void createInventory(OrganizationAccountEntity orgAccountEntity) {
-        InventoryEntity orgAcctInventoryToSave = new InventoryEntity(null, orgAccountEntity.getOrganizationAccountId(), null);
-        inventoryRepository.save(orgAcctInventoryToSave);
+        InventoryEntity orgAcctInventoryToSave = new InventoryEntity();
+        InventoryEntity savedInventory = inventoryRepository.save(orgAcctInventoryToSave);
+        InventoryOrganizationAccountRestrictionEntity restrictionToSave = new InventoryOrganizationAccountRestrictionEntity(savedInventory.getInventoryId(), orgAccountEntity.getOrganizationAccountId());
+        inventoryOrgAcctRestrictionRepository.save(restrictionToSave);
     }
 
     private void activateLicense(LicenseEntity license) {

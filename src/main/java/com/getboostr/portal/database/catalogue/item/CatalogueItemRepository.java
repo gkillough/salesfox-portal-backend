@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Component
 public interface CatalogueItemRepository extends JpaRepository<CatalogueItemEntity, UUID> {
-    @Query("SELECT DISTINCT itemRow" +
+    @Query("SELECT itemRow" +
             " FROM CatalogueItemEntity itemRow" +
             " LEFT JOIN itemRow.catalogueItemOrganizationAccountRestrictionEntity orgAcctRestriction" +
             " LEFT JOIN itemRow.catalogueItemUserRestrictionEntity userRestriction" +
