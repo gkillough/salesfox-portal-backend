@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -12,9 +12,10 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ContactInteractionsResponseModel {
     private UUID interactionId;
+    private UUID interactingUserId;
     private String medium;
     private String classification;
-    private OffsetDateTime date;
+    private LocalDate date;
     private String note;
 
 }

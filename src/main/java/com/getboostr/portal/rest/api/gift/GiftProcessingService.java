@@ -57,7 +57,7 @@ public class GiftProcessingService {
     public GiftProcessingService(GiftRepository giftRepository, GiftTrackingRepository giftTrackingRepository, GiftTrackingDetailRepository giftTrackingDetailRepository,
                                  InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository,
                                  GiftAccessService giftAccessService, HttpSafeUserMembershipRetrievalService membershipRetrievalService,
-                                 ContactInteractionRepository contactInteractionRepository, OrganizationAccountContactRepository contactRepository) {
+                                 ContactInteractionRepository interactionRepository, ContactInteractionRepository contactInteractionRepository, OrganizationAccountContactRepository contactRepository) {
         this.giftRepository = giftRepository;
         this.giftTrackingRepository = giftTrackingRepository;
         this.giftTrackingDetailRepository = giftTrackingDetailRepository;
