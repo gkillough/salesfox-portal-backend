@@ -292,21 +292,3 @@ databaseChangeLog:
             referencedTableName: organization_account_contacts
             referencedTableSchemaName: portal
             validate: true
-
-  - changeSet:
-      id: create-contact-tables-12
-      author: gavinkillough
-      changes:
-        - addForeignKeyConstraint:
-            baseColumnNames: contact_id
-            baseTableName: contact_interactions
-            baseTableSchemaName: portal
-            constraintName: contact_interaction_org_acct_contact_id_fk
-            deferrable: false
-            initiallyDeferred: false
-            onDelete: NO ACTION
-            onUpdate: NO ACTION
-            referencedColumnNames: contact_id
-            referencedTableName: organization_account_contacts
-            referencedTableSchemaName: portal
-            validate: true
