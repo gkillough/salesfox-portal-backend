@@ -83,7 +83,7 @@ databaseChangeLog:
                   type: VARCHAR
               - column:
                   name: date
-                  type: timestamp with timezone
+                  type: DATE
               - column:
                   name: note
                   type: VARCHAR

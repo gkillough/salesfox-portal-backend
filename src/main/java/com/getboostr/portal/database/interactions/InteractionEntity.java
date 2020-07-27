@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -27,7 +27,7 @@ public class InteractionEntity implements Serializable {
     private String classification;
 
     @Column(name = "date")
-    private OffsetDateTime date;
+    private LocalDate date;
 
     @Column(name = "note")
     private String note;

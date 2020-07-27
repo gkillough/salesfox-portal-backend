@@ -100,7 +100,7 @@ public class GiftService {
     @Transactional
     public GiftResponseModel createDraftGift(DraftGiftRequestModel requestModel) {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         validateRequestModel(loggedInUser, userMembership, requestModel);
 
         GiftEntity giftToSave = new GiftEntity(null, userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), requestModel.getContactId());
@@ -118,7 +118,7 @@ public class GiftService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot edit a gift that has been sent");
         }
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         validateRequestModel(loggedInUser, userMembership, requestModel);
 
         foundGift.setContactId(requestModel.getContactId());
