@@ -16,7 +16,7 @@ import java.util.UUID;
 @Table(schema = "portal", name = "contact_interactions")
 public class ContactInteractionEntity implements Serializable {
     @Id
-    @PrimaryKeyJoinColumn
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "interaction_id")
     private UUID interactionId;
 

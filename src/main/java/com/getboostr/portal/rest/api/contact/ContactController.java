@@ -73,7 +73,7 @@ public class ContactController {
 
     // Contact Interactions
 
-    @GetMapping("/{contactId}/interactions/initiation")
+    @GetMapping("/{contactId}/interactions")
     public MultiInteractionModel getContactInteractions(@PathVariable UUID contactId, @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset, @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit) {
         return contactInteractionService.getInteractions(contactId, offset, limit);
     }
@@ -83,7 +83,7 @@ public class ContactController {
         contactInteractionService.addInteraction(contactId, requestModel);
     }
 
-    @PutMapping("/{contactId}/interactions")
+    @PutMapping("/{contactId}/interactions/{interactionId}")
     public void updateContactInteraction(@PathVariable UUID contactId, @PathVariable UUID interactionId, @RequestBody ContactInteractionRequestModel requestModel) {
         contactInteractionService.updateInteraction(contactId, interactionId, requestModel);
     }

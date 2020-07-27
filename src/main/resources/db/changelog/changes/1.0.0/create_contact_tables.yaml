@@ -41,54 +41,6 @@ databaseChangeLog:
       author: gavinkillough
       changes:
         - createTable:
-            schemaName: portal
-            tableName: contact_interactions
-            columns:
-              - column:
-                  name: interactions_id
-                  type: UUID
-                  defaultValueComputed: uuid_generate_v4()
-                  constraints:
-                    nullable: false
-                    primaryKey: true
-                    primaryKeyName: contact_interactions_pkey
-              - column:
-                  name: contact_id
-                  type: UUID
-                  contraints:
-                    nullable: false
-                    foreignKeyName: contact_interactions_contact_id_fk
-                    referencedTableSchemaName: portal
-                    referencedTableName: organization_account_contacts
-                    referencedColumnNames: contact_id
-                    onDeleteCascade: true
-              - column:
-                  name: interacting_user_id
-                  type: UUID
-                  contraints:
-                    nullable: false
-                    foreignKeyName: contact_interactions_interacting_user_id_fk
-                    referencedTableSchemaName: portal
-                    referencedTableName: users
-                    referencedColumnNames: user_id
-              - column:
-                  name: medium
-                  type: VARCHAR
-              - column:
-                  name: classification
-                  type: VARCHAR
-              - column:
-                  name: date
-                  type: DATE
-              - column:
-                  name: note
-                  type: VARCHAR
-
-  - changeSet:
-      id: create-contact-tables-3
-      author: gavinkillough
-      changes:
-        - createTable:
             columns:
               - column:
                   constraints:
@@ -113,6 +65,54 @@ databaseChangeLog:
                   type: BOOLEAN
             schemaName: portal
             tableName: organization_account_contacts
+
+  - changeSet:
+      id: create-contact-tables-3
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: contact_interactions
+            columns:
+              - column:
+                  name: interaction_id
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: contact_interactions_pkey
+              - column:
+                  name: contact_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: contact_interactions_contact_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: organization_account_contacts
+                    referencedColumnNames: contact_id
+                    onDeleteCascade: true
+              - column:
+                  name: interacting_user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: contact_interactions_interacting_user_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: users
+                    referencedColumnNames: user_id
+              - column:
+                  name: medium
+                  type: VARCHAR
+              - column:
+                  name: classification
+                  type: VARCHAR
+              - column:
+                  name: date
+                  type: DATE
+              - column:
+                  name: note
+                  type: VARCHAR
 
   - changeSet:
       id: create-contact-tables-3a
@@ -299,7 +299,7 @@ databaseChangeLog:
       changes:
         - addForeignKeyConstraint:
             baseColumnNames: contact_id
-            baseTableName: organization_account_contact_interactions
+            baseTableName: contact_interactions
             baseTableSchemaName: portal
             constraintName: contact_interaction_org_acct_contact_id_fk
             deferrable: false

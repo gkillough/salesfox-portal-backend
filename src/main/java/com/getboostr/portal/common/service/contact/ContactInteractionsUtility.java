@@ -35,7 +35,7 @@ public class ContactInteractionsUtility<E extends Throwable> {
     }
 
     public ContactInteractionEntity addContactInteraction(UserEntity interactingUser, OrganizationAccountContactEntity contact, InteractionMedium medium, InteractionClassification classification, String note, LocalDate date) {
-        ContactInteractionEntity interactionToSave = new ContactInteractionEntity(null, interactingUser.getUserId(), contact.getContactId(), medium.name(), classification.name(), date, note);
+        ContactInteractionEntity interactionToSave = new ContactInteractionEntity(null, contact.getContactId(), interactingUser.getUserId(), medium.name(), classification.name(), date, note);
         return contactInteractionRepository.save(interactionToSave);
     }
 

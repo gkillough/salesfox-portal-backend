@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -79,13 +80,14 @@ public class ContactInteractionService {
         OrganizationAccountContactEntity foundContact = contactRepository.findById(contactId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        validateContactInteractionAccess(loggedInUser, foundContact);
-        validateRequestModel(foundContact, requestModel);
+        UserEntity interactingUser = Optional.ofNullable(requestModel.getInteractingUserId())
+                .flatMap(userRepository::findById)
+                .orElseGet(membershipRetrievalService::getAuthenticatedUserEntity);
+        validateRequestModel(foundContact, interactingUser, requestModel);
 
         InteractionMedium interactionMedium = InteractionMedium.valueOf(requestModel.getMedium());
         InteractionClassification interactionClassification = InteractionClassification.valueOf(requestModel.getClassification());
-        contactInteractionsUtility.addContactInteraction(loggedInUser, foundContact, interactionMedium, interactionClassification, requestModel.getNote(), requestModel.getDate().toLocalDate());
+        contactInteractionsUtility.addContactInteraction(interactingUser, foundContact, interactionMedium, interactionClassification, requestModel.getNote(), requestModel.getDate().toLocalDate());
     }
 
     @Transactional
@@ -93,14 +95,15 @@ public class ContactInteractionService {
         OrganizationAccountContactEntity foundContact = contactRepository.findById(contactId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        validateContactInteractionAccess(loggedInUser, foundContact);
-
         ContactInteractionEntity foundInteraction = contactInteractionRepository.findById(interactionId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        validateRequestModel(foundContact, requestModel);
 
-        foundInteraction.setInteractingUserId(requestModel.getInteractingUserId());
+        UserEntity interactingUser = Optional.ofNullable(requestModel.getInteractingUserId())
+                .flatMap(userRepository::findById)
+                .orElseGet(membershipRetrievalService::getAuthenticatedUserEntity);
+        validateRequestModel(foundContact, interactingUser, requestModel);
+
+        foundInteraction.setInteractingUserId(interactingUser.getUserId());
         foundInteraction.setMedium(requestModel.getMedium());
         foundInteraction.setClassification(requestModel.getClassification());
         foundInteraction.setDate(requestModel.getDate().toLocalDate());
@@ -108,24 +111,15 @@ public class ContactInteractionService {
         contactInteractionRepository.save(foundInteraction);
     }
 
-    private void validateContactInteractionAccess(UserEntity loggedInUser, OrganizationAccountContactEntity contact) {
-        if (!contactAccessOperationUtility.canUserAccessContact(loggedInUser, contact, AccessOperation.INTERACT)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-    }
-
-    private void validateRequestModel(OrganizationAccountContactEntity contact, ContactInteractionRequestModel requestModel) {
+    private void validateRequestModel(OrganizationAccountContactEntity contact, @Nullable UserEntity interactingUser, ContactInteractionRequestModel requestModel) {
         List<String> errors = new ArrayList<>();
 
-        if (null != requestModel.getInteractingUserId()) {
-            Optional<UserEntity> optionalInteractingUser = userRepository.findById(requestModel.getInteractingUserId());
-            if (optionalInteractingUser.isPresent()) {
-                if (!contactAccessOperationUtility.canUserAccessContact(optionalInteractingUser.get(), contact, AccessOperation.READ)) {
-                    errors.add("The user associated with the provided interactingUserId cannot access the specified contact");
-                }
-            } else {
-                errors.add("The interactingUserId is invalid");
+        if (null != interactingUser) {
+            if (!contactAccessOperationUtility.canUserAccessContact(interactingUser, contact, AccessOperation.READ)) {
+                errors.add("The user associated with the provided interactingUserId (or the current user if no interacting user was provided) cannot access the specified contact");
             }
+        } else {
+            errors.add("The interactingUserId is invalid");
         }
 
         if (StringUtils.isBlank(requestModel.getMedium())) {
@@ -136,8 +130,8 @@ public class ContactInteractionService {
 
         if (StringUtils.isBlank(requestModel.getClassification())) {
             errors.add("The field 'Classification' is required");
-        } else if (!EnumUtils.isValidEnum(InteractionClassification.class, requestModel.getMedium())) {
-            errors.add(String.format("The Classification '%s' is invalid. Valid values: %s", requestModel.getMedium(), Arrays.toString(InteractionClassification.values())));
+        } else if (!EnumUtils.isValidEnum(InteractionClassification.class, requestModel.getClassification())) {
+            errors.add(String.format("The Classification '%s' is invalid. Valid values: %s", requestModel.getClassification(), Arrays.toString(InteractionClassification.values())));
         }
 
         if (null != requestModel.getDate() && !FieldValidationUtils.isValidDate(requestModel.getDate())) {

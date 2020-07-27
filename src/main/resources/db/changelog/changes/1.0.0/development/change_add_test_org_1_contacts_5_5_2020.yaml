@@ -97,18 +97,6 @@ databaseChangeLog:
                   name: mobile_number
                   value: 5550005111
 
-  - changeSet:
-      id: test-contacts-interactions-111
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: organization_account_contact_interactions
-            columns:
-              - column:
-                  name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@getboostr.com')
-
   ##################################
   # TEST ORG 1 ACCOUNT 1 CONTACT 2 #
   ##################################
@@ -205,18 +193,6 @@ databaseChangeLog:
               - column:
                   name: mobile_number
                   value: 5550005112
-
-  - changeSet:
-      id: test-contacts-interactions-112
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: organization_account_contact_interactions
-            columns:
-              - column:
-                  name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@getboostr.com')
 
   ##################################
   # TEST ORG 1 ACCOUNT 1 CONTACT 3 #
@@ -315,18 +291,6 @@ databaseChangeLog:
                   name: mobile_number
                   value: 5550005113
 
-  - changeSet:
-      id: test-contacts-interactions-113
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: organization_account_contact_interactions
-            columns:
-              - column:
-                  name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@getboostr.com')
-
   ##################################
   # TEST ORG 1 ACCOUNT 1 CONTACT 4 #
   ##################################
@@ -423,18 +387,6 @@ databaseChangeLog:
               - column:
                   name: mobile_number
                   value: 5550005114
-
-  - changeSet:
-      id: test-contacts-interactions-114
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: organization_account_contact_interactions
-            columns:
-              - column:
-                  name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@getboostr.com')
 
   ##################################
   # TEST ORG 1 ACCOUNT 2 CONTACT 1 #
@@ -533,18 +485,6 @@ databaseChangeLog:
                   name: mobile_number
                   value: 5550005121
 
-  - changeSet:
-      id: test-contacts-interactions-121
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: organization_account_contact_interactions
-            columns:
-              - column:
-                  name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@getboostr.com')
-
   ##################################
   # TEST ORG 1 ACCOUNT 2 CONTACT 2 #
   ##################################
@@ -641,18 +581,6 @@ databaseChangeLog:
               - column:
                   name: mobile_number
                   value: 5550005122
-
-  - changeSet:
-      id: test-contacts-interactions-122
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: organization_account_contact_interactions
-            columns:
-              - column:
-                  name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@getboostr.com')
 
   ##################################
   # TEST ORG 1 ACCOUNT 2 CONTACT 3 #
@@ -751,18 +679,6 @@ databaseChangeLog:
                   name: mobile_number
                   value: 5550005123
 
-  - changeSet:
-      id: test-contacts-interactions-123
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: organization_account_contact_interactions
-            columns:
-              - column:
-                  name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@getboostr.com')
-
   ##################################
   # TEST ORG 1 ACCOUNT 2 CONTACT 4 #
   ##################################
@@ -859,15 +775,3 @@ databaseChangeLog:
               - column:
                   name: mobile_number
                   value: 5550005124
-
-  - changeSet:
-      id: test-contacts-interactions-124
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: organization_account_contact_interactions
-            columns:
-              - column:
-                  name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@getboostr.com')
