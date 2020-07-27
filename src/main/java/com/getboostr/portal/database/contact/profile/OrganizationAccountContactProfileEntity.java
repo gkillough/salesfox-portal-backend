@@ -1,4 +1,4 @@
-package com.getboostr.portal.database.contact.entity;
+package com.getboostr.portal.database.contact.profile;
 
 import com.getboostr.portal.database.contact.Contactable;
 import lombok.AllArgsConstructor;

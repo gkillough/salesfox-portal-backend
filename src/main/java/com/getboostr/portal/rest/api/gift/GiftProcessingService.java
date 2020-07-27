@@ -2,9 +2,14 @@ package com.getboostr.portal.rest.api.gift;
 
 import com.getboostr.portal.common.enumeration.AccessOperation;
 import com.getboostr.portal.common.enumeration.GiftTrackingStatus;
+import com.getboostr.portal.common.enumeration.InteractionClassification;
+import com.getboostr.portal.common.enumeration.InteractionMedium;
+import com.getboostr.portal.common.service.contact.ContactInteractionsUtility;
 import com.getboostr.portal.common.time.PortalDateTimeUtils;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
+import com.getboostr.portal.database.contact.OrganizationAccountContactRepository;
+import com.getboostr.portal.database.contact.interaction.ContactInteractionRepository;
 import com.getboostr.portal.database.gift.GiftEntity;
 import com.getboostr.portal.database.gift.GiftRepository;
 import com.getboostr.portal.database.gift.item.GiftItemDetailEntity;
@@ -17,7 +22,6 @@ import com.getboostr.portal.database.inventory.InventoryRepository;
 import com.getboostr.portal.database.inventory.item.InventoryItemEntity;
 import com.getboostr.portal.database.inventory.item.InventoryItemPK;
 import com.getboostr.portal.database.inventory.item.InventoryItemRepository;
-import com.getboostr.portal.rest.api.contact.ContactInteractionsService;
 import com.getboostr.portal.rest.api.gift.model.GiftResponseModel;
 import com.getboostr.portal.rest.api.gift.model.UpdateGiftStatusRequestModel;
 import com.getboostr.portal.rest.api.gift.model.UpdateGiftTrackingDetailRequestModel;
@@ -40,19 +44,20 @@ import java.util.stream.Collectors;
 
 @Component
 public class GiftProcessingService {
-    private GiftRepository giftRepository;
-    private GiftTrackingRepository giftTrackingRepository;
-    private GiftTrackingDetailRepository giftTrackingDetailRepository;
-    private InventoryRepository inventoryRepository;
-    private InventoryItemRepository inventoryItemRepository;
-    private GiftAccessService giftAccessService;
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private ContactInteractionsService contactInteractionsService;
+    private final GiftRepository giftRepository;
+    private final GiftTrackingRepository giftTrackingRepository;
+    private final GiftTrackingDetailRepository giftTrackingDetailRepository;
+    private final InventoryRepository inventoryRepository;
+    private final InventoryItemRepository inventoryItemRepository;
+    private final GiftAccessService giftAccessService;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final ContactInteractionsUtility<ResponseStatusException> contactInteractionsUtility;
 
     @Autowired
     public GiftProcessingService(GiftRepository giftRepository, GiftTrackingRepository giftTrackingRepository, GiftTrackingDetailRepository giftTrackingDetailRepository,
                                  InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository,
-                                 GiftAccessService giftAccessService, HttpSafeUserMembershipRetrievalService membershipRetrievalService, ContactInteractionsService contactInteractionsService) {
+                                 GiftAccessService giftAccessService, HttpSafeUserMembershipRetrievalService membershipRetrievalService,
+                                 ContactInteractionRepository interactionRepository, ContactInteractionRepository contactInteractionRepository, OrganizationAccountContactRepository contactRepository) {
         this.giftRepository = giftRepository;
         this.giftTrackingRepository = giftTrackingRepository;
         this.giftTrackingDetailRepository = giftTrackingDetailRepository;
@@ -60,7 +65,7 @@ public class GiftProcessingService {
         this.inventoryItemRepository = inventoryItemRepository;
         this.giftAccessService = giftAccessService;
         this.membershipRetrievalService = membershipRetrievalService;
-        this.contactInteractionsService = contactInteractionsService;
+        this.contactInteractionsUtility = new ContactInteractionsUtility<>(membershipRetrievalService, contactRepository, contactInteractionRepository);
     }
 
     @Transactional
@@ -73,7 +78,7 @@ public class GiftProcessingService {
         }
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         GiftItemDetailEntity giftItemDetail = foundGift.getGiftItemDetailEntity();
         if (giftItemDetail != null) {
             InventoryItemEntity inventoryItemForGift = findInventoryItemForGift(loggedInUser, userMembership, giftItemDetail);
@@ -92,7 +97,7 @@ public class GiftProcessingService {
         GiftTrackingEntity savedGiftTracking = giftTrackingRepository.save(giftTrackingToSave);
         foundGift.setGiftTrackingEntity(savedGiftTracking);
 
-        contactInteractionsService.incrementContactInitiations(foundGift.getContactId());
+        contactInteractionsUtility.addContactInteraction(loggedInUser, foundGift.getContactId(), InteractionMedium.MAIL, InteractionClassification.OUTGOING, "(Auto-generated) Sent gift/note");
         return GiftResponseModelUtils.convertToResponseModel(foundGift);
     }
 

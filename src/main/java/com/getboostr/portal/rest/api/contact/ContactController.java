@@ -1,9 +1,12 @@
 package com.getboostr.portal.rest.api.contact;
 
-import com.getboostr.portal.rest.api.contact.model.*;
-import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import com.getboostr.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import com.getboostr.portal.rest.api.common.page.PageMetadata;
+import com.getboostr.portal.rest.api.contact.interaction.ContactInteractionService;
+import com.getboostr.portal.rest.api.contact.interaction.model.ContactInteractionRequestModel;
+import com.getboostr.portal.rest.api.contact.interaction.model.MultiInteractionModel;
+import com.getboostr.portal.rest.api.contact.model.*;
+import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,14 +19,14 @@ import java.util.UUID;
 public class ContactController {
     public static final String BASE_ENDPOINT = "/contacts";
 
-    private ContactService contactService;
-    private ContactInteractionsService contactInteractionsService;
-    private ContactBulkUploadService contactBulkUploadService;
+    private final ContactService contactService;
+    private final ContactInteractionService contactInteractionService;
+    private final ContactBulkUploadService contactBulkUploadService;
 
     @Autowired
-    public ContactController(ContactService contactService, ContactInteractionsService contactInteractionsService, ContactBulkUploadService contactBulkUploadService) {
+    public ContactController(ContactService contactService, ContactInteractionService contactInteractionService, ContactBulkUploadService contactBulkUploadService) {
         this.contactService = contactService;
-        this.contactInteractionsService = contactInteractionsService;
+        this.contactInteractionService = contactInteractionService;
         this.contactBulkUploadService = contactBulkUploadService;
     }
 
@@ -68,14 +71,21 @@ public class ContactController {
         contactService.assignContactToUser(contactId, requestModel);
     }
 
-    @PostMapping("/{contactId}/interactions/initiation")
-    public void incrementContactInitiations(@PathVariable UUID contactId) {
-        contactInteractionsService.incrementContactInitiations(contactId);
+    // Contact Interactions
+
+    @GetMapping("/{contactId}/interactions")
+    public MultiInteractionModel getContactInteractions(@PathVariable UUID contactId, @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset, @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit) {
+        return contactInteractionService.getInteractions(contactId, offset, limit);
     }
 
-    @PostMapping("/{contactId}/interactions/engagement")
-    public void incrementEngagementsGenerated(@PathVariable UUID contactId) {
-        contactInteractionsService.incrementEngagementsGenerated(contactId);
+    @PostMapping("/{contactId}/interactions")
+    public void addContactInteraction(@PathVariable UUID contactId, @RequestBody ContactInteractionRequestModel requestModel) {
+        contactInteractionService.addInteraction(contactId, requestModel);
+    }
+
+    @PutMapping("/{contactId}/interactions/{interactionId}")
+    public void updateContactInteraction(@PathVariable UUID contactId, @PathVariable UUID interactionId, @RequestBody ContactInteractionRequestModel requestModel) {
+        contactInteractionService.updateInteraction(contactId, interactionId, requestModel);
     }
 
 }

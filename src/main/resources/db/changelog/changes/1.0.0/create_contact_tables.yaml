@@ -46,30 +46,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    primaryKeyName: organization_account_contact_interactions_pkey
-                  name: contact_id
-                  type: UUID
-              - column:
-                  defaultValueNumeric: 0
-                  name: contact_initiations
-                  type: BIGINT
-              - column:
-                  defaultValueNumeric: 0
-                  name: engagements_generated
-                  type: BIGINT
-            schemaName: portal
-            tableName: organization_account_contact_interactions
-
-  - changeSet:
-      id: create-contact-tables-3
-      author: gavinkillough
-      changes:
-        - createTable:
-            columns:
-              - column:
-                  constraints:
-                    nullable: false
-                    primaryKey: true
                     primaryKeyName: organization_account_contacts_pkey
                   defaultValueComputed: uuid_generate_v4()
                   name: contact_id
@@ -89,6 +65,54 @@ databaseChangeLog:
                   type: BOOLEAN
             schemaName: portal
             tableName: organization_account_contacts
+
+  - changeSet:
+      id: create-contact-tables-3
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: contact_interactions
+            columns:
+              - column:
+                  name: interaction_id
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: contact_interactions_pkey
+              - column:
+                  name: contact_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: contact_interactions_contact_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: organization_account_contacts
+                    referencedColumnNames: contact_id
+                    onDeleteCascade: true
+              - column:
+                  name: interacting_user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: contact_interactions_interacting_user_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: users
+                    referencedColumnNames: user_id
+              - column:
+                  name: medium
+                  type: VARCHAR
+              - column:
+                  name: classification
+                  type: VARCHAR
+              - column:
+                  name: date
+                  type: DATE
+              - column:
+                  name: note
+                  type: VARCHAR
 
   - changeSet:
       id: create-contact-tables-3a
@@ -260,24 +284,6 @@ databaseChangeLog:
             baseTableName: organization_account_contact_addresses
             baseTableSchemaName: portal
             constraintName: organization_account_contact_addresses_contact_id_fk
-            deferrable: false
-            initiallyDeferred: false
-            onDelete: NO ACTION
-            onUpdate: NO ACTION
-            referencedColumnNames: contact_id
-            referencedTableName: organization_account_contacts
-            referencedTableSchemaName: portal
-            validate: true
-
-  - changeSet:
-      id: create-contact-tables-12
-      author: gavinkillough
-      changes:
-        - addForeignKeyConstraint:
-            baseColumnNames: contact_id
-            baseTableName: organization_account_contact_interactions
-            baseTableSchemaName: portal
-            constraintName: client_interaction_organization_account_contact_id_fk
             deferrable: false
             initiallyDeferred: false
             onDelete: NO ACTION

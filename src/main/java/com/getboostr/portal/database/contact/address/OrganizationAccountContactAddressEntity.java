@@ -1,4 +1,4 @@
-package com.getboostr.portal.database.contact.entity;
+package com.getboostr.portal.database.contact.address;
 
 import com.getboostr.portal.database.common.AbstractAddressEntity;
 import com.getboostr.portal.database.contact.Contactable;

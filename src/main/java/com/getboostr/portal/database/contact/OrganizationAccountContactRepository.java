@@ -1,6 +1,5 @@
-package com.getboostr.portal.database.contact.repository;
+package com.getboostr.portal.database.contact;
 
-import com.getboostr.portal.database.contact.entity.OrganizationAccountContactEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -4,8 +4,8 @@ import com.getboostr.portal.common.enumeration.AccessOperation;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.catalogue.item.CatalogueItemRepository;
-import com.getboostr.portal.database.contact.entity.OrganizationAccountContactEntity;
-import com.getboostr.portal.database.contact.repository.OrganizationAccountContactRepository;
+import com.getboostr.portal.database.contact.OrganizationAccountContactEntity;
+import com.getboostr.portal.database.contact.OrganizationAccountContactRepository;
 import com.getboostr.portal.database.customization.branding_text.CustomBrandingTextEntity;
 import com.getboostr.portal.database.customization.branding_text.CustomBrandingTextRepository;
 import com.getboostr.portal.database.customization.icon.CustomIconEntity;
@@ -100,7 +100,7 @@ public class GiftService {
     @Transactional
     public GiftResponseModel createDraftGift(DraftGiftRequestModel requestModel) {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         validateRequestModel(loggedInUser, userMembership, requestModel);
 
         GiftEntity giftToSave = new GiftEntity(null, userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), requestModel.getContactId());
@@ -118,7 +118,7 @@ public class GiftService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot edit a gift that has been sent");
         }
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         validateRequestModel(loggedInUser, userMembership, requestModel);
 
         foundGift.setContactId(requestModel.getContactId());

@@ -1,36 +1,42 @@
 package com.getboostr.portal.common.service.contact;
 
+import com.getboostr.portal.common.enumeration.InteractionClassification;
+import com.getboostr.portal.common.enumeration.InteractionMedium;
 import com.getboostr.portal.common.service.auth.AbstractMembershipRetrievalService;
-import com.getboostr.portal.database.contact.entity.OrganizationAccountContactEntity;
-import com.getboostr.portal.database.contact.entity.OrganizationAccountContactInteractionsEntity;
-import com.getboostr.portal.database.contact.repository.OrganizationAccountContactInteractionsRepository;
+import com.getboostr.portal.common.time.PortalDateTimeUtils;
+import com.getboostr.portal.database.account.entity.UserEntity;
+import com.getboostr.portal.database.contact.OrganizationAccountContactEntity;
+import com.getboostr.portal.database.contact.OrganizationAccountContactRepository;
+import com.getboostr.portal.database.contact.interaction.ContactInteractionEntity;
+import com.getboostr.portal.database.contact.interaction.ContactInteractionRepository;
 
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.time.LocalDate;
+import java.util.UUID;
 
 public class ContactInteractionsUtility<E extends Throwable> {
     private final AbstractMembershipRetrievalService<E> membershipRetrievalService;
-    private final OrganizationAccountContactInteractionsRepository contactInteractionsRepository;
+    private final OrganizationAccountContactRepository contactRepository;
+    private final ContactInteractionRepository contactInteractionRepository;
 
-    public ContactInteractionsUtility(AbstractMembershipRetrievalService<E> membershipRetrievalService, OrganizationAccountContactInteractionsRepository contactInteractionsRepository) {
+    public ContactInteractionsUtility(AbstractMembershipRetrievalService<E> membershipRetrievalService, OrganizationAccountContactRepository contactRepository, ContactInteractionRepository contactInteractionRepository) {
         this.membershipRetrievalService = membershipRetrievalService;
-        this.contactInteractionsRepository = contactInteractionsRepository;
+        this.contactRepository = contactRepository;
+        this.contactInteractionRepository = contactInteractionRepository;
     }
 
-    public void incrementContactInitiations(OrganizationAccountContactEntity contact) throws E {
-        increment(contact, OrganizationAccountContactInteractionsEntity::getContactInitiations, OrganizationAccountContactInteractionsEntity::setContactInitiations);
-    }
-
-    public void incrementEngagementsGenerated(OrganizationAccountContactEntity contact) throws E {
-        increment(contact, OrganizationAccountContactInteractionsEntity::getEngagementsGenerated, OrganizationAccountContactInteractionsEntity::setEngagementsGenerated);
-    }
-
-    private void increment(OrganizationAccountContactEntity contact, Function<OrganizationAccountContactInteractionsEntity, Long> getter, BiConsumer<OrganizationAccountContactInteractionsEntity, Long> setter) throws E {
-        OrganizationAccountContactInteractionsEntity contactInteractions = contactInteractionsRepository.findById(contact.getContactId())
+    public ContactInteractionEntity addContactInteraction(UserEntity interactingUser, UUID contactId, InteractionMedium medium, InteractionClassification classification, String note) throws E {
+        OrganizationAccountContactEntity foundContact = contactRepository.findById(contactId)
                 .orElseThrow(membershipRetrievalService::unexpectedErrorDuringRetrieval);
-        Long incrementedValue = getter.apply(contactInteractions) + 1L;
-        setter.accept(contactInteractions, incrementedValue);
-        contactInteractionsRepository.save(contactInteractions);
+        return addContactInteraction(interactingUser, foundContact, medium, classification, note);
+    }
+
+    public ContactInteractionEntity addContactInteraction(UserEntity interactingUser, OrganizationAccountContactEntity contact, InteractionMedium medium, InteractionClassification classification, String note) {
+        return addContactInteraction(interactingUser, contact, medium, classification, note, PortalDateTimeUtils.getCurrentDateUTC());
+    }
+
+    public ContactInteractionEntity addContactInteraction(UserEntity interactingUser, OrganizationAccountContactEntity contact, InteractionMedium medium, InteractionClassification classification, String note, LocalDate date) {
+        ContactInteractionEntity interactionToSave = new ContactInteractionEntity(null, contact.getContactId(), interactingUser.getUserId(), medium.name(), classification.name(), date, note);
+        return contactInteractionRepository.save(interactionToSave);
     }
 
 }
