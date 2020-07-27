@@ -17,6 +17,7 @@ import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import com.getboostr.portal.rest.api.contact.interaction.model.ContactInteractionRequestModel;
 import com.getboostr.portal.rest.api.contact.interaction.model.ContactInteractionsResponseModel;
 import com.getboostr.portal.rest.api.contact.interaction.model.MultiInteractionModel;
+import com.getboostr.portal.rest.api.user.common.model.ViewUserModel;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -80,9 +81,14 @@ public class ContactInteractionService {
         OrganizationAccountContactEntity foundContact = contactRepository.findById(contactId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        if (!contactAccessOperationUtility.canUserAccessContact(loggedInUser, foundContact, AccessOperation.INTERACT)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         UserEntity interactingUser = Optional.ofNullable(requestModel.getInteractingUserId())
                 .flatMap(userRepository::findById)
-                .orElseGet(membershipRetrievalService::getAuthenticatedUserEntity);
+                .orElse(loggedInUser);
         validateRequestModel(foundContact, interactingUser, requestModel);
 
         InteractionMedium interactionMedium = InteractionMedium.valueOf(requestModel.getMedium());
@@ -95,12 +101,17 @@ public class ContactInteractionService {
         OrganizationAccountContactEntity foundContact = contactRepository.findById(contactId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        if (!contactAccessOperationUtility.canUserAccessContact(loggedInUser, foundContact, AccessOperation.INTERACT)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         ContactInteractionEntity foundInteraction = contactInteractionRepository.findById(interactionId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         UserEntity interactingUser = Optional.ofNullable(requestModel.getInteractingUserId())
                 .flatMap(userRepository::findById)
-                .orElseGet(membershipRetrievalService::getAuthenticatedUserEntity);
+                .orElse(loggedInUser);
         validateRequestModel(foundContact, interactingUser, requestModel);
 
         foundInteraction.setInteractingUserId(interactingUser.getUserId());
@@ -149,7 +160,9 @@ public class ContactInteractionService {
     }
 
     private ContactInteractionsResponseModel convertToResponseModel(ContactInteractionEntity entity) {
-        return new ContactInteractionsResponseModel(entity.getInteractionId(), entity.getInteractingUserId(), entity.getMedium(), entity.getClassification(), entity.getDate(), entity.getNote());
+        UserEntity interactingUserEntity = entity.getUserEntity();
+        ViewUserModel interactingUserModel = new ViewUserModel(interactingUserEntity.getUserId(), interactingUserEntity.getFirstName(), interactingUserEntity.getLastName(), interactingUserEntity.getEmail());
+        return new ContactInteractionsResponseModel(entity.getInteractionId(), interactingUserModel, entity.getMedium(), entity.getClassification(), entity.getDate(), entity.getNote());
     }
 
 }

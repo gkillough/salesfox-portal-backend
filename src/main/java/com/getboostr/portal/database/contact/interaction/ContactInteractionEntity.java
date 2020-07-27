@@ -1,6 +1,6 @@
 package com.getboostr.portal.database.contact.interaction;
 
-import lombok.AllArgsConstructor;
+import com.getboostr.portal.database.account.entity.UserEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +11,6 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "contact_interactions")
 public class ContactInteractionEntity implements Serializable {
@@ -39,5 +38,19 @@ public class ContactInteractionEntity implements Serializable {
 
     @Column(name = "note")
     private String note;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "interacting_user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
+    private UserEntity userEntity;
+
+    public ContactInteractionEntity(UUID interactionId, UUID contactId, UUID interactingUserId, String medium, String classification, LocalDate date, String note) {
+        this.interactionId = interactionId;
+        this.contactId = contactId;
+        this.interactingUserId = interactingUserId;
+        this.medium = medium;
+        this.classification = classification;
+        this.date = date;
+        this.note = note;
+    }
 
 }
