@@ -12,7 +12,7 @@ The gradle `runServer` task has two flags that can be set:
 - `--reuseContainer` will keep the database from the previous run
 - `--suspend` will wait for a debug connection (on port 9095) as soon as the application server starts
 
-## Set up Postgres
+## Set up production Postgres
 1. Create _portaladmin_ role: 
 ```sql 
 CREATE ROLE portaladmin WITH SUPERUSER LOGIN ENCRYPTED PASSWORD 'Port@l!23'
