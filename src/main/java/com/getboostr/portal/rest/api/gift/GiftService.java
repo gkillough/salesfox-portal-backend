@@ -21,6 +21,8 @@ import com.getboostr.portal.database.gift.note.GiftNoteDetailRepository;
 import com.getboostr.portal.database.gift.tracking.GiftTrackingRepository;
 import com.getboostr.portal.database.note.NoteEntity;
 import com.getboostr.portal.database.note.NoteRepository;
+import com.getboostr.portal.database.note.restriction.NoteOrganizationAccountRestrictionEntity;
+import com.getboostr.portal.database.note.restriction.NoteUserRestrictionEntity;
 import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import com.getboostr.portal.rest.api.gift.model.DraftGiftRequestModel;
 import com.getboostr.portal.rest.api.gift.model.GiftResponseModel;
@@ -215,8 +217,12 @@ public class GiftService {
             Optional<NoteEntity> optionalNote = noteRepository.findById(requestModel.getNoteId());
             if (optionalNote.isPresent()) {
                 NoteEntity requestedNote = optionalNote.get();
-                if ((membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember() && !requestedNote.getUpdatedByUserId().equals(loggedInUser.getUserId()))
-                        || !requestedNote.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
+
+                NoteOrganizationAccountRestrictionEntity orgAcctRestriction = requestedNote.getNoteOrganizationAccountRestrictionEntity();
+                NoteUserRestrictionEntity userRestriction = requestedNote.getNoteUserRestrictionEntity();
+                if (orgAcctRestriction != null && !orgAcctRestriction.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
+                    errors.add("The noteId provided is not accessible from this organization account");
+                } else if (userRestriction != null && !userRestriction.getUserId().equals(loggedInUser.getUserId())) {
                     errors.add("The noteId provided is not accessible by the requesting user");
                 }
             } else {

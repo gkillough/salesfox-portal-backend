@@ -161,7 +161,7 @@ public class ContactInteractionService {
 
     private ContactInteractionsResponseModel convertToResponseModel(ContactInteractionEntity entity) {
         UserEntity interactingUserEntity = entity.getUserEntity();
-        ViewUserModel interactingUserModel = new ViewUserModel(interactingUserEntity.getUserId(), interactingUserEntity.getFirstName(), interactingUserEntity.getLastName(), interactingUserEntity.getEmail());
+        ViewUserModel interactingUserModel = ViewUserModel.fromEntity(interactingUserEntity);
         return new ContactInteractionsResponseModel(entity.getInteractionId(), interactingUserModel, entity.getMedium(), entity.getClassification(), entity.getDate(), entity.getNote());
     }
 

@@ -5,8 +5,8 @@ import com.getboostr.portal.common.service.contact.ContactAccessOperationUtility
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.contact.OrganizationAccountContactEntity;
-import com.getboostr.portal.database.contact.profile.OrganizationAccountContactProfileRepository;
 import com.getboostr.portal.database.contact.OrganizationAccountContactRepository;
+import com.getboostr.portal.database.contact.profile.OrganizationAccountContactProfileRepository;
 import com.getboostr.portal.database.gift.GiftEntity;
 import com.getboostr.portal.database.inventory.InventoryEntity;
 import com.getboostr.portal.database.inventory.InventoryRepository;
@@ -61,7 +61,7 @@ public class GiftAccessService {
     }
 
     public void validateUserInventoryAccess(UserEntity userRequestingAccess, UUID itemId) {
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(userRequestingAccess);
+        MembershipEntity userMembership = userRequestingAccess.getMembershipEntity();
         InventoryEntity userInventory = inventoryRepository.findAccessibleInventories(userMembership.getOrganizationAccountId(), userRequestingAccess.getUserId(), PageRequest.of(1, 1))
                 .stream()
                 .findAny()
@@ -84,7 +84,7 @@ public class GiftAccessService {
                 return;
             }
         } else {
-            MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+            MembershipEntity userMembership = loggedInUser.getMembershipEntity();
             if (userMembership.getOrganizationAccountId().equals(entity.getOrganizationAccountId())) {
                 return;
             }

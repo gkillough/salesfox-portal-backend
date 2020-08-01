@@ -1,14 +1,20 @@
 package com.getboostr.portal.rest.api.note;
 
+import com.getboostr.portal.common.time.PortalDateTimeUtils;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.note.NoteEntity;
 import com.getboostr.portal.database.note.NoteRepository;
+import com.getboostr.portal.database.note.restriction.NoteOrganizationAccountRestrictionEntity;
+import com.getboostr.portal.database.note.restriction.NoteOrganizationAccountRestrictionRepository;
+import com.getboostr.portal.database.note.restriction.NoteUserRestrictionEntity;
+import com.getboostr.portal.database.note.restriction.NoteUserRestrictionRepository;
+import com.getboostr.portal.rest.api.common.model.request.RestrictionModel;
 import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import com.getboostr.portal.rest.api.note.model.MultiNoteModel;
 import com.getboostr.portal.rest.api.note.model.NoteRequestModel;
 import com.getboostr.portal.rest.api.note.model.NoteResponseModel;
-import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
+import com.getboostr.portal.rest.api.user.common.model.ViewUserModel;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,12 +32,17 @@ import java.util.stream.Collectors;
 public class NoteService {
     public static final int MESSAGE_LENGTH_CHAR_LIMIT = 2500;
 
-    private NoteRepository noteRepository;
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final NoteRepository noteRepository;
+    private final NoteOrganizationAccountRestrictionRepository noteOrgAcctRestrictionRepository;
+    private final NoteUserRestrictionRepository noteUserRestrictionRepository;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
-    public NoteService(NoteRepository noteRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+    public NoteService(NoteRepository noteRepository, NoteOrganizationAccountRestrictionRepository noteOrgAcctRestrictionRepository, NoteUserRestrictionRepository noteUserRestrictionRepository,
+                       HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.noteRepository = noteRepository;
+        this.noteOrgAcctRestrictionRepository = noteOrgAcctRestrictionRepository;
+        this.noteUserRestrictionRepository = noteUserRestrictionRepository;
         this.membershipRetrievalService = membershipRetrievalService;
     }
 
@@ -61,10 +72,22 @@ public class NoteService {
     public NoteResponseModel createNote(NoteRequestModel requestModel) {
         validateNoteRequestModel(requestModel);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
 
-        NoteEntity noteToSave = new NoteEntity(null, userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), requestModel.getMessage());
+        NoteEntity noteToSave = new NoteEntity(null, loggedInUser.getUserId(), PortalDateTimeUtils.getCurrentDateTimeUTC(), requestModel.getMessage());
         NoteEntity savedNote = noteRepository.save(noteToSave);
+
+        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
+            NoteUserRestrictionEntity noteUserRestrictionToSave = new NoteUserRestrictionEntity(noteToSave.getNoteId(), loggedInUser.getUserId());
+            NoteUserRestrictionEntity savedNoteUserRestriction = noteUserRestrictionRepository.save(noteUserRestrictionToSave);
+            savedNote.setNoteUserRestrictionEntity(savedNoteUserRestriction);
+        } else {
+            MembershipEntity userMembership = loggedInUser.getMembershipEntity();
+            NoteOrganizationAccountRestrictionEntity orgAcctRestrictionToSave = new NoteOrganizationAccountRestrictionEntity(savedNote.getNoteId(), userMembership.getOrganizationAccountId());
+            NoteOrganizationAccountRestrictionEntity savedOrgAcctRestriction = noteOrgAcctRestrictionRepository.save(orgAcctRestrictionToSave);
+            savedNote.setNoteOrganizationAccountRestrictionEntity(savedOrgAcctRestriction);
+        }
+
+        savedNote.setUpdatedByUserEntity(loggedInUser);
         return convertToResponseModel(savedNote);
     }
 
@@ -78,6 +101,7 @@ public class NoteService {
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         foundNote.setUpdatedByUserId(loggedInUser.getUserId());
+        foundNote.setDateModified(PortalDateTimeUtils.getCurrentDateTimeUTC());
 
         noteRepository.save(foundNote);
     }
@@ -89,12 +113,8 @@ public class NoteService {
         }
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
-        String roleLevel = membershipRetrievalService.getRoleEntity(userMembership).getRoleLevel();
-        if (PortalAuthorityConstants.PORTAL_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(roleLevel)) {
-            return noteRepository.findAllByUpdatedByUserId(loggedInUser.getUserId(), pageRequest);
-        }
-        return noteRepository.findAllByOrganizationAccountId(userMembership.getOrganizationAccountId(), pageRequest);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
+        return noteRepository.findAccessibleNotes(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), pageRequest);
     }
 
     private void validateNoteAccess(NoteEntity noteEntity) {
@@ -103,16 +123,14 @@ public class NoteService {
         }
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        if (noteEntity.getUpdatedByUserId().equals(loggedInUser.getUserId())) {
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
+
+        NoteOrganizationAccountRestrictionEntity orgAcctRestriction = noteEntity.getNoteOrganizationAccountRestrictionEntity();
+        NoteUserRestrictionEntity userRestriction = noteEntity.getNoteUserRestrictionEntity();
+        if (orgAcctRestriction != null && orgAcctRestriction.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
             return;
-        } else {
-            MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
-            String roleLevel = membershipRetrievalService.getRoleEntity(userMembership).getRoleLevel();
-            if (!PortalAuthorityConstants.PORTAL_BASIC_USER.equals(roleLevel)
-                    && !PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(roleLevel)
-                    && noteEntity.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
-                return;
-            }
+        } else if (userRestriction != null && userRestriction.getUserId().equals(loggedInUser.getUserId())) {
+            return;
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
@@ -128,7 +146,16 @@ public class NoteService {
     }
 
     private NoteResponseModel convertToResponseModel(NoteEntity entity) {
-        return new NoteResponseModel(entity.getNoteId(), entity.getOrganizationAccountId(), entity.getUpdatedByUserId(), entity.getMessage());
+        ViewUserModel updatedByUser = ViewUserModel.fromEntity(entity.getUpdatedByUserEntity());
+
+        NoteOrganizationAccountRestrictionEntity orgAcctRestriction = entity.getNoteOrganizationAccountRestrictionEntity();
+        NoteUserRestrictionEntity userRestriction = entity.getNoteUserRestrictionEntity();
+
+        UUID restrictedOrgAcctId = null != orgAcctRestriction ? orgAcctRestriction.getOrganizationAccountId() : null;
+        UUID restrictedUserId = null != userRestriction ? userRestriction.getUserId() : null;
+        RestrictionModel restrictionModel = new RestrictionModel(restrictedOrgAcctId, restrictedUserId);
+
+        return new NoteResponseModel(entity.getNoteId(), entity.getMessage(), entity.getDateModified(), updatedByUser, restrictionModel);
     }
 
 }
