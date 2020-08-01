@@ -27,11 +27,3 @@ CREATE DATABASE boostr WITH OWNER portaladmin;
 ```sql
 CREATE SCHEMA portal;
 ```
-
-4. Create _portaluser_ role: 
-```sql
-CREATE ROLE portaluser WITH LOGIN ENCRYPTED PASSWORD 'Port@l!23'
-
-GRANT USAGE ON SCHEMA portal TO portaluser;
-ALTER DEFAULT PRIVILEGES IN SCHEMA portal GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO portaluser;
-```

@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-jpa-db-user-1
+      author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM pg_user WHERE usename = 'portaluser';
+      changes:
+        - sql: CREATE ROLE portaluser WITH LOGIN ENCRYPTED PASSWORD 'Port@l!23';
+
+  - changeSet:
+      id: create-jpa-db-user-2
+      author: gavinkillough
+      changes:
+        - sql: GRANT USAGE ON SCHEMA portal TO portaluser;
+
+  - changeSet:
+      id: create-jpa-db-user-3
+      author: gavinkillough
+      changes:
+        - sql: GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA portal TO portaluser;
+
+  - changeSet:
+      id: create-jpa-db-user-4
+      author: gavinkillough
+      changes:
+        - sql: ALTER DEFAULT PRIVILEGES IN SCHEMA portal GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO portaluser;
