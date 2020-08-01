@@ -4,6 +4,10 @@ databaseChangeLog:
       relativeToChangelogFile: true
 
   - include:
+      file: create_jpa_db_user.yaml
+      relativeToChangelogFile: true
+
+  - include:
       file: create_uuid_extension.yaml
       relativeToChangelogFile: true
 
