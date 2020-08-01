@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
@@ -14,6 +15,7 @@ import java.util.UUID;
 public class NoteResponseModel {
     private UUID noteId;
     private String message;
+    private OffsetDateTime dateModified;
     private ViewUserModel updatedByUser;
     private RestrictionModel restriction;
 

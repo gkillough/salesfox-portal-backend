@@ -1,5 +1,6 @@
 package com.getboostr.portal.rest.api.note;
 
+import com.getboostr.portal.common.time.PortalDateTimeUtils;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.note.NoteEntity;
@@ -72,7 +73,7 @@ public class NoteService {
         validateNoteRequestModel(requestModel);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
 
-        NoteEntity noteToSave = new NoteEntity(null, loggedInUser.getUserId(), requestModel.getMessage());
+        NoteEntity noteToSave = new NoteEntity(null, loggedInUser.getUserId(), PortalDateTimeUtils.getCurrentDateTimeUTC(), requestModel.getMessage());
         NoteEntity savedNote = noteRepository.save(noteToSave);
 
         if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
@@ -100,6 +101,7 @@ public class NoteService {
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         foundNote.setUpdatedByUserId(loggedInUser.getUserId());
+        foundNote.setDateModified(PortalDateTimeUtils.getCurrentDateTimeUTC());
 
         noteRepository.save(foundNote);
     }
@@ -153,7 +155,7 @@ public class NoteService {
         UUID restrictedUserId = null != userRestriction ? userRestriction.getUserId() : null;
         RestrictionModel restrictionModel = new RestrictionModel(restrictedOrgAcctId, restrictedUserId);
 
-        return new NoteResponseModel(entity.getNoteId(), entity.getMessage(), updatedByUser, restrictionModel);
+        return new NoteResponseModel(entity.getNoteId(), entity.getMessage(), entity.getDateModified(), updatedByUser, restrictionModel);
     }
 
 }

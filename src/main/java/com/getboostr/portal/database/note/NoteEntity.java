@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
@@ -24,10 +25,11 @@ public class NoteEntity implements Serializable {
     @Column(name = "updated_by_user_id")
     private UUID updatedByUserId;
 
+    @Column(name = "date_modified")
+    private OffsetDateTime dateModified;
+
     @Column(name = "message")
     private String message;
-
-    // TODO add date_updated column
 
     @OneToOne
     @JoinColumn(name = "note_id", referencedColumnName = "note_id", insertable = false, updatable = false)
@@ -41,9 +43,10 @@ public class NoteEntity implements Serializable {
     @JoinColumn(name = "updated_by_user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
     private UserEntity updatedByUserEntity;
 
-    public NoteEntity(UUID noteId, UUID updatedByUserId, String message) {
+    public NoteEntity(UUID noteId, UUID updatedByUserId, OffsetDateTime dateModified, String message) {
         this.noteId = noteId;
         this.updatedByUserId = updatedByUserId;
+        this.dateModified = dateModified;
         this.message = message;
     }
 

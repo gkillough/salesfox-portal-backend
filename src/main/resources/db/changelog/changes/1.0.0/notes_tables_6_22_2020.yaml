@@ -23,8 +23,15 @@ databaseChangeLog:
                     referencedTableName: users
                     referencedColumnNames: user_id
               - column:
+                  name: date_modified
+                  type: timestamp with timezone
+                  constraints:
+                    nullable: false
+              - column:
                   name: message
                   type: character varying
+                  constraints:
+                    nullable: false
 
   - changeSet:
       id: notes-tables-2
