@@ -14,15 +14,6 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
               - column:
-                  name: organization_account_id
-                  type: UUID
-                  constraints:
-                    nullable: false
-                    foreignKeyName: notes_org_account_id_fk
-                    referencedTableSchemaName: portal
-                    referencedTableName: organization_accounts
-                    referencedColumnNames: organization_account_id
-              - column:
                   name: updated_by_user_id
                   type: UUID
                   constraints:
@@ -35,3 +26,58 @@ databaseChangeLog:
                   name: message
                   type: character varying
 
+  - changeSet:
+      id: notes-tables-2
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: note_organization_account_restrictions
+            columns:
+              - column:
+                  name: note_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: note_org_acct_restrictions_note_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: notes
+                    referencedColumnNames: note_id
+              - column:
+                  name: organization_account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: note_org_acct_restrictions_org_acct_id_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: organization_accounts
+                    referencedColumnNames: organization_account_id
+
+  - changeSet:
+      id: notes-tables-3
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: note_user_restrictions
+            columns:
+              - column:
+                  name: note_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: note_user_restrictions_note_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: notes
+                    referencedColumnNames: note_id
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: note_user_restrictions_user_id_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: users
+                    referencedColumnNames: user_id

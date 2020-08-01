@@ -1,6 +1,8 @@
 package com.getboostr.portal.database.note;
 
-import lombok.AllArgsConstructor;
+import com.getboostr.portal.database.account.entity.UserEntity;
+import com.getboostr.portal.database.note.restriction.NoteOrganizationAccountRestrictionEntity;
+import com.getboostr.portal.database.note.restriction.NoteUserRestrictionEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +12,6 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "notes")
 public class NoteEntity implements Serializable {
@@ -20,10 +21,6 @@ public class NoteEntity implements Serializable {
     private UUID noteId;
 
     @PrimaryKeyJoinColumn
-    @Column(name = "organization_account_id")
-    private UUID organizationAccountId;
-
-    @PrimaryKeyJoinColumn
     @Column(name = "updated_by_user_id")
     private UUID updatedByUserId;
 
@@ -31,5 +28,23 @@ public class NoteEntity implements Serializable {
     private String message;
 
     // TODO add date_updated column
+
+    @OneToOne
+    @JoinColumn(name = "note_id", referencedColumnName = "note_id", insertable = false, updatable = false)
+    private NoteOrganizationAccountRestrictionEntity noteOrganizationAccountRestrictionEntity;
+
+    @OneToOne
+    @JoinColumn(name = "note_id", referencedColumnName = "note_id", insertable = false, updatable = false)
+    private NoteUserRestrictionEntity noteUserRestrictionEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "updated_by_user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
+    private UserEntity updatedByUserEntity;
+
+    public NoteEntity(UUID noteId, UUID updatedByUserId, String message) {
+        this.noteId = noteId;
+        this.updatedByUserId = updatedByUserId;
+        this.message = message;
+    }
 
 }
