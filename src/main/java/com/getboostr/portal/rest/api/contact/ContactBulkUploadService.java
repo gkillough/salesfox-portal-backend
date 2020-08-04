@@ -28,18 +28,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Slf4j
 @Component
-@Transactional
 public class ContactBulkUploadService {
     public static final String UPLOAD_INPUT_TYPE_MANUAL = "MANUAL";
     public static final String UPLOAD_INPUT_TYPE_CSV = "CSV";
@@ -64,8 +64,25 @@ public class ContactBulkUploadService {
     }
 
     // TODO consider a response model with the upload session id
+    @Transactional
     public ContactBulkUploadResponse createContactsInBulk(ContactBulkUploadModel contactBulkUploadModel) {
         return createContactsInBulk(contactBulkUploadModel.getContacts(), UPLOAD_INPUT_TYPE_MANUAL);
+    }
+
+    // TODO consider also reading in the header mappings
+    @Transactional
+    public ContactBulkUploadResponse createContactsFromCsvFile(MultipartFile csvFile) {
+        if (csvFile.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The file cannot be empty");
+        }
+
+        Resource csvFileResource = csvFile.getResource();
+        try (InputStream csvFileInputStream = csvFileResource.getInputStream(); ContactCSVWrapper csvWrapper = ContactCSVFileUtils.createCSVWrapper(csvFileInputStream, ContactCSVFileUtils.portalCSVFormat())) {
+            List<ContactUploadModel> parsedContactRecords = csvWrapper.parseRecords();
+            return createContactsInBulk(parsedContactRecords, UPLOAD_INPUT_TYPE_CSV);
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while reading the file: " + e.getMessage());
+        }
     }
 
     private ContactBulkUploadResponse createContactsInBulk(List<ContactUploadModel> contactsUploadCandidates, String inputType) {
@@ -127,21 +144,6 @@ public class ContactBulkUploadService {
         contactAddressRepository.saveAll(contactAddressesToSave);
         contactProfileRepository.saveAll(contactProfilesToSave);
         return new ContactBulkUploadResponse(contactsUploadCandidates.size(), contactsToSave.size(), contactUploadStatuses);
-    }
-
-    // TODO consider also reading in the header mappings
-    public ContactBulkUploadResponse createContactsFromCsvFile(MultipartFile csvFile) {
-        if (csvFile.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The file cannot be empty");
-        }
-
-        Resource csvFileResource = csvFile.getResource();
-        try (ContactCSVWrapper csvWrapper = ContactCSVFileUtils.createCSVWrapper(csvFileResource.getFile(), ContactCSVFileUtils.portalCSVFormat())) {
-            List<ContactUploadModel> parsedContactRecords = csvWrapper.parseRecords();
-            return createContactsInBulk(parsedContactRecords, UPLOAD_INPUT_TYPE_CSV);
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while reading the file: " + e.getMessage());
-        }
     }
 
     private ContactBulkUploadFieldStatus createRowStatusModel(int fieldNumber, ContactUploadModel contactUploadCandidate) {

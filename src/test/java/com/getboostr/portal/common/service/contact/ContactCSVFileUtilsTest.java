@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ContactCSVFileUtilsTest {
     private static final String CONTACT_TEST_CSV_FILE_NAME = "contacts_test.csv";
@@ -24,8 +25,8 @@ public class ContactCSVFileUtilsTest {
     public void createCSVWrapperTest() {
         CSVFormat csvFormat = ContactCSVFileUtils.portalCSVFormat();
         File testCSVFile = getTestCSVFile(getClass().getClassLoader());
-        try {
-            ContactCSVFileUtils.createCSVWrapper(testCSVFile, csvFormat);
+        try (FileInputStream testCsvFileInputStream = new FileInputStream(testCSVFile)) {
+            ContactCSVFileUtils.createCSVWrapper(testCsvFileInputStream, csvFormat);
         } catch (Exception e) {
             fail(e);
         }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Optional;
 import java.util.UUID;
 
 @Data
@@ -17,7 +18,6 @@ import java.util.UUID;
 @Table(schema = "portal", name = "organization_account_contacts")
 public class OrganizationAccountContactEntity implements Serializable, Contactable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "contact_id")
     private UUID contactId;
 
@@ -42,7 +42,7 @@ public class OrganizationAccountContactEntity implements Serializable, Contactab
     private ContactUserRestrictionEntity contactUserRestrictionEntity;
 
     public OrganizationAccountContactEntity(UUID contactId, String firstName, String lastName, String email, Boolean isActive) {
-        this.contactId = contactId;
+        this.contactId = Optional.ofNullable(contactId).orElseGet(UUID::randomUUID);
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
