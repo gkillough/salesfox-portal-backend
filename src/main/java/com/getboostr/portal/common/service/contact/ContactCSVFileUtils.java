@@ -5,8 +5,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.QuoteMode;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public class ContactCSVFileUtils {
@@ -23,8 +23,8 @@ public class ContactCSVFileUtils {
                 .withAllowDuplicateHeaderNames(false);
     }
 
-    public static ContactCSVWrapper createCSVWrapper(File csvFile, CSVFormat csvFormat) throws IOException {
-        CSVParser parser = CSVParser.parse(csvFile, StandardCharsets.UTF_8, csvFormat);
+    public static ContactCSVWrapper createCSVWrapper(InputStream csvFileInputStream, CSVFormat csvFormat) throws IOException {
+        CSVParser parser = CSVParser.parse(csvFileInputStream, StandardCharsets.UTF_8, csvFormat);
         return new ContactCSVWrapper(parser);
     }
 
