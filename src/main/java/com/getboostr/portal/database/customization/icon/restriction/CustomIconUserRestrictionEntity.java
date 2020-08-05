@@ -1,4 +1,4 @@
-package com.getboostr.portal.database.customization.icon;
+package com.getboostr.portal.database.customization.icon.restriction;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,8 +12,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "portal", name = "custom_icon_owners")
-public class CustomIconOwnerEntity implements Serializable {
+@Table(schema = "portal", name = "custom_icon_user_restrictions")
+public class CustomIconUserRestrictionEntity implements Serializable {
     @Id
     @PrimaryKeyJoinColumn
     @Column(name = "custom_icon_id")
