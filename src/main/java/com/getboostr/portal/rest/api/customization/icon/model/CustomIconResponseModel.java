@@ -1,5 +1,7 @@
 package com.getboostr.portal.rest.api.customization.icon.model;
 
+import com.getboostr.portal.rest.api.common.model.request.RestrictionModel;
+import com.getboostr.portal.rest.api.user.common.model.ViewUserModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,9 +14,8 @@ import java.util.UUID;
 public class CustomIconResponseModel {
     private UUID customIconId;
     private String label;
-    private UUID organizationAccountId;
-    private UUID ownerId;
-    private UUID uploaderId;
+    private ViewUserModel uploader;
     private Boolean isActive;
+    private RestrictionModel restriction;
 
 }

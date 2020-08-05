@@ -22,7 +22,7 @@ import java.io.InputStream;
 @Slf4j
 @Component
 public class HttpSafeImageUtility {
-    private LocalIconManager localIconManager;
+    private final LocalIconManager localIconManager;
 
     @Autowired
     public HttpSafeImageUtility(LocalIconManager localIconManager) {
@@ -57,8 +57,10 @@ public class HttpSafeImageUtility {
 
             return localIconManager.saveIcon(fileInputStream, iconFileExtension);
         } catch (PortalFileSystemException fileSystemException) {
+            log.debug("Failed to upload image file", fileSystemException);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The provided file was an invalid image");
         } catch (IOException ioException) {
+            log.debug("Failed to save image file", ioException);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while saving the image");
         }
     }

@@ -11,13 +11,16 @@ import java.util.UUID;
 
 @Component
 public interface CustomIconRepository extends JpaRepository<CustomIconEntity, UUID> {
-    Page<CustomIconEntity> findAllByOrganizationAccountId(UUID organizationAccountId, Pageable pageable);
-
     @Query("SELECT icon" +
             " FROM CustomIconEntity icon" +
-            " RIGHT JOIN icon.customIconOwnerEntity owner" +
-            " WHERE owner.userId = :userId"
+            " LEFT JOIN icon.customIconOrganizationAccountRestrictionEntity orgAcctRestriction" +
+            " LEFT JOIN icon.customIconUserRestrictionEntity userRestriction" +
+            " WHERE (" +
+            "   (orgAcctRestriction != NULL AND orgAcctRestriction.organizationAccountId = :orgAcctId)" +
+            "   OR" +
+            "   (userRestriction != NULL AND userRestriction.userId = :userId)" +
+            " )"
     )
-    Page<CustomIconEntity> findAllByOwningUserId(@Param("userId") UUID userId, Pageable pageable);
+    Page<CustomIconEntity> findAccessibleCustomIcons(@Param("orgAcctId") UUID orgAcctId, @Param("userId") UUID userId, Pageable pageable);
 
 }

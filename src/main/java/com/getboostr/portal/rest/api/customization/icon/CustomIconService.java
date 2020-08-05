@@ -2,15 +2,19 @@ package com.getboostr.portal.rest.api.customization.icon;
 
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
+import com.getboostr.portal.database.customization.icon.CustomIconEntity;
+import com.getboostr.portal.database.customization.icon.CustomIconRepository;
+import com.getboostr.portal.database.customization.icon.restriction.CustomIconOrganizationAccountRepository;
+import com.getboostr.portal.database.customization.icon.restriction.CustomIconOrganizationAccountRestrictionEntity;
+import com.getboostr.portal.database.customization.icon.restriction.CustomIconUserRestrictionEntity;
+import com.getboostr.portal.database.customization.icon.restriction.CustomIconUserRestrictionRepository;
+import com.getboostr.portal.rest.api.common.model.request.ActiveStatusPatchModel;
+import com.getboostr.portal.rest.api.common.model.request.RestrictionModel;
+import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import com.getboostr.portal.rest.api.customization.icon.model.CustomIconRequestModel;
 import com.getboostr.portal.rest.api.customization.icon.model.CustomIconResponseModel;
 import com.getboostr.portal.rest.api.customization.icon.model.MultiCustomIconResponseModel;
-import com.getboostr.portal.database.customization.icon.CustomIconEntity;
-import com.getboostr.portal.database.customization.icon.CustomIconOwnerEntity;
-import com.getboostr.portal.database.customization.icon.CustomIconOwnerRepository;
-import com.getboostr.portal.database.customization.icon.CustomIconRepository;
-import com.getboostr.portal.rest.api.common.model.request.ActiveStatusPatchModel;
-import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
+import com.getboostr.portal.rest.api.user.common.model.ViewUserModel;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,20 +26,24 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 public class CustomIconService {
-    private CustomIconRepository customIconRepository;
-    private CustomIconOwnerRepository customIconOwnerRepository;
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private CustomIconAccessService customIconAccessService;
+    private final CustomIconRepository customIconRepository;
+    private final CustomIconOrganizationAccountRepository customIconOrgAcctRepository;
+    private final CustomIconUserRestrictionRepository customIconUserRestrictionRepository;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final CustomIconAccessService customIconAccessService;
 
     @Autowired
-    public CustomIconService(CustomIconRepository customIconRepository, CustomIconOwnerRepository customIconOwnerRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService, CustomIconAccessService customIconAccessService) {
+    public CustomIconService(CustomIconRepository customIconRepository, CustomIconOrganizationAccountRepository customIconOrgAcctRepository, CustomIconUserRestrictionRepository customIconUserRestrictionRepository,
+                             HttpSafeUserMembershipRetrievalService membershipRetrievalService, CustomIconAccessService customIconAccessService) {
         this.customIconRepository = customIconRepository;
-        this.customIconOwnerRepository = customIconOwnerRepository;
+        this.customIconOrgAcctRepository = customIconOrgAcctRepository;
+        this.customIconUserRestrictionRepository = customIconUserRestrictionRepository;
         this.membershipRetrievalService = membershipRetrievalService;
         this.customIconAccessService = customIconAccessService;
     }
@@ -50,7 +58,7 @@ public class CustomIconService {
 
         List<CustomIconResponseModel> responseModels = accessibleCustomIcons
                 .stream()
-                .map(entity -> convertToResponseModel(entity, entity.getCustomIconOwnerEntity()))
+                .map(this::convertToResponseModel)
                 .collect(Collectors.toList());
         return new MultiCustomIconResponseModel(responseModels, accessibleCustomIcons);
     }
@@ -58,40 +66,43 @@ public class CustomIconService {
     public CustomIconResponseModel getCustomIcon(UUID customIconId) {
         CustomIconEntity foundCustomIcon = customIconRepository.findById(customIconId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        CustomIconOwnerEntity nullableOwner = customIconOwnerRepository.findById(customIconId)
-                .orElse(null);
-        customIconAccessService.validateImageAccess(foundCustomIcon, nullableOwner);
-        return convertToResponseModel(foundCustomIcon, nullableOwner);
+        customIconAccessService.validateImageAccess(foundCustomIcon);
+        return convertToResponseModel(foundCustomIcon);
     }
 
     @Transactional
     public CustomIconResponseModel createCustomIcon(CustomIconRequestModel requestModel) {
         validateRequestModel(requestModel);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
 
-        CustomIconEntity customIconToSave = new CustomIconEntity(null, requestModel.getLabel(), userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), true);
+        CustomIconEntity customIconToSave = new CustomIconEntity(null, requestModel.getLabel(), loggedInUser.getUserId(), true);
         CustomIconEntity savedCustomIcon = customIconRepository.save(customIconToSave);
 
-        CustomIconOwnerEntity nullableOwner = null;
         if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
-            CustomIconOwnerEntity customIconOwnerToSave = new CustomIconOwnerEntity(savedCustomIcon.getCustomIconId(), loggedInUser.getUserId());
-            nullableOwner = customIconOwnerRepository.save(customIconOwnerToSave);
+            CustomIconUserRestrictionEntity userRestrictionToSave = new CustomIconUserRestrictionEntity(savedCustomIcon.getCustomIconId(), loggedInUser.getUserId());
+            CustomIconUserRestrictionEntity savedUserRestriction = customIconUserRestrictionRepository.save(userRestrictionToSave);
+            savedCustomIcon.setCustomIconUserRestrictionEntity(savedUserRestriction);
+        } else {
+            MembershipEntity userMembership = loggedInUser.getMembershipEntity();
+            CustomIconOrganizationAccountRestrictionEntity orgAcctRestrictionToSave = new CustomIconOrganizationAccountRestrictionEntity(savedCustomIcon.getCustomIconId(), userMembership.getOrganizationAccountId());
+            CustomIconOrganizationAccountRestrictionEntity savedOrgAcctRestriction = customIconOrgAcctRepository.save(orgAcctRestrictionToSave);
+            savedCustomIcon.setCustomIconOrganizationAccountRestrictionEntity(savedOrgAcctRestriction);
         }
 
-        return convertToResponseModel(savedCustomIcon, nullableOwner);
+        savedCustomIcon.setUploaderEntity(loggedInUser);
+        return convertToResponseModel(savedCustomIcon);
     }
 
     @Transactional
     public void updateCustomIcon(UUID customIconId, CustomIconRequestModel requestModel) {
         CustomIconEntity foundCustomIcon = customIconRepository.findById(customIconId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        CustomIconOwnerEntity nullableOwner = customIconOwnerRepository.findById(customIconId)
-                .orElse(null);
-        customIconAccessService.validateImageAccess(foundCustomIcon, nullableOwner);
-
+        customIconAccessService.validateImageAccess(foundCustomIcon);
         validateRequestModel(requestModel);
+
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         foundCustomIcon.setLabel(requestModel.getLabel());
+        foundCustomIcon.setUploaderId(loggedInUser.getUserId());
         customIconRepository.save(foundCustomIcon);
     }
 
@@ -99,9 +110,7 @@ public class CustomIconService {
     public void setActiveStatus(UUID customIconId, ActiveStatusPatchModel requestModel) {
         CustomIconEntity foundCustomIcon = customIconRepository.findById(customIconId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        CustomIconOwnerEntity nullableOwner = customIconOwnerRepository.findById(customIconId)
-                .orElse(null);
-        customIconAccessService.validateImageAccess(foundCustomIcon, nullableOwner);
+        customIconAccessService.validateImageAccess(foundCustomIcon);
 
         if (requestModel.getActiveStatus() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The request field 'activeStatus' cannot be null");
@@ -118,12 +127,8 @@ public class CustomIconService {
         }
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
-            return customIconRepository.findAllByOwningUserId(loggedInUser.getUserId(), pageRequest);
-        }
-
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
-        return customIconRepository.findAllByOrganizationAccountId(userMembership.getOrganizationAccountId(), pageRequest);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
+        return customIconRepository.findAccessibleCustomIcons(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), pageRequest);
     }
 
     private void validateRequestModel(CustomIconRequestModel requestModel) {
@@ -132,9 +137,19 @@ public class CustomIconService {
         }
     }
 
-    private CustomIconResponseModel convertToResponseModel(CustomIconEntity entity, CustomIconOwnerEntity nullableOwner) {
-        UUID ownerId = nullableOwner != null ? nullableOwner.getUserId() : null;
-        return new CustomIconResponseModel(entity.getCustomIconId(), entity.getLabel(), entity.getOrganizationAccountId(), ownerId, entity.getUploaderId(), entity.getIsActive());
+    private CustomIconResponseModel convertToResponseModel(CustomIconEntity entity) {
+        ViewUserModel uploaderModel = Optional.ofNullable(entity.getUploaderEntity())
+                .map(ViewUserModel::fromEntity)
+                .orElse(null);
+
+        RestrictionModel restrictionModel = new RestrictionModel();
+        Optional.ofNullable(entity.getCustomIconOrganizationAccountRestrictionEntity())
+                .map(CustomIconOrganizationAccountRestrictionEntity::getOrganizationAccountId)
+                .ifPresent(restrictionModel::setOrganizationAccountId);
+        Optional.ofNullable(entity.getCustomIconUserRestrictionEntity())
+                .map(CustomIconUserRestrictionEntity::getUserId)
+                .ifPresent(restrictionModel::setUserId);
+        return new CustomIconResponseModel(entity.getCustomIconId(), entity.getLabel(), uploaderModel, entity.getIsActive(), restrictionModel);
     }
 
 }

@@ -10,6 +10,8 @@ import com.getboostr.portal.database.customization.branding_text.CustomBrandingT
 import com.getboostr.portal.database.customization.branding_text.CustomBrandingTextRepository;
 import com.getboostr.portal.database.customization.icon.CustomIconEntity;
 import com.getboostr.portal.database.customization.icon.CustomIconRepository;
+import com.getboostr.portal.database.customization.icon.restriction.CustomIconOrganizationAccountRestrictionEntity;
+import com.getboostr.portal.database.customization.icon.restriction.CustomIconUserRestrictionEntity;
 import com.getboostr.portal.database.gift.GiftEntity;
 import com.getboostr.portal.database.gift.GiftRepository;
 import com.getboostr.portal.database.gift.customization.GiftCustomizationDetailEntity;
@@ -184,8 +186,12 @@ public class GiftService {
             Optional<CustomIconEntity> optionalCustomIcon = customIconRepository.findById(requestModel.getCustomIconId());
             if (optionalCustomIcon.isPresent()) {
                 CustomIconEntity customIcon = optionalCustomIcon.get();
-                if ((membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember() && !customIcon.getUploaderId().equals(loggedInUser.getUserId()))
-                        || !customIcon.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
+                CustomIconOrganizationAccountRestrictionEntity orgAcctRestriction = customIcon.getCustomIconOrganizationAccountRestrictionEntity();
+                CustomIconUserRestrictionEntity userRestriction = customIcon.getCustomIconUserRestrictionEntity();
+
+                if (null != orgAcctRestriction && !orgAcctRestriction.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
+                    errors.add("The customIconId provided is not accessible from this organization account");
+                } else if (null != userRestriction && !userRestriction.getUserId().equals(loggedInUser.getUserId())) {
                     errors.add("The customIconId provided is not accessible by the requesting user");
                 }
             } else {

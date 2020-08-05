@@ -35,16 +35,17 @@ public class RunServerTask extends Exec {
             throw new RuntimeException("You must specify a Postgres version to run with.");
         }
 
+        Project project = getProject();
+        String projectPath = project.getProjectDir().getAbsolutePath();
+        String buildDirectory = project.getBuildDir().getAbsolutePath();
+
         Map<String, String> envVars = new HashMap<>();
-        String projectPath = getProject().getPath();
-        envVars.put("PORTAL_RESOURCE_BASE_DIR", String.format("%s/src/main/resources/build/tmp", projectPath));
-        envVars.put("PORTAL_RESOURCE_ICON_DIR", String.format("%s/src/main/resources/build/tmp", projectPath));
+        envVars.put("PORTAL_RESOURCE_BASE_DIR", String.format("%s/tmp", buildDirectory));
+        envVars.put("PORTAL_RESOURCE_ICON_DIR", String.format("%s/tmp", buildDirectory));
         envVars.put("PORTAL_RESOURCE_LOGO_PNG", String.format("%s/src/main/resources/images/boostr_logo.png", projectPath));
         envVars.put("PORTAL_RESOURCE_LOGO_SVG", String.format("%s/src/main/resources/images/boostr_logo.png", projectPath));
         getEnvironment().putAll(envVars);
 
-        Project project = getProject();
-        String buildDirectory = project.getBuildDir().getAbsolutePath();
         String version = (String) project.getVersion();
 
         File jarFile = new File(String.format("%s/libs/portal-%s.jar", buildDirectory, version));
