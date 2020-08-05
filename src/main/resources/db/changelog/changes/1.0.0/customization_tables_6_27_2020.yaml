@@ -95,7 +95,7 @@ databaseChangeLog:
                   type: UUID
                   constraints:
                     nullable: false
-                    foreignKeyName: custom_icons_org_account_id_fk
+                    foreignKeyName: custom_icon_org_acct_restrictions_org_acct_id_fk
                     referencedTableSchemaName: portal
                     referencedTableName: organization_accounts
                     referencedColumnNames: organization_account_id
