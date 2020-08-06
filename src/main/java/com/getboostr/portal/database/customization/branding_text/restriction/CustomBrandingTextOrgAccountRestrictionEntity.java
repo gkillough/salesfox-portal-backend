@@ -19,6 +19,7 @@ public class CustomBrandingTextOrgAccountRestrictionEntity implements Serializab
     @Column(name = "custom_branding_text_id")
     private UUID customBrandingTextId;
 
+    @PrimaryKeyJoinColumn
     @Column(name = "organization_account_id")
     private UUID orgAccountId;
 
