@@ -1,4 +1,4 @@
-package com.getboostr.portal.database.customization.branding_text;
+package com.getboostr.portal.database.customization.branding_text.restriction;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,14 +12,14 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "portal", name = "custom_branding_text_owners")
-public class CustomBrandingTextOwnerEntity implements Serializable {
+@Table(schema = "portal", name = "custom_branding_text_org_account_restrictions")
+public class CustomBrandingTextOrgAccountRestrictionEntity implements Serializable {
     @Id
     @PrimaryKeyJoinColumn
     @Column(name = "custom_branding_text_id")
     private UUID customBrandingTextId;
 
-    @Column(name = "user_id")
-    private UUID userId;
+    @Column(name = "organization_account_id")
+    private UUID orgAccountId;
 
 }

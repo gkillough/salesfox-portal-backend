@@ -8,6 +8,8 @@ import com.getboostr.portal.database.contact.OrganizationAccountContactEntity;
 import com.getboostr.portal.database.contact.OrganizationAccountContactRepository;
 import com.getboostr.portal.database.customization.branding_text.CustomBrandingTextEntity;
 import com.getboostr.portal.database.customization.branding_text.CustomBrandingTextRepository;
+import com.getboostr.portal.database.customization.branding_text.restriction.CustomBrandingTextOrgAccountRestrictionEntity;
+import com.getboostr.portal.database.customization.branding_text.restriction.CustomBrandingTextUserRestrictionEntity;
 import com.getboostr.portal.database.customization.icon.CustomIconEntity;
 import com.getboostr.portal.database.customization.icon.CustomIconRepository;
 import com.getboostr.portal.database.customization.icon.restriction.CustomIconOrganizationAccountRestrictionEntity;
@@ -44,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -158,7 +161,7 @@ public class GiftService {
             return giftRepository.findAllByRequestingUserId(loggedInUser.getUserId(), pageRequest);
         }
 
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         return giftRepository.findAllByOrganizationAccountId(userMembership.getOrganizationAccountId(), pageRequest);
     }
 
@@ -186,14 +189,16 @@ public class GiftService {
             Optional<CustomIconEntity> optionalCustomIcon = customIconRepository.findById(requestModel.getCustomIconId());
             if (optionalCustomIcon.isPresent()) {
                 CustomIconEntity customIcon = optionalCustomIcon.get();
-                CustomIconOrganizationAccountRestrictionEntity orgAcctRestriction = customIcon.getCustomIconOrganizationAccountRestrictionEntity();
-                CustomIconUserRestrictionEntity userRestriction = customIcon.getCustomIconUserRestrictionEntity();
-
-                if (null != orgAcctRestriction && !orgAcctRestriction.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
-                    errors.add("The customIconId provided is not accessible from this organization account");
-                } else if (null != userRestriction && !userRestriction.getUserId().equals(loggedInUser.getUserId())) {
-                    errors.add("The customIconId provided is not accessible by the requesting user");
-                }
+                validateRestrictedEntity(
+                        "customIconId",
+                        errors,
+                        loggedInUser,
+                        userMembership,
+                        customIcon.getCustomIconOrganizationAccountRestrictionEntity(),
+                        customIcon.getCustomIconUserRestrictionEntity(),
+                        CustomIconOrganizationAccountRestrictionEntity::getOrganizationAccountId,
+                        CustomIconUserRestrictionEntity::getUserId
+                );
             } else {
                 errors.add("The customIconId provided is invalid");
             }
@@ -203,10 +208,16 @@ public class GiftService {
             Optional<CustomBrandingTextEntity> optionalCustomBrandingText = customBrandingTextRepository.findById(requestModel.getCustomTextId());
             if (optionalCustomBrandingText.isPresent()) {
                 CustomBrandingTextEntity customBrandingText = optionalCustomBrandingText.get();
-                if ((membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember() && !customBrandingText.getUploaderId().equals(loggedInUser.getUserId()))
-                        || !customBrandingText.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
-                    errors.add("The customIconId provided is not accessible by the requesting user");
-                }
+                validateRestrictedEntity(
+                        "customTextId",
+                        errors,
+                        loggedInUser,
+                        userMembership,
+                        customBrandingText.getCustomBrandingTextOrgAccountRestrictionEntity(),
+                        customBrandingText.getCustomBrandingTextUserRestrictionEntity(),
+                        CustomBrandingTextOrgAccountRestrictionEntity::getOrgAccountId,
+                        CustomBrandingTextUserRestrictionEntity::getUserId
+                );
             } else {
                 errors.add("The customTextId provided is invalid");
             }
@@ -223,14 +234,16 @@ public class GiftService {
             Optional<NoteEntity> optionalNote = noteRepository.findById(requestModel.getNoteId());
             if (optionalNote.isPresent()) {
                 NoteEntity requestedNote = optionalNote.get();
-
-                NoteOrganizationAccountRestrictionEntity orgAcctRestriction = requestedNote.getNoteOrganizationAccountRestrictionEntity();
-                NoteUserRestrictionEntity userRestriction = requestedNote.getNoteUserRestrictionEntity();
-                if (orgAcctRestriction != null && !orgAcctRestriction.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
-                    errors.add("The noteId provided is not accessible from this organization account");
-                } else if (userRestriction != null && !userRestriction.getUserId().equals(loggedInUser.getUserId())) {
-                    errors.add("The noteId provided is not accessible by the requesting user");
-                }
+                validateRestrictedEntity(
+                        "noteId",
+                        errors,
+                        loggedInUser,
+                        userMembership,
+                        requestedNote.getNoteOrganizationAccountRestrictionEntity(),
+                        requestedNote.getNoteUserRestrictionEntity(),
+                        NoteOrganizationAccountRestrictionEntity::getOrganizationAccountId,
+                        NoteUserRestrictionEntity::getUserId
+                );
             } else {
                 errors.add("The noteId provided is invalid");
             }
@@ -242,6 +255,15 @@ public class GiftService {
             } else {
                 giftAccessService.validateUserInventoryAccess(loggedInUser, requestModel.getItemId());
             }
+        }
+    }
+
+    private <O, U> void validateRestrictedEntity(String idName, List<String> errors, UserEntity loggedInUser, MembershipEntity userMembership,
+                                                 O orgAcctRestriction, U userRestriction, Function<O, UUID> orgAcctIdExtractor, Function<U, UUID> userIdExtractor) {
+        if (orgAcctRestriction != null && !orgAcctIdExtractor.apply(orgAcctRestriction).equals(userMembership.getOrganizationAccountId())) {
+            errors.add(String.format("The %s provided is not accessible from this organization account", idName));
+        } else if (userRestriction != null && !userIdExtractor.apply(userRestriction).equals(loggedInUser.getUserId())) {
+            errors.add(String.format("The %s provided is not accessible by the requesting user", idName));
         }
     }
 
