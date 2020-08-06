@@ -11,13 +11,16 @@ import java.util.UUID;
 
 @Component
 public interface CustomBrandingTextRepository extends JpaRepository<CustomBrandingTextEntity, UUID> {
-    Page<CustomBrandingTextEntity> findAllByOrganizationAccountId(UUID organizationAccountId, Pageable pageable);
-
     @Query("SELECT text" +
             " FROM CustomBrandingTextEntity text" +
-            " RIGHT JOIN text.customBrandingTextOwnerEntity owner" +
-            " WHERE owner.userId = :userId"
+            " LEFT JOIN text.customBrandingTextOrgAccountRestrictionEntity orgAcctRestriction" +
+            " LEFT JOIN text.customBrandingTextUserRestrictionEntity userRestriction" +
+            " WHERE (" +
+            "   (orgAcctRestriction != NULL AND orgAcctRestriction.orgAccountId = :orgAcctId)" +
+            "   OR" +
+            "   (userRestriction != NULL AND userRestriction.userId = :userId)" +
+            " )"
     )
-    Page<CustomBrandingTextEntity> findAllByOwningUserId(@Param("userId") UUID userId, Pageable pageable);
+    Page<CustomBrandingTextEntity> findAccessibleCustomBrandingTexts(@Param("orgAcctId") UUID orgAcctId, @Param("userId") UUID userId, Pageable pageable);
 
 }
