@@ -6,6 +6,6 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public interface GiftCustomizationDetailRepository extends JpaRepository<GiftCustomizationDetailEntity, UUID> {
+public interface GiftCustomIconDetailRepository extends JpaRepository<GiftCustomIconDetailEntity, UUID> {
 
 }

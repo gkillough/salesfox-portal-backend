@@ -1,6 +1,7 @@
 package com.getboostr.portal.database.gift;
 
-import com.getboostr.portal.database.gift.customization.GiftCustomizationDetailEntity;
+import com.getboostr.portal.database.gift.customization.GiftCustomIconDetailEntity;
+import com.getboostr.portal.database.gift.customization.GiftCustomTextDetailEntity;
 import com.getboostr.portal.database.gift.item.GiftItemDetailEntity;
 import com.getboostr.portal.database.gift.note.GiftNoteDetailEntity;
 import com.getboostr.portal.database.gift.tracking.GiftTrackingDetailEntity;
@@ -44,7 +45,11 @@ public class GiftEntity implements Serializable {
 
     @OneToOne
     @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
-    private GiftCustomizationDetailEntity giftCustomizationDetailEntity;
+    private GiftCustomIconDetailEntity giftCustomIconDetailEntity;
+
+    @OneToOne
+    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
+    private GiftCustomTextDetailEntity giftCustomTextDetailEntity;
 
     @OneToOne
     @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)

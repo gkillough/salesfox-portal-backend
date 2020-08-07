@@ -16,8 +16,10 @@ import com.getboostr.portal.database.customization.icon.restriction.CustomIconOr
 import com.getboostr.portal.database.customization.icon.restriction.CustomIconUserRestrictionEntity;
 import com.getboostr.portal.database.gift.GiftEntity;
 import com.getboostr.portal.database.gift.GiftRepository;
-import com.getboostr.portal.database.gift.customization.GiftCustomizationDetailEntity;
-import com.getboostr.portal.database.gift.customization.GiftCustomizationDetailRepository;
+import com.getboostr.portal.database.gift.customization.GiftCustomIconDetailEntity;
+import com.getboostr.portal.database.gift.customization.GiftCustomIconDetailRepository;
+import com.getboostr.portal.database.gift.customization.GiftCustomTextDetailEntity;
+import com.getboostr.portal.database.gift.customization.GiftCustomTextDetailRepository;
 import com.getboostr.portal.database.gift.item.GiftItemDetailEntity;
 import com.getboostr.portal.database.gift.item.GiftItemDetailRepository;
 import com.getboostr.portal.database.gift.note.GiftNoteDetailEntity;
@@ -54,7 +56,8 @@ public class GiftService {
     private final GiftRepository giftRepository;
     private final GiftNoteDetailRepository noteDetailRepository;
     private final GiftItemDetailRepository itemDetailRepository;
-    private final GiftCustomizationDetailRepository customizationDetailRepository;
+    private final GiftCustomIconDetailRepository customIconDetailRepository;
+    private final GiftCustomTextDetailRepository giftCustomTextDetailRepository;
     private final GiftTrackingRepository giftTrackingRepository;
     private final OrganizationAccountContactRepository contactRepository;
     private final NoteRepository noteRepository;
@@ -65,14 +68,26 @@ public class GiftService {
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
-    public GiftService(GiftRepository giftRepository, GiftNoteDetailRepository noteDetailRepository, GiftItemDetailRepository itemDetailRepository, GiftCustomizationDetailRepository customizationDetailRepository,
-                       GiftTrackingRepository giftTrackingRepository, OrganizationAccountContactRepository contactRepository, NoteRepository noteRepository, CatalogueItemRepository catalogueItemRepository,
-                       CustomIconRepository customIconRepository, CustomBrandingTextRepository customBrandingTextRepository,
-                       GiftAccessService giftAccessService, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+    public GiftService(
+            GiftRepository giftRepository,
+            GiftNoteDetailRepository noteDetailRepository,
+            GiftItemDetailRepository itemDetailRepository,
+            GiftCustomIconDetailRepository customIconDetailRepository,
+            GiftCustomTextDetailRepository giftCustomTextDetailRepository,
+            GiftTrackingRepository giftTrackingRepository,
+            OrganizationAccountContactRepository contactRepository,
+            NoteRepository noteRepository,
+            CatalogueItemRepository catalogueItemRepository,
+            CustomIconRepository customIconRepository,
+            CustomBrandingTextRepository customBrandingTextRepository,
+            GiftAccessService giftAccessService,
+            HttpSafeUserMembershipRetrievalService membershipRetrievalService
+    ) {
         this.giftRepository = giftRepository;
         this.noteDetailRepository = noteDetailRepository;
         this.itemDetailRepository = itemDetailRepository;
-        this.customizationDetailRepository = customizationDetailRepository;
+        this.customIconDetailRepository = customIconDetailRepository;
+        this.giftCustomTextDetailRepository = giftCustomTextDetailRepository;
         this.giftTrackingRepository = giftTrackingRepository;
         this.contactRepository = contactRepository;
         this.noteRepository = noteRepository;
@@ -144,9 +159,14 @@ public class GiftService {
         }
 
         // TODO consider separate constraints for these
-        if (requestModel.getCustomIconId() != null || requestModel.getCustomTextId() != null) {
-            GiftCustomizationDetailEntity customizationDetailToSave = new GiftCustomizationDetailEntity(savedGift.getGiftId(), requestModel.getCustomIconId(), requestModel.getCustomTextId());
-            customizationDetailRepository.save(customizationDetailToSave);
+        if (requestModel.getCustomIconId() != null) {
+            GiftCustomIconDetailEntity customIconDetailToSave = new GiftCustomIconDetailEntity(savedGift.getGiftId(), requestModel.getCustomIconId());
+            customIconDetailRepository.save(customIconDetailToSave);
+        }
+
+        if (requestModel.getCustomTextId() != null) {
+            GiftCustomTextDetailEntity customTextDetailToSave = new GiftCustomTextDetailEntity(savedGift.getGiftId(), requestModel.getCustomTextId());
+            giftCustomTextDetailRepository.save(customTextDetailToSave);
         }
     }
 

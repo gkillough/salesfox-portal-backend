@@ -94,19 +94,19 @@ databaseChangeLog:
                     referencedColumnNames: item_id
 
   - changeSet:
-      id: gift-tables-4
+      id: gift-tables-4a
       author: gavinkillough
       changes:
         - createTable:
             schemaName: portal
-            tableName: gift_customization_details
+            tableName: gift_custom_icon_details
             columns:
               - column:
                   name: gift_id
                   type: UUID
                   constraints:
                     primaryKey: true
-                    foreignKeyName: gift_item_detail_gift_id_fk
+                    foreignKeyName: gift_custom_icon_details_gift_id_fk
                     referencedTableSchemaName: portal
                     referencedTableName: gifts
                     referencedColumnNames: gift_id
@@ -114,15 +114,35 @@ databaseChangeLog:
                   name: custom_icon_id
                   type: UUID
                   constraints:
-                    foreignKeyName: gift_custom_icon_id_fk
+                    nullable: false
+                    foreignKeyName: gift_custom_icon_details_custom_icon_id_fk
                     referencedTableSchemaName: portal
                     referencedTableName: custom_icons
                     referencedColumnNames: custom_icon_id
+
+  - changeSet:
+      id: gift-tables-4b
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: gift_custom_text_details
+            columns:
+              - column:
+                  name: gift_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: gift_custom_text_details_gift_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: gifts
+                    referencedColumnNames: gift_id
               - column:
                   name: custom_text_id
                   type: UUID
                   constraints:
-                    foreignKeyName: gift_custom_text_id_fk
+                    nullable: false
+                    foreignKeyName: gift_custom_text_details_custom_text_id_fk
                     referencedTableSchemaName: portal
                     referencedTableName: custom_branding_texts
                     referencedColumnNames: custom_branding_text_id
