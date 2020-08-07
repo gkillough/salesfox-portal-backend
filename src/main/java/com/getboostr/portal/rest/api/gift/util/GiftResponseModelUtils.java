@@ -6,9 +6,13 @@ import com.getboostr.portal.database.gift.customization.GiftCustomIconDetailEnti
 import com.getboostr.portal.database.gift.customization.GiftCustomTextDetailEntity;
 import com.getboostr.portal.database.gift.item.GiftItemDetailEntity;
 import com.getboostr.portal.database.gift.note.GiftNoteDetailEntity;
+import com.getboostr.portal.database.gift.restriction.GiftOrgAccountRestrictionEntity;
+import com.getboostr.portal.database.gift.restriction.GiftUserRestrictionEntity;
 import com.getboostr.portal.database.gift.tracking.GiftTrackingEntity;
+import com.getboostr.portal.rest.api.common.model.request.RestrictionModel;
 import com.getboostr.portal.rest.api.gift.model.GiftResponseModel;
 import com.getboostr.portal.rest.api.gift.model.GiftTrackingModel;
+import com.getboostr.portal.rest.api.user.common.model.ViewUserModel;
 import org.springframework.lang.Nullable;
 
 import java.time.OffsetDateTime;
@@ -18,12 +22,17 @@ import java.util.function.Function;
 
 public class GiftResponseModelUtils {
     public static GiftResponseModel convertToResponseModel(GiftEntity gift) {
+        ViewUserModel requestingUserModel = ViewUserModel.fromEntity(gift.getRequestingUser());
         UUID noteId = extractDetailIdOrNull(gift.getGiftNoteDetailEntity(), GiftNoteDetailEntity::getNoteId);
         UUID itemId = extractDetailIdOrNull(gift.getGiftItemDetailEntity(), GiftItemDetailEntity::getItemId);
         UUID customIconId = extractDetailIdOrNull(gift.getGiftCustomIconDetailEntity(), GiftCustomIconDetailEntity::getCustomIconId);
         UUID customTextId = extractDetailIdOrNull(gift.getGiftCustomTextDetailEntity(), GiftCustomTextDetailEntity::getCustomTextId);
         GiftTrackingModel trackingModel = createTrackingModel(gift.getGiftTrackingEntity());
-        return new GiftResponseModel(gift.getGiftId(), gift.getOrganizationAccountId(), gift.getRequestingUserId(), gift.getContactId(), noteId, itemId, customTextId, customIconId, trackingModel);
+
+        RestrictionModel restrictionModel = new RestrictionModel();
+        Optional.ofNullable(gift.getGiftOrgAccountRestrictionEntity()).map(GiftOrgAccountRestrictionEntity::getOrgAccountId).ifPresent(restrictionModel::setOrganizationAccountId);
+        Optional.ofNullable(gift.getGiftUserRestrictionEntity()).map(GiftUserRestrictionEntity::getUserId).ifPresent(restrictionModel::setUserId);
+        return new GiftResponseModel(gift.getGiftId(), requestingUserModel, gift.getContactId(), noteId, itemId, customTextId, customIconId, trackingModel, restrictionModel);
     }
 
     public static GiftTrackingModel createTrackingModel(@Nullable GiftTrackingEntity giftTracking) {

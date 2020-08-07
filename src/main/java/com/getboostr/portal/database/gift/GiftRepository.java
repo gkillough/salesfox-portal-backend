@@ -13,14 +13,14 @@ import java.util.UUID;
 public interface GiftRepository extends JpaRepository<GiftEntity, UUID> {
     @Query("SELECT gift" +
             " FROM GiftEntity gift" +
-            " WHERE gift.organizationAccountId = :orgAcctId"
+            " LEFT JOIN gift.giftOrgAccountRestrictionEntity orgAcctRestriction" +
+            " LEFT JOIN gift.giftUserRestrictionEntity userRestriction" +
+            " WHERE (" +
+            "   (orgAcctRestriction != NULL AND orgAcctRestriction.orgAccountId = :orgAcctId)" +
+            "   OR" +
+            "   (userRestriction != NULL AND userRestriction.userId = :userId)" +
+            " )"
     )
-    Page<GiftEntity> findAllByOrganizationAccountId(@Param("orgAcctId") UUID orgAcctId, Pageable pageable);
-
-    @Query("SELECT gift" +
-            " FROM GiftEntity gift" +
-            " WHERE gift.requestingUserId = :requestingUserId"
-    )
-    Page<GiftEntity> findAllByRequestingUserId(@Param("requestingUserId") UUID requestingUserId, Pageable pageable);
+    Page<GiftEntity> findAccessibleGifts(@Param("orgAcctId") UUID orgAcctId, @Param("userId") UUID userId, Pageable pageable);
 
 }

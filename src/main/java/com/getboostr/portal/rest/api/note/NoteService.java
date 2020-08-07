@@ -77,7 +77,7 @@ public class NoteService {
         NoteEntity savedNote = noteRepository.save(noteToSave);
 
         if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
-            NoteUserRestrictionEntity noteUserRestrictionToSave = new NoteUserRestrictionEntity(noteToSave.getNoteId(), loggedInUser.getUserId());
+            NoteUserRestrictionEntity noteUserRestrictionToSave = new NoteUserRestrictionEntity(savedNote.getNoteId(), loggedInUser.getUserId());
             NoteUserRestrictionEntity savedNoteUserRestriction = noteUserRestrictionRepository.save(noteUserRestrictionToSave);
             savedNote.setNoteUserRestrictionEntity(savedNoteUserRestriction);
         } else {

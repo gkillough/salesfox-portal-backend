@@ -24,6 +24,10 @@ import com.getboostr.portal.database.gift.item.GiftItemDetailEntity;
 import com.getboostr.portal.database.gift.item.GiftItemDetailRepository;
 import com.getboostr.portal.database.gift.note.GiftNoteDetailEntity;
 import com.getboostr.portal.database.gift.note.GiftNoteDetailRepository;
+import com.getboostr.portal.database.gift.restriction.GiftOrgAccountRestrictionEntity;
+import com.getboostr.portal.database.gift.restriction.GiftOrgAccountRestrictionRepository;
+import com.getboostr.portal.database.gift.restriction.GiftUserRestrictionEntity;
+import com.getboostr.portal.database.gift.restriction.GiftUserRestrictionRepository;
 import com.getboostr.portal.database.gift.tracking.GiftTrackingRepository;
 import com.getboostr.portal.database.note.NoteEntity;
 import com.getboostr.portal.database.note.NoteRepository;
@@ -59,6 +63,8 @@ public class GiftService {
     private final GiftCustomIconDetailRepository customIconDetailRepository;
     private final GiftCustomTextDetailRepository giftCustomTextDetailRepository;
     private final GiftTrackingRepository giftTrackingRepository;
+    private final GiftOrgAccountRestrictionRepository giftOrgAcctRestrictionRepository;
+    private final GiftUserRestrictionRepository giftUserRestrictionRepository;
     private final OrganizationAccountContactRepository contactRepository;
     private final NoteRepository noteRepository;
     private final CatalogueItemRepository catalogueItemRepository;
@@ -75,6 +81,8 @@ public class GiftService {
             GiftCustomIconDetailRepository customIconDetailRepository,
             GiftCustomTextDetailRepository giftCustomTextDetailRepository,
             GiftTrackingRepository giftTrackingRepository,
+            GiftOrgAccountRestrictionRepository giftOrgAcctRestrictionRepository,
+            GiftUserRestrictionRepository giftUserRestrictionRepository,
             OrganizationAccountContactRepository contactRepository,
             NoteRepository noteRepository,
             CatalogueItemRepository catalogueItemRepository,
@@ -89,6 +97,8 @@ public class GiftService {
         this.customIconDetailRepository = customIconDetailRepository;
         this.giftCustomTextDetailRepository = giftCustomTextDetailRepository;
         this.giftTrackingRepository = giftTrackingRepository;
+        this.giftOrgAcctRestrictionRepository = giftOrgAcctRestrictionRepository;
+        this.giftUserRestrictionRepository = giftUserRestrictionRepository;
         this.contactRepository = contactRepository;
         this.noteRepository = noteRepository;
         this.catalogueItemRepository = catalogueItemRepository;
@@ -125,10 +135,22 @@ public class GiftService {
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         validateRequestModel(loggedInUser, userMembership, requestModel);
 
-        GiftEntity giftToSave = new GiftEntity(null, userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), requestModel.getContactId());
+        GiftEntity giftToSave = new GiftEntity(null, loggedInUser.getUserId(), requestModel.getContactId());
         GiftEntity savedGift = giftRepository.save(giftToSave);
 
         saveDetails(savedGift, requestModel);
+
+        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
+            GiftUserRestrictionEntity userRestrictionToSave = new GiftUserRestrictionEntity(savedGift.getGiftId(), loggedInUser.getUserId());
+            GiftUserRestrictionEntity savedUserRestriction = giftUserRestrictionRepository.save(userRestrictionToSave);
+            savedGift.setGiftUserRestrictionEntity(savedUserRestriction);
+        } else {
+            GiftOrgAccountRestrictionEntity orgAcctRestrictionToSave = new GiftOrgAccountRestrictionEntity(savedGift.getGiftId(), userMembership.getOrganizationAccountId());
+            GiftOrgAccountRestrictionEntity savedOrgAcctRestriction = giftOrgAcctRestrictionRepository.save(orgAcctRestrictionToSave);
+            savedGift.setGiftOrgAccountRestrictionEntity(savedOrgAcctRestriction);
+        }
+
+        savedGift.setRequestingUser(loggedInUser);
         return GiftResponseModelUtils.convertToResponseModel(savedGift);
     }
 
@@ -140,6 +162,8 @@ public class GiftService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot edit a gift that has been sent");
         }
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        giftAccessService.validateGiftAccess(foundGift, AccessOperation.UPDATE);
+
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         validateRequestModel(loggedInUser, userMembership, requestModel);
 
@@ -150,23 +174,27 @@ public class GiftService {
     private void saveDetails(GiftEntity savedGift, DraftGiftRequestModel requestModel) {
         if (requestModel.getNoteId() != null) {
             GiftNoteDetailEntity noteDetailToSave = new GiftNoteDetailEntity(savedGift.getGiftId(), requestModel.getNoteId());
-            noteDetailRepository.save(noteDetailToSave);
+            GiftNoteDetailEntity savedNoteDetail = noteDetailRepository.save(noteDetailToSave);
+            savedGift.setGiftNoteDetailEntity(savedNoteDetail);
         }
 
         if (requestModel.getItemId() != null) {
             GiftItemDetailEntity itemDetailToSave = new GiftItemDetailEntity(savedGift.getGiftId(), requestModel.getItemId());
-            itemDetailRepository.save(itemDetailToSave);
+            GiftItemDetailEntity savedItemDetail = itemDetailRepository.save(itemDetailToSave);
+            savedGift.setGiftItemDetailEntity(savedItemDetail);
         }
 
         // TODO consider separate constraints for these
         if (requestModel.getCustomIconId() != null) {
             GiftCustomIconDetailEntity customIconDetailToSave = new GiftCustomIconDetailEntity(savedGift.getGiftId(), requestModel.getCustomIconId());
-            customIconDetailRepository.save(customIconDetailToSave);
+            GiftCustomIconDetailEntity savedIconDetail = customIconDetailRepository.save(customIconDetailToSave);
+            savedGift.setGiftCustomIconDetailEntity(savedIconDetail);
         }
 
         if (requestModel.getCustomTextId() != null) {
             GiftCustomTextDetailEntity customTextDetailToSave = new GiftCustomTextDetailEntity(savedGift.getGiftId(), requestModel.getCustomTextId());
-            giftCustomTextDetailRepository.save(customTextDetailToSave);
+            GiftCustomTextDetailEntity savedTextDetail = giftCustomTextDetailRepository.save(customTextDetailToSave);
+            savedGift.setGiftCustomTextDetailEntity(savedTextDetail);
         }
     }
 
@@ -177,12 +205,8 @@ public class GiftService {
         }
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
-            return giftRepository.findAllByRequestingUserId(loggedInUser.getUserId(), pageRequest);
-        }
-
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
-        return giftRepository.findAllByOrganizationAccountId(userMembership.getOrganizationAccountId(), pageRequest);
+        return giftRepository.findAccessibleGifts(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), pageRequest);
     }
 
     // TODO clean this method up after database is normalized

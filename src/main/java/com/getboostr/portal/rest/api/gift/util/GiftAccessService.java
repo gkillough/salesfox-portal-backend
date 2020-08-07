@@ -8,6 +8,8 @@ import com.getboostr.portal.database.contact.OrganizationAccountContactEntity;
 import com.getboostr.portal.database.contact.OrganizationAccountContactRepository;
 import com.getboostr.portal.database.contact.profile.OrganizationAccountContactProfileRepository;
 import com.getboostr.portal.database.gift.GiftEntity;
+import com.getboostr.portal.database.gift.restriction.GiftOrgAccountRestrictionEntity;
+import com.getboostr.portal.database.gift.restriction.GiftUserRestrictionEntity;
 import com.getboostr.portal.database.inventory.InventoryEntity;
 import com.getboostr.portal.database.inventory.InventoryRepository;
 import com.getboostr.portal.database.inventory.item.InventoryItemPK;
@@ -62,7 +64,7 @@ public class GiftAccessService {
 
     public void validateUserInventoryAccess(UserEntity userRequestingAccess, UUID itemId) {
         MembershipEntity userMembership = userRequestingAccess.getMembershipEntity();
-        InventoryEntity userInventory = inventoryRepository.findAccessibleInventories(userMembership.getOrganizationAccountId(), userRequestingAccess.getUserId(), PageRequest.of(1, 1))
+        InventoryEntity userInventory = inventoryRepository.findAccessibleInventories(userMembership.getOrganizationAccountId(), userRequestingAccess.getUserId(), PageRequest.of(0, 1))
                 .stream()
                 .findAny()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
@@ -79,15 +81,14 @@ public class GiftAccessService {
             return;
         }
 
-        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
-            if (loggedInUser.getUserId().equals(entity.getRequestingUserId())) {
-                return;
-            }
-        } else {
-            MembershipEntity userMembership = loggedInUser.getMembershipEntity();
-            if (userMembership.getOrganizationAccountId().equals(entity.getOrganizationAccountId())) {
-                return;
-            }
+        GiftOrgAccountRestrictionEntity orgAcctRestriction = entity.getGiftOrgAccountRestrictionEntity();
+        GiftUserRestrictionEntity userRestriction = entity.getGiftUserRestrictionEntity();
+
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
+        if (null != orgAcctRestriction && orgAcctRestriction.getOrgAccountId().equals(userMembership.getOrganizationAccountId())) {
+            return;
+        } else if (null != userRestriction && userRestriction.getUserId().equals(loggedInUser.getUserId())) {
+            return;
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
