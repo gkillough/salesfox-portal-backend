@@ -1,6 +1,7 @@
 package com.getboostr.portal.database.gift;
 
 import com.getboostr.portal.database.account.entity.UserEntity;
+import com.getboostr.portal.database.contact.OrganizationAccountContactEntity;
 import com.getboostr.portal.database.gift.customization.GiftCustomIconDetailEntity;
 import com.getboostr.portal.database.gift.customization.GiftCustomTextDetailEntity;
 import com.getboostr.portal.database.gift.item.GiftItemDetailEntity;
@@ -37,7 +38,11 @@ public class GiftEntity implements Serializable {
 
     @OneToOne
     @JoinColumn(name = "requesting_user_id", referencedColumnName = "user_id", updatable = false, insertable = false)
-    private UserEntity requestingUser;
+    private UserEntity requestingUserEntity;
+
+    @OneToOne
+    @JoinColumn(name = "contact_id", referencedColumnName = "contact_id", updatable = false, insertable = false)
+    private OrganizationAccountContactEntity contactEntity;
 
     @OneToOne
     @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)

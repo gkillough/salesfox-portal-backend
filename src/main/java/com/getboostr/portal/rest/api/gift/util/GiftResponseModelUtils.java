@@ -10,6 +10,7 @@ import com.getboostr.portal.database.gift.restriction.GiftOrgAccountRestrictionE
 import com.getboostr.portal.database.gift.restriction.GiftUserRestrictionEntity;
 import com.getboostr.portal.database.gift.tracking.GiftTrackingEntity;
 import com.getboostr.portal.rest.api.common.model.request.RestrictionModel;
+import com.getboostr.portal.rest.api.contact.model.ContactSummaryModel;
 import com.getboostr.portal.rest.api.gift.model.GiftResponseModel;
 import com.getboostr.portal.rest.api.gift.model.GiftTrackingModel;
 import com.getboostr.portal.rest.api.user.common.model.ViewUserModel;
@@ -22,17 +23,20 @@ import java.util.function.Function;
 
 public class GiftResponseModelUtils {
     public static GiftResponseModel convertToResponseModel(GiftEntity gift) {
-        ViewUserModel requestingUserModel = ViewUserModel.fromEntity(gift.getRequestingUser());
+        ViewUserModel requestingUserModel = ViewUserModel.fromEntity(gift.getRequestingUserEntity());
+        ContactSummaryModel contactModel = ContactSummaryModel.fromEntity(gift.getContactEntity());
+
         UUID noteId = extractDetailIdOrNull(gift.getGiftNoteDetailEntity(), GiftNoteDetailEntity::getNoteId);
         UUID itemId = extractDetailIdOrNull(gift.getGiftItemDetailEntity(), GiftItemDetailEntity::getItemId);
         UUID customIconId = extractDetailIdOrNull(gift.getGiftCustomIconDetailEntity(), GiftCustomIconDetailEntity::getCustomIconId);
         UUID customTextId = extractDetailIdOrNull(gift.getGiftCustomTextDetailEntity(), GiftCustomTextDetailEntity::getCustomTextId);
+
         GiftTrackingModel trackingModel = createTrackingModel(gift.getGiftTrackingEntity());
 
         RestrictionModel restrictionModel = new RestrictionModel();
         Optional.ofNullable(gift.getGiftOrgAccountRestrictionEntity()).map(GiftOrgAccountRestrictionEntity::getOrgAccountId).ifPresent(restrictionModel::setOrganizationAccountId);
         Optional.ofNullable(gift.getGiftUserRestrictionEntity()).map(GiftUserRestrictionEntity::getUserId).ifPresent(restrictionModel::setUserId);
-        return new GiftResponseModel(gift.getGiftId(), requestingUserModel, gift.getContactId(), noteId, itemId, customTextId, customIconId, trackingModel, restrictionModel);
+        return new GiftResponseModel(gift.getGiftId(), requestingUserModel, contactModel, noteId, itemId, customTextId, customIconId, trackingModel, restrictionModel);
     }
 
     public static GiftTrackingModel createTrackingModel(@Nullable GiftTrackingEntity giftTracking) {

@@ -150,7 +150,8 @@ public class GiftService {
             savedGift.setGiftOrgAccountRestrictionEntity(savedOrgAcctRestriction);
         }
 
-        savedGift.setRequestingUser(loggedInUser);
+        savedGift.setRequestingUserEntity(loggedInUser);
+        contactRepository.findById(savedGift.getContactId()).ifPresent(savedGift::setContactEntity);
         return GiftResponseModelUtils.convertToResponseModel(savedGift);
     }
 
