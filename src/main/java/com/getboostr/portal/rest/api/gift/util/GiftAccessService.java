@@ -5,7 +5,6 @@ import com.getboostr.portal.common.service.contact.ContactAccessOperationUtility
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.contact.OrganizationAccountContactEntity;
-import com.getboostr.portal.database.contact.OrganizationAccountContactRepository;
 import com.getboostr.portal.database.contact.profile.OrganizationAccountContactProfileRepository;
 import com.getboostr.portal.database.gift.GiftEntity;
 import com.getboostr.portal.database.gift.restriction.GiftOrgAccountRestrictionEntity;
@@ -22,37 +21,30 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Component
 public class GiftAccessService {
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private final OrganizationAccountContactRepository contactRepository;
     private final ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
     private final InventoryRepository inventoryRepository;
     private final InventoryItemRepository inventoryItemRepository;
     private final InventoryAccessService inventoryAccessService;
 
     @Autowired
-    public GiftAccessService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccountContactRepository contactRepository, OrganizationAccountContactProfileRepository contactProfileRepository,
+    public GiftAccessService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccountContactProfileRepository contactProfileRepository,
                              InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository, InventoryAccessService inventoryAccessService) {
         this.membershipRetrievalService = membershipRetrievalService;
-        this.contactRepository = contactRepository;
         this.inventoryRepository = inventoryRepository;
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryAccessService = inventoryAccessService;
         this.contactAccessOperationUtility = new ContactAccessOperationUtility<>(membershipRetrievalService, contactProfileRepository);
     }
 
-    public void validateGiftAccess(GiftEntity entity, AccessOperation contactAccessOperation) {
-        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        validateGiftEntityAccess(entity, loggedInUser);
-        Optional<OrganizationAccountContactEntity> optionalContact = contactRepository.findById(entity.getContactId());
-        if (optionalContact.isPresent()) {
-            if (!contactAccessOperationUtility.canUserAccessContact(loggedInUser, optionalContact.get(), contactAccessOperation)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot perform the gifting operation for this contact");
-            }
+    public void validateGiftAccess(GiftEntity gift, UserEntity userRequestingAccess, AccessOperation contactAccessOperation) {
+        validateGiftEntityAccess(gift, userRequestingAccess);
+        if (!contactAccessOperationUtility.canUserAccessContact(userRequestingAccess, gift.getContactEntity(), contactAccessOperation)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot perform the gifting operation for this contact");
         }
     }
 

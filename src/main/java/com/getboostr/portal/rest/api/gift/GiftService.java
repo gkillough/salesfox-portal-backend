@@ -125,7 +125,8 @@ public class GiftService {
     public GiftResponseModel getGift(UUID giftId) {
         GiftEntity foundGift = giftRepository.findById(giftId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        giftAccessService.validateGiftAccess(foundGift, AccessOperation.READ);
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.READ);
         return GiftResponseModelUtils.convertToResponseModel(foundGift);
     }
 
@@ -159,11 +160,13 @@ public class GiftService {
     public void updateDraftGift(UUID giftId, DraftGiftRequestModel requestModel) {
         GiftEntity foundGift = giftRepository.findById(giftId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.UPDATE);
+
         if (giftTrackingRepository.existsById(giftId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot edit a gift that has been sent");
         }
-        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        giftAccessService.validateGiftAccess(foundGift, AccessOperation.UPDATE);
 
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         validateRequestModel(loggedInUser, userMembership, requestModel);
@@ -185,7 +188,6 @@ public class GiftService {
             savedGift.setGiftItemDetailEntity(savedItemDetail);
         }
 
-        // TODO consider separate constraints for these
         if (requestModel.getCustomIconId() != null) {
             GiftCustomIconDetailEntity customIconDetailToSave = new GiftCustomIconDetailEntity(savedGift.getGiftId(), requestModel.getCustomIconId());
             GiftCustomIconDetailEntity savedIconDetail = customIconDetailRepository.save(customIconDetailToSave);
@@ -210,7 +212,7 @@ public class GiftService {
         return giftRepository.findAccessibleGifts(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), pageRequest);
     }
 
-    // TODO clean this method up after database is normalized
+    // TODO clean this method up after a common restriction interface is implemented
     private void validateRequestModel(UserEntity loggedInUser, MembershipEntity userMembership, DraftGiftRequestModel requestModel) {
         List<String> errors = new ArrayList<>();
         if (requestModel.getContactId() == null) {
