@@ -72,12 +72,14 @@ public class GiftProcessingService {
     public GiftResponseModel sendGift(UUID giftId) {
         GiftEntity foundGift = giftRepository.findById(giftId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        giftAccessService.validateGiftAccess(foundGift, AccessOperation.INTERACT);
+
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.INTERACT);
+        
         if (giftTrackingRepository.existsById(giftId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This gift has already been sent");
         }
 
-        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         GiftItemDetailEntity giftItemDetail = foundGift.getGiftItemDetailEntity();
         if (giftItemDetail != null) {

@@ -11,19 +11,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "portal", name = "gift_customization_details")
-public class GiftCustomizationDetailEntity {
+@Table(schema = "portal", name = "gift_custom_text_details")
+public class GiftCustomTextDetailEntity {
     @Id
     @PrimaryKeyJoinColumn
     @Column(name = "gift_id")
     private UUID giftId;
-
-    // TODO If gift to item is many to many, there should be customization details per item.
-    //  That means this will need an item_id as part of its PK.
-
-    @PrimaryKeyJoinColumn
-    @Column(name = "custom_icon_id")
-    private UUID customIconId;
 
     @PrimaryKeyJoinColumn
     @Column(name = "custom_text_id")
