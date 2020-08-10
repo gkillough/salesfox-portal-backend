@@ -36,7 +36,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -92,13 +91,7 @@ public class GiftProcessingService {
             }
         }
 
-        GiftTrackingEntity giftTrackingToUpdate = foundGift.getGiftTrackingEntity();
-        giftTrackingToUpdate.setStatus(GiftTrackingStatus.SUBMITTED.name());
-        giftTrackingToUpdate.setUpdatedByUserId(loggedInUser.getUserId());
-        giftTrackingToUpdate.setDateUpdated(PortalDateTimeUtils.getCurrentDateTimeUTC());
-        GiftTrackingEntity savedGiftTracking = giftTrackingRepository.save(giftTrackingToUpdate);
-        foundGift.setGiftTrackingEntity(savedGiftTracking);
-
+        updateGiftTrackingInfo(foundGift, loggedInUser, GiftTrackingStatus.SUBMITTED.name());
         contactInteractionsUtility.addContactInteraction(loggedInUser, foundGift.getContactId(), InteractionMedium.MAIL, InteractionClassification.OUTGOING, "(Auto-generated) Sent gift/note");
         return GiftResponseModelUtils.convertToResponseModel(foundGift);
     }
@@ -107,12 +100,11 @@ public class GiftProcessingService {
     public GiftResponseModel updateGiftStatus(UUID giftId, UpdateGiftStatusRequestModel requestModel) {
         GiftEntity foundGift = giftRepository.findById(giftId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        GiftTrackingEntity foundTrackingEntity = giftTrackingRepository.findById(giftId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "This gift has not been sent"));
+        GiftTrackingEntity foundTrackingEntity = foundGift.getGiftTrackingEntity();
         validateUpdateGiftStatusRequestModel(foundTrackingEntity.getStatus(), requestModel);
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
 
         GiftItemDetailEntity giftItemDetail = foundGift.getGiftItemDetailEntity();
         if (giftItemDetail != null && isIncompleteStatus(requestModel.getStatus())) {
@@ -122,13 +114,7 @@ public class GiftProcessingService {
             inventoryItemRepository.save(inventoryItemForGift);
         }
 
-        OffsetDateTime currentDateTime = PortalDateTimeUtils.getCurrentDateTimeUTC();
-
-        foundTrackingEntity.setStatus(requestModel.getStatus());
-        foundTrackingEntity.setUpdatedByUserId(loggedInUser.getUserId());
-        foundTrackingEntity.setDateUpdated(currentDateTime);
-        giftTrackingRepository.save(foundTrackingEntity);
-
+        updateGiftTrackingInfo(foundGift, loggedInUser, requestModel.getStatus());
         return GiftResponseModelUtils.convertToResponseModel(foundGift);
     }
 
@@ -189,11 +175,20 @@ public class GiftProcessingService {
         }
     }
 
+    private void updateGiftTrackingInfo(GiftEntity gift, UserEntity updatingUser, String status) {
+        GiftTrackingEntity giftTrackingToUpdate = gift.getGiftTrackingEntity();
+        giftTrackingToUpdate.setStatus(status);
+        giftTrackingToUpdate.setUpdatedByUserId(updatingUser.getUserId());
+        giftTrackingToUpdate.setDateUpdated(PortalDateTimeUtils.getCurrentDateTimeUTC());
+        GiftTrackingEntity savedGiftTracking = giftTrackingRepository.save(giftTrackingToUpdate);
+        gift.setGiftTrackingEntity(savedGiftTracking);
+    }
+
     private InventoryItemEntity findInventoryItemForGift(UserEntity loggedInUser, MembershipEntity userMembership, GiftItemDetailEntity giftItemDetail) {
-        InventoryEntity inventory = inventoryRepository.findAccessibleInventories(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), PageRequest.of(1, 1))
+        InventoryEntity inventory = inventoryRepository.findAccessibleInventories(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), PageRequest.of(0, 1))
                 .stream()
                 .findAny()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not find an inventory for the requesting user"));
         InventoryItemPK inventoryItemPK = new InventoryItemPK(giftItemDetail.getItemId(), inventory.getInventoryId());
         return inventoryItemRepository.findById(inventoryItemPK)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "The requested item does not exist in the inventory"));
