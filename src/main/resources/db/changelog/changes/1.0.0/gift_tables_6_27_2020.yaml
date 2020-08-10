@@ -209,6 +209,7 @@ databaseChangeLog:
                     referencedTableSchemaName: portal
                     referencedTableName: gifts
                     referencedColumnNames: gift_id
+                    onDeleteCascade: true
               - column:
                   name: status
                   type: character varying
@@ -245,6 +246,7 @@ databaseChangeLog:
                     referencedTableSchemaName: portal
                     referencedTableName: gifts
                     referencedColumnNames: gift_id
+                    onDeleteCascade: true
               - column:
                   name: distributor
                   type: character varying

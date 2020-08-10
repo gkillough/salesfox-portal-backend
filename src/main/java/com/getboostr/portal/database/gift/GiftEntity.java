@@ -15,7 +15,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -84,7 +83,7 @@ public class GiftEntity implements Serializable {
         this.contactId = contactId;
     }
 
-    public boolean isSent() {
+    public boolean isSubmitted() {
         return !isDraft() && !isScheduled();
     }
 
@@ -96,7 +95,7 @@ public class GiftEntity implements Serializable {
         return hasStatus(GiftTrackingStatus.SCHEDULED);
     }
 
-    public boolean hasStatus(@NotNull GiftTrackingStatus status) {
+    public boolean hasStatus(GiftTrackingStatus status) {
         return giftTrackingEntity != null && status.name().equals(giftTrackingEntity.getStatus());
     }
 

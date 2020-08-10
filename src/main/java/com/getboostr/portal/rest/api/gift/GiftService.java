@@ -172,8 +172,8 @@ public class GiftService {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.UPDATE);
 
-        if (foundGift.isSent()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot edit a gift that has been sent");
+        if (foundGift.isSubmitted()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot edit a gift that has been submitted");
         }
 
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
@@ -185,6 +185,22 @@ public class GiftService {
         GiftTrackingEntity giftTrackingToUpdate = foundGift.getGiftTrackingEntity();
         giftTrackingToUpdate.setDateUpdated(PortalDateTimeUtils.getCurrentDateTimeUTC());
         giftTrackingRepository.save(giftTrackingToUpdate);
+    }
+
+    @Transactional
+    public void discardDraftGift(UUID giftId) {
+        GiftEntity foundGift = giftRepository.findById(giftId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.UPDATE);
+
+        if (foundGift.isSubmitted()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot discard a gift that has been submitted");
+        }
+
+        // Tracking and tracking-details will cascade on delete
+        giftRepository.delete(foundGift);
     }
 
     private void saveDetails(GiftEntity savedGift, DraftGiftRequestModel requestModel) {

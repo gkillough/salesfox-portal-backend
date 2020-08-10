@@ -14,8 +14,8 @@ import java.util.UUID;
 public class GiftController {
     public static final String BASE_ENDPOINT = "/gifts";
 
-    private GiftService giftService;
-    private GiftProcessingService giftProcessingService;
+    private final GiftService giftService;
+    private final GiftProcessingService giftProcessingService;
 
     @Autowired
     public GiftController(GiftService giftService, GiftProcessingService giftProcessingService) {
@@ -41,6 +41,11 @@ public class GiftController {
     @PutMapping("/{giftId}")
     public void updateDraftGift(@PathVariable UUID giftId, @RequestBody DraftGiftRequestModel requestModel) {
         giftService.updateDraftGift(giftId, requestModel);
+    }
+
+    @PostMapping("/{giftId}/discard")
+    public void discardDraftGift(@PathVariable UUID giftId) {
+        giftService.discardDraftGift(giftId);
     }
 
     @PostMapping("/{giftId}/send")
