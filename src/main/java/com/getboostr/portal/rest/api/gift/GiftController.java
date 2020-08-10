@@ -48,9 +48,14 @@ public class GiftController {
         giftService.discardDraftGift(giftId);
     }
 
-    @PostMapping("/{giftId}/send")
-    public GiftResponseModel sendGift(@PathVariable UUID giftId) {
-        return giftProcessingService.sendGift(giftId);
+    @PostMapping("/{giftId}/submit")
+    public GiftResponseModel submitGift(@PathVariable UUID giftId) {
+        return giftProcessingService.submitGift(giftId);
+    }
+
+    @PostMapping("/{giftId}/cancel")
+    public GiftResponseModel cancelGift(@PathVariable UUID giftId) {
+        return giftProcessingService.cancelGift(giftId);
     }
 
     @PostMapping("/{giftId}/status")

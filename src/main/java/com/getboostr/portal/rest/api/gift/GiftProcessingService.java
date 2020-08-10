@@ -38,6 +38,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -68,14 +69,14 @@ public class GiftProcessingService {
     }
 
     @Transactional
-    public GiftResponseModel sendGift(UUID giftId) {
+    public GiftResponseModel submitGift(UUID giftId) {
         GiftEntity foundGift = giftRepository.findById(giftId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.INTERACT);
 
-        if (foundGift.isSubmitted()) {
+        if (!foundGift.isSubmittable()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This gift has already been submitted");
         }
 
@@ -93,6 +94,25 @@ public class GiftProcessingService {
 
         updateGiftTrackingInfo(foundGift, loggedInUser, GiftTrackingStatus.SUBMITTED.name());
         contactInteractionsUtility.addContactInteraction(loggedInUser, foundGift.getContactId(), InteractionMedium.MAIL, InteractionClassification.OUTGOING, "(Auto-generated) Sent gift/note");
+        return GiftResponseModelUtils.convertToResponseModel(foundGift);
+    }
+
+    @Transactional
+    // TODO consider changing this to "requestCancellation" in case the distributor cannot complete the order
+    public GiftResponseModel cancelGift(UUID giftId) {
+        GiftEntity foundGift = giftRepository.findById(giftId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.INTERACT);
+
+        GiftTrackingEntity giftTracking = foundGift.getGiftTrackingEntity();
+        if (!foundGift.isCancellable()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("This gift cannot be cancelled because its status is: %s", giftTracking.getStatus()));
+        }
+
+        // TODO notify distributor(s)
+        updateGiftTrackingInfo(foundGift, loggedInUser, GiftTrackingStatus.CANCELLED.name());
         return GiftResponseModelUtils.convertToResponseModel(foundGift);
     }
 
@@ -122,18 +142,19 @@ public class GiftProcessingService {
     public GiftResponseModel updateGiftTrackingDetail(UUID giftId, UpdateGiftTrackingDetailRequestModel requestModel) {
         GiftEntity foundGift = giftRepository.findById(giftId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (!foundGift.isSubmitted()) {
+        if (foundGift.isSubmittable()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This gift has not been submitted");
         }
         validateUpdateGiftTrackingDetailRequestModel(requestModel);
 
-        GiftTrackingDetailEntity trackingDetailToSave = giftTrackingDetailRepository.findById(giftId)
+        GiftTrackingDetailEntity trackingDetailToSave = Optional.ofNullable(foundGift.getGiftTrackingDetailEntity())
                 .orElseGet(() -> new GiftTrackingDetailEntity(giftId, null, null));
         trackingDetailToSave.setDistributor(requestModel.getDistributor());
         trackingDetailToSave.setTrackingNumber(requestModel.getTrackingId());
 
         GiftTrackingDetailEntity savedTrackingDetail = giftTrackingDetailRepository.save(trackingDetailToSave);
         foundGift.setGiftTrackingDetailEntity(savedTrackingDetail);
+        foundGift.getGiftTrackingEntity().setGiftTrackingDetailEntity(savedTrackingDetail);
 
         return GiftResponseModelUtils.convertToResponseModel(foundGift);
     }

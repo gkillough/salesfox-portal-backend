@@ -83,8 +83,12 @@ public class GiftEntity implements Serializable {
         this.contactId = contactId;
     }
 
-    public boolean isSubmitted() {
-        return !isDraft() && !isScheduled();
+    public boolean isSubmittable() {
+        return isDraft() || isScheduled();
+    }
+
+    public boolean isCancellable() {
+        return isSubmitted() || isPackaged();
     }
 
     public boolean isDraft() {
@@ -93,6 +97,18 @@ public class GiftEntity implements Serializable {
 
     public boolean isScheduled() {
         return hasStatus(GiftTrackingStatus.SCHEDULED);
+    }
+
+    public boolean isSubmitted() {
+        return hasStatus(GiftTrackingStatus.SUBMITTED);
+    }
+
+    public boolean isPackaged() {
+        return hasStatus(GiftTrackingStatus.PACKAGED);
+    }
+
+    public boolean isCancelled() {
+        return hasStatus(GiftTrackingStatus.CANCELLED);
     }
 
     public boolean hasStatus(GiftTrackingStatus status) {

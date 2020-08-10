@@ -172,7 +172,7 @@ public class GiftService {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.UPDATE);
 
-        if (foundGift.isSubmitted()) {
+        if (!foundGift.isSubmittable()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot edit a gift that has been submitted");
         }
 
@@ -195,7 +195,7 @@ public class GiftService {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.UPDATE);
 
-        if (foundGift.isSubmitted()) {
+        if (!foundGift.isSubmittable()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot discard a gift that has been submitted");
         }
 
