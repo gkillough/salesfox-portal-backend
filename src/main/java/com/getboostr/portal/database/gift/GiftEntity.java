@@ -1,5 +1,6 @@
 package com.getboostr.portal.database.gift;
 
+import com.getboostr.portal.common.enumeration.GiftTrackingStatus;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.contact.OrganizationAccountContactEntity;
 import com.getboostr.portal.database.gift.customization.GiftCustomIconDetailEntity;
@@ -14,6 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -80,6 +82,22 @@ public class GiftEntity implements Serializable {
         this.giftId = giftId;
         this.requestingUserId = requestingUserId;
         this.contactId = contactId;
+    }
+
+    public boolean isSent() {
+        return !isDraft() && !isScheduled();
+    }
+
+    public boolean isDraft() {
+        return hasStatus(GiftTrackingStatus.DRAFT);
+    }
+
+    public boolean isScheduled() {
+        return hasStatus(GiftTrackingStatus.SCHEDULED);
+    }
+
+    public boolean hasStatus(@NotNull GiftTrackingStatus status) {
+        return giftTrackingEntity != null && status.name().equals(giftTrackingEntity.getStatus());
     }
 
 }

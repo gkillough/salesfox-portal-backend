@@ -213,7 +213,7 @@ databaseChangeLog:
                   name: status
                   type: character varying
               - column:
-                  name: date_submitted
+                  name: date_created
                   type: timestamp with timezone
               - column:
                   name: date_updated

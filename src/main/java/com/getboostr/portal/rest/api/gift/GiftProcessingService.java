@@ -57,7 +57,7 @@ public class GiftProcessingService {
     public GiftProcessingService(GiftRepository giftRepository, GiftTrackingRepository giftTrackingRepository, GiftTrackingDetailRepository giftTrackingDetailRepository,
                                  InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository,
                                  GiftAccessService giftAccessService, HttpSafeUserMembershipRetrievalService membershipRetrievalService,
-                                 ContactInteractionRepository interactionRepository, ContactInteractionRepository contactInteractionRepository, OrganizationAccountContactRepository contactRepository) {
+                                 ContactInteractionRepository contactInteractionRepository, OrganizationAccountContactRepository contactRepository) {
         this.giftRepository = giftRepository;
         this.giftTrackingRepository = giftTrackingRepository;
         this.giftTrackingDetailRepository = giftTrackingDetailRepository;
@@ -75,8 +75,8 @@ public class GiftProcessingService {
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.INTERACT);
-        
-        if (giftTrackingRepository.existsById(giftId)) {
+
+        if (foundGift.isSent()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This gift has already been sent");
         }
 
@@ -92,11 +92,11 @@ public class GiftProcessingService {
             }
         }
 
-        OffsetDateTime currentDateTime = PortalDateTimeUtils.getCurrentDateTimeUTC();
-        String trackingStatus = GiftTrackingStatus.SUBMITTED.name();
-
-        GiftTrackingEntity giftTrackingToSave = new GiftTrackingEntity(giftId, trackingStatus, loggedInUser.getUserId(), currentDateTime, currentDateTime);
-        GiftTrackingEntity savedGiftTracking = giftTrackingRepository.save(giftTrackingToSave);
+        GiftTrackingEntity giftTrackingToUpdate = foundGift.getGiftTrackingEntity();
+        giftTrackingToUpdate.setStatus(GiftTrackingStatus.SUBMITTED.name());
+        giftTrackingToUpdate.setUpdatedByUserId(loggedInUser.getUserId());
+        giftTrackingToUpdate.setDateUpdated(PortalDateTimeUtils.getCurrentDateTimeUTC());
+        GiftTrackingEntity savedGiftTracking = giftTrackingRepository.save(giftTrackingToUpdate);
         foundGift.setGiftTrackingEntity(savedGiftTracking);
 
         contactInteractionsUtility.addContactInteraction(loggedInUser, foundGift.getContactId(), InteractionMedium.MAIL, InteractionClassification.OUTGOING, "(Auto-generated) Sent gift/note");
@@ -136,7 +136,7 @@ public class GiftProcessingService {
     public GiftResponseModel updateGiftTrackingDetail(UUID giftId, UpdateGiftTrackingDetailRequestModel requestModel) {
         GiftEntity foundGift = giftRepository.findById(giftId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (!giftTrackingRepository.existsById(giftId)) {
+        if (!foundGift.isSent()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This gift has not been sent");
         }
         validateUpdateGiftTrackingDetailRequestModel(requestModel);

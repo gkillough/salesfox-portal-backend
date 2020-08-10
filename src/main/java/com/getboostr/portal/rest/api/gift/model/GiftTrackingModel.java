@@ -15,7 +15,7 @@ public class GiftTrackingModel {
     private String distributor;
     private String trackingId;
     private UUID updatedByUserId;
-    private OffsetDateTime dateSubmitted;
+    private OffsetDateTime dateCreated;
     private OffsetDateTime dateUpdated;
 
 }

@@ -1,6 +1,8 @@
 package com.getboostr.portal.rest.api.gift;
 
 import com.getboostr.portal.common.enumeration.AccessOperation;
+import com.getboostr.portal.common.enumeration.GiftTrackingStatus;
+import com.getboostr.portal.common.time.PortalDateTimeUtils;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.catalogue.item.CatalogueItemRepository;
@@ -28,6 +30,7 @@ import com.getboostr.portal.database.gift.restriction.GiftOrgAccountRestrictionE
 import com.getboostr.portal.database.gift.restriction.GiftOrgAccountRestrictionRepository;
 import com.getboostr.portal.database.gift.restriction.GiftUserRestrictionEntity;
 import com.getboostr.portal.database.gift.restriction.GiftUserRestrictionRepository;
+import com.getboostr.portal.database.gift.tracking.GiftTrackingEntity;
 import com.getboostr.portal.database.gift.tracking.GiftTrackingRepository;
 import com.getboostr.portal.database.note.NoteEntity;
 import com.getboostr.portal.database.note.NoteRepository;
@@ -48,6 +51,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -138,8 +142,11 @@ public class GiftService {
 
         GiftEntity giftToSave = new GiftEntity(null, loggedInUser.getUserId(), requestModel.getContactId());
         GiftEntity savedGift = giftRepository.save(giftToSave);
-
         saveDetails(savedGift, requestModel);
+
+        OffsetDateTime dateCreated = PortalDateTimeUtils.getCurrentDateTimeUTC();
+        GiftTrackingEntity giftTrackingToSave = new GiftTrackingEntity(savedGift.getGiftId(), GiftTrackingStatus.DRAFT.name(), loggedInUser.getUserId(), dateCreated, dateCreated);
+        giftTrackingRepository.save(giftTrackingToSave);
 
         if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
             GiftUserRestrictionEntity userRestrictionToSave = new GiftUserRestrictionEntity(savedGift.getGiftId(), loggedInUser.getUserId());
@@ -164,7 +171,7 @@ public class GiftService {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.UPDATE);
 
-        if (giftTrackingRepository.existsById(giftId)) {
+        if (foundGift.isSent()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot edit a gift that has been sent");
         }
 
@@ -173,6 +180,10 @@ public class GiftService {
 
         foundGift.setContactId(requestModel.getContactId());
         saveDetails(foundGift, requestModel);
+
+        GiftTrackingEntity giftTrackingToUpdate = foundGift.getGiftTrackingEntity();
+        giftTrackingToUpdate.setDateUpdated(PortalDateTimeUtils.getCurrentDateTimeUTC());
+        giftTrackingRepository.save(giftTrackingToUpdate);
     }
 
     private void saveDetails(GiftEntity savedGift, DraftGiftRequestModel requestModel) {

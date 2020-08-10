@@ -25,8 +25,8 @@ public class GiftTrackingEntity implements Serializable {
     @Column(name = "updated_by_user_id")
     private UUID updatedByUserId;
 
-    @Column(name = "date_submitted")
-    private OffsetDateTime dateSubmitted;
+    @Column(name = "date_created")
+    private OffsetDateTime dateCreated;
 
     @Column(name = "date_updated")
     private OffsetDateTime dateUpdated;
@@ -35,11 +35,11 @@ public class GiftTrackingEntity implements Serializable {
     @JoinColumn(name = "gift_id", referencedColumnName = "gift_id")
     private GiftTrackingDetailEntity giftTrackingDetailEntity;
 
-    public GiftTrackingEntity(UUID giftId, String status, UUID updatedByUserId, OffsetDateTime dateSubmitted, OffsetDateTime dateUpdated) {
+    public GiftTrackingEntity(UUID giftId, String status, UUID updatedByUserId, OffsetDateTime dateCreated, OffsetDateTime dateUpdated) {
         this.giftId = giftId;
         this.status = status;
         this.updatedByUserId = updatedByUserId;
-        this.dateSubmitted = dateSubmitted;
+        this.dateCreated = dateCreated;
         this.dateUpdated = dateUpdated;
     }
 

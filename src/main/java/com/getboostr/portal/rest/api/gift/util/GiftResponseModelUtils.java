@@ -42,21 +42,21 @@ public class GiftResponseModelUtils {
     public static GiftTrackingModel createTrackingModel(@Nullable GiftTrackingEntity giftTracking) {
         String status = GiftTrackingStatus.DRAFT.name();
         UUID updatedByUserId = null;
-        OffsetDateTime dateSubmitted = null;
+        OffsetDateTime dateCreated = null;
         OffsetDateTime dateUpdated = null;
         String distributor = null;
         String trackingNumber = null;
         if (giftTracking != null) {
             status = giftTracking.getStatus();
             updatedByUserId = giftTracking.getUpdatedByUserId();
-            dateSubmitted = giftTracking.getDateSubmitted();
+            dateCreated = giftTracking.getDateCreated();
             dateUpdated = giftTracking.getDateUpdated();
             if (giftTracking.getGiftTrackingDetailEntity() != null) {
                 distributor = giftTracking.getGiftTrackingDetailEntity().getDistributor();
                 trackingNumber = giftTracking.getGiftTrackingDetailEntity().getTrackingNumber();
             }
         }
-        return new GiftTrackingModel(status, distributor, trackingNumber, updatedByUserId, dateSubmitted, dateUpdated);
+        return new GiftTrackingModel(status, distributor, trackingNumber, updatedByUserId, dateCreated, dateUpdated);
     }
 
     private static <E> UUID extractDetailIdOrNull(E detailEntity, Function<E, UUID> getter) {

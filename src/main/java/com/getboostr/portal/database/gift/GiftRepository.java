@@ -15,11 +15,13 @@ public interface GiftRepository extends JpaRepository<GiftEntity, UUID> {
             " FROM GiftEntity gift" +
             " LEFT JOIN gift.giftOrgAccountRestrictionEntity orgAcctRestriction" +
             " LEFT JOIN gift.giftUserRestrictionEntity userRestriction" +
+            " LEFT JOIN gift.giftTrackingEntity tracking" +
             " WHERE (" +
             "   (orgAcctRestriction != NULL AND orgAcctRestriction.orgAccountId = :orgAcctId)" +
             "   OR" +
             "   (userRestriction != NULL AND userRestriction.userId = :userId)" +
-            " )"
+            " )" +
+            " ORDER BY tracking.dateCreated"
     )
     Page<GiftEntity> findAccessibleGifts(@Param("orgAcctId") UUID orgAcctId, @Param("userId") UUID userId, Pageable pageable);
 
