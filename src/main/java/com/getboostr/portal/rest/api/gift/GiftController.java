@@ -24,8 +24,12 @@ public class GiftController {
     }
 
     @GetMapping
-    public MultiGiftModel getGifts(@RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset, @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit) {
-        return giftService.getGifts(offset, limit);
+    public MultiGiftModel getGifts(
+            @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset,
+            @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit,
+            @RequestParam(required = false) String status
+    ) {
+        return giftService.getGifts(offset, limit, status);
     }
 
     @GetMapping("/{giftId}")

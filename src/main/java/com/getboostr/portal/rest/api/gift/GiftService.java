@@ -43,19 +43,18 @@ import com.getboostr.portal.rest.api.gift.model.MultiGiftModel;
 import com.getboostr.portal.rest.api.gift.util.GiftAccessService;
 import com.getboostr.portal.rest.api.gift.util.GiftResponseModelUtils;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -112,9 +111,13 @@ public class GiftService {
         this.membershipRetrievalService = membershipRetrievalService;
     }
 
-    public MultiGiftModel getGifts(Integer pageOffset, Integer pageLimit) {
+    public MultiGiftModel getGifts(Integer pageOffset, Integer pageLimit, String giftStatus) {
         PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
-        Page<GiftEntity> accessibleGifts = getAccessibleGifts(pageOffset, pageLimit);
+        if (null != giftStatus && !EnumUtils.isValidEnum(GiftTrackingStatus.class, giftStatus)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The status [%s] is invalid. Valid statuses: %s", giftStatus, Arrays.toString(GiftTrackingStatus.values())));
+        }
+
+        Page<GiftEntity> accessibleGifts = getAccessibleGifts(pageOffset, pageLimit, giftStatus);
         if (accessibleGifts.isEmpty()) {
             return MultiGiftModel.empty();
         }
@@ -229,7 +232,7 @@ public class GiftService {
         }
     }
 
-    private Page<GiftEntity> getAccessibleGifts(Integer pageOffset, Integer pageLimit) {
+    private Page<GiftEntity> getAccessibleGifts(Integer pageOffset, Integer pageLimit, @Nullable String giftStatus) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
         if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return giftRepository.findAll(pageRequest);
@@ -237,7 +240,7 @@ public class GiftService {
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
-        return giftRepository.findAccessibleGifts(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), pageRequest);
+        return giftRepository.findAccessibleGiftsByStatus(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), giftStatus, pageRequest);
     }
 
     // TODO clean this method up after a common restriction interface is implemented
