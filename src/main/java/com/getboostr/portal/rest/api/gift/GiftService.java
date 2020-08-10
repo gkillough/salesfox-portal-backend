@@ -146,7 +146,8 @@ public class GiftService {
 
         OffsetDateTime dateCreated = PortalDateTimeUtils.getCurrentDateTimeUTC();
         GiftTrackingEntity giftTrackingToSave = new GiftTrackingEntity(savedGift.getGiftId(), GiftTrackingStatus.DRAFT.name(), loggedInUser.getUserId(), dateCreated, dateCreated);
-        giftTrackingRepository.save(giftTrackingToSave);
+        GiftTrackingEntity savedGiftTracking = giftTrackingRepository.save(giftTrackingToSave);
+        savedGift.setGiftTrackingEntity(savedGiftTracking);
 
         if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
             GiftUserRestrictionEntity userRestrictionToSave = new GiftUserRestrictionEntity(savedGift.getGiftId(), loggedInUser.getUserId());

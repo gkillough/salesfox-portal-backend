@@ -14,7 +14,7 @@ import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import com.getboostr.portal.rest.api.customization.icon.model.CustomIconRequestModel;
 import com.getboostr.portal.rest.api.customization.icon.model.CustomIconResponseModel;
 import com.getboostr.portal.rest.api.customization.icon.model.MultiCustomIconResponseModel;
-import com.getboostr.portal.rest.api.user.common.model.ViewUserModel;
+import com.getboostr.portal.rest.api.user.common.model.UserSummaryModel;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,8 +138,8 @@ public class CustomIconService {
     }
 
     private CustomIconResponseModel convertToResponseModel(CustomIconEntity entity) {
-        ViewUserModel uploaderModel = Optional.ofNullable(entity.getUploaderEntity())
-                .map(ViewUserModel::fromEntity)
+        UserSummaryModel uploaderModel = Optional.ofNullable(entity.getUploaderEntity())
+                .map(UserSummaryModel::fromEntity)
                 .orElse(null);
 
         RestrictionModel restrictionModel = new RestrictionModel();

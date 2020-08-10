@@ -1,5 +1,6 @@
 package com.getboostr.portal.database.gift.tracking;
 
+import com.getboostr.portal.database.account.entity.UserEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -32,7 +33,11 @@ public class GiftTrackingEntity implements Serializable {
     private OffsetDateTime dateUpdated;
 
     @OneToOne
-    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id")
+    @JoinColumn(name = "updated_by_user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
+    private UserEntity updatedByUserEntity;
+
+    @OneToOne
+    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", insertable = false, updatable = false)
     private GiftTrackingDetailEntity giftTrackingDetailEntity;
 
     public GiftTrackingEntity(UUID giftId, String status, UUID updatedByUserId, OffsetDateTime dateCreated, OffsetDateTime dateUpdated) {

@@ -14,7 +14,7 @@ import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import com.getboostr.portal.rest.api.note.model.MultiNoteModel;
 import com.getboostr.portal.rest.api.note.model.NoteRequestModel;
 import com.getboostr.portal.rest.api.note.model.NoteResponseModel;
-import com.getboostr.portal.rest.api.user.common.model.ViewUserModel;
+import com.getboostr.portal.rest.api.user.common.model.UserSummaryModel;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -146,7 +146,7 @@ public class NoteService {
     }
 
     private NoteResponseModel convertToResponseModel(NoteEntity entity) {
-        ViewUserModel updatedByUser = ViewUserModel.fromEntity(entity.getUpdatedByUserEntity());
+        UserSummaryModel updatedByUser = UserSummaryModel.fromEntity(entity.getUpdatedByUserEntity());
 
         NoteOrganizationAccountRestrictionEntity orgAcctRestriction = entity.getNoteOrganizationAccountRestrictionEntity();
         NoteUserRestrictionEntity userRestriction = entity.getNoteUserRestrictionEntity();

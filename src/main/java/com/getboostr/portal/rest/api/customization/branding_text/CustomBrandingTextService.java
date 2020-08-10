@@ -14,7 +14,7 @@ import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import com.getboostr.portal.rest.api.customization.branding_text.model.CustomBrandingTextRequestModel;
 import com.getboostr.portal.rest.api.customization.branding_text.model.CustomBrandingTextResponseModel;
 import com.getboostr.portal.rest.api.customization.branding_text.model.MultiCustomBrandingTextModel;
-import com.getboostr.portal.rest.api.user.common.model.ViewUserModel;
+import com.getboostr.portal.rest.api.user.common.model.UserSummaryModel;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -158,8 +158,8 @@ public class CustomBrandingTextService {
     }
 
     private CustomBrandingTextResponseModel createResponseModel(CustomBrandingTextEntity entity) {
-        ViewUserModel uploaderModel = Optional.ofNullable(entity.getUploaderEntity())
-                .map(ViewUserModel::fromEntity)
+        UserSummaryModel uploaderModel = Optional.ofNullable(entity.getUploaderEntity())
+                .map(UserSummaryModel::fromEntity)
                 .orElse(null);
 
         RestrictionModel restrictionModel = new RestrictionModel();

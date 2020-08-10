@@ -10,14 +10,14 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ViewUserModel {
+public class UserSummaryModel {
     private UUID userId;
     private String firstName;
     private String lastName;
     private String email;
 
-    public static ViewUserModel fromEntity(UserEntity userEntity) {
-        return new ViewUserModel(userEntity.getUserId(), userEntity.getFirstName(), userEntity.getLastName(), userEntity.getEmail());
+    public static UserSummaryModel fromEntity(UserEntity userEntity) {
+        return new UserSummaryModel(userEntity.getUserId(), userEntity.getFirstName(), userEntity.getLastName(), userEntity.getEmail());
     }
 
 }

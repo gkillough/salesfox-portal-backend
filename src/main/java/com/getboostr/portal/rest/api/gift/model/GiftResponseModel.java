@@ -2,7 +2,7 @@ package com.getboostr.portal.rest.api.gift.model;
 
 import com.getboostr.portal.rest.api.common.model.request.RestrictionModel;
 import com.getboostr.portal.rest.api.contact.model.ContactSummaryModel;
-import com.getboostr.portal.rest.api.user.common.model.ViewUserModel;
+import com.getboostr.portal.rest.api.user.common.model.UserSummaryModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class GiftResponseModel {
     private UUID giftId;
-    private ViewUserModel requestingUser;
+    private UserSummaryModel requestingUser;
     private ContactSummaryModel contact;
     private UUID noteId;
     private UUID itemId;
