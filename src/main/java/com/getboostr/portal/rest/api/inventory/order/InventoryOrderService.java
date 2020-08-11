@@ -7,7 +7,6 @@ import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.catalogue.item.CatalogueItemEntity;
 import com.getboostr.portal.database.catalogue.item.CatalogueItemRepository;
-import com.getboostr.portal.database.catalogue.restriction.CatalogueItemOrganizationAccountRestrictionRepository;
 import com.getboostr.portal.database.inventory.InventoryEntity;
 import com.getboostr.portal.database.inventory.InventoryRepository;
 import com.getboostr.portal.database.inventory.item.InventoryItemEntity;
@@ -39,8 +38,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -49,7 +46,6 @@ public class InventoryOrderService {
     private final InventoryOrderRequestRepository orderRequestRepository;
     private final InventoryOrderRequestStatusRepository orderRequestStatusRepository;
     private final CatalogueItemRepository catalogueItemRepository;
-    private final CatalogueItemOrganizationAccountRestrictionRepository catalogueItemOrganizationAccountRestrictionRepository;
     private final InventoryRepository inventoryRepository;
     private final InventoryItemRepository inventoryItemRepository;
     private final InventoryAccessService inventoryAccessService;
@@ -57,12 +53,11 @@ public class InventoryOrderService {
 
     @Autowired
     public InventoryOrderService(InventoryOrderRequestRepository orderRequestRepository, InventoryOrderRequestStatusRepository orderRequestStatusRepository,
-                                 CatalogueItemRepository catalogueItemRepository, CatalogueItemOrganizationAccountRestrictionRepository catalogueItemOrganizationAccountRestrictionRepository,
-                                 InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository, InventoryAccessService inventoryAccessService, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+                                 CatalogueItemRepository catalogueItemRepository, InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository,
+                                 InventoryAccessService inventoryAccessService, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.orderRequestRepository = orderRequestRepository;
         this.orderRequestStatusRepository = orderRequestStatusRepository;
         this.catalogueItemRepository = catalogueItemRepository;
-        this.catalogueItemOrganizationAccountRestrictionRepository = catalogueItemOrganizationAccountRestrictionRepository;
         this.inventoryRepository = inventoryRepository;
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryAccessService = inventoryAccessService;
@@ -79,28 +74,15 @@ public class InventoryOrderService {
             return MultiInventoryOrderModel.empty();
         }
 
-        Set<UUID> relatedInventoryIds = new HashSet<>();
-        Set<UUID> relatedCatalogueItemIds = new HashSet<>();
-        Set<UUID> relatedOrderStatuses = new HashSet<>();
-        for (InventoryOrderRequestEntity order : accessibleOrderRequests) {
-            relatedInventoryIds.add(order.getInventoryId());
-            relatedCatalogueItemIds.add(order.getCatalogueItemId());
-            relatedOrderStatuses.add(order.getOrderId());
-        }
-
-        Map<UUID, InventoryEntity> inventoryCache = createIdToEntityCache(() -> inventoryRepository.findAllById(relatedInventoryIds), InventoryEntity::getInventoryId);
-        Map<UUID, CatalogueItemEntity> catalogueItemCache = createIdToEntityCache(() -> catalogueItemRepository.findAllById(relatedCatalogueItemIds), CatalogueItemEntity::getItemId);
-        Map<UUID, InventoryOrderRequestStatusEntity> orderStatusCache = createIdToEntityCache(() -> orderRequestStatusRepository.findAllByOrderIdIn(relatedOrderStatuses), InventoryOrderRequestStatusEntity::getOrderId);
-
         List<InventoryOrderResponseModel> responseModels = accessibleOrderRequests
                 .stream()
-                .map(order -> convertToResponseModel(order, inventoryCache.get(order.getInventoryId()), catalogueItemCache.get(order.getCatalogueItemId()), orderStatusCache.get(order.getOrderId())))
+                .map(this::convertToResponseModel)
                 .collect(Collectors.toList());
         return new MultiInventoryOrderModel(responseModels, accessibleOrderRequests);
     }
 
     public InventoryOrderResponseModel getOrder(UUID inventoryId, UUID orderId) {
-        InventoryEntity foundInventory = findInventoryAndValidateAccess(inventoryId);
+        findInventoryAndValidateAccess(inventoryId);
         InventoryOrderRequestEntity foundOrder = orderRequestRepository.findById(orderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -108,13 +90,10 @@ public class InventoryOrderService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", foundOrder.getCatalogueItemId())));
         validateReadAccess(foundOrder, targetItem);
 
-        InventoryOrderRequestStatusEntity targetStatus = orderRequestStatusRepository.findByOrderId(foundOrder.getOrderId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No order request status item with the id [%s] exists", foundOrder.getOrderId())));
-
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         validateItemAccess(loggedInUser, targetItem);
 
-        return convertToResponseModel(foundOrder, foundInventory, targetItem, targetStatus);
+        return convertToResponseModel(foundOrder);
     }
 
     @Transactional
@@ -123,14 +102,15 @@ public class InventoryOrderService {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         String userRoleLevel = userMembership.getRoleEntity().getRoleLevel();
-        validateSubmitOrderAccess(userRoleLevel);
 
+        validateSubmitOrderAccess(userRoleLevel);
         validateOrderRequest(requestModel);
 
         CatalogueItemEntity targetItem = catalogueItemRepository.findById(requestModel.getCatalogueItemId())
                 .filter(CatalogueItemEntity::getIsActive)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", requestModel.getCatalogueItemId())));
         validateItemAccess(loggedInUser, targetItem);
+        validateItemQuantity(targetItem, requestModel.getQuantity());
 
         InventoryOrderRequestEntity orderToSave = new InventoryOrderRequestEntity(
                 null,
@@ -144,15 +124,20 @@ public class InventoryOrderService {
         );
         InventoryOrderRequestEntity savedOrder = orderRequestRepository.save(orderToSave);
 
+        savedOrder.setCatalogueItemEntity(targetItem);
+        savedOrder.setInventoryEntity(foundInventory);
+
         String processingStatus = InventoryOrderRequestStatus.SUBMITTED.name();
         OffsetDateTime orderDateTime = PortalDateTimeUtils.getCurrentDateTimeUTC();
         InventoryOrderRequestStatusEntity statusToSave = new InventoryOrderRequestStatusEntity(null, savedOrder.getOrderId(), loggedInUser.getUserId(), processingStatus, orderDateTime, orderDateTime);
         InventoryOrderRequestStatusEntity savedStatus = orderRequestStatusRepository.save(statusToSave);
+        savedOrder.setInventoryOrderRequestStatusEntity(savedStatus);
 
-        return convertToResponseModel(savedOrder, foundInventory, targetItem, savedStatus);
+        return convertToResponseModel(savedOrder);
     }
 
     @Transactional
+    // TODO clean this method up
     public void processOrder(UUID inventoryId, UUID orderId, InventoryOrderProcessingRequestModel requestModel) {
         findInventoryAndValidateAccess(inventoryId);
         InventoryOrderRequestEntity foundOrder = orderRequestRepository.findById(orderId)
@@ -177,10 +162,17 @@ public class InventoryOrderService {
 
         InventoryOrderRequestStatus newOrderStatus = InventoryOrderRequestStatus.valueOf(requestModel.getNewStatus());
         if (InventoryOrderRequestStatus.COMPLETED.equals(newOrderStatus)) {
+            CatalogueItemEntity orderedItem = foundOrder.getCatalogueItemEntity();
+            validateItemQuantity(orderedItem, foundOrder.getQuantity());
+
             InventoryItemEntity itemToSave = findOrCreateInventoryItemEntity(foundOrder);
             Long newInventoryItemQuantity = Math.addExact(itemToSave.getQuantity(), foundOrder.getQuantity());
             itemToSave.setQuantity(newInventoryItemQuantity);
             inventoryItemRepository.save(itemToSave);
+
+            Long newCatalogItemQuantity = Math.subtractExact(orderedItem.getQuantity(), foundOrder.getQuantity());
+            orderedItem.setQuantity(newCatalogItemQuantity);
+            catalogueItemRepository.save(orderedItem);
         }
 
         orderStatusEntity.setDateUpdated(PortalDateTimeUtils.getCurrentDateTimeUTC());
@@ -239,6 +231,12 @@ public class InventoryOrderService {
         }
     }
 
+    private void validateItemQuantity(CatalogueItemEntity catalogueItem, Integer orderQuantity) {
+        if (catalogueItem.getQuantity() < orderQuantity) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The requested quantity is more than the available quantity");
+        }
+    }
+
     private boolean isPortalIndividualAccount(String roleLevel) {
         return PortalAuthorityConstants.PORTAL_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(roleLevel);
     }
@@ -270,22 +268,17 @@ public class InventoryOrderService {
                 .orElseGet(() -> new InventoryItemEntity(orderEntity.getCatalogueItemId(), orderEntity.getInventoryId(), 0L));
     }
 
-    private <T> Map<UUID, T> createIdToEntityCache(Supplier<List<T>> findEntitiesSupplier, Function<T, UUID> keyMapper) {
-        return findEntitiesSupplier.get()
-                .stream()
-                .collect(Collectors.toMap(keyMapper, Function.identity()));
-    }
-
-    private InventoryOrderResponseModel convertToResponseModel(InventoryOrderRequestEntity entity, InventoryEntity foundInventory, CatalogueItemEntity foundCatalogueItem, InventoryOrderRequestStatusEntity foundOrderStatus) {
+    private InventoryOrderResponseModel convertToResponseModel(InventoryOrderRequestEntity entity) {
         BigDecimal bigDecimalQuantity = new BigDecimal(entity.getQuantity());
         BigDecimal totalPrice = entity.getItemPrice().multiply(bigDecimalQuantity);
+        InventoryOrderRequestStatusEntity foundOrderStatus = entity.getInventoryOrderRequestStatusEntity();
         return new InventoryOrderResponseModel(
                 entity.getOrderId(),
                 entity.getOrganizationAccountId(),
                 entity.getRequestingUserId(),
-                foundInventory.getInventoryId(),
-                foundCatalogueItem.getItemId(),
-                foundCatalogueItem.getName(),
+                entity.getInventoryId(),
+                entity.getCatalogueItemId(),
+                entity.getCatalogueItemEntity().getName(),
                 entity.getQuantity(),
                 entity.getItemPrice(),
                 totalPrice,
