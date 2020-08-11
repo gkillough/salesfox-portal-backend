@@ -98,7 +98,7 @@ public class GiftProcessingService {
     }
 
     @Transactional
-    // TODO consider changing this to "requestCancellation" in case the distributor cannot complete the order
+    // TODO consider changing this to "requestCancellation" in case the distributor cannot cancel the order in time
     public GiftResponseModel cancelGift(UUID giftId) {
         GiftEntity foundGift = giftRepository.findById(giftId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -108,7 +108,7 @@ public class GiftProcessingService {
 
         GiftTrackingEntity giftTracking = foundGift.getGiftTrackingEntity();
         if (!foundGift.isCancellable()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("This gift cannot be cancelled because its status is: %s", giftTracking.getStatus()));
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("This gift cannot be cancelled because its status is '%s'", giftTracking.getStatus()));
         }
 
         // TODO notify distributor(s)

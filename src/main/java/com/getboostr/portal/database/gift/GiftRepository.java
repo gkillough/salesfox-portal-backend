@@ -12,7 +12,6 @@ import java.util.UUID;
 
 @Component
 public interface GiftRepository extends JpaRepository<GiftEntity, UUID> {
-
     @Query("SELECT gift" +
             " FROM GiftEntity gift" +
             " LEFT JOIN gift.giftOrgAccountRestrictionEntity orgAcctRestriction" +
