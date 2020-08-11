@@ -1,11 +1,11 @@
 package com.getboostr.portal.rest.api.gift.model;
 
+import com.getboostr.portal.rest.api.user.common.model.UserSummaryModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -14,8 +14,8 @@ public class GiftTrackingModel {
     private String status;
     private String distributor;
     private String trackingId;
-    private UUID updatedByUserId;
-    private OffsetDateTime dateSubmitted;
+    private UserSummaryModel updatedByUser;
+    private OffsetDateTime dateCreated;
     private OffsetDateTime dateUpdated;
 
 }

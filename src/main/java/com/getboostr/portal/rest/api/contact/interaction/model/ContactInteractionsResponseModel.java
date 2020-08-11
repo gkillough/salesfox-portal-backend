@@ -1,6 +1,6 @@
 package com.getboostr.portal.rest.api.contact.interaction.model;
 
-import com.getboostr.portal.rest.api.user.common.model.ViewUserModel;
+import com.getboostr.portal.rest.api.user.common.model.UserSummaryModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ContactInteractionsResponseModel {
     private UUID interactionId;
-    private ViewUserModel interactingUser;
+    private UserSummaryModel interactingUser;
     private String medium;
     private String classification;
     private LocalDate date;

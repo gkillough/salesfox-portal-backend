@@ -1,6 +1,5 @@
 package com.getboostr.portal.rest.api.gift.util;
 
-import com.getboostr.portal.common.enumeration.GiftTrackingStatus;
 import com.getboostr.portal.database.gift.GiftEntity;
 import com.getboostr.portal.database.gift.customization.GiftCustomIconDetailEntity;
 import com.getboostr.portal.database.gift.customization.GiftCustomTextDetailEntity;
@@ -13,17 +12,15 @@ import com.getboostr.portal.rest.api.common.model.request.RestrictionModel;
 import com.getboostr.portal.rest.api.contact.model.ContactSummaryModel;
 import com.getboostr.portal.rest.api.gift.model.GiftResponseModel;
 import com.getboostr.portal.rest.api.gift.model.GiftTrackingModel;
-import com.getboostr.portal.rest.api.user.common.model.ViewUserModel;
-import org.springframework.lang.Nullable;
+import com.getboostr.portal.rest.api.user.common.model.UserSummaryModel;
 
-import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
 public class GiftResponseModelUtils {
     public static GiftResponseModel convertToResponseModel(GiftEntity gift) {
-        ViewUserModel requestingUserModel = ViewUserModel.fromEntity(gift.getRequestingUserEntity());
+        UserSummaryModel requestingUserModel = UserSummaryModel.fromEntity(gift.getRequestingUserEntity());
         ContactSummaryModel contactModel = ContactSummaryModel.fromEntity(gift.getContactEntity());
 
         UUID noteId = extractDetailIdOrNull(gift.getGiftNoteDetailEntity(), GiftNoteDetailEntity::getNoteId);
@@ -39,24 +36,19 @@ public class GiftResponseModelUtils {
         return new GiftResponseModel(gift.getGiftId(), requestingUserModel, contactModel, noteId, itemId, customTextId, customIconId, trackingModel, restrictionModel);
     }
 
-    public static GiftTrackingModel createTrackingModel(@Nullable GiftTrackingEntity giftTracking) {
-        String status = GiftTrackingStatus.DRAFT.name();
-        UUID updatedByUserId = null;
-        OffsetDateTime dateSubmitted = null;
-        OffsetDateTime dateUpdated = null;
+    public static GiftTrackingModel createTrackingModel(GiftTrackingEntity giftTracking) {
         String distributor = null;
         String trackingNumber = null;
-        if (giftTracking != null) {
-            status = giftTracking.getStatus();
-            updatedByUserId = giftTracking.getUpdatedByUserId();
-            dateSubmitted = giftTracking.getDateSubmitted();
-            dateUpdated = giftTracking.getDateUpdated();
-            if (giftTracking.getGiftTrackingDetailEntity() != null) {
-                distributor = giftTracking.getGiftTrackingDetailEntity().getDistributor();
-                trackingNumber = giftTracking.getGiftTrackingDetailEntity().getTrackingNumber();
-            }
+        if (giftTracking.getGiftTrackingDetailEntity() != null) {
+            distributor = giftTracking.getGiftTrackingDetailEntity().getDistributor();
+            trackingNumber = giftTracking.getGiftTrackingDetailEntity().getTrackingNumber();
         }
-        return new GiftTrackingModel(status, distributor, trackingNumber, updatedByUserId, dateSubmitted, dateUpdated);
+
+        UserSummaryModel updatedByUser = null;
+        if (null != giftTracking.getUpdatedByUserEntity()) {
+            updatedByUser = UserSummaryModel.fromEntity(giftTracking.getUpdatedByUserEntity());
+        }
+        return new GiftTrackingModel(giftTracking.getStatus(), distributor, trackingNumber, updatedByUser, giftTracking.getDateCreated(), giftTracking.getDateUpdated());
     }
 
     private static <E> UUID extractDetailIdOrNull(E detailEntity, Function<E, UUID> getter) {

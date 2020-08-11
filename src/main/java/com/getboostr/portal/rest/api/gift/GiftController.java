@@ -14,8 +14,8 @@ import java.util.UUID;
 public class GiftController {
     public static final String BASE_ENDPOINT = "/gifts";
 
-    private GiftService giftService;
-    private GiftProcessingService giftProcessingService;
+    private final GiftService giftService;
+    private final GiftProcessingService giftProcessingService;
 
     @Autowired
     public GiftController(GiftService giftService, GiftProcessingService giftProcessingService) {
@@ -24,8 +24,12 @@ public class GiftController {
     }
 
     @GetMapping
-    public MultiGiftModel getGifts(@RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset, @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit) {
-        return giftService.getGifts(offset, limit);
+    public MultiGiftModel getGifts(
+            @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset,
+            @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit,
+            @RequestParam(required = false) String status
+    ) {
+        return giftService.getGifts(offset, limit, status);
     }
 
     @GetMapping("/{giftId}")
@@ -43,9 +47,19 @@ public class GiftController {
         giftService.updateDraftGift(giftId, requestModel);
     }
 
-    @PostMapping("/{giftId}/send")
-    public GiftResponseModel sendGift(@PathVariable UUID giftId) {
-        return giftProcessingService.sendGift(giftId);
+    @PostMapping("/{giftId}/discard")
+    public void discardDraftGift(@PathVariable UUID giftId) {
+        giftService.discardDraftGift(giftId);
+    }
+
+    @PostMapping("/{giftId}/submit")
+    public GiftResponseModel submitGift(@PathVariable UUID giftId) {
+        return giftProcessingService.submitGift(giftId);
+    }
+
+    @PostMapping("/{giftId}/cancel")
+    public GiftResponseModel cancelGift(@PathVariable UUID giftId) {
+        return giftProcessingService.cancelGift(giftId);
     }
 
     @PostMapping("/{giftId}/status")

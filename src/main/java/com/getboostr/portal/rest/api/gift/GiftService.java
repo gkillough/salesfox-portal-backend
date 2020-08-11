@@ -1,6 +1,8 @@
 package com.getboostr.portal.rest.api.gift;
 
 import com.getboostr.portal.common.enumeration.AccessOperation;
+import com.getboostr.portal.common.enumeration.GiftTrackingStatus;
+import com.getboostr.portal.common.time.PortalDateTimeUtils;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.catalogue.item.CatalogueItemRepository;
@@ -28,6 +30,7 @@ import com.getboostr.portal.database.gift.restriction.GiftOrgAccountRestrictionE
 import com.getboostr.portal.database.gift.restriction.GiftOrgAccountRestrictionRepository;
 import com.getboostr.portal.database.gift.restriction.GiftUserRestrictionEntity;
 import com.getboostr.portal.database.gift.restriction.GiftUserRestrictionRepository;
+import com.getboostr.portal.database.gift.tracking.GiftTrackingEntity;
 import com.getboostr.portal.database.gift.tracking.GiftTrackingRepository;
 import com.getboostr.portal.database.note.NoteEntity;
 import com.getboostr.portal.database.note.NoteRepository;
@@ -40,18 +43,18 @@ import com.getboostr.portal.rest.api.gift.model.MultiGiftModel;
 import com.getboostr.portal.rest.api.gift.util.GiftAccessService;
 import com.getboostr.portal.rest.api.gift.util.GiftResponseModelUtils;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.OffsetDateTime;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -108,9 +111,13 @@ public class GiftService {
         this.membershipRetrievalService = membershipRetrievalService;
     }
 
-    public MultiGiftModel getGifts(Integer pageOffset, Integer pageLimit) {
+    public MultiGiftModel getGifts(Integer pageOffset, Integer pageLimit, String giftStatus) {
         PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
-        Page<GiftEntity> accessibleGifts = getAccessibleGifts(pageOffset, pageLimit);
+        if (null != giftStatus && !EnumUtils.isValidEnum(GiftTrackingStatus.class, giftStatus)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The status [%s] is invalid. Valid statuses: %s", giftStatus, Arrays.toString(GiftTrackingStatus.values())));
+        }
+
+        Page<GiftEntity> accessibleGifts = getAccessibleGifts(pageOffset, pageLimit, giftStatus);
         if (accessibleGifts.isEmpty()) {
             return MultiGiftModel.empty();
         }
@@ -138,8 +145,12 @@ public class GiftService {
 
         GiftEntity giftToSave = new GiftEntity(null, loggedInUser.getUserId(), requestModel.getContactId());
         GiftEntity savedGift = giftRepository.save(giftToSave);
-
         saveDetails(savedGift, requestModel);
+
+        OffsetDateTime dateCreated = PortalDateTimeUtils.getCurrentDateTimeUTC();
+        GiftTrackingEntity giftTrackingToSave = new GiftTrackingEntity(savedGift.getGiftId(), GiftTrackingStatus.DRAFT.name(), loggedInUser.getUserId(), dateCreated, dateCreated);
+        GiftTrackingEntity savedGiftTracking = giftTrackingRepository.save(giftTrackingToSave);
+        savedGift.setGiftTrackingEntity(savedGiftTracking);
 
         if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
             GiftUserRestrictionEntity userRestrictionToSave = new GiftUserRestrictionEntity(savedGift.getGiftId(), loggedInUser.getUserId());
@@ -162,10 +173,10 @@ public class GiftService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.UPDATE);
+        giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.INTERACT);
 
-        if (giftTrackingRepository.existsById(giftId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot edit a gift that has been sent");
+        if (!foundGift.isSubmittable()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot edit a gift that has been submitted");
         }
 
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
@@ -173,6 +184,26 @@ public class GiftService {
 
         foundGift.setContactId(requestModel.getContactId());
         saveDetails(foundGift, requestModel);
+
+        GiftTrackingEntity giftTrackingToUpdate = foundGift.getGiftTrackingEntity();
+        giftTrackingToUpdate.setDateUpdated(PortalDateTimeUtils.getCurrentDateTimeUTC());
+        giftTrackingRepository.save(giftTrackingToUpdate);
+    }
+
+    @Transactional
+    public void discardDraftGift(UUID giftId) {
+        GiftEntity foundGift = giftRepository.findById(giftId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.INTERACT);
+
+        if (!foundGift.isSubmittable()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot discard a gift that has been submitted");
+        }
+
+        // Tracking and tracking-details will cascade on delete
+        giftRepository.delete(foundGift);
     }
 
     private void saveDetails(GiftEntity savedGift, DraftGiftRequestModel requestModel) {
@@ -201,7 +232,7 @@ public class GiftService {
         }
     }
 
-    private Page<GiftEntity> getAccessibleGifts(Integer pageOffset, Integer pageLimit) {
+    private Page<GiftEntity> getAccessibleGifts(Integer pageOffset, Integer pageLimit, @Nullable String giftStatus) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
         if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return giftRepository.findAll(pageRequest);
@@ -209,7 +240,7 @@ public class GiftService {
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
-        return giftRepository.findAccessibleGifts(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), pageRequest);
+        return giftRepository.findAccessibleGiftsByStatus(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), giftStatus, pageRequest);
     }
 
     // TODO clean this method up after a common restriction interface is implemented

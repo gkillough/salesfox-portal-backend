@@ -36,9 +36,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -57,7 +57,7 @@ public class GiftProcessingService {
     public GiftProcessingService(GiftRepository giftRepository, GiftTrackingRepository giftTrackingRepository, GiftTrackingDetailRepository giftTrackingDetailRepository,
                                  InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository,
                                  GiftAccessService giftAccessService, HttpSafeUserMembershipRetrievalService membershipRetrievalService,
-                                 ContactInteractionRepository interactionRepository, ContactInteractionRepository contactInteractionRepository, OrganizationAccountContactRepository contactRepository) {
+                                 ContactInteractionRepository contactInteractionRepository, OrganizationAccountContactRepository contactRepository) {
         this.giftRepository = giftRepository;
         this.giftTrackingRepository = giftTrackingRepository;
         this.giftTrackingDetailRepository = giftTrackingDetailRepository;
@@ -69,15 +69,15 @@ public class GiftProcessingService {
     }
 
     @Transactional
-    public GiftResponseModel sendGift(UUID giftId) {
+    public GiftResponseModel submitGift(UUID giftId) {
         GiftEntity foundGift = giftRepository.findById(giftId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.INTERACT);
-        
-        if (giftTrackingRepository.existsById(giftId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This gift has already been sent");
+
+        if (!foundGift.isSubmittable()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This gift has already been submitted");
         }
 
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
@@ -92,14 +92,27 @@ public class GiftProcessingService {
             }
         }
 
-        OffsetDateTime currentDateTime = PortalDateTimeUtils.getCurrentDateTimeUTC();
-        String trackingStatus = GiftTrackingStatus.SUBMITTED.name();
-
-        GiftTrackingEntity giftTrackingToSave = new GiftTrackingEntity(giftId, trackingStatus, loggedInUser.getUserId(), currentDateTime, currentDateTime);
-        GiftTrackingEntity savedGiftTracking = giftTrackingRepository.save(giftTrackingToSave);
-        foundGift.setGiftTrackingEntity(savedGiftTracking);
-
+        updateGiftTrackingInfo(foundGift, loggedInUser, GiftTrackingStatus.SUBMITTED.name());
         contactInteractionsUtility.addContactInteraction(loggedInUser, foundGift.getContactId(), InteractionMedium.MAIL, InteractionClassification.OUTGOING, "(Auto-generated) Sent gift/note");
+        return GiftResponseModelUtils.convertToResponseModel(foundGift);
+    }
+
+    @Transactional
+    // TODO consider changing this to "requestCancellation" in case the distributor cannot cancel the order in time
+    public GiftResponseModel cancelGift(UUID giftId) {
+        GiftEntity foundGift = giftRepository.findById(giftId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.INTERACT);
+
+        GiftTrackingEntity giftTracking = foundGift.getGiftTrackingEntity();
+        if (!foundGift.isCancellable()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("This gift cannot be cancelled because its status is '%s'", giftTracking.getStatus()));
+        }
+
+        // TODO notify distributor(s)
+        updateGiftTrackingInfo(foundGift, loggedInUser, GiftTrackingStatus.CANCELLED.name());
         return GiftResponseModelUtils.convertToResponseModel(foundGift);
     }
 
@@ -107,12 +120,11 @@ public class GiftProcessingService {
     public GiftResponseModel updateGiftStatus(UUID giftId, UpdateGiftStatusRequestModel requestModel) {
         GiftEntity foundGift = giftRepository.findById(giftId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        GiftTrackingEntity foundTrackingEntity = giftTrackingRepository.findById(giftId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "This gift has not been sent"));
+        GiftTrackingEntity foundTrackingEntity = foundGift.getGiftTrackingEntity();
         validateUpdateGiftStatusRequestModel(foundTrackingEntity.getStatus(), requestModel);
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
 
         GiftItemDetailEntity giftItemDetail = foundGift.getGiftItemDetailEntity();
         if (giftItemDetail != null && isIncompleteStatus(requestModel.getStatus())) {
@@ -122,13 +134,7 @@ public class GiftProcessingService {
             inventoryItemRepository.save(inventoryItemForGift);
         }
 
-        OffsetDateTime currentDateTime = PortalDateTimeUtils.getCurrentDateTimeUTC();
-
-        foundTrackingEntity.setStatus(requestModel.getStatus());
-        foundTrackingEntity.setUpdatedByUserId(loggedInUser.getUserId());
-        foundTrackingEntity.setDateUpdated(currentDateTime);
-        giftTrackingRepository.save(foundTrackingEntity);
-
+        updateGiftTrackingInfo(foundGift, loggedInUser, requestModel.getStatus());
         return GiftResponseModelUtils.convertToResponseModel(foundGift);
     }
 
@@ -136,18 +142,19 @@ public class GiftProcessingService {
     public GiftResponseModel updateGiftTrackingDetail(UUID giftId, UpdateGiftTrackingDetailRequestModel requestModel) {
         GiftEntity foundGift = giftRepository.findById(giftId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (!giftTrackingRepository.existsById(giftId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This gift has not been sent");
+        if (foundGift.isSubmittable()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This gift has not been submitted");
         }
         validateUpdateGiftTrackingDetailRequestModel(requestModel);
 
-        GiftTrackingDetailEntity trackingDetailToSave = giftTrackingDetailRepository.findById(giftId)
+        GiftTrackingDetailEntity trackingDetailToSave = Optional.ofNullable(foundGift.getGiftTrackingDetailEntity())
                 .orElseGet(() -> new GiftTrackingDetailEntity(giftId, null, null));
         trackingDetailToSave.setDistributor(requestModel.getDistributor());
         trackingDetailToSave.setTrackingNumber(requestModel.getTrackingId());
 
         GiftTrackingDetailEntity savedTrackingDetail = giftTrackingDetailRepository.save(trackingDetailToSave);
         foundGift.setGiftTrackingDetailEntity(savedTrackingDetail);
+        foundGift.getGiftTrackingEntity().setGiftTrackingDetailEntity(savedTrackingDetail);
 
         return GiftResponseModelUtils.convertToResponseModel(foundGift);
     }
@@ -189,11 +196,20 @@ public class GiftProcessingService {
         }
     }
 
+    private void updateGiftTrackingInfo(GiftEntity gift, UserEntity updatingUser, String status) {
+        GiftTrackingEntity giftTrackingToUpdate = gift.getGiftTrackingEntity();
+        giftTrackingToUpdate.setStatus(status);
+        giftTrackingToUpdate.setUpdatedByUserId(updatingUser.getUserId());
+        giftTrackingToUpdate.setDateUpdated(PortalDateTimeUtils.getCurrentDateTimeUTC());
+        GiftTrackingEntity savedGiftTracking = giftTrackingRepository.save(giftTrackingToUpdate);
+        gift.setGiftTrackingEntity(savedGiftTracking);
+    }
+
     private InventoryItemEntity findInventoryItemForGift(UserEntity loggedInUser, MembershipEntity userMembership, GiftItemDetailEntity giftItemDetail) {
-        InventoryEntity inventory = inventoryRepository.findAccessibleInventories(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), PageRequest.of(1, 1))
+        InventoryEntity inventory = inventoryRepository.findAccessibleInventories(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), PageRequest.of(0, 1))
                 .stream()
                 .findAny()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not find an inventory for the requesting user"));
         InventoryItemPK inventoryItemPK = new InventoryItemPK(giftItemDetail.getItemId(), inventory.getInventoryId());
         return inventoryItemRepository.findById(inventoryItemPK)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "The requested item does not exist in the inventory"));

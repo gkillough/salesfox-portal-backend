@@ -2,11 +2,9 @@ package com.getboostr.portal.common.enumeration;
 
 public enum GiftTrackingStatus {
     DRAFT,
-    SUBMITTED,
     SCHEDULED,
-    IN_FULFILMENT,
-    READY_FOR_SHIPPING,
-    SHIPMENT_PENDING,
+    SUBMITTED,
+    PACKAGED,
     SHIPPED,
     DELIVERED,
     CANCELLED,

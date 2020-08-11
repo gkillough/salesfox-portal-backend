@@ -17,7 +17,7 @@ import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
 import com.getboostr.portal.rest.api.contact.interaction.model.ContactInteractionRequestModel;
 import com.getboostr.portal.rest.api.contact.interaction.model.ContactInteractionsResponseModel;
 import com.getboostr.portal.rest.api.contact.interaction.model.MultiInteractionModel;
-import com.getboostr.portal.rest.api.user.common.model.ViewUserModel;
+import com.getboostr.portal.rest.api.user.common.model.UserSummaryModel;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -161,7 +161,7 @@ public class ContactInteractionService {
 
     private ContactInteractionsResponseModel convertToResponseModel(ContactInteractionEntity entity) {
         UserEntity interactingUserEntity = entity.getUserEntity();
-        ViewUserModel interactingUserModel = ViewUserModel.fromEntity(interactingUserEntity);
+        UserSummaryModel interactingUserModel = UserSummaryModel.fromEntity(interactingUserEntity);
         return new ContactInteractionsResponseModel(entity.getInteractionId(), interactingUserModel, entity.getMedium(), entity.getClassification(), entity.getDate(), entity.getNote());
     }
 
