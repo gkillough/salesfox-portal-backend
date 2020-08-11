@@ -91,7 +91,7 @@ databaseChangeLog:
                     referencedTableSchemaName: portal
                     referencedTableName: organization_account_contacts
                     referencedColumnNames: contact_id
-                    onDeleteCascade: true
+                    deleteCascade: true
               - column:
                   name: interacting_user_id
                   type: UUID

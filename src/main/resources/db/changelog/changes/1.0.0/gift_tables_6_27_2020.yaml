@@ -49,6 +49,7 @@ databaseChangeLog:
                     referencedTableSchemaName: portal
                     referencedTableName: gifts
                     referencedColumnNames: gift_id
+                    deleteCascade: true
               - column:
                   name: organization_account_id
                   type: UUID
@@ -76,6 +77,7 @@ databaseChangeLog:
                     referencedTableSchemaName: portal
                     referencedTableName: gifts
                     referencedColumnNames: gift_id
+                    deleteCascade: true
               - column:
                   name: user_id
                   type: UUID
@@ -103,6 +105,7 @@ databaseChangeLog:
                     referencedTableSchemaName: portal
                     referencedTableName: gifts
                     referencedColumnNames: gift_id
+                    deleteCascade: true
               - column:
                   name: note_id
                   type: UUID
@@ -129,6 +132,7 @@ databaseChangeLog:
                     referencedTableSchemaName: portal
                     referencedTableName: gifts
                     referencedColumnNames: gift_id
+                    deleteCascade: true
               - column:
                   name: item_id
                   type: UUID
@@ -155,6 +159,7 @@ databaseChangeLog:
                     referencedTableSchemaName: portal
                     referencedTableName: gifts
                     referencedColumnNames: gift_id
+                    deleteCascade: true
               - column:
                   name: custom_icon_id
                   type: UUID
@@ -182,6 +187,7 @@ databaseChangeLog:
                     referencedTableSchemaName: portal
                     referencedTableName: gifts
                     referencedColumnNames: gift_id
+                    deleteCascade: true
               - column:
                   name: custom_text_id
                   type: UUID
@@ -209,7 +215,7 @@ databaseChangeLog:
                     referencedTableSchemaName: portal
                     referencedTableName: gifts
                     referencedColumnNames: gift_id
-                    onDeleteCascade: true
+                    deleteCascade: true
               - column:
                   name: status
                   type: character varying
@@ -246,7 +252,7 @@ databaseChangeLog:
                     referencedTableSchemaName: portal
                     referencedTableName: gifts
                     referencedColumnNames: gift_id
-                    onDeleteCascade: true
+                    deleteCascade: true
               - column:
                   name: distributor
                   type: character varying
