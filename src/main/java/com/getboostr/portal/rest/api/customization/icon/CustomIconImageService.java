@@ -23,16 +23,19 @@ import java.util.UUID;
 @Slf4j
 @Component
 public class CustomIconImageService {
-    private CustomIconRepository customIconRepository;
-    private CustomIconFileRepository customIconFileRepository;
-    private CustomIconAccessService customIconAccessService;
-    private HttpSafeImageUtility imageUtility;
+    private final CustomIconRepository customIconRepository;
+    private final CustomIconFileRepository customIconFileRepository;
+    private final CustomIconAccessService customIconAccessService;
+    private final CustomIconGiftStatusValidator customIconGiftStatusValidator;
+    private final HttpSafeImageUtility imageUtility;
 
     @Autowired
-    public CustomIconImageService(CustomIconRepository customIconRepository, CustomIconFileRepository customIconFileRepository, CustomIconAccessService customIconAccessService, HttpSafeImageUtility imageUtility) {
+    public CustomIconImageService(CustomIconRepository customIconRepository, CustomIconFileRepository customIconFileRepository,
+                                  CustomIconAccessService customIconAccessService, CustomIconGiftStatusValidator customIconGiftStatusValidator, HttpSafeImageUtility imageUtility) {
         this.customIconRepository = customIconRepository;
         this.customIconFileRepository = customIconFileRepository;
         this.customIconAccessService = customIconAccessService;
+        this.customIconGiftStatusValidator = customIconGiftStatusValidator;
         this.imageUtility = imageUtility;
     }
 
@@ -58,6 +61,7 @@ public class CustomIconImageService {
         CustomIconEntity foundCustomIconEntity = customIconRepository.findById(customIconId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         customIconAccessService.validateImageAccess(foundCustomIconEntity);
+        customIconGiftStatusValidator.validateCustomIconGiftStatus(customIconId);
 
         // TODO consider restrictions around uploader id
 
