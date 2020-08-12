@@ -84,35 +84,35 @@ public class GiftEntity implements Serializable {
     }
 
     public boolean isSubmittable() {
-        return isDraft() || isScheduled();
+        return giftTrackingEntity.isSubmittable();
     }
 
     public boolean isCancellable() {
-        return isSubmitted() || isPackaged();
+        return giftTrackingEntity.isCancellable();
     }
 
     public boolean isDraft() {
-        return hasStatus(GiftTrackingStatus.DRAFT);
+        return giftTrackingEntity.isDraft();
     }
 
     public boolean isScheduled() {
-        return hasStatus(GiftTrackingStatus.SCHEDULED);
+        return giftTrackingEntity.isScheduled();
     }
 
     public boolean isSubmitted() {
-        return hasStatus(GiftTrackingStatus.SUBMITTED);
+        return giftTrackingEntity.isSubmitted();
     }
 
     public boolean isPackaged() {
-        return hasStatus(GiftTrackingStatus.PACKAGED);
+        return giftTrackingEntity.isPackaged();
     }
 
     public boolean isCancelled() {
-        return hasStatus(GiftTrackingStatus.CANCELLED);
+        return giftTrackingEntity.isCancelled();
     }
 
     public boolean hasStatus(GiftTrackingStatus status) {
-        return giftTrackingEntity != null && status.name().equals(giftTrackingEntity.getStatus());
+        return giftTrackingEntity.hasStatus(status);
     }
 
 }

@@ -35,15 +35,17 @@ public class CustomIconService {
     private final CustomIconRepository customIconRepository;
     private final CustomIconOrganizationAccountRepository customIconOrgAcctRepository;
     private final CustomIconUserRestrictionRepository customIconUserRestrictionRepository;
+    private final CustomIconGiftStatusValidator customIconGiftStatusValidator;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private final CustomIconAccessService customIconAccessService;
 
     @Autowired
     public CustomIconService(CustomIconRepository customIconRepository, CustomIconOrganizationAccountRepository customIconOrgAcctRepository, CustomIconUserRestrictionRepository customIconUserRestrictionRepository,
-                             HttpSafeUserMembershipRetrievalService membershipRetrievalService, CustomIconAccessService customIconAccessService) {
+                             CustomIconGiftStatusValidator customIconGiftStatusValidator, HttpSafeUserMembershipRetrievalService membershipRetrievalService, CustomIconAccessService customIconAccessService) {
         this.customIconRepository = customIconRepository;
         this.customIconOrgAcctRepository = customIconOrgAcctRepository;
         this.customIconUserRestrictionRepository = customIconUserRestrictionRepository;
+        this.customIconGiftStatusValidator = customIconGiftStatusValidator;
         this.membershipRetrievalService = membershipRetrievalService;
         this.customIconAccessService = customIconAccessService;
     }
@@ -98,6 +100,7 @@ public class CustomIconService {
         CustomIconEntity foundCustomIcon = customIconRepository.findById(customIconId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         customIconAccessService.validateImageAccess(foundCustomIcon);
+        customIconGiftStatusValidator.validateCustomIconGiftStatus(customIconId);
         validateRequestModel(requestModel);
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();

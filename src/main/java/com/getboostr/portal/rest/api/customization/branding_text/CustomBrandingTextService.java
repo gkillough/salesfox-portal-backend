@@ -8,6 +8,10 @@ import com.getboostr.portal.database.customization.branding_text.restriction.Cus
 import com.getboostr.portal.database.customization.branding_text.restriction.CustomBrandingTextOrgAccountRestrictionRepository;
 import com.getboostr.portal.database.customization.branding_text.restriction.CustomBrandingTextUserRestrictionEntity;
 import com.getboostr.portal.database.customization.branding_text.restriction.CustomBrandingTextUserRestrictionRepository;
+import com.getboostr.portal.database.gift.customization.GiftCustomTextDetailEntity;
+import com.getboostr.portal.database.gift.customization.GiftCustomTextDetailRepository;
+import com.getboostr.portal.database.gift.tracking.GiftTrackingEntity;
+import com.getboostr.portal.database.gift.tracking.GiftTrackingRepository;
 import com.getboostr.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import com.getboostr.portal.rest.api.common.model.request.RestrictionModel;
 import com.getboostr.portal.rest.api.common.page.PageRequestValidationUtils;
@@ -36,13 +40,19 @@ public class CustomBrandingTextService {
     private final CustomBrandingTextRepository customBrandingTextRepository;
     private final CustomBrandingTextOrgAccountRestrictionRepository customBrandingTextOrgAcctRestrictionRepository;
     private final CustomBrandingTextUserRestrictionRepository customBrandingTextUserRestrictionRepository;
+    private final GiftTrackingRepository giftTrackingRepository;
+    private final GiftCustomTextDetailRepository giftCustomTextDetailRepository;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
-    public CustomBrandingTextService(CustomBrandingTextRepository customBrandingTextRepository, CustomBrandingTextOrgAccountRestrictionRepository customBrandingTextOrgAcctRestrictionRepository, CustomBrandingTextUserRestrictionRepository customBrandingTextUserRestrictionRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+    public CustomBrandingTextService(CustomBrandingTextRepository customBrandingTextRepository,
+                                     CustomBrandingTextOrgAccountRestrictionRepository customBrandingTextOrgAcctRestrictionRepository, CustomBrandingTextUserRestrictionRepository customBrandingTextUserRestrictionRepository,
+                                     GiftTrackingRepository giftTrackingRepository, GiftCustomTextDetailRepository giftCustomTextDetailRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.customBrandingTextRepository = customBrandingTextRepository;
         this.customBrandingTextOrgAcctRestrictionRepository = customBrandingTextOrgAcctRestrictionRepository;
         this.customBrandingTextUserRestrictionRepository = customBrandingTextUserRestrictionRepository;
+        this.giftTrackingRepository = giftTrackingRepository;
+        this.giftCustomTextDetailRepository = giftCustomTextDetailRepository;
         this.membershipRetrievalService = membershipRetrievalService;
     }
 
@@ -96,6 +106,7 @@ public class CustomBrandingTextService {
         CustomBrandingTextEntity foundCustomBrandingText = customBrandingTextRepository.findById(customBrandingTextId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         validateAccess(foundCustomBrandingText);
+        validateCustomBrandingTextGiftStatus(customBrandingTextId);
         validateRequestModel(requestModel);
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
@@ -154,6 +165,21 @@ public class CustomBrandingTextService {
 
         if (requestModel.getCustomBrandingText().length() > CUSTOM_BRANDING_TEXT_CHAR_LIMIT) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The custom branding text cannot exceed %d characters", CUSTOM_BRANDING_TEXT_CHAR_LIMIT));
+        }
+    }
+
+    private void validateCustomBrandingTextGiftStatus(UUID customTextId) {
+        List<UUID> customTextGiftIds = giftCustomTextDetailRepository.findByCustomTextId(customTextId)
+                .stream()
+                .map(GiftCustomTextDetailEntity::getGiftId)
+                .collect(Collectors.toList());
+        if (!customTextGiftIds.isEmpty()) {
+            boolean hasCustomTextBeenSubmitted = giftTrackingRepository.findAllById(customTextGiftIds)
+                    .stream()
+                    .anyMatch(GiftTrackingEntity::isSubmitted);
+            if (hasCustomTextBeenSubmitted) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot update a custom branding text that has been submitted with a gift");
+            }
         }
     }
 

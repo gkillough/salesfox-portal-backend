@@ -3,6 +3,10 @@ package com.getboostr.portal.rest.api.note;
 import com.getboostr.portal.common.time.PortalDateTimeUtils;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
+import com.getboostr.portal.database.gift.note.GiftNoteDetailEntity;
+import com.getboostr.portal.database.gift.note.GiftNoteDetailRepository;
+import com.getboostr.portal.database.gift.tracking.GiftTrackingEntity;
+import com.getboostr.portal.database.gift.tracking.GiftTrackingRepository;
 import com.getboostr.portal.database.note.NoteEntity;
 import com.getboostr.portal.database.note.NoteRepository;
 import com.getboostr.portal.database.note.restriction.NoteOrganizationAccountRestrictionEntity;
@@ -35,14 +39,18 @@ public class NoteService {
     private final NoteRepository noteRepository;
     private final NoteOrganizationAccountRestrictionRepository noteOrgAcctRestrictionRepository;
     private final NoteUserRestrictionRepository noteUserRestrictionRepository;
+    private final GiftTrackingRepository giftTrackingRepository;
+    private final GiftNoteDetailRepository giftNoteDetailRepository;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
     public NoteService(NoteRepository noteRepository, NoteOrganizationAccountRestrictionRepository noteOrgAcctRestrictionRepository, NoteUserRestrictionRepository noteUserRestrictionRepository,
-                       HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+                       GiftTrackingRepository giftTrackingRepository, GiftNoteDetailRepository giftNoteDetailRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.noteRepository = noteRepository;
         this.noteOrgAcctRestrictionRepository = noteOrgAcctRestrictionRepository;
         this.noteUserRestrictionRepository = noteUserRestrictionRepository;
+        this.giftTrackingRepository = giftTrackingRepository;
+        this.giftNoteDetailRepository = giftNoteDetailRepository;
         this.membershipRetrievalService = membershipRetrievalService;
     }
 
@@ -96,12 +104,13 @@ public class NoteService {
         NoteEntity foundNote = noteRepository.findById(noteId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         validateNoteAccess(foundNote);
+        validateNoteGiftStatus(noteId);
         validateNoteRequestModel(requestModel);
-        foundNote.setMessage(requestModel.getMessage());
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         foundNote.setUpdatedByUserId(loggedInUser.getUserId());
         foundNote.setDateModified(PortalDateTimeUtils.getCurrentDateTimeUTC());
+        foundNote.setMessage(requestModel.getMessage());
 
         noteRepository.save(foundNote);
     }
@@ -142,6 +151,21 @@ public class NoteService {
 
         if (noteRequestModel.getMessage().length() > MESSAGE_LENGTH_CHAR_LIMIT) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The message cannot exceed %d characters", MESSAGE_LENGTH_CHAR_LIMIT));
+        }
+    }
+
+    private void validateNoteGiftStatus(UUID noteId) {
+        List<UUID> noteGiftIds = giftNoteDetailRepository.findByNoteId(noteId)
+                .stream()
+                .map(GiftNoteDetailEntity::getGiftId)
+                .collect(Collectors.toList());
+        if (!noteGiftIds.isEmpty()) {
+            boolean hasNoteBeenSubmitted = giftTrackingRepository.findAllById(noteGiftIds)
+                    .stream()
+                    .anyMatch(GiftTrackingEntity::isSubmitted);
+            if (hasNoteBeenSubmitted) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot update a note that has been submitted with a gift");
+            }
         }
     }
 
