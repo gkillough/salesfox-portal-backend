@@ -58,7 +58,7 @@ public class PortalUserDetailsService implements UserDetailsService {
     public boolean isUserLocked(LoginEntity userLogin) {
         OffsetDateTime lastLockedTime = userLogin.getLastLocked();
         if (lastLockedTime != null) {
-            Duration timeSinceLocked = Duration.between(lastLockedTime, PortalDateTimeUtils.getCurrentDateTimeUTC());
+            Duration timeSinceLocked = Duration.between(lastLockedTime, PortalDateTimeUtils.getCurrentDateTime());
             if (timeSinceLocked.compareTo(PortalUserLoginAttemptService.DURATION_UNTIL_ACCOUNT_UNLOCKED) < 0) {
                 // If the time since the account was locked is strictly less than the time needed to unlock the account, then the account is still locked.
                 return true;

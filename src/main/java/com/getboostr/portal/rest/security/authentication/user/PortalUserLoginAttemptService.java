@@ -37,7 +37,7 @@ public class PortalUserLoginAttemptService {
             if (numFailedLogins % MAX_LOGIN_ATTEMPTS == 0) {
                 // Set last locked time only when they reach exactly the max number of attempts
                 log.warn("Maximum login attempts reached for user [{}]. Locking account.", username);
-                userLogin.setLastLocked(PortalDateTimeUtils.getCurrentDateTimeUTC());
+                userLogin.setLastLocked(PortalDateTimeUtils.getCurrentDateTime());
             }
 
             loginRepository.save(userLogin);
@@ -50,7 +50,7 @@ public class PortalUserLoginAttemptService {
             LoginEntity userLogin = optionalLogin.get();
             userLogin.setNumFailedLogins(0);
             userLogin.setLastLocked(null);
-            userLogin.setLastSuccessfulLogin(PortalDateTimeUtils.getCurrentDateTimeUTC());
+            userLogin.setLastSuccessfulLogin(PortalDateTimeUtils.getCurrentDateTime());
 
             loginRepository.save(userLogin);
             log.info("Login attempts have been reset for user [{}]", username);

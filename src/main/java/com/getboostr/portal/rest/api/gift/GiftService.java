@@ -147,7 +147,7 @@ public class GiftService {
         GiftEntity savedGift = giftRepository.save(giftToSave);
         saveDetails(savedGift, requestModel);
 
-        OffsetDateTime dateCreated = PortalDateTimeUtils.getCurrentDateTimeUTC();
+        OffsetDateTime dateCreated = PortalDateTimeUtils.getCurrentDateTime();
         GiftTrackingEntity giftTrackingToSave = new GiftTrackingEntity(savedGift.getGiftId(), GiftTrackingStatus.DRAFT.name(), loggedInUser.getUserId(), dateCreated, dateCreated);
         GiftTrackingEntity savedGiftTracking = giftTrackingRepository.save(giftTrackingToSave);
         savedGift.setGiftTrackingEntity(savedGiftTracking);
@@ -186,7 +186,7 @@ public class GiftService {
         saveDetails(foundGift, requestModel);
 
         GiftTrackingEntity giftTrackingToUpdate = foundGift.getGiftTrackingEntity();
-        giftTrackingToUpdate.setDateUpdated(PortalDateTimeUtils.getCurrentDateTimeUTC());
+        giftTrackingToUpdate.setDateUpdated(PortalDateTimeUtils.getCurrentDateTime());
         giftTrackingRepository.save(giftTrackingToUpdate);
     }
 

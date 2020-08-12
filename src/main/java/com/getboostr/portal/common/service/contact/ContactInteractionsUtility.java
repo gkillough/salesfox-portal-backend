@@ -31,7 +31,7 @@ public class ContactInteractionsUtility<E extends Throwable> {
     }
 
     public ContactInteractionEntity addContactInteraction(UserEntity interactingUser, OrganizationAccountContactEntity contact, InteractionMedium medium, InteractionClassification classification, String note) {
-        return addContactInteraction(interactingUser, contact, medium, classification, note, PortalDateTimeUtils.getCurrentDateUTC());
+        return addContactInteraction(interactingUser, contact, medium, classification, note, PortalDateTimeUtils.getCurrentDate());
     }
 
     public ContactInteractionEntity addContactInteraction(UserEntity interactingUser, OrganizationAccountContactEntity contact, InteractionMedium medium, InteractionClassification classification, String note, LocalDate date) {

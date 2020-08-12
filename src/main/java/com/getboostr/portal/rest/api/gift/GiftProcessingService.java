@@ -200,7 +200,7 @@ public class GiftProcessingService {
         GiftTrackingEntity giftTrackingToUpdate = gift.getGiftTrackingEntity();
         giftTrackingToUpdate.setStatus(status);
         giftTrackingToUpdate.setUpdatedByUserId(updatingUser.getUserId());
-        giftTrackingToUpdate.setDateUpdated(PortalDateTimeUtils.getCurrentDateTimeUTC());
+        giftTrackingToUpdate.setDateUpdated(PortalDateTimeUtils.getCurrentDateTime());
         GiftTrackingEntity savedGiftTracking = giftTrackingRepository.save(giftTrackingToUpdate);
         gift.setGiftTrackingEntity(savedGiftTracking);
     }

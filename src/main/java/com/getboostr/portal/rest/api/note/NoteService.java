@@ -81,7 +81,7 @@ public class NoteService {
         validateNoteRequestModel(requestModel);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
 
-        NoteEntity noteToSave = new NoteEntity(null, loggedInUser.getUserId(), PortalDateTimeUtils.getCurrentDateTimeUTC(), requestModel.getMessage());
+        NoteEntity noteToSave = new NoteEntity(null, loggedInUser.getUserId(), PortalDateTimeUtils.getCurrentDateTime(), requestModel.getMessage());
         NoteEntity savedNote = noteRepository.save(noteToSave);
 
         if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
@@ -109,7 +109,7 @@ public class NoteService {
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         foundNote.setUpdatedByUserId(loggedInUser.getUserId());
-        foundNote.setDateModified(PortalDateTimeUtils.getCurrentDateTimeUTC());
+        foundNote.setDateModified(PortalDateTimeUtils.getCurrentDateTime());
         foundNote.setMessage(requestModel.getMessage());
 
         noteRepository.save(foundNote);
