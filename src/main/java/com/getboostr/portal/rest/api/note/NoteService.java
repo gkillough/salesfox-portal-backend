@@ -164,7 +164,7 @@ public class NoteService {
                     .stream()
                     .anyMatch(GiftTrackingEntity::isSubmitted);
             if (hasNoteBeenSubmitted) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot update a note that has been submitted");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot update a note that has been submitted with a gift");
             }
         }
     }
