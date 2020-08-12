@@ -128,7 +128,7 @@ public class InventoryOrderService {
         savedOrder.setInventoryEntity(foundInventory);
 
         String processingStatus = InventoryOrderRequestStatus.SUBMITTED.name();
-        OffsetDateTime orderDateTime = PortalDateTimeUtils.getCurrentDateTimeUTC();
+        OffsetDateTime orderDateTime = PortalDateTimeUtils.getCurrentDateTime();
         InventoryOrderRequestStatusEntity statusToSave = new InventoryOrderRequestStatusEntity(null, savedOrder.getOrderId(), loggedInUser.getUserId(), processingStatus, orderDateTime, orderDateTime);
         InventoryOrderRequestStatusEntity savedStatus = orderRequestStatusRepository.save(statusToSave);
         savedOrder.setInventoryOrderRequestStatusEntity(savedStatus);
@@ -175,7 +175,7 @@ public class InventoryOrderService {
             catalogueItemRepository.save(orderedItem);
         }
 
-        orderStatusEntity.setDateUpdated(PortalDateTimeUtils.getCurrentDateTimeUTC());
+        orderStatusEntity.setDateUpdated(PortalDateTimeUtils.getCurrentDateTime());
         orderStatusEntity.setProcessingStatus(requestModel.getNewStatus());
         orderRequestStatusRepository.save(orderStatusEntity);
     }

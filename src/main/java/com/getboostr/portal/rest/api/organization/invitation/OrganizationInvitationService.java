@@ -13,6 +13,10 @@ import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.account.repository.RoleRepository;
 import com.getboostr.portal.database.organization.account.OrganizationAccountEntity;
+import com.getboostr.portal.database.organization.account.OrganizationAccountRepository;
+import com.getboostr.portal.database.organization.account.invite.OrganizationAccountInviteTokenEntity;
+import com.getboostr.portal.database.organization.account.invite.OrganizationAccountInviteTokenPK;
+import com.getboostr.portal.database.organization.account.invite.OrganizationAccountInviteTokenRepository;
 import com.getboostr.portal.rest.api.organization.invitation.model.OrganizationAccountInvitationModel;
 import com.getboostr.portal.rest.api.organization.invitation.model.OrganizationAssignableRolesModel;
 import com.getboostr.portal.rest.api.password.PasswordService;
@@ -20,17 +24,13 @@ import com.getboostr.portal.rest.api.registration.RegistrationController;
 import com.getboostr.portal.rest.api.registration.organization.model.OrganizationAccountUserRegistrationModel;
 import com.getboostr.portal.rest.api.registration.user.UserRegistrationModel;
 import com.getboostr.portal.rest.api.registration.user.UserRegistrationService;
-import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import com.getboostr.portal.rest.api.user.profile.UserProfileService;
 import com.getboostr.portal.rest.api.user.profile.model.UserProfileUpdateModel;
 import com.getboostr.portal.rest.api.user.role.UserRoleService;
 import com.getboostr.portal.rest.api.user.role.model.UserRoleModel;
 import com.getboostr.portal.rest.api.user.role.model.UserRoleUpdateModel;
+import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
-import com.getboostr.portal.database.organization.account.OrganizationAccountRepository;
-import com.getboostr.portal.database.organization.account.invite.OrganizationAccountInviteTokenEntity;
-import com.getboostr.portal.database.organization.account.invite.OrganizationAccountInviteTokenPK;
-import com.getboostr.portal.database.organization.account.invite.OrganizationAccountInviteTokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,18 +55,18 @@ import java.util.stream.Collectors;
 public class OrganizationInvitationService {
     public static final Duration DURATION_OF_TOKEN_VALIDITY = Duration.ofDays(7);
 
-    private PortalConfiguration portalConfiguration;
-    private RoleRepository roleRepository;
-    private OrganizationAccountRepository organizationAccountRepository;
-    private OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository;
-    private UserRegistrationService userRegistrationService;
-    private UserDetailsService userDetailsService;
-    private UserProfileService userProfileService;
-    private PasswordService passwordService;
-    private UserRoleService userRoleService;
-    private LicenseSeatManager licenseSeatManager;
-    private HttpSafeUserMembershipRetrievalService userMembershipRetrievalService;
-    private EmailMessagingService emailMessagingService;
+    private final PortalConfiguration portalConfiguration;
+    private final RoleRepository roleRepository;
+    private final OrganizationAccountRepository organizationAccountRepository;
+    private final OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository;
+    private final UserRegistrationService userRegistrationService;
+    private final UserDetailsService userDetailsService;
+    private final UserProfileService userProfileService;
+    private final PasswordService passwordService;
+    private final UserRoleService userRoleService;
+    private final LicenseSeatManager licenseSeatManager;
+    private final HttpSafeUserMembershipRetrievalService userMembershipRetrievalService;
+    private final EmailMessagingService emailMessagingService;
 
     @Autowired
     public OrganizationInvitationService(PortalConfiguration portalConfiguration, RoleRepository roleRepository, OrganizationAccountRepository organizationAccountRepository, OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository,
@@ -114,7 +114,7 @@ public class OrganizationInvitationService {
         }
 
         String invitationToken = UUID.randomUUID().toString();
-        OrganizationAccountInviteTokenEntity inviteEntity = new OrganizationAccountInviteTokenEntity(requestModel.getInviteEmail(), invitationToken, orgAccountEntity.getOrganizationAccountId(), requestModel.getInviteRole(), PortalDateTimeUtils.getCurrentDateTimeUTC());
+        OrganizationAccountInviteTokenEntity inviteEntity = new OrganizationAccountInviteTokenEntity(requestModel.getInviteEmail(), invitationToken, orgAccountEntity.getOrganizationAccountId(), requestModel.getInviteRole(), PortalDateTimeUtils.getCurrentDateTime());
         organizationAccountInviteTokenRepository.save(inviteEntity);
 
         sendInvitationEmail(requestModel.getInviteEmail(), orgAccountEntity.getOrganizationAccountName(), invitationToken);
@@ -144,7 +144,7 @@ public class OrganizationInvitationService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Duration timeSinceTokenGenerated = Duration.between(inviteTokenEntity.getDateGenerated(), PortalDateTimeUtils.getCurrentDateTimeUTC());
+        Duration timeSinceTokenGenerated = Duration.between(inviteTokenEntity.getDateGenerated(), PortalDateTimeUtils.getCurrentDateTime());
         if (timeSinceTokenGenerated.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
             createUserAccountWithOrgAccountCreationRole(inviteTokenEntity);
             createUserSessionWithOrgAccountCreationPermission(email);

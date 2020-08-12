@@ -75,7 +75,7 @@ public class PasswordService {
         }
 
         String passwordResetToken = UUID.randomUUID().toString();
-        PasswordResetTokenEntity passwordResetTokenToSave = new PasswordResetTokenEntity(email, passwordResetToken, PortalDateTimeUtils.getCurrentDateTimeUTC());
+        PasswordResetTokenEntity passwordResetTokenToSave = new PasswordResetTokenEntity(email, passwordResetToken, PortalDateTimeUtils.getCurrentDateTime());
         passwordResetTokenRepository.save(passwordResetTokenToSave);
 
         return sendPasswordResetEmail(email, passwordResetToken);
@@ -96,7 +96,7 @@ public class PasswordService {
                 .map(PasswordResetTokenEntity::getDateGenerated);
 
         if (optionalTimeGenerated.isPresent()) {
-            Duration timeSinceTokenGenerated = Duration.between(optionalTimeGenerated.get(), PortalDateTimeUtils.getCurrentDateTimeUTC());
+            Duration timeSinceTokenGenerated = Duration.between(optionalTimeGenerated.get(), PortalDateTimeUtils.getCurrentDateTime());
             if (timeSinceTokenGenerated.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
                 grantResetPasswordAuthorityToUser(email);
                 response.setHeader("Location", PasswordController.UPDATE_ENDPOINT);
