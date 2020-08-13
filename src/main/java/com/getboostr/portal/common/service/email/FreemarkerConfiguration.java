@@ -1,20 +1,29 @@
 package com.getboostr.portal.common.service.email;
 
 import freemarker.cache.ClassTemplateLoader;
+import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
+import java.io.File;
+import java.io.IOException;
+
+@Slf4j
 @org.springframework.context.annotation.Configuration
 public class FreemarkerConfiguration {
-    // TODO read this as a spring property
-    public static final String DEFAULT_TEMPLATE_DIR_PATH = "/templates/";
+    @Getter
+    @Value("file:${com.getboostr.portal.resource.freemarker.templateDir:}")
+    private File freemarkerTemplateDir;
 
     @Bean
     public Configuration createFreemarkerConfig() {
         Configuration configuration = createDefaultConfiguration();
-        configuration.setTemplateLoader(createClassTemplateLoader());
+        configuration.setTemplateLoader(createTemplateLoader());
         return configuration;
     }
 
@@ -26,8 +35,13 @@ public class FreemarkerConfiguration {
         return defaultConfiguration;
     }
 
-    private TemplateLoader createClassTemplateLoader() {
-        return new ClassTemplateLoader(getClass(), DEFAULT_TEMPLATE_DIR_PATH);
+    private TemplateLoader createTemplateLoader() {
+        try {
+            return new FileTemplateLoader(freemarkerTemplateDir, false);
+        } catch (IOException ioException) {
+            log.warn("Could not initialize Freemarker FileTemplateLoader. Falling back to ClassTemplateLoader", ioException);
+            return new ClassTemplateLoader(getClass(), freemarkerTemplateDir.getName());
+        }
     }
 
 }

@@ -3,6 +3,7 @@ package com.getboostr.portal.rest.api.password;
 import com.getboostr.portal.PortalConfiguration;
 import com.getboostr.portal.common.service.email.EmailMessagingService;
 import com.getboostr.portal.common.service.email.PortalEmailException;
+import com.getboostr.portal.common.service.email.model.ButtonEmailMessageModel;
 import com.getboostr.portal.common.service.email.model.EmailMessageModel;
 import com.getboostr.portal.common.time.PortalDateTimeUtils;
 import com.getboostr.portal.database.account.entity.LoginEntity;
@@ -178,7 +179,7 @@ public class PasswordService {
         log.info("*** REMOVE ME *** Password Reset Token: " + passwordResetToken);
         log.info("*** REMOVE ME *** Password Reset URL: " + passwordResetUrl);
 
-        EmailMessageModel emailMessage = new EmailMessageModel(List.of(email), "BOOSTR - Password Reset", "Password Reset", passwordResetUrl);
+        EmailMessageModel emailMessage = createPasswordResetMessageModel(email, passwordResetUrl);
         try {
             emailMessagingService.sendMessage(emailMessage);
             return true;
@@ -186,6 +187,17 @@ public class PasswordService {
             log.error("Problem sending password reset email", e);
         }
         return false;
+    }
+
+    private ButtonEmailMessageModel createPasswordResetMessageModel(String recipientEmail, String passwordResetUrl) {
+        return new ButtonEmailMessageModel(
+                List.of(recipientEmail),
+                "BOOSTR - Password Reset",
+                "Password Reset",
+                "Click the button below to reset your password. If you did not request a password reset, please contact support.",
+                "Reset your password",
+                passwordResetUrl
+        );
     }
 
     private String createResetPasswordLink(String email, String passwordResetToken) {
