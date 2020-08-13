@@ -5,6 +5,7 @@ import com.getboostr.portal.common.FieldValidationUtils;
 import com.getboostr.portal.common.exception.PortalException;
 import com.getboostr.portal.common.service.email.EmailMessagingService;
 import com.getboostr.portal.common.service.email.PortalEmailException;
+import com.getboostr.portal.common.service.email.model.ButtonEmailMessageModel;
 import com.getboostr.portal.common.service.email.model.EmailMessageModel;
 import com.getboostr.portal.common.service.license.LicenseSeatManager;
 import com.getboostr.portal.common.time.PortalDateTimeUtils;
@@ -259,13 +260,23 @@ public class OrganizationInvitationService {
 
         log.info("*** REMOVE ME *** Invitation Link: {}", invitationUrl);
 
-        String subjectLine = String.format("Invitation to join %s on BOOSTR", organizationAccountName);
-        EmailMessageModel emailMessage = new EmailMessageModel(List.of(email), subjectLine, subjectLine, invitationUrl);
+        EmailMessageModel emailMessage = createInvitationMessageModel(email, organizationAccountName, invitationUrl);
         try {
             emailMessagingService.sendMessage(emailMessage);
         } catch (PortalEmailException e) {
             log.error("Problem sending organization account invitation email", e);
         }
+    }
+
+    private ButtonEmailMessageModel createInvitationMessageModel(String recipientEmail, String organizationAccountName, String invitationUrl) {
+        return new ButtonEmailMessageModel(
+                List.of(recipientEmail),
+                String.format("Invitation to join %s on BOOSTR", organizationAccountName),
+                "Invitation",
+                String.format("You have been invited to join the '%s' account on BOOSTR. Click the button below to accept.", organizationAccountName),
+                "Accept Invitation",
+                invitationUrl
+        );
     }
 
     private String createInvitationLink(String email, String invitationToken) {
