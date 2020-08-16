@@ -30,6 +30,7 @@ import com.getboostr.portal.rest.api.user.profile.model.UserProfileUpdateModel;
 import com.getboostr.portal.rest.api.user.role.UserRoleService;
 import com.getboostr.portal.rest.api.user.role.model.UserRoleModel;
 import com.getboostr.portal.rest.api.user.role.model.UserRoleUpdateModel;
+import com.getboostr.portal.rest.security.authentication.user.PortalUserDetails;
 import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import com.getboostr.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -97,8 +97,8 @@ public class OrganizationInvitationService {
         validateInviteRequestModel(requestModel);
 
         UserEntity authenticatedUser = userMembershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity membership = userMembershipRetrievalService.getMembershipEntity(authenticatedUser);
-        OrganizationAccountEntity orgAccountEntity = userMembershipRetrievalService.getOrganizationAccountEntity(membership);
+        MembershipEntity membership = authenticatedUser.getMembershipEntity();
+        OrganizationAccountEntity orgAccountEntity = membership.getOrganizationAccountEntity();
 
         if (!orgAccountEntity.getOrganizationAccountName().equals(requestModel.getOrganizationAccountName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You do not have access to that Organization Account");
@@ -147,8 +147,8 @@ public class OrganizationInvitationService {
 
         Duration timeSinceTokenGenerated = Duration.between(inviteTokenEntity.getDateGenerated(), PortalDateTimeUtils.getCurrentDateTime());
         if (timeSinceTokenGenerated.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
-            createUserAccountWithOrgAccountCreationRole(inviteTokenEntity);
-            createUserSessionWithOrgAccountCreationPermission(email);
+            UserEntity tempUser = createUserAccountWithOrgAccountCreationRole(inviteTokenEntity);
+            createUserSessionWithOrgAccountCreationPermission(tempUser);
             response.setHeader("Location", RegistrationController.BASE_ENDPOINT + RegistrationController.ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your invitation has expired. Please contact your organization's account owner.");
@@ -221,7 +221,7 @@ public class OrganizationInvitationService {
         }
     }
 
-    private void createUserAccountWithOrgAccountCreationRole(OrganizationAccountInviteTokenEntity inviteTokenEntity) {
+    private UserEntity createUserAccountWithOrgAccountCreationRole(OrganizationAccountInviteTokenEntity inviteTokenEntity) {
         OrganizationAccountEntity orgAccount = organizationAccountRepository.findById(inviteTokenEntity.getOrganizationAccountId())
                 .orElseThrow(() -> {
                     log.error("Expected organization account with id [{}] to exist in the database", inviteTokenEntity.getOrganizationAccountId());
@@ -229,15 +229,14 @@ public class OrganizationInvitationService {
                 });
 
         String randomTemporaryPassword = UUID.randomUUID().toString();
-        UserRegistrationModel userRegistrationModel = new UserRegistrationModel("First Name", "Last Name", inviteTokenEntity.getEmail(), randomTemporaryPassword, orgAccount.getOrganizationAccountName());
-        userRegistrationService.registerOrganizationUser(userRegistrationModel, orgAccount.getOrganizationId(), PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION);
+        UserRegistrationModel userRegistrationModel = new UserRegistrationModel("First Name", "Last Name", inviteTokenEntity.getEmail(), randomTemporaryPassword, PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION);
+        return userRegistrationService.registerOrganizationUser(userRegistrationModel, orgAccount);
     }
 
-    private void createUserSessionWithOrgAccountCreationPermission(String email) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                userDetails, null, List.of(new SimpleGrantedAuthority(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION)));
+    private void createUserSessionWithOrgAccountCreationPermission(UserEntity user) {
+        String temporaryRoleName = PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION;
+        PortalUserDetails userDetails = new PortalUserDetails(List.of(temporaryRoleName), user.getEmail(), null, false, true);
+        Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, List.of(new SimpleGrantedAuthority(temporaryRoleName)));
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 

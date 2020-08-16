@@ -12,6 +12,6 @@ public class UserRegistrationModel {
     private String lastName;
     private String email;
     private String password;
-    private String planType;
+    private String roleLevel;
 
 }

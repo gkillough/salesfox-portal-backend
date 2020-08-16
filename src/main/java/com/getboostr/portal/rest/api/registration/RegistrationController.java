@@ -1,14 +1,16 @@
 package com.getboostr.portal.rest.api.registration;
 
+import com.getboostr.portal.rest.api.common.model.request.EmailToValidateModel;
+import com.getboostr.portal.rest.api.common.model.response.ValidationResponseModel;
+import com.getboostr.portal.rest.api.organization.invitation.OrganizationInvitationService;
 import com.getboostr.portal.rest.api.registration.organization.OrganizationAccountRegistrationService;
 import com.getboostr.portal.rest.api.registration.organization.model.OrganizationAccountNameToValidateModel;
 import com.getboostr.portal.rest.api.registration.organization.model.OrganizationAccountRegistrationModel;
 import com.getboostr.portal.rest.api.registration.organization.model.OrganizationAccountUserRegistrationModel;
+import com.getboostr.portal.rest.api.registration.plan.MultiPlanModel;
+import com.getboostr.portal.rest.api.registration.plan.RegistrationPlanService;
 import com.getboostr.portal.rest.api.registration.user.UserRegistrationModel;
 import com.getboostr.portal.rest.api.registration.user.UserRegistrationService;
-import com.getboostr.portal.rest.api.common.model.request.EmailToValidateModel;
-import com.getboostr.portal.rest.api.common.model.response.ValidationResponseModel;
-import com.getboostr.portal.rest.api.organization.invitation.OrganizationInvitationService;
 import com.getboostr.portal.rest.security.authentication.AnonymouslyAccessible;
 import com.getboostr.portal.rest.security.authorization.CsrfIgnorable;
 import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
@@ -16,10 +18,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,23 +30,30 @@ public class RegistrationController implements CsrfIgnorable, AnonymouslyAccessi
     public static final String ORGANIZATION_ENDPOINT_SUFFIX = "/organization";
     public static final String ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX = ORGANIZATION_ENDPOINT_SUFFIX + USER_ENDPOINT_SUFFIX;
 
-    private UserRegistrationService userRegistrationService;
-    private OrganizationAccountRegistrationService organizationAccountRegistrationService;
-    private OrganizationInvitationService organizationInvitationService;
+    private final UserRegistrationService userRegistrationService;
+    private final RegistrationPlanService registrationPlanService;
+    private final OrganizationAccountRegistrationService organizationAccountRegistrationService;
+    private final OrganizationInvitationService organizationInvitationService;
 
     @Autowired
-    public RegistrationController(UserRegistrationService userRegistrationService,
+    public RegistrationController(UserRegistrationService userRegistrationService, RegistrationPlanService registrationPlanService,
                                   OrganizationAccountRegistrationService organizationAccountRegistrationService, OrganizationInvitationService organizationInvitationService) {
         this.userRegistrationService = userRegistrationService;
+        this.registrationPlanService = registrationPlanService;
         this.organizationAccountRegistrationService = organizationAccountRegistrationService;
         this.organizationInvitationService = organizationInvitationService;
     }
 
-    @ApiOperation(value = "Register a non organization user", response = Boolean.class)
+    @ApiOperation(value = "Register an individual (non-organization) user", response = Boolean.class)
     @PostMapping(USER_ENDPOINT_SUFFIX)
     public boolean registerUser(@ApiParam @RequestBody UserRegistrationModel registrationRequest) {
         userRegistrationService.registerUser(registrationRequest);
         return true;
+    }
+
+    @GetMapping("/plans")
+    public MultiPlanModel getUserRegistrationPlans() {
+        return registrationPlanService.getPlans();
     }
 
     @ApiOperation(value = "Register an organization with an initial account owner user", response = Boolean.class)

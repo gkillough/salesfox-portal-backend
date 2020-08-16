@@ -5,8 +5,6 @@ import com.getboostr.portal.database.account.entity.LoginEntity;
 import com.getboostr.portal.database.account.entity.MembershipEntity;
 import com.getboostr.portal.database.account.entity.RoleEntity;
 import com.getboostr.portal.database.account.entity.UserEntity;
-import com.getboostr.portal.database.account.repository.LoginRepository;
-import com.getboostr.portal.database.account.repository.MembershipRepository;
 import com.getboostr.portal.database.account.repository.RoleRepository;
 import com.getboostr.portal.database.account.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -19,19 +17,16 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @Slf4j
 public class PortalUserDetailsService implements UserDetailsService {
-    private final MembershipRepository membershipRepository;
-    private final LoginRepository loginRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
     @Autowired
-    public PortalUserDetailsService(MembershipRepository membershipRepository, LoginRepository loginRepository, UserRepository userRepository, RoleRepository roleRepository) {
-        this.membershipRepository = membershipRepository;
-        this.loginRepository = loginRepository;
+    public PortalUserDetailsService(UserRepository userRepository, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
     }
@@ -43,7 +38,7 @@ public class PortalUserDetailsService implements UserDetailsService {
         LoginEntity userLogin = user.getLoginEntity();
         MembershipEntity membership = user.getMembershipEntity();
 
-        ArrayList<String> userRoles = new ArrayList<>();
+        List<String> userRoles = new ArrayList<>();
         roleRepository.findById(membership.getRoleId())
                 .map(RoleEntity::getRoleLevel)
                 .ifPresent(userRoles::add);

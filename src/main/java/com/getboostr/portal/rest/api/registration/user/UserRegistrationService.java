@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -72,38 +71,51 @@ public class UserRegistrationService {
      * @return the id of the registered user
      */
     @Transactional
-    public UUID registerUser(UserRegistrationModel registrationModel) {
-        UUID defaultOrganizationId = organizationRepository.findFirstByOrganizationName(OrganizationConstants.PLAN_BOOSTR_BASIC_OR_PREMIUM_DEFAULT_ORG_NAME)
+    public void registerUser(UserRegistrationModel registrationModel) {
+        UUID defaultOrganizationId = organizationRepository.findFirstByOrganizationName(OrganizationConstants.PLAN_INDIVIDUAL_ORG_NAME)
                 .map(OrganizationEntity::getOrganizationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
-        return registerOrganizationUser(registrationModel, defaultOrganizationId, null);
+
+        String roleLevel = registrationModel.getRoleLevel();
+        String planName;
+        if (null == roleLevel) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid plan selected");
+        } else if (roleLevel.equals(PortalAuthorityConstants.PORTAL_PREMIUM_USER)) {
+            planName = OrganizationConstants.PLAN_INDIVIDUAL_PREMIUM_DISPLAY_NAME;
+        } else {
+            planName = OrganizationConstants.PLAN_INDIVIDUAL_BASIC_DISPLAY_NAME;
+        }
+
+        OrganizationAccountEntity individualOrgAccount = organizationAccountRepository.findFirstByOrganizationIdAndOrganizationAccountName(defaultOrganizationId, planName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No plan with the name '[" + planName + "]' exists"));
+        registerOrganizationUser(registrationModel, individualOrgAccount);
     }
 
     /**
      * @param registrationModel a model containing the fields required to register a user
-     * @param organizationId    an id to indicate which organization to assign to the user
-     * @param role              a nullable role to indicate which role to assign to the user
+     * @param orgAccount        the organization account in which to register the user
      * @return the id of the registered user
      */
     @Transactional
-    public UUID registerOrganizationUser(UserRegistrationModel registrationModel, UUID organizationId, @Nullable String role) {
+    public UserEntity registerOrganizationUser(UserRegistrationModel registrationModel, OrganizationAccountEntity orgAccount) {
         validateRegistrationModel(registrationModel);
-        return registerValidOrganizationUser(registrationModel, organizationId, role);
+        return registerValidatedUser(registrationModel, orgAccount);
     }
 
-    private UUID registerValidOrganizationUser(UserRegistrationModel registrationModel, UUID organizationId, @Nullable String role) {
+    private UserEntity registerValidatedUser(UserRegistrationModel registrationModel, OrganizationAccountEntity orgAccount) {
         UserEntity userEntity = saveUserInfo(registrationModel.getFirstName(), registrationModel.getLastName(), registrationModel.getEmail());
+        RoleEntity roleEntity = getRoleInfo(registrationModel.getRoleLevel());
 
-        RoleEntity roleEntity = getRoleInfo(registrationModel.getPlanType(), role);
-        OrganizationAccountEntity organizationAccountEntity = getPlanInfo(registrationModel.getPlanType(), organizationId);
-
-        reserveLicenseSeatForNewUser(organizationAccountEntity);
-        saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
-        saveMembershipInfo(userEntity.getUserId(), organizationAccountEntity.getOrganizationAccountId(), roleEntity.getRoleId());
+        reserveLicenseSeatForNewUser(orgAccount);
+        LoginEntity loginInfo = saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
+        MembershipEntity membershipInfo = saveMembershipInfo(userEntity.getUserId(), orgAccount.getOrganizationAccountId(), roleEntity.getRoleId());
 
         createInventoryIfNecessary(userEntity.getUserId(), roleEntity);
         userProfileService.initializeProfile(userEntity.getUserId());
-        return userEntity.getUserId();
+
+        userEntity.setLoginEntity(loginInfo);
+        userEntity.setMembershipEntity(membershipInfo);
+        return userEntity;
     }
 
     private UserEntity saveUserInfo(String firstName, String lastName, String email) {
@@ -116,24 +128,8 @@ public class UserRegistrationService {
         return userRepository.save(newUserToSave);
     }
 
-    private OrganizationAccountEntity getPlanInfo(String planName, UUID organizationId) {
-        return organizationAccountRepository.findFirstByOrganizationIdAndOrganizationAccountName(organizationId, planName)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No plan with the name '[" + planName + "]' exists"));
-    }
-
-    private RoleEntity getRoleInfo(String planName, @Nullable String role) {
-        String portalRole;
-        if (role != null) {
-            portalRole = role;
-        } else if (OrganizationConstants.PLAN_BOOSTR_BASIC_DISPLAY_NAME.equals(planName)) {
-            portalRole = PortalAuthorityConstants.PORTAL_BASIC_USER;
-        } else if (OrganizationConstants.PLAN_BOOSTR_PREMIUM_DISPLAY_NAME.equals(planName)) {
-            portalRole = PortalAuthorityConstants.PORTAL_PREMIUM_USER;
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid plan selected. To create a business account please contact us.");
-        }
-
-        return roleRepository.findFirstByRoleLevel(portalRole)
+    private RoleEntity getRoleInfo(String roleLevel) {
+        return roleRepository.findFirstByRoleLevel(roleLevel)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
@@ -149,15 +145,15 @@ public class UserRegistrationService {
         }
     }
 
-    private void saveLoginInfo(UUID userId, String password) {
+    private LoginEntity saveLoginInfo(UUID userId, String password) {
         String encodedPassword = passwordEncoder.encode(password);
         LoginEntity newLoginToSave = new LoginEntity(userId, encodedPassword, null, null, 0);
-        loginRepository.save(newLoginToSave);
+        return loginRepository.save(newLoginToSave);
     }
 
-    private void saveMembershipInfo(UUID userId, UUID organizationAccountId, UUID roleId) {
+    private MembershipEntity saveMembershipInfo(UUID userId, UUID organizationAccountId, UUID roleId) {
         MembershipEntity newMembershipToSave = new MembershipEntity(userId, organizationAccountId, roleId);
-        membershipRepository.save(newMembershipToSave);
+        return membershipRepository.save(newMembershipToSave);
     }
 
     private void createInventoryIfNecessary(UUID userId, RoleEntity roleEntity) {
@@ -176,7 +172,7 @@ public class UserRegistrationService {
         isBlankAddError(errorFields, "Last Name", registrationModel.getLastName());
         isBlankAddError(errorFields, "Email", registrationModel.getEmail());
         isBlankAddError(errorFields, "Password", registrationModel.getPassword());
-        isBlankAddError(errorFields, "Plan Type", registrationModel.getPlanType());
+        isBlankAddError(errorFields, "Plan", registrationModel.getRoleLevel());
 
         if (!errorFields.isEmpty()) {
             String commaSeparatedErrors = String.join(", ", errorFields);
