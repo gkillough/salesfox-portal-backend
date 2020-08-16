@@ -97,8 +97,8 @@ public class OrganizationInvitationService {
         validateInviteRequestModel(requestModel);
 
         UserEntity authenticatedUser = userMembershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity membership = userMembershipRetrievalService.getMembershipEntity(authenticatedUser);
-        OrganizationAccountEntity orgAccountEntity = userMembershipRetrievalService.getOrganizationAccountEntity(membership);
+        MembershipEntity membership = authenticatedUser.getMembershipEntity();
+        OrganizationAccountEntity orgAccountEntity = membership.getOrganizationAccountEntity();
 
         if (!orgAccountEntity.getOrganizationAccountName().equals(requestModel.getOrganizationAccountName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You do not have access to that Organization Account");
@@ -229,8 +229,8 @@ public class OrganizationInvitationService {
                 });
 
         String randomTemporaryPassword = UUID.randomUUID().toString();
-        UserRegistrationModel userRegistrationModel = new UserRegistrationModel("First Name", "Last Name", inviteTokenEntity.getEmail(), randomTemporaryPassword, orgAccount.getOrganizationAccountName());
-        userRegistrationService.registerOrganizationUser(userRegistrationModel, orgAccount.getOrganizationId(), PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION);
+        UserRegistrationModel userRegistrationModel = new UserRegistrationModel("First Name", "Last Name", inviteTokenEntity.getEmail(), randomTemporaryPassword, PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION);
+        userRegistrationService.registerOrganizationUser(userRegistrationModel, orgAccount);
     }
 
     private void createUserSessionWithOrgAccountCreationPermission(String email) {

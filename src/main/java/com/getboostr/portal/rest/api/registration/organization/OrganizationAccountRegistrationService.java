@@ -105,7 +105,7 @@ public class OrganizationAccountRegistrationService {
         createOrganizationAccountAddress(registrationModel.getOrganizationAddress(), orgAccountEntity);
 
         activateLicense(orgAccountLicense);
-        registerOrganizationAccountOwner(registrationModel.getAccountOwner(), orgEntity, orgAccountEntity);
+        registerOrganizationAccountOwner(registrationModel.getAccountOwner(), orgAccountEntity);
         createOrganizationAccountProfile(orgAccountEntity, registrationModel.getBusinessPhoneNumber());
         createInventory(orgAccountEntity);
     }
@@ -145,10 +145,10 @@ public class OrganizationAccountRegistrationService {
         organizationAccountAddressRepository.save(orgAcctAddressToSave);
     }
 
-    private void registerOrganizationAccountOwner(OrganizationAccountUserRegistrationModel accountOwnerModel, OrganizationEntity organization, OrganizationAccountEntity organizationAccount) {
+    private void registerOrganizationAccountOwner(OrganizationAccountUserRegistrationModel accountOwnerModel, OrganizationAccountEntity organizationAccount) {
         UserRegistrationModel organizationAccountOwnerToRegister = new UserRegistrationModel(
-                accountOwnerModel.getFirstName(), accountOwnerModel.getLastName(), accountOwnerModel.getEmail(), accountOwnerModel.getPassword(), organizationAccount.getOrganizationAccountName());
-        UUID registeredUserId = userRegistrationService.registerOrganizationUser(organizationAccountOwnerToRegister, organization.getOrganizationId(), PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER);
+                accountOwnerModel.getFirstName(), accountOwnerModel.getLastName(), accountOwnerModel.getEmail(), accountOwnerModel.getPassword(), PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER);
+        UUID registeredUserId = userRegistrationService.registerOrganizationUser(organizationAccountOwnerToRegister, organizationAccount);
 
         UserProfileUpdateModel accountOwnerProfileUpdateModel = new UserProfileUpdateModel(
                 accountOwnerModel.getFirstName(), accountOwnerModel.getLastName(), accountOwnerModel.getEmail(),
