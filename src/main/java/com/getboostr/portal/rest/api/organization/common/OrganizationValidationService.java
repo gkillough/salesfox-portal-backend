@@ -2,8 +2,8 @@ package com.getboostr.portal.rest.api.organization.common;
 
 import com.getboostr.portal.database.organization.OrganizationEntity;
 import com.getboostr.portal.database.organization.OrganizationRepository;
-import com.getboostr.portal.rest.api.registration.organization.OrganizationConstants;
 import com.getboostr.portal.database.organization.account.OrganizationAccountRepository;
+import com.getboostr.portal.rest.api.registration.organization.OrganizationConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,8 +12,8 @@ import java.util.UUID;
 
 @Component
 public class OrganizationValidationService {
-    private OrganizationRepository organizationRepository;
-    private OrganizationAccountRepository organizationAccountRepository;
+    private final OrganizationRepository organizationRepository;
+    private final OrganizationAccountRepository organizationAccountRepository;
 
     @Autowired
     public OrganizationValidationService(OrganizationRepository organizationRepository, OrganizationAccountRepository organizationAccountRepository) {
@@ -22,7 +22,7 @@ public class OrganizationValidationService {
     }
 
     public boolean isOrganizationRestricted(String organizationName) {
-        return OrganizationConstants.INTERNAL_BOOSTR_ORG_NAME.equals(organizationName) || OrganizationConstants.PLAN_BOOSTR_BASIC_OR_PREMIUM_DEFAULT_ORG_NAME.equals(organizationName);
+        return OrganizationConstants.ADMIN_AND_SUPPORT_ORG_NAME.equals(organizationName) || OrganizationConstants.PLAN_INDIVIDUAL_ORG_NAME.equals(organizationName);
     }
 
     public boolean isOrganizationAccountNameInUse(String organizationName, String organizationAccountName) {
