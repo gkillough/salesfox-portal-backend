@@ -3,6 +3,7 @@ package com.getboostr.portal.rest.api.registration.organization;
 import com.getboostr.portal.common.FieldValidationUtils;
 import com.getboostr.portal.common.model.PortalAddressModel;
 import com.getboostr.portal.database.account.entity.LicenseEntity;
+import com.getboostr.portal.database.account.entity.UserEntity;
 import com.getboostr.portal.database.account.repository.LicenseRepository;
 import com.getboostr.portal.database.inventory.InventoryEntity;
 import com.getboostr.portal.database.inventory.InventoryRepository;
@@ -148,12 +149,12 @@ public class OrganizationAccountRegistrationService {
     private void registerOrganizationAccountOwner(OrganizationAccountUserRegistrationModel accountOwnerModel, OrganizationAccountEntity organizationAccount) {
         UserRegistrationModel organizationAccountOwnerToRegister = new UserRegistrationModel(
                 accountOwnerModel.getFirstName(), accountOwnerModel.getLastName(), accountOwnerModel.getEmail(), accountOwnerModel.getPassword(), PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER);
-        UUID registeredUserId = userRegistrationService.registerOrganizationUser(organizationAccountOwnerToRegister, organizationAccount);
+        UserEntity orgAcctOwnerUserEntity = userRegistrationService.registerOrganizationUser(organizationAccountOwnerToRegister, organizationAccount);
 
         UserProfileUpdateModel accountOwnerProfileUpdateModel = new UserProfileUpdateModel(
                 accountOwnerModel.getFirstName(), accountOwnerModel.getLastName(), accountOwnerModel.getEmail(),
                 accountOwnerModel.getUserAddress(), accountOwnerModel.getMobilePhoneNumber(), accountOwnerModel.getBusinessPhoneNumber());
-        userProfileService.updateProfileWithoutPermissionsCheck(registeredUserId, accountOwnerProfileUpdateModel);
+        userProfileService.updateProfileWithoutPermissionsCheck(orgAcctOwnerUserEntity.getUserId(), accountOwnerProfileUpdateModel);
     }
 
     private void createOrganizationAccountProfile(OrganizationAccountEntity organizationAccount, String businessPhoneNumber) {

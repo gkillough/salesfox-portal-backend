@@ -71,7 +71,7 @@ public class UserRegistrationService {
      * @return the id of the registered user
      */
     @Transactional
-    public UUID registerUser(UserRegistrationModel registrationModel) {
+    public void registerUser(UserRegistrationModel registrationModel) {
         UUID defaultOrganizationId = organizationRepository.findFirstByOrganizationName(OrganizationConstants.PLAN_INDIVIDUAL_ORG_NAME)
                 .map(OrganizationEntity::getOrganizationId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
@@ -88,7 +88,7 @@ public class UserRegistrationService {
 
         OrganizationAccountEntity individualOrgAccount = organizationAccountRepository.findFirstByOrganizationIdAndOrganizationAccountName(defaultOrganizationId, planName)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No plan with the name '[" + planName + "]' exists"));
-        return registerOrganizationUser(registrationModel, individualOrgAccount);
+        registerOrganizationUser(registrationModel, individualOrgAccount);
     }
 
     /**
@@ -97,22 +97,25 @@ public class UserRegistrationService {
      * @return the id of the registered user
      */
     @Transactional
-    public UUID registerOrganizationUser(UserRegistrationModel registrationModel, OrganizationAccountEntity orgAccount) {
+    public UserEntity registerOrganizationUser(UserRegistrationModel registrationModel, OrganizationAccountEntity orgAccount) {
         validateRegistrationModel(registrationModel);
         return registerValidatedUser(registrationModel, orgAccount);
     }
 
-    private UUID registerValidatedUser(UserRegistrationModel registrationModel, OrganizationAccountEntity orgAccount) {
+    private UserEntity registerValidatedUser(UserRegistrationModel registrationModel, OrganizationAccountEntity orgAccount) {
         UserEntity userEntity = saveUserInfo(registrationModel.getFirstName(), registrationModel.getLastName(), registrationModel.getEmail());
         RoleEntity roleEntity = getRoleInfo(registrationModel.getRoleLevel());
 
         reserveLicenseSeatForNewUser(orgAccount);
-        saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
-        saveMembershipInfo(userEntity.getUserId(), orgAccount.getOrganizationAccountId(), roleEntity.getRoleId());
+        LoginEntity loginInfo = saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
+        MembershipEntity membershipInfo = saveMembershipInfo(userEntity.getUserId(), orgAccount.getOrganizationAccountId(), roleEntity.getRoleId());
 
         createInventoryIfNecessary(userEntity.getUserId(), roleEntity);
         userProfileService.initializeProfile(userEntity.getUserId());
-        return userEntity.getUserId();
+
+        userEntity.setLoginEntity(loginInfo);
+        userEntity.setMembershipEntity(membershipInfo);
+        return userEntity;
     }
 
     private UserEntity saveUserInfo(String firstName, String lastName, String email) {
@@ -142,15 +145,15 @@ public class UserRegistrationService {
         }
     }
 
-    private void saveLoginInfo(UUID userId, String password) {
+    private LoginEntity saveLoginInfo(UUID userId, String password) {
         String encodedPassword = passwordEncoder.encode(password);
         LoginEntity newLoginToSave = new LoginEntity(userId, encodedPassword, null, null, 0);
-        loginRepository.save(newLoginToSave);
+        return loginRepository.save(newLoginToSave);
     }
 
-    private void saveMembershipInfo(UUID userId, UUID organizationAccountId, UUID roleId) {
+    private MembershipEntity saveMembershipInfo(UUID userId, UUID organizationAccountId, UUID roleId) {
         MembershipEntity newMembershipToSave = new MembershipEntity(userId, organizationAccountId, roleId);
-        membershipRepository.save(newMembershipToSave);
+        return membershipRepository.save(newMembershipToSave);
     }
 
     private void createInventoryIfNecessary(UUID userId, RoleEntity roleEntity) {
