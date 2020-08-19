@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
 import java.io.File;
-import java.io.IOException;
 
 @Slf4j
 @org.springframework.context.annotation.Configuration
@@ -38,9 +37,9 @@ public class FreemarkerConfiguration {
     private TemplateLoader createTemplateLoader() {
         try {
             return new FileTemplateLoader(freemarkerTemplateDir, false);
-        } catch (IOException ioException) {
-            log.warn("Could not initialize Freemarker FileTemplateLoader. Falling back to ClassTemplateLoader", ioException);
-            return new ClassTemplateLoader(getClass(), freemarkerTemplateDir.getName());
+        } catch (Exception e) {
+            log.warn("Could not initialize Freemarker FileTemplateLoader. Falling back to ClassTemplateLoader", e);
+            return new ClassTemplateLoader(getClass(), "/templates/");
         }
     }
 
