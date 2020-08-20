@@ -156,18 +156,18 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private String[] collectCsrfIgnorableResources() {
-        return collectFlattenedApiStrings(csrfIgnorables, CsrfIgnorable::csrfIgnoredApiEndpoints);
+        return collectFlattenedApiStrings(csrfIgnorables, CsrfIgnorable::csrfIgnorableApiAntMatchers);
     }
 
     private String[] collectAnonymouslyAccessibleResources() {
-        String[] staticResourceEndpoints = collectFlattenedStrings(anonymouslyAccessibles, AnonymouslyAccessible::anonymouslyAccessibleStaticResourceEndpoints);
-        String[] apiEndpoints = collectFlattenedApiStrings(anonymouslyAccessibles, AnonymouslyAccessible::anonymouslyAccessibleApiEndpoints);
+        String[] staticResourceEndpoints = collectFlattenedStrings(anonymouslyAccessibles, AnonymouslyAccessible::anonymouslyAccessibleStaticResourceAntMatchers);
+        String[] apiEndpoints = collectFlattenedApiStrings(anonymouslyAccessibles, AnonymouslyAccessible::anonymouslyAccessibleApiAntMatchers);
         return ArrayUtils.addAll(staticResourceEndpoints, apiEndpoints);
     }
 
     private String[] collectAdminOnlyResources() {
-        String[] staticResourceEndpoints = collectFlattenedStrings(adminOnlyAccessibles, AdminOnlyAccessible::adminOnlyStaticResourceEndpoints);
-        String[] apiEndpoints = collectFlattenedApiStrings(adminOnlyAccessibles, AdminOnlyAccessible::adminOnlyApiEndpoints);
+        String[] staticResourceEndpoints = collectFlattenedStrings(adminOnlyAccessibles, AdminOnlyAccessible::adminOnlyStaticResourceAntMatchers);
+        String[] apiEndpoints = collectFlattenedApiStrings(adminOnlyAccessibles, AdminOnlyAccessible::adminOnlyApiAntMatchers);
         return ArrayUtils.addAll(staticResourceEndpoints, apiEndpoints);
     }
 

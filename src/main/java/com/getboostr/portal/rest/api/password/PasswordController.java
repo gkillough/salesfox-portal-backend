@@ -40,7 +40,7 @@ public class PasswordController implements CsrfIgnorable, AnonymouslyAccessible 
     }
 
     @Override
-    public String[] anonymouslyAccessibleApiEndpoints() {
+    public String[] anonymouslyAccessibleApiAntMatchers() {
         return new String[] {
                 PasswordController.RESET_ENDPOINT,
                 PasswordController.GRANT_UPDATE_PERMISSION_ENDPOINT
@@ -48,7 +48,7 @@ public class PasswordController implements CsrfIgnorable, AnonymouslyAccessible 
     }
 
     @Override
-    public String[] csrfIgnoredApiEndpoints() {
+    public String[] csrfIgnorableApiAntMatchers() {
         return new String[] {
                 PasswordController.RESET_ENDPOINT,
                 PasswordController.UPDATE_ENDPOINT

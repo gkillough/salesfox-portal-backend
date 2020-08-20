@@ -32,7 +32,7 @@ public class DefaultAllowedEndpoints implements AnonymouslyAccessible {
     public static final String JPG_SUB_CONTENT = "/**/*.jpg";
 
     @Override
-    public String[] anonymouslyAccessibleStaticResourceEndpoints() {
+    public String[] anonymouslyAccessibleStaticResourceAntMatchers() {
         return new String[] {
                 ROOT_ENDPOINT,
                 ERROR_ENDPOINT,
@@ -59,7 +59,7 @@ public class DefaultAllowedEndpoints implements AnonymouslyAccessible {
     }
 
     @Override
-    public String[] anonymouslyAccessibleApiEndpoints() {
+    public String[] anonymouslyAccessibleApiAntMatchers() {
         // TODO determine if these should be duplicated above
         return new String[] {
                 ROOT_ENDPOINT,

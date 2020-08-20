@@ -50,7 +50,7 @@ public class SwaggerConfiguration implements AnonymouslyAccessible {
     }
 
     @Override
-    public String[] anonymouslyAccessibleStaticResourceEndpoints() {
+    public String[] anonymouslyAccessibleStaticResourceAntMatchers() {
         return adminOnlyStaticResourceEndpoints();
     }
 

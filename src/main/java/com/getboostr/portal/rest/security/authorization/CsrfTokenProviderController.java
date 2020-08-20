@@ -27,7 +27,7 @@ public class CsrfTokenProviderController implements AnonymouslyAccessible {
     }
 
     @Override
-    public String[] anonymouslyAccessibleApiEndpoints() {
+    public String[] anonymouslyAccessibleApiAntMatchers() {
         return new String[] {
                 CSRF_TOKEN_REQUEST_ENDPOINT
         };
