@@ -38,7 +38,7 @@ public class SwaggerConfiguration implements AnonymouslyAccessible {
 
     // FIXME fix this before release and make this class implement AdminOnlyAccessible
 //    @Override
-    public static String[] adminOnlyEndpointAntMatchers() {
+    public static String[] adminOnlyStaticResourceEndpoints() {
         return new String[] {
                 "/swagger-ui.html",
                 "/webjars",
@@ -50,8 +50,8 @@ public class SwaggerConfiguration implements AnonymouslyAccessible {
     }
 
     @Override
-    public String[] allowedEndpointAntMatchers() {
-        return adminOnlyEndpointAntMatchers();
+    public String[] anonymouslyAccessibleStaticResourceEndpoints() {
+        return adminOnlyStaticResourceEndpoints();
     }
 
 }

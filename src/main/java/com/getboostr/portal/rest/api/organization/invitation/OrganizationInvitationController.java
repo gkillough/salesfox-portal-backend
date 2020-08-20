@@ -43,7 +43,7 @@ public class OrganizationInvitationController implements AnonymouslyAccessible {
     }
 
     @Override
-    public String[] allowedEndpointAntMatchers() {
+    public String[] anonymouslyAccessibleApiEndpoints() {
         return new String[] {
                 OrganizationEndpointConstants.BASE_ENDPOINT + VALIDATE_INVITE_ENDPOINT,
                 SecurityInterface.createSubDirectoryPattern(OrganizationEndpointConstants.BASE_ENDPOINT + VALIDATE_INVITE_ENDPOINT)

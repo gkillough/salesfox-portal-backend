@@ -83,14 +83,14 @@ public class RegistrationController implements CsrfIgnorable, AnonymouslyAccessi
     }
 
     @Override
-    public String[] ignoredEndpointAntMatchers() {
+    public String[] anonymouslyAccessibleApiEndpoints() {
         return new String[] {
                 SecurityInterface.createSubDirectoryPattern(RegistrationController.BASE_ENDPOINT)
         };
     }
 
     @Override
-    public String[] allowedEndpointAntMatchers() {
+    public String[] csrfIgnoredApiEndpoints() {
         return new String[] {
                 SecurityInterface.createSubDirectoryPattern(RegistrationController.BASE_ENDPOINT)
         };

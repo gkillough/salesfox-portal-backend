@@ -16,7 +16,7 @@ public class PasswordController implements CsrfIgnorable, AnonymouslyAccessible 
     public static final String GRANT_UPDATE_PERMISSION_ENDPOINT = RESET_ENDPOINT + "/validate";
     public static final String UPDATE_ENDPOINT = BASE_ENDPOINT + "/update";
 
-    private PasswordService passwordService;
+    private final PasswordService passwordService;
 
     @Autowired
     public PasswordController(PasswordService passwordService) {
@@ -40,18 +40,18 @@ public class PasswordController implements CsrfIgnorable, AnonymouslyAccessible 
     }
 
     @Override
-    public String[] ignoredEndpointAntMatchers() {
-        return new String[]{
+    public String[] anonymouslyAccessibleApiEndpoints() {
+        return new String[] {
                 PasswordController.RESET_ENDPOINT,
-                PasswordController.UPDATE_ENDPOINT
+                PasswordController.GRANT_UPDATE_PERMISSION_ENDPOINT
         };
     }
 
     @Override
-    public String[] allowedEndpointAntMatchers() {
-        return new String[]{
+    public String[] csrfIgnoredApiEndpoints() {
+        return new String[] {
                 PasswordController.RESET_ENDPOINT,
-                PasswordController.GRANT_UPDATE_PERMISSION_ENDPOINT
+                PasswordController.UPDATE_ENDPOINT
         };
     }
 
