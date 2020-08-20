@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 public class CsrfTokenProviderController implements AnonymouslyAccessible {
     public static final String CSRF_TOKEN_REQUEST_ENDPOINT = "/csrf/token";
-    private CsrfTokenRepository csrfTokenRepository;
+    private final CsrfTokenRepository csrfTokenRepository;
 
     @Autowired
     public CsrfTokenProviderController(CsrfTokenRepository csrfTokenRepository) {
@@ -27,8 +27,8 @@ public class CsrfTokenProviderController implements AnonymouslyAccessible {
     }
 
     @Override
-    public String[] allowedEndpointAntMatchers() {
-        return new String[]{
+    public String[] anonymouslyAccessibleApiAntMatchers() {
+        return new String[] {
                 CSRF_TOKEN_REQUEST_ENDPOINT
         };
     }

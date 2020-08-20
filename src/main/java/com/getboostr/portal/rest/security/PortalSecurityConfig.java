@@ -2,16 +2,18 @@ package com.getboostr.portal.rest.security;
 
 import com.getboostr.portal.database.account.entity.RoleEntity;
 import com.getboostr.portal.database.account.repository.RoleRepository;
+import com.getboostr.portal.rest.RestApiPathConfig;
+import com.getboostr.portal.rest.api.password.PasswordController;
 import com.getboostr.portal.rest.api.registration.RegistrationController;
 import com.getboostr.portal.rest.security.authentication.AnonymouslyAccessible;
 import com.getboostr.portal.rest.security.authentication.DefaultAuthenticationHandlers;
+import com.getboostr.portal.rest.security.authentication.user.PortalUserDetailsService;
 import com.getboostr.portal.rest.security.authorization.AdminOnlyAccessible;
 import com.getboostr.portal.rest.security.authorization.CsrfIgnorable;
 import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import com.getboostr.portal.rest.security.common.DefaultAllowedEndpoints;
 import com.getboostr.portal.rest.security.common.SecurityInterface;
-import com.getboostr.portal.rest.api.password.PasswordController;
-import com.getboostr.portal.rest.security.authentication.user.PortalUserDetailsService;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -35,13 +37,13 @@ import java.util.function.Function;
 public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String PORTAL_COOKIE_NAME = "PORTAL_SESSION_ID";
 
-    private CsrfTokenRepository csrfTokenRepository;
-    private RoleRepository roleRepository;
-    private List<CsrfIgnorable> csrfIgnorables;
-    private List<AnonymouslyAccessible> anonymouslyAccessibles;
-    private List<AdminOnlyAccessible> adminOnlyAccessibles;
-    private PortalUserDetailsService userDetailsService;
-    private PasswordEncoder passwordEncoder;
+    private final CsrfTokenRepository csrfTokenRepository;
+    private final RoleRepository roleRepository;
+    private final List<CsrfIgnorable> csrfIgnorables;
+    private final List<AnonymouslyAccessible> anonymouslyAccessibles;
+    private final List<AdminOnlyAccessible> adminOnlyAccessibles;
+    private final PortalUserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public PortalSecurityConfig(CsrfTokenRepository csrfTokenRepository, RoleRepository roleRepository,
@@ -85,10 +87,9 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private HttpSecurity configureCsrf(HttpSecurity security) throws Exception {
-        String[] ignoredAntMatchers = collectFlattenedStrings(csrfIgnorables, CsrfIgnorable::ignoredEndpointAntMatchers);
         return security.csrf()
                 .csrfTokenRepository(csrfTokenRepository)
-                .ignoringAntMatchers(ignoredAntMatchers)
+                .ignoringAntMatchers(collectCsrfIgnorableResources())
                 .and();
     }
 
@@ -109,7 +110,7 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private HttpSecurity configureDefaultPermissions(HttpSecurity security) throws Exception {
         return security.authorizeRequests()
-                .antMatchers(collectAnonymouslyAccessibleEndpoints())
+                .antMatchers(collectAnonymouslyAccessibleResources())
                 .permitAll()
                 .anyRequest()
                 .hasAnyAuthority(collectUserAuthoritiesFromDatabase())
@@ -118,7 +119,7 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private HttpSecurity configureAdminPermissions(HttpSecurity security) throws Exception {
         return security.authorizeRequests()
-                .antMatchers(collectAdminOnlyEndpoints())
+                .antMatchers(collectAdminOnlyResources())
                 .hasAuthority(PortalAuthorityConstants.PORTAL_ADMIN)
                 .and();
     }
@@ -132,6 +133,7 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private HttpSecurity configureLogin(HttpSecurity security) throws Exception {
         return security.formLogin()
+                .loginPage(DefaultAllowedEndpoints.LOGIN_ENDPOINT)
                 .permitAll()
                 .successHandler(DefaultAuthenticationHandlers.AUTHENTICATION_SUCCESS_HANDLER)
                 .failureHandler(DefaultAuthenticationHandlers.AUTHENTICATION_FAILURE_HANDLER)
@@ -153,19 +155,36 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
                 .toArray(String[]::new);
     }
 
-    private String[] collectAnonymouslyAccessibleEndpoints() {
-        return collectFlattenedStrings(anonymouslyAccessibles, AnonymouslyAccessible::allowedEndpointAntMatchers);
+    private String[] collectCsrfIgnorableResources() {
+        return collectFlattenedApiStrings(csrfIgnorables, CsrfIgnorable::csrfIgnorableApiAntMatchers);
     }
 
-    private String[] collectAdminOnlyEndpoints() {
-        return collectFlattenedStrings(adminOnlyAccessibles, AdminOnlyAccessible::adminOnlyEndpointAntMatchers);
+    private String[] collectAnonymouslyAccessibleResources() {
+        String[] staticResourceEndpoints = collectFlattenedStrings(anonymouslyAccessibles, AnonymouslyAccessible::anonymouslyAccessibleStaticResourceAntMatchers);
+        String[] apiEndpoints = collectFlattenedApiStrings(anonymouslyAccessibles, AnonymouslyAccessible::anonymouslyAccessibleApiAntMatchers);
+        return ArrayUtils.addAll(staticResourceEndpoints, apiEndpoints);
+    }
+
+    private String[] collectAdminOnlyResources() {
+        String[] staticResourceEndpoints = collectFlattenedStrings(adminOnlyAccessibles, AdminOnlyAccessible::adminOnlyStaticResourceAntMatchers);
+        String[] apiEndpoints = collectFlattenedApiStrings(adminOnlyAccessibles, AdminOnlyAccessible::adminOnlyApiAntMatchers);
+        return ArrayUtils.addAll(staticResourceEndpoints, apiEndpoints);
+    }
+
+    private <T extends SecurityInterface> String[] collectFlattenedApiStrings(Collection<T> securityInterfaces, Function<T, String[]> stringExtractor) {
+        return collectFlattenedStrings(securityInterfaces, stringExtractor, RestApiPathConfig::addApiPrefix);
     }
 
     private <T extends SecurityInterface> String[] collectFlattenedStrings(Collection<T> securityInterfaces, Function<T, String[]> stringExtractor) {
+        return collectFlattenedStrings(securityInterfaces, stringExtractor, Function.identity());
+    }
+
+    private <T extends SecurityInterface> String[] collectFlattenedStrings(Collection<T> securityInterfaces, Function<T, String[]> stringExtractor, Function<String, String> postProcessor) {
         return securityInterfaces
                 .stream()
                 .map(stringExtractor)
                 .flatMap(Arrays::stream)
+                .map(postProcessor)
                 .distinct()
                 .toArray(String[]::new);
     }
