@@ -14,6 +14,7 @@ import com.getboostr.portal.rest.api.registration.user.UserRegistrationService;
 import com.getboostr.portal.rest.security.authentication.AnonymouslyAccessible;
 import com.getboostr.portal.rest.security.authorization.CsrfIgnorable;
 import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
+import com.getboostr.portal.rest.security.common.SecurityInterface;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,15 +84,15 @@ public class RegistrationController implements CsrfIgnorable, AnonymouslyAccessi
 
     @Override
     public String[] ignoredEndpointAntMatchers() {
-        return new String[]{
-                createSubDirectoryPattern(RegistrationController.BASE_ENDPOINT)
+        return new String[] {
+                SecurityInterface.createSubDirectoryPattern(RegistrationController.BASE_ENDPOINT)
         };
     }
 
     @Override
     public String[] allowedEndpointAntMatchers() {
-        return new String[]{
-                createSubDirectoryPattern(RegistrationController.BASE_ENDPOINT)
+        return new String[] {
+                SecurityInterface.createSubDirectoryPattern(RegistrationController.BASE_ENDPOINT)
         };
     }
 

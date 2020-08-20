@@ -1,6 +1,7 @@
 package com.getboostr.portal.rest.documentation;
 
 import com.getboostr.portal.rest.security.authentication.AnonymouslyAccessible;
+import com.getboostr.portal.rest.security.common.SecurityInterface;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -37,13 +38,13 @@ public class SwaggerConfiguration implements AnonymouslyAccessible {
 
     // FIXME fix this before release and make this class implement AdminOnlyAccessible
 //    @Override
-    public String[] adminOnlyEndpointAntMatchers() {
-        return new String[]{
+    public static String[] adminOnlyEndpointAntMatchers() {
+        return new String[] {
                 "/swagger-ui.html",
                 "/webjars",
-                createSubDirectoryPattern("/webjars"),
+                SecurityInterface.createSubDirectoryPattern("/webjars"),
                 "/swagger-resources",
-                createSubDirectoryPattern("/swagger-resources"),
+                SecurityInterface.createSubDirectoryPattern("/swagger-resources"),
                 "/v2/api-docs"
         };
     }

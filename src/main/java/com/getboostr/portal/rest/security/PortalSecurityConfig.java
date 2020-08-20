@@ -2,16 +2,16 @@ package com.getboostr.portal.rest.security;
 
 import com.getboostr.portal.database.account.entity.RoleEntity;
 import com.getboostr.portal.database.account.repository.RoleRepository;
+import com.getboostr.portal.rest.api.password.PasswordController;
 import com.getboostr.portal.rest.api.registration.RegistrationController;
 import com.getboostr.portal.rest.security.authentication.AnonymouslyAccessible;
 import com.getboostr.portal.rest.security.authentication.DefaultAuthenticationHandlers;
+import com.getboostr.portal.rest.security.authentication.user.PortalUserDetailsService;
 import com.getboostr.portal.rest.security.authorization.AdminOnlyAccessible;
 import com.getboostr.portal.rest.security.authorization.CsrfIgnorable;
 import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
 import com.getboostr.portal.rest.security.common.DefaultAllowedEndpoints;
 import com.getboostr.portal.rest.security.common.SecurityInterface;
-import com.getboostr.portal.rest.api.password.PasswordController;
-import com.getboostr.portal.rest.security.authentication.user.PortalUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -35,13 +35,13 @@ import java.util.function.Function;
 public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     public static final String PORTAL_COOKIE_NAME = "PORTAL_SESSION_ID";
 
-    private CsrfTokenRepository csrfTokenRepository;
-    private RoleRepository roleRepository;
-    private List<CsrfIgnorable> csrfIgnorables;
-    private List<AnonymouslyAccessible> anonymouslyAccessibles;
-    private List<AdminOnlyAccessible> adminOnlyAccessibles;
-    private PortalUserDetailsService userDetailsService;
-    private PasswordEncoder passwordEncoder;
+    private final CsrfTokenRepository csrfTokenRepository;
+    private final RoleRepository roleRepository;
+    private final List<CsrfIgnorable> csrfIgnorables;
+    private final List<AnonymouslyAccessible> anonymouslyAccessibles;
+    private final List<AdminOnlyAccessible> adminOnlyAccessibles;
+    private final PortalUserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public PortalSecurityConfig(CsrfTokenRepository csrfTokenRepository, RoleRepository roleRepository,

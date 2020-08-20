@@ -1,10 +1,11 @@
 package com.getboostr.portal.rest.api.organization.invitation;
 
+import com.getboostr.portal.rest.api.organization.common.OrganizationEndpointConstants;
 import com.getboostr.portal.rest.api.organization.invitation.model.OrganizationAccountInvitationModel;
 import com.getboostr.portal.rest.api.organization.invitation.model.OrganizationAssignableRolesModel;
-import com.getboostr.portal.rest.api.organization.common.OrganizationEndpointConstants;
 import com.getboostr.portal.rest.security.authentication.AnonymouslyAccessible;
 import com.getboostr.portal.rest.security.authorization.PortalAuthorityConstants;
+import com.getboostr.portal.rest.security.common.SecurityInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class OrganizationInvitationController implements AnonymouslyAccessible {
     public static final String INVITE_ENDPOINT = "/invite";
     public static final String VALIDATE_INVITE_ENDPOINT = INVITE_ENDPOINT + "/validate";
 
-    private OrganizationInvitationService organizationInvitationService;
+    private final OrganizationInvitationService organizationInvitationService;
 
     @Autowired
     public OrganizationInvitationController(OrganizationInvitationService organizationInvitationService) {
@@ -43,9 +44,9 @@ public class OrganizationInvitationController implements AnonymouslyAccessible {
 
     @Override
     public String[] allowedEndpointAntMatchers() {
-        return new String[]{
+        return new String[] {
                 OrganizationEndpointConstants.BASE_ENDPOINT + VALIDATE_INVITE_ENDPOINT,
-                createSubDirectoryPattern(OrganizationEndpointConstants.BASE_ENDPOINT + VALIDATE_INVITE_ENDPOINT)
+                SecurityInterface.createSubDirectoryPattern(OrganizationEndpointConstants.BASE_ENDPOINT + VALIDATE_INVITE_ENDPOINT)
         };
     }
 
