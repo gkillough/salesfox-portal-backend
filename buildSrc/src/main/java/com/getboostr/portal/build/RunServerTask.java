@@ -39,15 +39,21 @@ public class RunServerTask extends Exec {
         String projectPath = project.getProjectDir().getAbsolutePath();
         String buildDirectory = project.getBuildDir().getAbsolutePath();
 
-        Map<String, String> envVars = new HashMap<>();
+        Map<String, Object> envVars = new HashMap<>();
         envVars.put("PORTAL_RESOURCE_BASE_DIR", String.format("%s/tmp", buildDirectory));
         envVars.put("PORTAL_RESOURCE_ICON_DIR", String.format("%s/tmp", buildDirectory));
         envVars.put("PORTAL_RESOURCE_LOGO_PNG", String.format("%s/src/main/resources/images/boostr_logo.png", projectPath));
         envVars.put("PORTAL_RESOURCE_LOGO_SVG", String.format("%s/src/main/resources/images/boostr_logo.png", projectPath));
+
+        envVars.put("PORTAL_SMTP_HOST", "smtp.gmail.com");
+        envVars.put("PORTAL_SMTP_PORT", 465);
+        envVars.put("PORTAL_SMTP_USER", "accounts@getboostr.com");
+        envVars.put("PORTAL_SMTP_PASSWORD", "yptjlvfodhkuxdly");
+        envVars.put("PORTAL_SMTP_FROM", "accounts@getboostr.com");
+
         getEnvironment().putAll(envVars);
 
         String version = (String) project.getVersion();
-
         File jarFile = new File(String.format("%s/libs/portal-%s.jar", buildDirectory, version));
 
         List<String> commandArray = new ArrayList<>();
@@ -79,7 +85,6 @@ public class RunServerTask extends Exec {
 
     public List<String> getApplicationVariables() {
         return List.of(
-                "--server.port=8443",
                 "--spring.jpa.hibernate.ddl-auto=none",
                 "--spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect",
 
