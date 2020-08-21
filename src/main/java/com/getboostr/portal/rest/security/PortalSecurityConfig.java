@@ -67,7 +67,8 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity security) throws Exception {
-        HttpSecurity csrfSecured = configureCsrf(security);
+        HttpSecurity sslSecured = configureSSL(security);
+        HttpSecurity csrfSecured = configureCsrf(sslSecured);
         HttpSecurity corsAllowed = configureCors(csrfSecured);
         HttpSecurity passwordResetSecured = configurePasswordReset(corsAllowed);
         HttpSecurity orgAccountRegistrationSecured = configureOrganizationAccountRegistration(passwordResetSecured);
@@ -76,6 +77,14 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
         HttpSecurity errorHandlingSecured = configureErrorHandling(defaultPermissionsSecured);
         HttpSecurity loginSecured = configureLogin(errorHandlingSecured);
         configureLogout(loginSecured);
+    }
+
+    private HttpSecurity configureSSL(HttpSecurity security) throws Exception {
+        return security
+                .requiresChannel()
+                .anyRequest()
+                .requiresSecure()
+                .and();
     }
 
     private HttpSecurity configureCors(HttpSecurity security) throws Exception {

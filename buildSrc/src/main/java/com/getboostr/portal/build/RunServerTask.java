@@ -79,7 +79,7 @@ public class RunServerTask extends Exec {
 
     public List<String> getApplicationVariables() {
         return List.of(
-                "--server.port=8080",
+                "--server.port=8443",
                 "--spring.jpa.hibernate.ddl-auto=none",
                 "--spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect",
 
