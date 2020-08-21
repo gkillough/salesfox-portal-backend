@@ -85,6 +85,9 @@ public class RunServerTask extends Exec {
 
     public List<String> getApplicationVariables() {
         return List.of(
+                "--logging.level.org.springframework.security=DEBUG",
+                "--server.error.include-stacktrace=always",
+
                 "--spring.jpa.hibernate.ddl-auto=none",
                 "--spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect",
 

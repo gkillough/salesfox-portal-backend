@@ -27,7 +27,7 @@ public class PortalConfiguration {
 
     @Bean
     public PasswordEncoder defaultPasswordEncoder() {
-        return new BCryptPasswordEncoder(8);
+        return new BCryptPasswordEncoder(13);
     }
 
 }
