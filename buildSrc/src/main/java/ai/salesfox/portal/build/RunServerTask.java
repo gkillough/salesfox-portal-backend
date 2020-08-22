@@ -42,8 +42,7 @@ public class RunServerTask extends Exec {
         Map<String, Object> envVars = new HashMap<>();
         envVars.put("PORTAL_RESOURCE_BASE_DIR", String.format("%s/tmp", buildDirectory));
         envVars.put("PORTAL_RESOURCE_ICON_DIR", String.format("%s/tmp", buildDirectory));
-        envVars.put("PORTAL_RESOURCE_LOGO_PNG", String.format("%s/src/main/resources/images/boostr_logo.png", projectPath));
-        envVars.put("PORTAL_RESOURCE_LOGO_SVG", String.format("%s/src/main/resources/images/boostr_logo.png", projectPath));
+        envVars.put("PORTAL_RESOURCE_LOGO_PNG", String.format("%s/src/main/resources/images/salesfox_logo.png", projectPath));
 
         envVars.put("PORTAL_SMTP_HOST", "smtp.gmail.com");
         envVars.put("PORTAL_SMTP_PORT", 465);
@@ -109,8 +108,8 @@ public class RunServerTask extends Exec {
                 "--hibernate.default_schema=portal",
                 "--spring.datasource.username=portaluser",
                 "--spring.datasource.password=Port@l!23",
-                "--spring.datasource.url=jdbc:postgresql://${embedded.postgresql.host}:${embedded.postgresql.port}/boostr",
-                "--spring.datasource.hikari.jdbc-url=jdbc:postgresql://${embedded.postgresql.host}:${embedded.postgresql.port}/boostr"
+                "--spring.datasource.url=jdbc:postgresql://${embedded.postgresql.host}:${embedded.postgresql.port}/salesfox",
+                "--spring.datasource.hikari.jdbc-url=jdbc:postgresql://${embedded.postgresql.host}:${embedded.postgresql.port}/salesfox"
         );
     }
 
