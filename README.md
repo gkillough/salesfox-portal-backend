@@ -1,4 +1,4 @@
-# Boostr Portal
+# Salesfox Portal
 
 ## Start a development instance
 1. Install Docker
