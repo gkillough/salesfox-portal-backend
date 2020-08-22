@@ -1,0 +1,25 @@
+plugins {
+    id 'java-library'
+}
+
+group 'ai.salesfox'
+version '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Utilities
+    api 'org.apache.commons:commons-lang3:3.8'
+    api 'org.apache.commons:commons-csv:1.8'
+    api 'commons-io:commons-io:2.6'
+
+    // Development
+    api 'org.projectlombok:lombok'
+
+    // Test
+    api 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+    api 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    api 'org.mockito:mockito-core:2.10.0'
+}
