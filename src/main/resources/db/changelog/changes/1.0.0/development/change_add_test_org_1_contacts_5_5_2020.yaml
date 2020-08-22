@@ -20,7 +20,7 @@ databaseChangeLog:
                   value: One
               - column:
                   name: email
-                  value: contact1@getboostr.com
+                  value: contact1@salesfox.ai
 
   - changeSet:
       id: test-contact-restrictions-111
@@ -32,7 +32,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@salesfox.ai')
               - column:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
@@ -47,7 +47,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@salesfox.ai')
               - column:
                   name: street_number
                   valueNumeric: 1
@@ -80,7 +80,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact1@salesfox.ai')
               - column:
                   name: organization_point_of_contact_user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test3@usepipeline.com')
@@ -117,7 +117,7 @@ databaseChangeLog:
                   value: Two
               - column:
                   name: email
-                  value: contact2@getboostr.com
+                  value: contact2@salesfox.ai
 
   - changeSet:
       id: test-contact-restrictions-112
@@ -129,7 +129,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@salesfox.ai')
               - column:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
@@ -144,7 +144,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@salesfox.ai')
               - column:
                   name: street_number
                   valueNumeric: 2
@@ -177,7 +177,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact2@salesfox.ai')
               - column:
                   name: organization_point_of_contact_user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test3@usepipeline.com')
@@ -214,7 +214,7 @@ databaseChangeLog:
                   value: Three
               - column:
                   name: email
-                  value: contact3@getboostr.com
+                  value: contact3@salesfox.ai
 
   - changeSet:
       id: test-contact-restrictions-113
@@ -226,7 +226,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@salesfox.ai')
               - column:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
@@ -241,7 +241,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@salesfox.ai')
               - column:
                   name: street_number
                   valueNumeric: 3
@@ -274,7 +274,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact3@salesfox.ai')
               - column:
                   name: organization_point_of_contact_user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test4@usepipeline.com')
@@ -311,7 +311,7 @@ databaseChangeLog:
                   value: Four
               - column:
                   name: email
-                  value: contact4@getboostr.com
+                  value: contact4@salesfox.ai
 
   - changeSet:
       id: test-contact-restrictions-114
@@ -323,7 +323,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@salesfox.ai')
               - column:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
@@ -338,7 +338,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@salesfox.ai')
               - column:
                   name: street_number
                   valueNumeric: 4
@@ -371,7 +371,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact4@salesfox.ai')
               - column:
                   name: organization_point_of_contact_user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test4@usepipeline.com')
@@ -408,7 +408,7 @@ databaseChangeLog:
                   value: Five
               - column:
                   name: email
-                  value: contact5@getboostr.com
+                  value: contact5@salesfox.ai
 
   - changeSet:
       id: test-contact-restrictions-121
@@ -420,7 +420,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@salesfox.ai')
               - column:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
@@ -435,7 +435,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@salesfox.ai')
               - column:
                   name: street_number
                   valueNumeric: 5
@@ -468,7 +468,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact5@salesfox.ai')
               - column:
                   name: organization_point_of_contact_user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test7@usepipeline.com')
@@ -505,7 +505,7 @@ databaseChangeLog:
                   value: Six
               - column:
                   name: email
-                  value: contact6@getboostr.com
+                  value: contact6@salesfox.ai
 
   - changeSet:
       id: test-contact-restrictions-122
@@ -517,7 +517,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@salesfox.ai')
               - column:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
@@ -532,7 +532,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@salesfox.ai')
               - column:
                   name: street_number
                   valueNumeric: 6
@@ -565,7 +565,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact6@salesfox.ai')
               - column:
                   name: organization_point_of_contact_user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test7@usepipeline.com')
@@ -602,7 +602,7 @@ databaseChangeLog:
                   value: Seven
               - column:
                   name: email
-                  value: contact7@getboostr.com
+                  value: contact7@salesfox.ai
 
   - changeSet:
       id: test-contact-restrictions-123
@@ -614,7 +614,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@salesfox.ai')
               - column:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
@@ -629,7 +629,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@salesfox.ai')
               - column:
                   name: street_number
                   valueNumeric: 7
@@ -662,7 +662,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact7@salesfox.ai')
               - column:
                   name: organization_point_of_contact_user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test8@usepipeline.com')
@@ -699,7 +699,7 @@ databaseChangeLog:
                   value: Eight
               - column:
                   name: email
-                  value: contact8@getboostr.com
+                  value: contact8@salesfox.ai
 
   - changeSet:
       id: test-contact-restrictions-124
@@ -711,7 +711,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@salesfox.ai')
               - column:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
@@ -726,7 +726,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@salesfox.ai')
               - column:
                   name: street_number
                   valueNumeric: 8
@@ -759,7 +759,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: contact_id
-                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@getboostr.com')
+                  valueComputed: GET_CONTACT_ID_BY_EMAIL('contact8@salesfox.ai')
               - column:
                   name: organization_point_of_contact_user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test8@usepipeline.com')

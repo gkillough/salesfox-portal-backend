@@ -51,7 +51,7 @@ databaseChangeLog:
                   valueComputed: GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com')
               - column:
                   name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Boostr for Individuals', 'Boostr Basic')
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Salesfox for Individuals', 'Salesfox Basic')
               - column:
                   name: role_id
                   valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PORTAL_BASIC_USER')
@@ -186,7 +186,7 @@ databaseChangeLog:
                   valueComputed: GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com')
               - column:
                   name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Boostr for Individuals', 'Boostr Premium')
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Salesfox for Individuals', 'Salesfox Premium')
               - column:
                   name: role_id
                   valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PORTAL_PREMIUM_USER')
@@ -321,7 +321,7 @@ databaseChangeLog:
                   valueComputed: GET_USER_ID_BY_EMAIL('admin@usepipeline.com')
               - column:
                   name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Boostr Organization', 'Boostr Team')
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Salesfox Organization', 'Salesfox Team')
               - column:
                   name: role_id
                   valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PORTAL_ADMIN')

@@ -1,4 +1,4 @@
-# Boostr Portal
+# Salesfox Portal
 
 ## Start a development instance
 1. Install Docker
@@ -20,7 +20,7 @@ CREATE ROLE portaladmin WITH SUPERUSER LOGIN ENCRYPTED PASSWORD 'Port@l!23'
 
 2. Create database: 
 ```sql
-CREATE DATABASE boostr WITH OWNER portaladmin;
+CREATE DATABASE salesfox WITH OWNER portaladmin;
 ```
 
 3. Create schema:
