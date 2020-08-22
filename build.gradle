@@ -16,28 +16,46 @@ buildscript {
 }
 
 plugins {
-    id 'application'
     id 'java'
-    id 'idea'
+    id 'application'
     id 'org.springframework.boot' version '2.2.3.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'org.liquibase.gradle' version '2.0.1'
 }
 
+ext {
+    javaSourceCompatibility = JavaVersion.VERSION_11
+    javaTargetCompatibility = JavaVersion.VERSION_11
+
+    postgresContainerVersion = '12.3-alpine'
+}
+
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+
+    repositories {
+        mavenCentral()
+        maven { url 'https://plugins.gradle.org/m2/' }
+    }
+
+    dependencies {
+        implementation 'org.projectlombok:lombok:1.18.12'
+        annotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+        testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+        testImplementation 'org.mockito:mockito-core:2.10.0'
+    }
+}
+
+subprojects {
+    apply plugin: 'java-library'
+}
+
 group = 'ai.salesfox'
 version = '0.0.1-SNAPSHOT'
 mainClassName = 'ai.salesfox.portal.PortalApplication'
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
-
-repositories {
-    mavenCentral()
-    maven { url 'https://plugins.gradle.org/m2/' }
-}
-
-ext {
-    postgresContainerVersion = '12.3-alpine'
-}
 
 apply from: 'buildSrc/tasks.gradle'
 
@@ -51,9 +69,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
     // Utilities
-    // implementation 'org.apache.commons:commons-csv:1.8'
-    // implementation 'commons-io:commons-io:2.6'
-    // implementation 'org.apache.commons:commons-lang3:3.8'
     implementation 'org.freemarker:freemarker:2.3.30'
     implementation 'javax.mail:javax.mail-api:1.6.2'
     runtimeOnly 'com.sun.mail:javax.mail:1.6.2'
@@ -65,22 +80,6 @@ dependencies {
     // Database
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.liquibase:liquibase-core'
-
-    // Development
-    annotationProcessor 'org.projectlombok:lombok'
-    // compile 'org.projectlombok:lombok'
-    // annotationProcessor 'org.projectlombok:lombok'
-
-    // Test
-//    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
-//    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
-//    testImplementation 'org.mockito:mockito-core:2.10.0'
-
-//    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-//        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-//    }
-//    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-//    testImplementation 'org.springframework.security:spring-security-test'
 
     if (getGradle().getStartParameter().taskNames.contains('runServer')) {
         runtimeClasspath 'org.springframework.cloud:spring-cloud-starter:2.2.3.RELEASE'
