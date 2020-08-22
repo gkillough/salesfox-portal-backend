@@ -52,7 +52,7 @@
             </#if>
             <hr />
             <div style="font-family: Arial, FreeSans, Helvetica, sans-serif;font-size: 16px;">
-                Copyright (c) Boostr 2020
+                Copyright (c) Salesfox 2020
             </div>
         </div>
     </body>

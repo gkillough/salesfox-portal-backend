@@ -192,7 +192,7 @@ public class PasswordService {
     private ButtonEmailMessageModel createPasswordResetMessageModel(String recipientEmail, String passwordResetUrl) {
         return new ButtonEmailMessageModel(
                 List.of(recipientEmail),
-                "BOOSTR - Password Reset",
+                "Salesfox - Password Reset",
                 "Password Reset",
                 "Click the button below to reset your password. If you did not request a password reset, please contact support.",
                 "Reset your password",

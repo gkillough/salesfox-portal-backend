@@ -32,7 +32,7 @@ public class SwaggerConfiguration implements AnonymouslyAccessible {
 
     private ApiInfo apiEndPointsInfo() {
         return new ApiInfoBuilder()
-                .title("Boostr Portal - REST API")
+                .title("Salesfox Portal - REST API")
                 .build();
     }
 

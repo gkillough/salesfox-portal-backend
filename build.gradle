@@ -24,7 +24,7 @@ plugins {
     id 'org.liquibase.gradle' version '2.0.1'
 }
 
-group = 'com.getboostr'
+group = 'ai.salesfox'
 version = '0.0.1-SNAPSHOT'
 mainClassName = 'ai.salesfox.portal.PortalApplication'
 sourceCompatibility = JavaVersion.VERSION_11

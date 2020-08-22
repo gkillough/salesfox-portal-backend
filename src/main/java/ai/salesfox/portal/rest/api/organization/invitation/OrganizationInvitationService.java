@@ -1,11 +1,5 @@
 package ai.salesfox.portal.rest.api.organization.invitation;
 
-import ai.salesfox.portal.rest.api.organization.invitation.model.OrganizationAccountInvitationModel;
-import ai.salesfox.portal.rest.api.organization.invitation.model.OrganizationAssignableRolesModel;
-import ai.salesfox.portal.rest.api.registration.RegistrationController;
-import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountUserRegistrationModel;
-import ai.salesfox.portal.rest.api.registration.user.UserRegistrationModel;
-import ai.salesfox.portal.rest.api.registration.user.UserRegistrationService;
 import ai.salesfox.portal.PortalConfiguration;
 import ai.salesfox.portal.common.FieldValidationUtils;
 import ai.salesfox.portal.common.exception.PortalException;
@@ -24,7 +18,13 @@ import ai.salesfox.portal.database.organization.account.OrganizationAccountRepos
 import ai.salesfox.portal.database.organization.account.invite.OrganizationAccountInviteTokenEntity;
 import ai.salesfox.portal.database.organization.account.invite.OrganizationAccountInviteTokenPK;
 import ai.salesfox.portal.database.organization.account.invite.OrganizationAccountInviteTokenRepository;
+import ai.salesfox.portal.rest.api.organization.invitation.model.OrganizationAccountInvitationModel;
+import ai.salesfox.portal.rest.api.organization.invitation.model.OrganizationAssignableRolesModel;
 import ai.salesfox.portal.rest.api.password.PasswordService;
+import ai.salesfox.portal.rest.api.registration.RegistrationController;
+import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountUserRegistrationModel;
+import ai.salesfox.portal.rest.api.registration.user.UserRegistrationModel;
+import ai.salesfox.portal.rest.api.registration.user.UserRegistrationService;
 import ai.salesfox.portal.rest.api.user.profile.UserProfileService;
 import ai.salesfox.portal.rest.api.user.profile.model.UserProfileUpdateModel;
 import ai.salesfox.portal.rest.api.user.role.UserRoleService;
@@ -270,9 +270,9 @@ public class OrganizationInvitationService {
     private ButtonEmailMessageModel createInvitationMessageModel(String recipientEmail, String organizationAccountName, String invitationUrl) {
         return new ButtonEmailMessageModel(
                 List.of(recipientEmail),
-                String.format("Invitation to join %s on BOOSTR", organizationAccountName),
+                String.format("Invitation to join %s on Salesfox", organizationAccountName),
                 "Invitation",
-                String.format("You have been invited to join the '%s' account on BOOSTR. Click the button below to accept.", organizationAccountName),
+                String.format("You have been invited to join the '%s' account on Salesfox. Click the button below to accept.", organizationAccountName),
                 "Accept Invitation",
                 invitationUrl
         );
