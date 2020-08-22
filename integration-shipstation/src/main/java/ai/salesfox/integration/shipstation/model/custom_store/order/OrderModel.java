@@ -28,10 +28,7 @@ public class OrderModel {
     private String customField3;
     private String requestedWarehouse;
     private String source;
-    private Object customer; // TODO
-    private String customerCode;
-    private BillToModel billTo;
-    private ShipToModel shipTo;
+    private CustomerModel customer;
     private List<OrderItemModel> items;
 
 }

@@ -1,11 +1,11 @@
-package ai.salesfox.integration.shipstation.model.custom_store.order;
+package ai.salesfox.integration.shipstation.model.custom_store;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class ShipToModel {
+public class RecipientModel {
     private String name;
     private String company;
     private String address1;
