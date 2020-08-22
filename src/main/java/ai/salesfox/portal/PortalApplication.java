@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = {"com.getboostr.portal.database"})
+@EnableJpaRepositories(basePackages = {"ai.salesfox.portal.database"})
 @SpringBootApplication(exclude = {BatchAutoConfiguration.class})
 public class PortalApplication {
 

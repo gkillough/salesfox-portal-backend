@@ -22,7 +22,7 @@ public class SwaggerConfiguration implements AnonymouslyAccessible {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.getboostr.portal.rest.api"))
+                .apis(RequestHandlerSelectors.basePackage("ai.salesfox.portal.rest.api"))
                 .build()
                 .produces(Set.of("application/json"))
                 .consumes(Set.of("application/json"))
@@ -39,7 +39,7 @@ public class SwaggerConfiguration implements AnonymouslyAccessible {
     // FIXME fix this before release and make this class implement AdminOnlyAccessible
 //    @Override
     public static String[] adminOnlyStaticResourceEndpoints() {
-        return new String[] {
+        return new String[]{
                 "/swagger-ui.html",
                 "/webjars",
                 SecurityInterface.createSubDirectoryPattern("/webjars"),

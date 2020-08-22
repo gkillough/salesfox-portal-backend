@@ -2,7 +2,6 @@ package ai.salesfox.portal.rest.api.gift;
 
 import ai.salesfox.portal.rest.api.common.page.PageMetadata;
 import ai.salesfox.portal.rest.api.gift.model.*;
-import com.getboostr.portal.rest.api.gift.model.*;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

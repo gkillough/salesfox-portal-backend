@@ -16,7 +16,7 @@ import java.io.File;
 @org.springframework.context.annotation.Configuration
 public class FreemarkerConfiguration {
     @Getter
-    @Value("file:${com.getboostr.portal.resource.freemarker.templateDir:}")
+    @Value("file:${ai.salesfox.portal.resource.freemarker.templateDir:}")
     private File freemarkerTemplateDir;
 
     @Bean

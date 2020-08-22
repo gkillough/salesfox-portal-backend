@@ -11,13 +11,13 @@ import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 @Configuration
 public class PortalConfiguration {
     @Getter
-    @Value("${com.getboostr.portal.baseUrl:}")
+    @Value("${ai.salesfox.portal.baseUrl:}")
     private String portalBaseUrl;
     @Getter
-    @Value("${com.getboostr.portal.resetPasswordLinkSpec:}")
+    @Value("${ai.salesfox.portal.resetPasswordLinkSpec:}")
     private String resetPasswordLinkSpec;
     @Getter
-    @Value("${com.getboostr.portal.inviteOrganizationAccountUserLinkSpec:}")
+    @Value("${ai.salesfox.portal.inviteOrganizationAccountUserLinkSpec:}")
     private String inviteOrganizationAccountUserLinkSpec;
 
     @Bean

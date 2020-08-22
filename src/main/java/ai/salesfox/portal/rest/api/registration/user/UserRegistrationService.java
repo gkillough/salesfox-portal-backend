@@ -1,12 +1,10 @@
 package ai.salesfox.portal.rest.api.registration.user;
 
-import ai.salesfox.portal.database.account.entity.*;
-import ai.salesfox.portal.rest.api.registration.organization.OrganizationConstants;
 import ai.salesfox.portal.common.FieldValidationUtils;
 import ai.salesfox.portal.common.exception.PortalDatabaseIntegrityViolationException;
 import ai.salesfox.portal.common.service.license.LicenseSeatManager;
 import ai.salesfox.portal.common.service.license.PortalLicenseSeatException;
-import com.getboostr.portal.database.account.entity.*;
+import ai.salesfox.portal.database.account.entity.*;
 import ai.salesfox.portal.database.account.repository.LoginRepository;
 import ai.salesfox.portal.database.account.repository.MembershipRepository;
 import ai.salesfox.portal.database.account.repository.RoleRepository;
@@ -19,6 +17,7 @@ import ai.salesfox.portal.database.organization.OrganizationEntity;
 import ai.salesfox.portal.database.organization.OrganizationRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
+import ai.salesfox.portal.rest.api.registration.organization.OrganizationConstants;
 import ai.salesfox.portal.rest.api.user.profile.UserProfileService;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import lombok.extern.slf4j.Slf4j;

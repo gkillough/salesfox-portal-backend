@@ -1,12 +1,11 @@
 package ai.salesfox.portal.rest.api.contact;
 
+import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
+import ai.salesfox.portal.rest.api.common.page.PageMetadata;
 import ai.salesfox.portal.rest.api.contact.interaction.ContactInteractionService;
 import ai.salesfox.portal.rest.api.contact.interaction.model.ContactInteractionRequestModel;
 import ai.salesfox.portal.rest.api.contact.interaction.model.MultiInteractionModel;
 import ai.salesfox.portal.rest.api.contact.model.*;
-import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
-import ai.salesfox.portal.rest.api.common.page.PageMetadata;
-import com.getboostr.portal.rest.api.contact.model.*;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

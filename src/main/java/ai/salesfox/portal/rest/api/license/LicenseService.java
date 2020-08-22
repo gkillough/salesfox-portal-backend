@@ -1,6 +1,5 @@
 package ai.salesfox.portal.rest.api.license;
 
-import ai.salesfox.portal.rest.api.license.model.*;
 import ai.salesfox.portal.common.FieldValidationUtils;
 import ai.salesfox.portal.common.enumeration.LicenseType;
 import ai.salesfox.portal.common.service.license.LicenseGenerator;
@@ -9,9 +8,9 @@ import ai.salesfox.portal.database.account.repository.LicenseRepository;
 import ai.salesfox.portal.database.organization.OrganizationEntity;
 import ai.salesfox.portal.database.organization.OrganizationRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
-import com.getboostr.portal.rest.api.license.model.*;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
+import ai.salesfox.portal.rest.api.license.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

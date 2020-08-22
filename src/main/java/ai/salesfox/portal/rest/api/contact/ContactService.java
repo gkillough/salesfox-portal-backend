@@ -1,6 +1,5 @@
 package ai.salesfox.portal.rest.api.contact;
 
-import ai.salesfox.portal.rest.api.contact.model.*;
 import ai.salesfox.portal.common.enumeration.AccessOperation;
 import ai.salesfox.portal.common.model.PortalAddressModel;
 import ai.salesfox.portal.common.service.contact.ContactAccessOperationUtility;
@@ -21,7 +20,7 @@ import ai.salesfox.portal.database.contact.restriction.ContactUserRestrictionEnt
 import ai.salesfox.portal.database.contact.restriction.ContactUserRestrictionRepository;
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
-import com.getboostr.portal.rest.api.contact.model.*;
+import ai.salesfox.portal.rest.api.contact.model.*;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
