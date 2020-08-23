@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: scheduling-tables-1
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: gift_schedules
+            tableName: gifts
+            columns:
+              - column:
+                  name: gift_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    foreignKeyName: gift_schedules_gift_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: gifts
+                    referencedColumnNames: gift_id
+                    deleteCascade: true
+              - column:
+                  name: send_date
+                  type: DATE
+                  constraints:
+                    nullable: false
