@@ -1,22 +1,22 @@
 databaseChangeLog:
   - include:
-      file: create_portal_schema.yaml
+      file: portal_schema.yaml
       relativeToChangelogFile: true
 
   - include:
-      file: create_jpa_db_user.yaml
+      file: jpa_db_user.yaml
       relativeToChangelogFile: true
 
   - include:
-      file: create_uuid_extension.yaml
+      file: uuid_extension.yaml
       relativeToChangelogFile: true
 
   - include:
-      file: create_auth_tables.yaml
+      file: auth_tables.yaml
       relativeToChangelogFile: true
 
   - include:
-      file: create_auth_stored_procedures.yaml
+      file: auth_stored_procedures.yaml
       relativeToChangelogFile: true
 
   - include:
@@ -24,7 +24,7 @@ databaseChangeLog:
       relativeToChangelogFile: true
 
   - include:
-      file: create_organization_account_profiles_table.yaml
+      file: organization_account_profiles_table.yaml
       relativeToChangelogFile: true
 
   - include:
@@ -32,15 +32,15 @@ databaseChangeLog:
       relativeToChangelogFile: true
 
   - include:
-      file: create_organization_account_invite_token_table.yaml
+      file: organization_account_invite_token_table.yaml
       relativeToChangelogFile: true
 
   - include:
-      file: create_contact_tables.yaml
+      file: contact_tables.yaml
       relativeToChangelogFile: true
 
   - include:
-      file: create_contact_stored_procedures.yaml
+      file: contact_stored_procedures.yaml
       relativeToChangelogFile: true
 
   - include:
