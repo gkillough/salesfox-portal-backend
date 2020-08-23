@@ -1,5 +1,6 @@
 package ai.salesfox.portal.database.gift;
 
+import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomIconDetailEntity;
@@ -8,9 +9,9 @@ import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.gift.note.GiftNoteDetailEntity;
 import ai.salesfox.portal.database.gift.restriction.GiftOrgAccountRestrictionEntity;
 import ai.salesfox.portal.database.gift.restriction.GiftUserRestrictionEntity;
+import ai.salesfox.portal.database.gift.scheduling.GiftScheduleEntity;
 import ai.salesfox.portal.database.gift.tracking.GiftTrackingDetailEntity;
 import ai.salesfox.portal.database.gift.tracking.GiftTrackingEntity;
-import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -76,6 +77,10 @@ public class GiftEntity implements Serializable {
     @OneToOne
     @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
     private GiftTrackingDetailEntity giftTrackingDetailEntity;
+
+    @OneToOne
+    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
+    private GiftScheduleEntity giftScheduleEntity;
 
     public GiftEntity(UUID giftId, UUID requestingUserId, UUID contactId) {
         this.giftId = giftId;
