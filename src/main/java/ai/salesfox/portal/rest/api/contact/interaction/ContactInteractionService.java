@@ -1,8 +1,5 @@
 package ai.salesfox.portal.rest.api.contact.interaction;
 
-import ai.salesfox.portal.rest.api.contact.interaction.model.ContactInteractionRequestModel;
-import ai.salesfox.portal.rest.api.contact.interaction.model.ContactInteractionsResponseModel;
-import ai.salesfox.portal.rest.api.contact.interaction.model.MultiInteractionModel;
 import ai.salesfox.portal.common.FieldValidationUtils;
 import ai.salesfox.portal.common.enumeration.AccessOperation;
 import ai.salesfox.portal.common.enumeration.InteractionClassification;
@@ -17,6 +14,9 @@ import ai.salesfox.portal.database.contact.interaction.ContactInteractionEntity;
 import ai.salesfox.portal.database.contact.interaction.ContactInteractionRepository;
 import ai.salesfox.portal.database.contact.profile.OrganizationAccountContactProfileRepository;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
+import ai.salesfox.portal.rest.api.contact.interaction.model.ContactInteractionRequestModel;
+import ai.salesfox.portal.rest.api.contact.interaction.model.ContactInteractionsResponseModel;
+import ai.salesfox.portal.rest.api.contact.interaction.model.MultiInteractionModel;
 import ai.salesfox.portal.rest.api.user.common.model.UserSummaryModel;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.apache.commons.lang3.EnumUtils;
@@ -50,7 +50,7 @@ public class ContactInteractionService {
         this.userRepository = userRepository;
         this.membershipRetrievalService = membershipRetrievalService;
         this.contactAccessOperationUtility = new ContactAccessOperationUtility<>(membershipRetrievalService, contactProfileRepository);
-        this.contactInteractionsUtility = new ContactInteractionsUtility<>(membershipRetrievalService, contactRepository, contactInteractionRepository);
+        this.contactInteractionsUtility = new ContactInteractionsUtility<>(contactRepository, contactInteractionRepository);
     }
 
     public MultiInteractionModel getInteractions(UUID contactId, Integer offset, Integer limit) {

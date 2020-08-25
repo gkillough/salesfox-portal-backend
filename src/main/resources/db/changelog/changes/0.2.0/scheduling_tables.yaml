@@ -22,3 +22,12 @@ databaseChangeLog:
                   type: DATE
                   constraints:
                     nullable: false
+              - column:
+                  name: scheduling_user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: gift_schedules_scheduling_user_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: users
+                    referencedColumnNames: user_id
