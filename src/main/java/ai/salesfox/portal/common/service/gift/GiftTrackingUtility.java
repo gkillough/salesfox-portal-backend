@@ -1,5 +1,6 @@
 package ai.salesfox.portal.common.service.gift;
 
+import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
 import ai.salesfox.portal.common.time.PortalDateTimeUtils;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
@@ -11,6 +12,10 @@ public class GiftTrackingUtility {
 
     public GiftTrackingUtility(GiftTrackingRepository giftTrackingRepository) {
         this.giftTrackingRepository = giftTrackingRepository;
+    }
+
+    public void updateGiftTrackingInfo(GiftEntity gift, UserEntity updatingUser, GiftTrackingStatus status) {
+        updateGiftTrackingInfo(gift, updatingUser, status.name());
     }
 
     public void updateGiftTrackingInfo(GiftEntity gift, UserEntity updatingUser, String status) {
