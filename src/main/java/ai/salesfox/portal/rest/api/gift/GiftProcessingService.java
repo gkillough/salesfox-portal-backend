@@ -50,7 +50,7 @@ public class GiftProcessingService {
 
     private final GiftAccessService giftAccessService;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private final ContactInteractionsUtility<ResponseStatusException> contactInteractionsUtility;
+    private final ContactInteractionsUtility contactInteractionsUtility;
     private final GiftTrackingUtility giftTrackingUtility;
     private final GiftItemUtility giftItemUtility;
 
@@ -64,7 +64,7 @@ public class GiftProcessingService {
         this.giftAccessService = giftAccessService;
         this.membershipRetrievalService = membershipRetrievalService;
 
-        this.contactInteractionsUtility = new ContactInteractionsUtility<>(contactRepository, contactInteractionRepository);
+        this.contactInteractionsUtility = new ContactInteractionsUtility(contactRepository, contactInteractionRepository);
         this.giftTrackingUtility = new GiftTrackingUtility(giftTrackingRepository);
         this.giftItemUtility = new GiftItemUtility(inventoryRepository, inventoryItemRepository);
     }
@@ -87,7 +87,9 @@ public class GiftProcessingService {
             Supplier<ResponseStatusException> outOfStockExceptionSupplier = () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "The requested item is not in stock");
             InventoryItemEntity inventoryItemForGift = giftItemUtility.findInventoryItemForGift(loggedInUser, userMembership, giftItemDetail)
                     .orElseThrow(outOfStockExceptionSupplier);
-            giftItemUtility.decrementItemQuantityOrElseThrow(inventoryItemForGift, outOfStockExceptionSupplier);
+            giftItemUtility.decrementItemQuantityOrElse(inventoryItemForGift, ignoredItem -> {
+                throw outOfStockExceptionSupplier.get();
+            });
         }
 
         giftTrackingUtility.updateGiftTrackingInfo(foundGift, loggedInUser, GiftTrackingStatus.SUBMITTED.name());

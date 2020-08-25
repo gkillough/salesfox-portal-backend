@@ -40,7 +40,7 @@ public class ContactInteractionService {
     private final UserRepository userRepository;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private final ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
-    private final ContactInteractionsUtility<ResponseStatusException> contactInteractionsUtility;
+    private final ContactInteractionsUtility contactInteractionsUtility;
 
     @Autowired
     public ContactInteractionService(OrganizationAccountContactRepository contactRepository, OrganizationAccountContactProfileRepository contactProfileRepository,
@@ -50,7 +50,7 @@ public class ContactInteractionService {
         this.userRepository = userRepository;
         this.membershipRetrievalService = membershipRetrievalService;
         this.contactAccessOperationUtility = new ContactAccessOperationUtility<>(membershipRetrievalService, contactProfileRepository);
-        this.contactInteractionsUtility = new ContactInteractionsUtility<>(contactRepository, contactInteractionRepository);
+        this.contactInteractionsUtility = new ContactInteractionsUtility(contactRepository, contactInteractionRepository);
     }
 
     public MultiInteractionModel getInteractions(UUID contactId, Integer offset, Integer limit) {

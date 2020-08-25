@@ -13,7 +13,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
-public class ContactInteractionsUtility<E extends Throwable> {
+// TODO convert to service
+public class ContactInteractionsUtility {
     private final OrganizationAccountContactRepository contactRepository;
     private final ContactInteractionRepository contactInteractionRepository;
 
@@ -22,7 +23,7 @@ public class ContactInteractionsUtility<E extends Throwable> {
         this.contactInteractionRepository = contactInteractionRepository;
     }
 
-    public Optional<ContactInteractionEntity> addContactInteraction(UserEntity interactingUser, UUID contactId, InteractionMedium medium, InteractionClassification classification, String note) throws E {
+    public Optional<ContactInteractionEntity> addContactInteraction(UserEntity interactingUser, UUID contactId, InteractionMedium medium, InteractionClassification classification, String note) {
         return contactRepository.findById(contactId)
                 .map(foundContact -> addContactInteraction(interactingUser, foundContact, medium, classification, note));
     }

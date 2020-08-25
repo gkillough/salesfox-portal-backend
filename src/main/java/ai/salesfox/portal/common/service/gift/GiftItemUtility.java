@@ -1,5 +1,6 @@
 package ai.salesfox.portal.common.service.gift;
 
+import ai.salesfox.portal.common.exception.ThrowingConsumer;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
@@ -10,7 +11,6 @@ import ai.salesfox.portal.database.inventory.item.InventoryItemRepository;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class GiftItemUtility {
     private final InventoryRepository inventoryRepository;
@@ -34,9 +34,9 @@ public class GiftItemUtility {
         inventoryItemRepository.save(inventoryItemForGift);
     }
 
-    public <E extends Throwable> void decrementItemQuantityOrElseThrow(InventoryItemEntity inventoryItemForGift, Supplier<E> outOfStockExceptionSupplier) throws E {
+    public <E extends Throwable> void decrementItemQuantityOrElse(InventoryItemEntity inventoryItemForGift, ThrowingConsumer<InventoryItemEntity, E> outOfStockHandler) throws E {
         if (inventoryItemForGift.getQuantity() < 1L) {
-            throw outOfStockExceptionSupplier.get();
+            outOfStockHandler.accept(inventoryItemForGift);
         } else {
             inventoryItemForGift.setQuantity(inventoryItemForGift.getQuantity() - 1L);
             inventoryItemRepository.save(inventoryItemForGift);
