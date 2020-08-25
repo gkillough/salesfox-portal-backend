@@ -31,7 +31,6 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
         if (!foundGift.isSubmittable()) {
             handleGiftNotSubmittable(foundGift, submittingUser);
             return Optional.empty();
-            // throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This gift has already been submitted");
         }
 
         MembershipEntity userMembership = submittingUser.getMembershipEntity();
@@ -39,14 +38,11 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
         if (giftItemDetail != null) {
             Optional<InventoryItemEntity> optionalGiftItem = giftItemUtility.findInventoryItemForGift(submittingUser, userMembership, giftItemDetail);
             if (optionalGiftItem.isPresent()) {
-                // new ResponseStatusException(HttpStatus.BAD_REQUEST, "The requested item is not in stock")
                 giftItemUtility.decrementItemQuantityOrElse(optionalGiftItem.get(), giftItem -> handleItemOutOfStock(foundGift, giftItem, submittingUser));
             } else {
                 handleItemMissingFromInventory(foundGift, giftItemDetail, submittingUser);
                 return Optional.empty();
-                // throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The requested item does not exist in the inventory");
             }
-
         }
 
         giftTrackingUtility.updateGiftTrackingInfo(foundGift, submittingUser, GiftTrackingStatus.SUBMITTED.name());

@@ -2,8 +2,6 @@ package ai.salesfox.portal.rest.api.gift;
 
 import ai.salesfox.portal.common.enumeration.AccessOperation;
 import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
-import ai.salesfox.portal.common.enumeration.InteractionClassification;
-import ai.salesfox.portal.common.enumeration.InteractionMedium;
 import ai.salesfox.portal.common.service.contact.ContactInteractionsUtility;
 import ai.salesfox.portal.common.service.gift.GiftItemUtility;
 import ai.salesfox.portal.common.service.gift.GiftTrackingUtility;
@@ -19,11 +17,11 @@ import ai.salesfox.portal.database.gift.tracking.GiftTrackingDetailRepository;
 import ai.salesfox.portal.database.gift.tracking.GiftTrackingEntity;
 import ai.salesfox.portal.database.gift.tracking.GiftTrackingRepository;
 import ai.salesfox.portal.database.inventory.InventoryRepository;
-import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
 import ai.salesfox.portal.database.inventory.item.InventoryItemRepository;
 import ai.salesfox.portal.rest.api.gift.model.GiftResponseModel;
 import ai.salesfox.portal.rest.api.gift.model.UpdateGiftStatusRequestModel;
 import ai.salesfox.portal.rest.api.gift.model.UpdateGiftTrackingDetailRequestModel;
+import ai.salesfox.portal.rest.api.gift.util.EndpointGiftSubmissionUtility;
 import ai.salesfox.portal.rest.api.gift.util.GiftAccessService;
 import ai.salesfox.portal.rest.api.gift.util.GiftResponseModelUtils;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
@@ -39,7 +37,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -51,6 +48,7 @@ public class GiftProcessingService {
     private final GiftAccessService giftAccessService;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private final ContactInteractionsUtility contactInteractionsUtility;
+    private final EndpointGiftSubmissionUtility giftSubmissionUtility;
     private final GiftTrackingUtility giftTrackingUtility;
     private final GiftItemUtility giftItemUtility;
 
@@ -67,6 +65,7 @@ public class GiftProcessingService {
         this.contactInteractionsUtility = new ContactInteractionsUtility(contactRepository, contactInteractionRepository);
         this.giftTrackingUtility = new GiftTrackingUtility(giftTrackingRepository);
         this.giftItemUtility = new GiftItemUtility(inventoryRepository, inventoryItemRepository);
+        this.giftSubmissionUtility = new EndpointGiftSubmissionUtility(giftTrackingUtility, giftItemUtility, contactInteractionsUtility);
     }
 
     @Transactional
@@ -77,26 +76,9 @@ public class GiftProcessingService {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.INTERACT);
 
-        if (!foundGift.isSubmittable()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This gift has already been submitted");
-        }
-
-        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
-        GiftItemDetailEntity giftItemDetail = foundGift.getGiftItemDetailEntity();
-        if (giftItemDetail != null) {
-            Supplier<ResponseStatusException> outOfStockExceptionSupplier = () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "The requested item is not in stock");
-            InventoryItemEntity inventoryItemForGift = giftItemUtility.findInventoryItemForGift(loggedInUser, userMembership, giftItemDetail)
-                    .orElseThrow(outOfStockExceptionSupplier);
-            giftItemUtility.decrementItemQuantityOrElse(inventoryItemForGift, ignoredItem -> {
-                throw outOfStockExceptionSupplier.get();
-            });
-        }
-
-        giftTrackingUtility.updateGiftTrackingInfo(foundGift, loggedInUser, GiftTrackingStatus.SUBMITTED.name());
-        contactInteractionsUtility.addContactInteraction(loggedInUser, foundGift.getContactId(), InteractionMedium.MAIL, InteractionClassification.OUTGOING, "(Auto-generated) Sent gift/note")
-                .ifPresentOrElse(ignored -> {
-                }, () -> log.warn("Failed to add auto-generated gift submission interaction to contact with id: [{}]", foundGift.getContactId()));
-        return GiftResponseModelUtils.convertToResponseModel(foundGift);
+        return giftSubmissionUtility.submitGift(foundGift, loggedInUser)
+                .map(GiftResponseModelUtils::convertToResponseModel)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred. Please contact support if this problem persists."));
     }
 
     @Transactional
