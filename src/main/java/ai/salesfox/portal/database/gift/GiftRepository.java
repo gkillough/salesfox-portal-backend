@@ -40,6 +40,6 @@ public interface GiftRepository extends JpaRepository<GiftEntity, UUID> {
             "   AND :sendDate = schedule.sendDate" +
             " )"
     )
-    Slice<GiftEntity> findScheduledGiftsBySendDate(@Param("status") String scheduledStatusName, @Param("sendDate") LocalDate sendDate, Pageable pageable);
+    Slice<GiftEntity> findScheduledGiftsBySendDate(@Param("scheduledStatusName") String scheduledStatusName, @Param("sendDate") LocalDate sendDate, Pageable pageable);
 
 }
