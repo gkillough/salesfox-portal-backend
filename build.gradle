@@ -24,8 +24,8 @@ plugins {
 }
 
 ext {
-    javaSourceCompatibility = JavaVersion.VERSION_11
-    javaTargetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 
     postgresContainerVersion = '12.3-alpine'
 }
