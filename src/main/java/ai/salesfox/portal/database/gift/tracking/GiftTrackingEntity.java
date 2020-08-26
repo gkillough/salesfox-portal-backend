@@ -1,7 +1,7 @@
 package ai.salesfox.portal.database.gift.tracking;
 
-import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
+import ai.salesfox.portal.database.account.entity.UserEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -50,7 +50,7 @@ public class GiftTrackingEntity implements Serializable {
     }
 
     public boolean isSubmittable() {
-        return isDraft() || isScheduled();
+        return isDraft() || isScheduled() || isScheduledSubmissionFailed();
     }
 
     public boolean isCancellable() {
@@ -63,6 +63,10 @@ public class GiftTrackingEntity implements Serializable {
 
     public boolean isScheduled() {
         return hasStatus(GiftTrackingStatus.SCHEDULED);
+    }
+
+    public boolean isScheduledSubmissionFailed() {
+        return hasStatus(GiftTrackingStatus.SCHEDULED_SUBMISSION_FAILED);
     }
 
     public boolean isSubmitted() {

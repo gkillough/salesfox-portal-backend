@@ -1,6 +1,6 @@
 package ai.salesfox.portal.database.gift.scheduling;
 
-import lombok.AllArgsConstructor;
+import ai.salesfox.portal.database.account.entity.UserEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +10,6 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "gift_schedules")
 public class GiftScheduleEntity {
@@ -21,5 +20,18 @@ public class GiftScheduleEntity {
 
     @Column(name = "send_date")
     private LocalDate sendDate;
+
+    @Column(name = "scheduling_user_id")
+    private UUID schedulingUserId;
+
+    @OneToOne
+    @JoinColumn(name = "scheduling_user_id", referencedColumnName = "user_id", updatable = false, insertable = false)
+    private UserEntity schedulingUserEntity;
+
+    public GiftScheduleEntity(UUID giftId, LocalDate sendDate, UUID schedulingUserId) {
+        this.giftId = giftId;
+        this.sendDate = sendDate;
+        this.schedulingUserId = schedulingUserId;
+    }
 
 }
