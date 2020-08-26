@@ -2,26 +2,20 @@ package ai.salesfox.portal.rest.api.gift;
 
 import ai.salesfox.portal.common.enumeration.AccessOperation;
 import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
-import ai.salesfox.portal.common.service.contact.ContactInteractionsUtility;
-import ai.salesfox.portal.common.service.gift.GiftItemUtility;
-import ai.salesfox.portal.common.service.gift.GiftTrackingUtility;
+import ai.salesfox.portal.common.service.gift.GiftItemService;
+import ai.salesfox.portal.common.service.gift.GiftTrackingService;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
-import ai.salesfox.portal.database.contact.OrganizationAccountContactRepository;
-import ai.salesfox.portal.database.contact.interaction.ContactInteractionRepository;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.GiftRepository;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.gift.tracking.GiftTrackingDetailEntity;
 import ai.salesfox.portal.database.gift.tracking.GiftTrackingDetailRepository;
 import ai.salesfox.portal.database.gift.tracking.GiftTrackingEntity;
-import ai.salesfox.portal.database.gift.tracking.GiftTrackingRepository;
-import ai.salesfox.portal.database.inventory.InventoryRepository;
-import ai.salesfox.portal.database.inventory.item.InventoryItemRepository;
 import ai.salesfox.portal.rest.api.gift.model.GiftResponseModel;
 import ai.salesfox.portal.rest.api.gift.model.UpdateGiftStatusRequestModel;
 import ai.salesfox.portal.rest.api.gift.model.UpdateGiftTrackingDetailRequestModel;
-import ai.salesfox.portal.rest.api.gift.util.EndpointGiftSubmissionUtility;
+import ai.salesfox.portal.rest.api.gift.util.EndpointGiftSubmissionService;
 import ai.salesfox.portal.rest.api.gift.util.GiftAccessService;
 import ai.salesfox.portal.rest.api.gift.util.GiftResponseModelUtils;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
@@ -46,26 +40,22 @@ public class GiftProcessingService {
     private final GiftTrackingDetailRepository giftTrackingDetailRepository;
 
     private final GiftAccessService giftAccessService;
+    private final EndpointGiftSubmissionService giftSubmissionService;
+    private final GiftTrackingService giftTrackingService;
+    private final GiftItemService giftItemService;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private final ContactInteractionsUtility contactInteractionsUtility;
-    private final EndpointGiftSubmissionUtility giftSubmissionUtility;
-    private final GiftTrackingUtility giftTrackingUtility;
-    private final GiftItemUtility giftItemUtility;
 
     @Autowired
-    public GiftProcessingService(GiftRepository giftRepository, GiftTrackingRepository giftTrackingRepository, GiftTrackingDetailRepository giftTrackingDetailRepository,
-                                 InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository,
-                                 GiftAccessService giftAccessService, HttpSafeUserMembershipRetrievalService membershipRetrievalService,
-                                 ContactInteractionRepository contactInteractionRepository, OrganizationAccountContactRepository contactRepository) {
+    public GiftProcessingService(GiftRepository giftRepository, GiftTrackingDetailRepository giftTrackingDetailRepository,
+                                 GiftAccessService giftAccessService, EndpointGiftSubmissionService giftSubmissionService, GiftTrackingService giftTrackingService, GiftItemService giftItemService,
+                                 HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.giftRepository = giftRepository;
         this.giftTrackingDetailRepository = giftTrackingDetailRepository;
         this.giftAccessService = giftAccessService;
         this.membershipRetrievalService = membershipRetrievalService;
-
-        this.contactInteractionsUtility = new ContactInteractionsUtility(contactRepository, contactInteractionRepository);
-        this.giftTrackingUtility = new GiftTrackingUtility(giftTrackingRepository);
-        this.giftItemUtility = new GiftItemUtility(inventoryRepository, inventoryItemRepository);
-        this.giftSubmissionUtility = new EndpointGiftSubmissionUtility(giftTrackingUtility, giftItemUtility, contactInteractionsUtility);
+        this.giftSubmissionService = giftSubmissionService;
+        this.giftTrackingService = giftTrackingService;
+        this.giftItemService = giftItemService;
     }
 
     @Transactional
@@ -76,7 +66,7 @@ public class GiftProcessingService {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.INTERACT);
 
-        return giftSubmissionUtility.submitGift(foundGift, loggedInUser)
+        return giftSubmissionService.submitGift(foundGift, loggedInUser)
                 .map(GiftResponseModelUtils::convertToResponseModel)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred. Please contact support if this problem persists."));
     }
@@ -96,7 +86,7 @@ public class GiftProcessingService {
         }
 
         // TODO notify distributor(s)
-        giftTrackingUtility.updateGiftTrackingInfo(foundGift, loggedInUser, GiftTrackingStatus.CANCELLED.name());
+        giftTrackingService.updateGiftTrackingInfo(foundGift, loggedInUser, GiftTrackingStatus.CANCELLED.name());
         return GiftResponseModelUtils.convertToResponseModel(foundGift);
     }
 
@@ -113,11 +103,11 @@ public class GiftProcessingService {
         GiftItemDetailEntity giftItemDetail = foundGift.getGiftItemDetailEntity();
         if (giftItemDetail != null && isIncompleteStatus(requestModel.getStatus())) {
             // The gift request result was incomplete, so the item must be returned to its inventory
-            giftItemUtility.findInventoryItemForGift(loggedInUser, userMembership, giftItemDetail)
-                    .ifPresent(giftItemUtility::incrementItemQuantity);
+            giftItemService.findInventoryItemForGift(loggedInUser, userMembership, giftItemDetail)
+                    .ifPresent(giftItemService::incrementItemQuantity);
         }
 
-        giftTrackingUtility.updateGiftTrackingInfo(foundGift, loggedInUser, requestModel.getStatus());
+        giftTrackingService.updateGiftTrackingInfo(foundGift, loggedInUser, requestModel.getStatus());
         return GiftResponseModelUtils.convertToResponseModel(foundGift);
     }
 

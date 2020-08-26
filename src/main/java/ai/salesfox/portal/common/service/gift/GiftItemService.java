@@ -8,15 +8,19 @@ import ai.salesfox.portal.database.inventory.InventoryRepository;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
 import ai.salesfox.portal.database.inventory.item.InventoryItemPK;
 import ai.salesfox.portal.database.inventory.item.InventoryItemRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-public class GiftItemUtility {
+@Component
+public class GiftItemService {
     private final InventoryRepository inventoryRepository;
     private final InventoryItemRepository inventoryItemRepository;
 
-    public GiftItemUtility(InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository) {
+    @Autowired
+    public GiftItemService(InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository) {
         this.inventoryRepository = inventoryRepository;
         this.inventoryItemRepository = inventoryItemRepository;
     }

@@ -6,11 +6,15 @@ import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.tracking.GiftTrackingEntity;
 import ai.salesfox.portal.database.gift.tracking.GiftTrackingRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-public class GiftTrackingUtility {
+@Component
+public class GiftTrackingService {
     private final GiftTrackingRepository giftTrackingRepository;
 
-    public GiftTrackingUtility(GiftTrackingRepository giftTrackingRepository) {
+    @Autowired
+    public GiftTrackingService(GiftTrackingRepository giftTrackingRepository) {
         this.giftTrackingRepository = giftTrackingRepository;
     }
 

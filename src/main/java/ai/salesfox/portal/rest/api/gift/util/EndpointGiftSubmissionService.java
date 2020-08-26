@@ -1,19 +1,21 @@
 package ai.salesfox.portal.rest.api.gift.util;
 
-import ai.salesfox.portal.common.service.contact.ContactInteractionsUtility;
-import ai.salesfox.portal.common.service.gift.GiftItemUtility;
+import ai.salesfox.portal.common.service.contact.ContactInteractionsService;
+import ai.salesfox.portal.common.service.gift.GiftItemService;
 import ai.salesfox.portal.common.service.gift.GiftSubmissionUtility;
-import ai.salesfox.portal.common.service.gift.GiftTrackingUtility;
+import ai.salesfox.portal.common.service.gift.GiftTrackingService;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-public class EndpointGiftSubmissionUtility extends GiftSubmissionUtility<ResponseStatusException> {
-    public EndpointGiftSubmissionUtility(GiftTrackingUtility giftTrackingUtility, GiftItemUtility giftItemUtility, ContactInteractionsUtility contactInteractionsUtility) {
-        super(giftTrackingUtility, giftItemUtility, contactInteractionsUtility);
+@Component
+public class EndpointGiftSubmissionService extends GiftSubmissionUtility<ResponseStatusException> {
+    public EndpointGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService, ContactInteractionsService contactInteractionsService) {
+        super(giftTrackingService, giftItemService, contactInteractionsService);
     }
 
     @Override

@@ -5,7 +5,7 @@ import ai.salesfox.portal.common.enumeration.AccessOperation;
 import ai.salesfox.portal.common.enumeration.InteractionClassification;
 import ai.salesfox.portal.common.enumeration.InteractionMedium;
 import ai.salesfox.portal.common.service.contact.ContactAccessOperationUtility;
-import ai.salesfox.portal.common.service.contact.ContactInteractionsUtility;
+import ai.salesfox.portal.common.service.contact.ContactInteractionsService;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserRepository;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
@@ -40,7 +40,7 @@ public class ContactInteractionService {
     private final UserRepository userRepository;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private final ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
-    private final ContactInteractionsUtility contactInteractionsUtility;
+    private final ContactInteractionsService contactInteractionsService;
 
     @Autowired
     public ContactInteractionService(OrganizationAccountContactRepository contactRepository, OrganizationAccountContactProfileRepository contactProfileRepository,
@@ -50,7 +50,7 @@ public class ContactInteractionService {
         this.userRepository = userRepository;
         this.membershipRetrievalService = membershipRetrievalService;
         this.contactAccessOperationUtility = new ContactAccessOperationUtility<>(membershipRetrievalService, contactProfileRepository);
-        this.contactInteractionsUtility = new ContactInteractionsUtility(contactRepository, contactInteractionRepository);
+        this.contactInteractionsService = new ContactInteractionsService(contactRepository, contactInteractionRepository);
     }
 
     public MultiInteractionModel getInteractions(UUID contactId, Integer offset, Integer limit) {
@@ -93,7 +93,7 @@ public class ContactInteractionService {
 
         InteractionMedium interactionMedium = InteractionMedium.valueOf(requestModel.getMedium());
         InteractionClassification interactionClassification = InteractionClassification.valueOf(requestModel.getClassification());
-        contactInteractionsUtility.addContactInteraction(interactingUser, foundContact, interactionMedium, interactionClassification, requestModel.getNote(), requestModel.getDate().toLocalDate());
+        contactInteractionsService.addContactInteraction(interactingUser, foundContact, interactionMedium, interactionClassification, requestModel.getNote(), requestModel.getDate().toLocalDate());
     }
 
     @Transactional

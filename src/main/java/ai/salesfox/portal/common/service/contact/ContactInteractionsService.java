@@ -8,17 +8,18 @@ import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactRepository;
 import ai.salesfox.portal.database.contact.interaction.ContactInteractionEntity;
 import ai.salesfox.portal.database.contact.interaction.ContactInteractionRepository;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
-// TODO convert to service
-public class ContactInteractionsUtility {
+@Component
+public class ContactInteractionsService {
     private final OrganizationAccountContactRepository contactRepository;
     private final ContactInteractionRepository contactInteractionRepository;
 
-    public ContactInteractionsUtility(OrganizationAccountContactRepository contactRepository, ContactInteractionRepository contactInteractionRepository) {
+    public ContactInteractionsService(OrganizationAccountContactRepository contactRepository, ContactInteractionRepository contactInteractionRepository) {
         this.contactRepository = contactRepository;
         this.contactInteractionRepository = contactInteractionRepository;
     }

@@ -2,31 +2,33 @@ package ai.salesfox.portal.task;
 
 import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
 import ai.salesfox.portal.common.exception.PortalException;
-import ai.salesfox.portal.common.service.contact.ContactInteractionsUtility;
+import ai.salesfox.portal.common.service.contact.ContactInteractionsService;
 import ai.salesfox.portal.common.service.email.EmailMessagingService;
 import ai.salesfox.portal.common.service.email.model.EmailMessageModel;
-import ai.salesfox.portal.common.service.gift.GiftItemUtility;
+import ai.salesfox.portal.common.service.gift.GiftItemService;
 import ai.salesfox.portal.common.service.gift.GiftSubmissionUtility;
-import ai.salesfox.portal.common.service.gift.GiftTrackingUtility;
+import ai.salesfox.portal.common.service.gift.GiftTrackingService;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.UUID;
 
 @Slf4j
-public class ScheduledGiftSubmissionUtility extends GiftSubmissionUtility<PortalException> {
+@Component
+public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<PortalException> {
     public static final String FAILURE_MESSAGE_SUBJECT_LINE = "Salesfox - Scheduled Gift Submission Failure";
 
-    private final GiftTrackingUtility giftTrackingUtility;
+    private final GiftTrackingService giftTrackingService;
     private final EmailMessagingService emailMessagingService;
 
-    public ScheduledGiftSubmissionUtility(GiftTrackingUtility giftTrackingUtility, GiftItemUtility giftItemUtility, ContactInteractionsUtility contactInteractionsUtility, EmailMessagingService emailMessagingService) {
-        super(giftTrackingUtility, giftItemUtility, contactInteractionsUtility);
-        this.giftTrackingUtility = giftTrackingUtility;
+    public ScheduledGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService, ContactInteractionsService contactInteractionsService, EmailMessagingService emailMessagingService) {
+        super(giftTrackingService, giftItemService, contactInteractionsService);
+        this.giftTrackingService = giftTrackingService;
         this.emailMessagingService = emailMessagingService;
     }
 
@@ -54,7 +56,7 @@ public class ScheduledGiftSubmissionUtility extends GiftSubmissionUtility<Portal
     }
 
     private void unscheduleGift(GiftEntity giftEntity, UserEntity submittingUser) {
-        giftTrackingUtility.updateGiftTrackingInfo(giftEntity, submittingUser, GiftTrackingStatus.SCHEDULED_SUBMISSION_FAILED);
+        giftTrackingService.updateGiftTrackingInfo(giftEntity, submittingUser, GiftTrackingStatus.SCHEDULED_SUBMISSION_FAILED);
     }
 
 }
