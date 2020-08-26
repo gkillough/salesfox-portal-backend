@@ -17,8 +17,8 @@ import java.util.List;
 @Slf4j
 @Component
 public class EmailMessagingService {
-    private EmailConfiguration emailConfiguration;
-    private EmailHtmlMessageCreator emailHtmlMessageCreator;
+    private final EmailConfiguration emailConfiguration;
+    private final EmailHtmlMessageCreator emailHtmlMessageCreator;
 
     @Autowired
     public EmailMessagingService(EmailConfiguration emailConfiguration, EmailHtmlMessageCreator emailHtmlMessageCreator) {
