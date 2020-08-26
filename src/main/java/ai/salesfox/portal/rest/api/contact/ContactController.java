@@ -2,7 +2,7 @@ package ai.salesfox.portal.rest.api.contact;
 
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import ai.salesfox.portal.rest.api.common.page.PageMetadata;
-import ai.salesfox.portal.rest.api.contact.interaction.ContactInteractionService;
+import ai.salesfox.portal.rest.api.contact.interaction.ContactInteractionApiService;
 import ai.salesfox.portal.rest.api.contact.interaction.model.ContactInteractionRequestModel;
 import ai.salesfox.portal.rest.api.contact.interaction.model.MultiInteractionModel;
 import ai.salesfox.portal.rest.api.contact.model.*;
@@ -20,11 +20,11 @@ public class ContactController {
     public static final String BASE_ENDPOINT = "/contacts";
 
     private final ContactService contactService;
-    private final ContactInteractionService contactInteractionService;
+    private final ContactInteractionApiService contactInteractionService;
     private final ContactBulkUploadService contactBulkUploadService;
 
     @Autowired
-    public ContactController(ContactService contactService, ContactInteractionService contactInteractionService, ContactBulkUploadService contactBulkUploadService) {
+    public ContactController(ContactService contactService, ContactInteractionApiService contactInteractionService, ContactBulkUploadService contactBulkUploadService) {
         this.contactService = contactService;
         this.contactInteractionService = contactInteractionService;
         this.contactBulkUploadService = contactBulkUploadService;

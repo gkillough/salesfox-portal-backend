@@ -34,23 +34,24 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class ContactInteractionService {
+public class ContactInteractionApiService {
     private final OrganizationAccountContactRepository contactRepository;
     private final ContactInteractionRepository contactInteractionRepository;
+    private final ContactInteractionsService contactInteractionsService;
+
     private final UserRepository userRepository;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private final ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
-    private final ContactInteractionsService contactInteractionsService;
 
     @Autowired
-    public ContactInteractionService(OrganizationAccountContactRepository contactRepository, OrganizationAccountContactProfileRepository contactProfileRepository,
-                                     ContactInteractionRepository contactInteractionRepository, UserRepository userRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+    public ContactInteractionApiService(OrganizationAccountContactRepository contactRepository, OrganizationAccountContactProfileRepository contactProfileRepository, ContactInteractionRepository contactInteractionRepository,
+                                        ContactInteractionsService contactInteractionsService, UserRepository userRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.contactRepository = contactRepository;
         this.contactInteractionRepository = contactInteractionRepository;
+        this.contactInteractionsService = contactInteractionsService;
         this.userRepository = userRepository;
         this.membershipRetrievalService = membershipRetrievalService;
         this.contactAccessOperationUtility = new ContactAccessOperationUtility<>(membershipRetrievalService, contactProfileRepository);
-        this.contactInteractionsService = new ContactInteractionsService(contactRepository, contactInteractionRepository);
     }
 
     public MultiInteractionModel getInteractions(UUID contactId, Integer offset, Integer limit) {
