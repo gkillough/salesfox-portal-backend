@@ -34,7 +34,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class ContactInteractionApiService {
+public class ContactInteractionEndpointService {
     private final OrganizationAccountContactRepository contactRepository;
     private final ContactInteractionRepository contactInteractionRepository;
     private final ContactInteractionsService contactInteractionsService;
@@ -44,8 +44,8 @@ public class ContactInteractionApiService {
     private final ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
 
     @Autowired
-    public ContactInteractionApiService(OrganizationAccountContactRepository contactRepository, OrganizationAccountContactProfileRepository contactProfileRepository, ContactInteractionRepository contactInteractionRepository,
-                                        ContactInteractionsService contactInteractionsService, UserRepository userRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+    public ContactInteractionEndpointService(OrganizationAccountContactRepository contactRepository, OrganizationAccountContactProfileRepository contactProfileRepository, ContactInteractionRepository contactInteractionRepository,
+                                             ContactInteractionsService contactInteractionsService, UserRepository userRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.contactRepository = contactRepository;
         this.contactInteractionRepository = contactInteractionRepository;
         this.contactInteractionsService = contactInteractionsService;

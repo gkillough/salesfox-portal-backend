@@ -4,8 +4,8 @@ databaseChangeLog:
       author: gavinkillough
       changes:
         - createTable:
-            schemaName: gift_schedules
-            tableName: gifts
+            schemaName: portal
+            tableName: gift_schedules
             columns:
               - column:
                   name: gift_id
