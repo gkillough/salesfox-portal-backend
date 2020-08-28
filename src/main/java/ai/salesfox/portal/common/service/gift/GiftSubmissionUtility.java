@@ -38,6 +38,7 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
         if (giftItemDetail != null) {
             Optional<InventoryItemEntity> optionalGiftItem = giftItemService.findInventoryItemForGift(submittingUser, userMembership, giftItemDetail);
             if (optionalGiftItem.isPresent()) {
+                // TODO decrement available notes
                 giftItemService.decrementItemQuantityOrElse(optionalGiftItem.get(), giftItem -> handleItemOutOfStock(gift, giftItem, submittingUser));
             } else {
                 handleItemMissingFromInventory(gift, giftItemDetail, submittingUser);
