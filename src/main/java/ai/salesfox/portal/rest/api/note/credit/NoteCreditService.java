@@ -33,6 +33,7 @@ public class NoteCreditService {
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         NoteCreditEntity foundNoteCredits = noteCreditRepository.findAccessibleNoteCredits(userMembership.getOrganizationAccountId(), loggedInUser.getUserId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No accessible note credits. Please contact support."));
+        // TODO initialize this entity if none exists
 
         UUID orgRestrictionId = Optional.ofNullable(foundNoteCredits.getNoteCreditOrgAccountRestrictionEntity())
                 .map(NoteCreditOrgAccountRestrictionEntity::getOrganizationAccountId)
