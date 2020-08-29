@@ -9,10 +9,10 @@ import ai.salesfox.portal.database.inventory.InventoryEntity;
 import ai.salesfox.portal.database.inventory.InventoryRepository;
 import ai.salesfox.portal.database.inventory.restriction.InventoryOrganizationAccountRestrictionEntity;
 import ai.salesfox.portal.database.inventory.restriction.InventoryOrganizationAccountRestrictionRepository;
-import ai.salesfox.portal.database.note.credit.NoteCreditEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditOrgAccountRestrictionEntity;
-import ai.salesfox.portal.database.note.credit.NoteCreditOrgAccountRestrictionRepository;
-import ai.salesfox.portal.database.note.credit.NoteCreditRepository;
+import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
+import ai.salesfox.portal.database.note.credit.NoteCreditsOrgAccountRestrictionRepository;
+import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
 import ai.salesfox.portal.database.organization.OrganizationEntity;
 import ai.salesfox.portal.database.organization.OrganizationRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
@@ -50,8 +50,8 @@ public class OrganizationAccountRegistrationService {
     private final OrganizationAccountProfileRepository organizationAccountProfileRepository;
     private final InventoryRepository inventoryRepository;
     private final InventoryOrganizationAccountRestrictionRepository inventoryOrgAcctRestrictionRepository;
-    private final NoteCreditRepository noteCreditRepository;
-    private final NoteCreditOrgAccountRestrictionRepository noteCreditOrgAccountRestrictionRepository;
+    private final NoteCreditsRepository noteCreditsRepository;
+    private final NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository;
     private final OrganizationValidationService organizationValidationService;
     private final UserRegistrationService userRegistrationService;
     private final UserProfileService userProfileService;
@@ -64,8 +64,8 @@ public class OrganizationAccountRegistrationService {
                                                   OrganizationAccountProfileRepository organizationAccountProfileRepository,
                                                   InventoryRepository inventoryRepository,
                                                   InventoryOrganizationAccountRestrictionRepository inventoryOrgAcctRestrictionRepository,
-                                                  NoteCreditRepository noteCreditRepository,
-                                                  NoteCreditOrgAccountRestrictionRepository noteCreditOrgAccountRestrictionRepository,
+                                                  NoteCreditsRepository noteCreditsRepository,
+                                                  NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository,
                                                   OrganizationValidationService organizationValidationService,
                                                   UserRegistrationService userRegistrationService,
                                                   UserProfileService userProfileService
@@ -77,8 +77,8 @@ public class OrganizationAccountRegistrationService {
         this.organizationAccountProfileRepository = organizationAccountProfileRepository;
         this.inventoryRepository = inventoryRepository;
         this.inventoryOrgAcctRestrictionRepository = inventoryOrgAcctRestrictionRepository;
-        this.noteCreditRepository = noteCreditRepository;
-        this.noteCreditOrgAccountRestrictionRepository = noteCreditOrgAccountRestrictionRepository;
+        this.noteCreditsRepository = noteCreditsRepository;
+        this.noteCreditsOrgAccountRestrictionRepository = noteCreditsOrgAccountRestrictionRepository;
         this.organizationValidationService = organizationValidationService;
         this.userRegistrationService = userRegistrationService;
         this.userProfileService = userProfileService;
@@ -185,10 +185,10 @@ public class OrganizationAccountRegistrationService {
     }
 
     private void createNoteCredits(OrganizationAccountEntity orgAccountEntity) {
-        NoteCreditEntity noteCreditsToSave = new NoteCreditEntity(null, 0);
-        NoteCreditEntity savedNoteCredits = noteCreditRepository.save(noteCreditsToSave);
+        NoteCreditsEntity noteCreditsToSave = new NoteCreditsEntity(null, 0);
+        NoteCreditsEntity savedNoteCredits = noteCreditsRepository.save(noteCreditsToSave);
         NoteCreditOrgAccountRestrictionEntity restrictionToSave = new NoteCreditOrgAccountRestrictionEntity(savedNoteCredits.getNoteCreditId(), orgAccountEntity.getOrganizationAccountId());
-        noteCreditOrgAccountRestrictionRepository.save(restrictionToSave);
+        noteCreditsOrgAccountRestrictionRepository.save(restrictionToSave);
     }
 
     private void activateLicense(LicenseEntity license) {

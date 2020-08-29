@@ -9,9 +9,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-public interface NoteCreditRepository extends JpaRepository<NoteCreditEntity, UUID> {
+public interface NoteCreditsRepository extends JpaRepository<NoteCreditsEntity, UUID> {
     @Query("SELECT noteCredit" +
-            " FROM NoteCreditEntity noteCredit" +
+            " FROM NoteCreditsEntity noteCredit" +
             " LEFT JOIN noteCredit.noteCreditOrgAccountRestrictionEntity orgAcctRestriction" +
             " LEFT JOIN noteCredit.noteCreditUserRestrictionEntity userRestriction" +
             " WHERE (" +
@@ -20,6 +20,6 @@ public interface NoteCreditRepository extends JpaRepository<NoteCreditEntity, UU
             "   (userRestriction != NULL AND userRestriction.userId = :userId)" +
             " )"
     )
-    Optional<NoteCreditEntity> findAccessibleNoteCredits(@Param("orgAcctId") UUID orgAcctId, @Param("userId") UUID userId);
+    Optional<NoteCreditsEntity> findAccessibleNoteCredits(@Param("orgAcctId") UUID orgAcctId, @Param("userId") UUID userId);
 
 }

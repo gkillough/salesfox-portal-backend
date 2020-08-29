@@ -6,5 +6,5 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public interface NoteCreditOrgAccountRestrictionRepository extends JpaRepository<NoteCreditOrgAccountRestrictionEntity, UUID> {
+public interface NoteCreditsUserRestrictionRepository extends JpaRepository<NoteCreditUserRestrictionEntity, UUID> {
 }

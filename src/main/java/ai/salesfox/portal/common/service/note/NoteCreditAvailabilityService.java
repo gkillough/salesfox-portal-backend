@@ -1,30 +1,30 @@
 package ai.salesfox.portal.common.service.note;
 
 import ai.salesfox.portal.common.exception.ThrowingConsumer;
-import ai.salesfox.portal.database.note.credit.NoteCreditEntity;
-import ai.salesfox.portal.database.note.credit.NoteCreditRepository;
+import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
+import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class NoteCreditAvailabilityService {
-    private final NoteCreditRepository noteCreditRepository;
+    private final NoteCreditsRepository noteCreditsRepository;
 
     @Autowired
-    public NoteCreditAvailabilityService(NoteCreditRepository noteCreditRepository) {
-        this.noteCreditRepository = noteCreditRepository;
+    public NoteCreditAvailabilityService(NoteCreditsRepository noteCreditsRepository) {
+        this.noteCreditsRepository = noteCreditsRepository;
     }
 
-    public void incrementNoteCredits(NoteCreditEntity noteCredit) {
+    public void incrementNoteCredits(NoteCreditsEntity noteCredit) {
         incrementNoteCredits(noteCredit, 1);
     }
 
-    public void incrementNoteCredits(NoteCreditEntity noteCredit, int quantity) {
+    public void incrementNoteCredits(NoteCreditsEntity noteCredit, int quantity) {
         noteCredit.setAvailableCredits(noteCredit.getAvailableCredits() + quantity);
-        noteCreditRepository.save(noteCredit);
+        noteCreditsRepository.save(noteCredit);
     }
 
-    public <E extends Throwable> void decrementNoteCreditsOrElse(NoteCreditEntity noteCredits, ThrowingConsumer<NoteCreditEntity, E> outOfCreditsHandler) throws E {
+    public <E extends Throwable> void decrementNoteCreditsOrElse(NoteCreditsEntity noteCredits, ThrowingConsumer<NoteCreditsEntity, E> outOfCreditsHandler) throws E {
         if (noteCredits.getAvailableCredits() < 1) {
             outOfCreditsHandler.accept(noteCredits);
         } else {
