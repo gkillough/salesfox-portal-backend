@@ -16,7 +16,7 @@ public class NoteCreditEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "note_credit_id")
     private UUID noteCreditId;
-
+    
     @Column(name = "available_credits")
     private Integer availableCredits;
 

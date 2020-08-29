@@ -188,7 +188,7 @@ public class UserRegistrationService {
     private void createNoteCreditsIfNecessary(UUID userId, RoleEntity roleEntity) {
         String roleLevel = roleEntity.getRoleLevel();
         if (PortalAuthorityConstants.PORTAL_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(roleLevel)) {
-            NoteCreditEntity noteCreditsToSave = new NoteCreditEntity();
+            NoteCreditEntity noteCreditsToSave = new NoteCreditEntity(null, 0);
             NoteCreditEntity savedNoteCredits = noteCreditRepository.save(noteCreditsToSave);
             NoteCreditUserRestrictionEntity restrictionToSave = new NoteCreditUserRestrictionEntity(savedNoteCredits.getNoteCreditId(), userId);
             noteCreditUserRestrictionRepository.save(restrictionToSave);

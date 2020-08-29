@@ -86,6 +86,7 @@ public class GiftProcessingService {
         }
 
         // TODO notify distributor(s)
+        // TODO update inventory and note credits
         giftTrackingService.updateGiftTrackingInfo(foundGift, loggedInUser, GiftTrackingStatus.CANCELLED.name());
         return GiftResponseModelUtils.convertToResponseModel(foundGift);
     }

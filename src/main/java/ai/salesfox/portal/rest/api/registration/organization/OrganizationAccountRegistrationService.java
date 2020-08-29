@@ -185,7 +185,7 @@ public class OrganizationAccountRegistrationService {
     }
 
     private void createNoteCredits(OrganizationAccountEntity orgAccountEntity) {
-        NoteCreditEntity noteCreditsToSave = new NoteCreditEntity();
+        NoteCreditEntity noteCreditsToSave = new NoteCreditEntity(null, 0);
         NoteCreditEntity savedNoteCredits = noteCreditRepository.save(noteCreditsToSave);
         NoteCreditOrgAccountRestrictionEntity restrictionToSave = new NoteCreditOrgAccountRestrictionEntity(savedNoteCredits.getNoteCreditId(), orgAccountEntity.getOrganizationAccountId());
         noteCreditOrgAccountRestrictionRepository.save(restrictionToSave);
