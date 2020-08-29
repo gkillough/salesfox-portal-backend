@@ -1,0 +1,82 @@
+databaseChangeLog:
+  - changeSet:
+      id: note-credits-1
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: note_credits
+            columns:
+              - column:
+                  name: note_credit_id
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: available_credits
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: note-credits-2
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: note_credit_organization_account_restrictions
+            columns:
+              - column:
+                  name: note_credit_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: note_credit_org_acct_restrictions_note_credit_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: note_credits
+                    referencedColumnNames: note_credit_id
+                    deleteCascade: true
+              - column:
+                  name: organization_account_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: note_credit_org_acct_restrictions_org_acct_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: organization_accounts
+                    referencedColumnNames: organization_account_id
+                    deleteCascade: true
+
+  - changeSet:
+      id: note-credits-3
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: note_credit_user_restrictions
+            columns:
+              - column:
+                  name: note_credit_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: note_credit_user_restrictions_note_credit_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: note_credits
+                    referencedColumnNames: note_credit_id
+                    deleteCascade: true
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: note_credit_user_restrictions_user_id_fk
+                    referencedTableSchemaName: portal
+                    referencedTableName: users
+                    referencedColumnNames: user_id
+                    deleteCascade: true

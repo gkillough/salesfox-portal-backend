@@ -2,3 +2,7 @@ databaseChangeLog:
   - include:
       file: scheduling_tables.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: note_credits.yaml
+      relativeToChangelogFile: true
