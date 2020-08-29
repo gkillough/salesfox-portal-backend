@@ -9,8 +9,8 @@ import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
-import ai.salesfox.portal.database.note.credit.NoteCreditEntity;
-import ai.salesfox.portal.database.note.credit.NoteCreditRepository;
+import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
+import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -20,9 +20,9 @@ import org.springframework.web.server.ResponseStatusException;
 public class EndpointGiftSubmissionService extends GiftSubmissionUtility<ResponseStatusException> {
     @Autowired
     public EndpointGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService,
-                                         NoteCreditRepository noteCreditRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
+                                         NoteCreditsRepository noteCreditsRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
                                          ContactInteractionsService contactInteractionsService) {
-        super(giftTrackingService, giftItemService, noteCreditRepository, noteCreditAvailabilityService, contactInteractionsService);
+        super(giftTrackingService, giftItemService, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class EndpointGiftSubmissionService extends GiftSubmissionUtility<Respons
     }
 
     @Override
-    protected void handleNotEnoughNoteCredits(GiftEntity foundGift, NoteCreditEntity noteCredits, UserEntity submittingUser) throws ResponseStatusException {
+    protected void handleNotEnoughNoteCredits(GiftEntity foundGift, NoteCreditsEntity noteCredits, UserEntity submittingUser) throws ResponseStatusException {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There were not enough note-credits available to attach a note to the gift");
     }
 

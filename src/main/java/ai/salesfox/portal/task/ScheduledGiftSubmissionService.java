@@ -13,8 +13,8 @@ import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
-import ai.salesfox.portal.database.note.credit.NoteCreditEntity;
-import ai.salesfox.portal.database.note.credit.NoteCreditRepository;
+import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
+import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,9 +32,9 @@ public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<Portal
 
     @Autowired
     public ScheduledGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService,
-                                          NoteCreditRepository noteCreditRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
+                                          NoteCreditsRepository noteCreditsRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
                                           ContactInteractionsService contactInteractionsService, GiftTrackingService giftTrackingService1, EmailMessagingService emailMessagingService) {
-        super(giftTrackingService, giftItemService, noteCreditRepository, noteCreditAvailabilityService, contactInteractionsService);
+        super(giftTrackingService, giftItemService, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService);
         this.giftTrackingService = giftTrackingService1;
         this.emailMessagingService = emailMessagingService;
     }
@@ -64,7 +64,7 @@ public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<Portal
     }
 
     @Override
-    protected void handleNotEnoughNoteCredits(GiftEntity foundGift, NoteCreditEntity noteCredits, UserEntity submittingUser) throws PortalException {
+    protected void handleNotEnoughNoteCredits(GiftEntity foundGift, NoteCreditsEntity noteCredits, UserEntity submittingUser) throws PortalException {
         unscheduleGift(foundGift, submittingUser);
         notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), "A gift was scheduled to be submitted, but the there were not enough note-credits.");
     }

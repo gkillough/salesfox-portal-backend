@@ -10,7 +10,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class NoteCreditResponseModel {
+public class NoteCreditsResponseModel {
     private UUID noteCreditId;
     private Integer availableQuantity;
     private RestrictionModel restriction;

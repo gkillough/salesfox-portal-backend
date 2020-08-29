@@ -11,8 +11,8 @@ import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.gift.note.GiftNoteDetailEntity;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
-import ai.salesfox.portal.database.note.credit.NoteCreditEntity;
-import ai.salesfox.portal.database.note.credit.NoteCreditRepository;
+import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
+import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,15 +22,15 @@ import java.util.Optional;
 public abstract class GiftSubmissionUtility<E extends Throwable> {
     private final GiftTrackingService giftTrackingService;
     private final GiftItemService giftItemService;
-    private final NoteCreditRepository noteCreditRepository;
+    private final NoteCreditsRepository noteCreditsRepository;
     private final NoteCreditAvailabilityService noteCreditAvailabilityService;
     private final ContactInteractionsService contactInteractionsService;
 
     public GiftSubmissionUtility(GiftTrackingService giftTrackingService, GiftItemService giftItemService,
-                                 NoteCreditRepository noteCreditRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
+                                 NoteCreditsRepository noteCreditsRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
                                  ContactInteractionsService contactInteractionsService) {
         this.giftItemService = giftItemService;
-        this.noteCreditRepository = noteCreditRepository;
+        this.noteCreditsRepository = noteCreditsRepository;
         this.noteCreditAvailabilityService = noteCreditAvailabilityService;
         this.contactInteractionsService = contactInteractionsService;
         this.giftTrackingService = giftTrackingService;
@@ -57,7 +57,7 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
 
         GiftNoteDetailEntity giftNoteDetail = gift.getGiftNoteDetailEntity();
         if (null != giftNoteDetail) {
-            Optional<NoteCreditEntity> optionalNoteCredits = noteCreditRepository.findAccessibleNoteCredits(userMembership.getOrganizationAccountId(), submittingUser.getUserId());
+            Optional<NoteCreditsEntity> optionalNoteCredits = noteCreditsRepository.findAccessibleNoteCredits(userMembership.getOrganizationAccountId(), submittingUser.getUserId());
             if (optionalNoteCredits.isPresent()) {
                 noteCreditAvailabilityService.decrementNoteCreditsOrElse(optionalNoteCredits.get(), noteCredits -> handleNotEnoughNoteCredits(gift, noteCredits, submittingUser));
             } else {
@@ -81,6 +81,6 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
 
     protected abstract void handleMissingNoteCredits(GiftEntity foundGift, UserEntity submittingUser) throws E;
 
-    protected abstract void handleNotEnoughNoteCredits(GiftEntity foundGift, NoteCreditEntity noteCredits, UserEntity submittingUser) throws E;
+    protected abstract void handleNotEnoughNoteCredits(GiftEntity foundGift, NoteCreditsEntity noteCredits, UserEntity submittingUser) throws E;
 
 }
