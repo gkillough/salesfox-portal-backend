@@ -1,7 +1,12 @@
 databaseChangeLog:
   - changeSet:
-      id: create-user-1
+      id: test-data-create-user-1
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.users WHERE email = 'basic.user@usepipeline.com';
       changes:
         - insert:
             schemaName: portal
@@ -21,8 +26,13 @@ databaseChangeLog:
                   valueBoolean: true
 
   - changeSet:
-      id: create-user-login-1
+      id: test-data-create-user-login-1
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.logins WHERE user_id = GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com');
       changes:
         - insert:
             schemaName: portal
@@ -39,8 +49,13 @@ databaseChangeLog:
                   valueNumeric: 0
 
   - changeSet:
-      id: create-user-membership-1
+      id: test-data-create-user-membership-1
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.memberships WHERE user_id = GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com');
       changes:
         - insert:
             schemaName: portal
@@ -57,8 +72,13 @@ databaseChangeLog:
                   valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PORTAL_BASIC_USER')
 
   - changeSet:
-      id: create-user-address-1
+      id: test-data-create-user-address-1
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.user_addresses WHERE user_id = GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com');
       changes:
         - insert:
             schemaName: portal
@@ -90,8 +110,13 @@ databaseChangeLog:
                   valueBoolean: true
 
   - changeSet:
-      id: create-user-profile-1
+      id: test-data-create-user-profile-1
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.user_profiles WHERE user_id = GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com');
       changes:
         - insert:
             schemaName: portal
@@ -108,8 +133,13 @@ databaseChangeLog:
                   valueComputed: 5555550002
 
   - changeSet:
-      id: create-user-inventory-1
+      id: test-data-create-user-inventory-1
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.inventories WHERE inventory_id = '1a0c6260-712e-4753-9cf4-4eb80faf8b50';
       changes:
         - insert:
             schemaName: portal
@@ -120,8 +150,13 @@ databaseChangeLog:
                   value: 1a0c6260-712e-4753-9cf4-4eb80faf8b50
 
   - changeSet:
-      id: create-user-inventory-restriction-1
+      id: test-data-create-user-inventory-restriction-1
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.inventory_user_restrictions WHERE user_id = GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com');
       changes:
         - insert:
             schemaName: portal
@@ -135,8 +170,13 @@ databaseChangeLog:
                   valueComputed: GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com')
 
   - changeSet:
-      id: create-user-2
+      id: test-data-create-user-2
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.users WHERE email = 'premium.user@usepipeline.com';
       changes:
         - insert:
             schemaName: portal
@@ -156,8 +196,13 @@ databaseChangeLog:
                   valueBoolean: true
 
   - changeSet:
-      id: create-user-login-2
+      id: test-data-create-user-login-2
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.logins WHERE user_id = GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com');
       changes:
         - insert:
             schemaName: portal
@@ -174,8 +219,13 @@ databaseChangeLog:
                   valueNumeric: 0
 
   - changeSet:
-      id: create-user-membership-2
+      id: test-data-create-user-membership-2
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.memberships WHERE user_id = GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com');
       changes:
         - insert:
             schemaName: portal
@@ -192,8 +242,13 @@ databaseChangeLog:
                   valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PORTAL_PREMIUM_USER')
 
   - changeSet:
-      id: create-user-address-2
+      id: test-data-create-user-address-2
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.user_addresses WHERE user_id = GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com');
       changes:
         - insert:
             schemaName: portal
@@ -225,8 +280,13 @@ databaseChangeLog:
                   valueBoolean: false
 
   - changeSet:
-      id: create-user-profile-2
+      id: test-data-create-user-profile-2
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.user_profiles WHERE user_id = GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com');
       changes:
         - insert:
             schemaName: portal
@@ -243,8 +303,13 @@ databaseChangeLog:
                   valueComputed: 5555550004
 
   - changeSet:
-      id: create-user-inventory-2
+      id: test-data-create-user-inventory-2
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.inventories WHERE inventory_id = '6d57f19b-c14a-4dcd-bc25-6b92ee8b6852';
       changes:
         - insert:
             schemaName: portal
@@ -255,8 +320,13 @@ databaseChangeLog:
                   value: 6d57f19b-c14a-4dcd-bc25-6b92ee8b6852
 
   - changeSet:
-      id: create-user-inventory-restriction-2
+      id: test-data-create-user-inventory-restriction-2
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.inventory_user_restrictions WHERE user_id = GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com');
       changes:
         - insert:
             schemaName: portal
@@ -270,8 +340,13 @@ databaseChangeLog:
                   valueComputed: GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com')
 
   - changeSet:
-      id: create-user-3
+      id: test-data-create-user-3
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.users WHERE email = 'admin@usepipeline.com';
       changes:
         - insert:
             schemaName: portal
@@ -291,8 +366,13 @@ databaseChangeLog:
                   valueBoolean: true
 
   - changeSet:
-      id: create-user-login-3
+      id: test-data-create-user-login-3
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.logins WHERE user_id = GET_USER_ID_BY_EMAIL('admin@usepipeline.com');
       changes:
         - insert:
             schemaName: portal
@@ -309,8 +389,13 @@ databaseChangeLog:
                   valueNumeric: 0
 
   - changeSet:
-      id: create-user-membership-3
+      id: test-data-create-user-membership-3
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.memberships WHERE user_id = GET_USER_ID_BY_EMAIL('admin@usepipeline.com');
       changes:
         - insert:
             schemaName: portal
@@ -327,8 +412,13 @@ databaseChangeLog:
                   valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PORTAL_ADMIN')
 
   - changeSet:
-      id: create-user-address-3
+      id: test-data-create-user-address-3
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.user_addresses WHERE user_id = GET_USER_ID_BY_EMAIL('admin@usepipeline.com');
       changes:
         - insert:
             schemaName: portal
@@ -360,8 +450,13 @@ databaseChangeLog:
                   valueBoolean: false
 
   - changeSet:
-      id: create-user-profile-3
+      id: test-data-create-user-profile-3
       author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.user_profiles WHERE user_id = GET_USER_ID_BY_EMAIL('admin@usepipeline.com');
       changes:
         - insert:
             schemaName: portal
@@ -376,31 +471,3 @@ databaseChangeLog:
               - column:
                   name: business_number
                   valueComputed: 5555550006
-
-  #  - changeSet:
-  #      id: create-user-inventory-3
-  #      author: gavinkillough
-  #      changes:
-  #        - insert:
-  #            schemaName: portal
-  #            tableName: inventories
-  #            columns:
-  #              - column:
-  #                  name: inventory_id
-  #                  value: 8c1a2762-422a-4c2e-8173-53453a90d15e
-
-  #  - changeSet:
-  #      id: create-user-inventory-restriction-3
-  #      author: gavinkillough
-  #      changes:
-  #        - insert:
-  #            schemaName: portal
-  #            tableName: inventory_user_restrictions
-  #            columns:
-  #              - column:
-  #                  name: inventory_id
-  #                  value: 8c1a2762-422a-4c2e-8173-53453a90d15e
-  #              - column:
-  #                  name: user_id
-  #                  valueComputed: GET_USER_ID_BY_EMAIL('admin@usepipeline.com')
-
