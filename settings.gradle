@@ -1,1 +1,4 @@
 rootProject.name = 'portal'
+include 'integration-shipstation'
+include 'common'
+
