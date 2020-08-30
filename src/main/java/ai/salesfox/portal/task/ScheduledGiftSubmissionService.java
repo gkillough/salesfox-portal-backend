@@ -8,11 +8,15 @@ import ai.salesfox.portal.common.service.email.model.EmailMessageModel;
 import ai.salesfox.portal.common.service.gift.GiftItemService;
 import ai.salesfox.portal.common.service.gift.GiftSubmissionUtility;
 import ai.salesfox.portal.common.service.gift.GiftTrackingService;
+import ai.salesfox.portal.common.service.note.NoteCreditAvailabilityService;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
+import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
+import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -26,9 +30,12 @@ public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<Portal
     private final GiftTrackingService giftTrackingService;
     private final EmailMessagingService emailMessagingService;
 
-    public ScheduledGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService, ContactInteractionsService contactInteractionsService, EmailMessagingService emailMessagingService) {
-        super(giftTrackingService, giftItemService, contactInteractionsService);
-        this.giftTrackingService = giftTrackingService;
+    @Autowired
+    public ScheduledGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService,
+                                          NoteCreditsRepository noteCreditsRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
+                                          ContactInteractionsService contactInteractionsService, GiftTrackingService giftTrackingService1, EmailMessagingService emailMessagingService) {
+        super(giftTrackingService, giftItemService, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService);
+        this.giftTrackingService = giftTrackingService1;
         this.emailMessagingService = emailMessagingService;
     }
 
@@ -48,6 +55,18 @@ public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<Portal
     protected void handleItemOutOfStock(GiftEntity foundGift, InventoryItemEntity inventoryItemForGift, UserEntity submittingUser) throws PortalException {
         unscheduleGift(foundGift, submittingUser);
         notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), "A gift was scheduled to be submitted, but the gift-item was out of stock.");
+    }
+
+    @Override
+    protected void handleMissingNoteCredits(GiftEntity foundGift, UserEntity submittingUser) throws PortalException {
+        unscheduleGift(foundGift, submittingUser);
+        notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), "A gift was scheduled to be submitted, but the there was a problem tracking note-credits.");
+    }
+
+    @Override
+    protected void handleNotEnoughNoteCredits(GiftEntity foundGift, NoteCreditsEntity noteCredits, UserEntity submittingUser) throws PortalException {
+        unscheduleGift(foundGift, submittingUser);
+        notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), "A gift was scheduled to be submitted, but the there were not enough note-credits.");
     }
 
     private void notifyUserOfFailure(UUID giftId, String userEmail, String failureMessage) throws PortalException {

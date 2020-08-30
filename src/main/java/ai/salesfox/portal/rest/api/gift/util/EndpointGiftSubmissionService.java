@@ -4,18 +4,25 @@ import ai.salesfox.portal.common.service.contact.ContactInteractionsService;
 import ai.salesfox.portal.common.service.gift.GiftItemService;
 import ai.salesfox.portal.common.service.gift.GiftSubmissionUtility;
 import ai.salesfox.portal.common.service.gift.GiftTrackingService;
+import ai.salesfox.portal.common.service.note.NoteCreditAvailabilityService;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
+import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
+import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class EndpointGiftSubmissionService extends GiftSubmissionUtility<ResponseStatusException> {
-    public EndpointGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService, ContactInteractionsService contactInteractionsService) {
-        super(giftTrackingService, giftItemService, contactInteractionsService);
+    @Autowired
+    public EndpointGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService,
+                                         NoteCreditsRepository noteCreditsRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
+                                         ContactInteractionsService contactInteractionsService) {
+        super(giftTrackingService, giftItemService, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService);
     }
 
     @Override
@@ -31,6 +38,16 @@ public class EndpointGiftSubmissionService extends GiftSubmissionUtility<Respons
     @Override
     protected void handleItemOutOfStock(GiftEntity foundGift, InventoryItemEntity inventoryItemForGift, UserEntity submittingUser) throws ResponseStatusException {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The requested item is not in stock");
+    }
+
+    @Override
+    protected void handleMissingNoteCredits(GiftEntity foundGift, UserEntity submittingUser) throws ResponseStatusException {
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "There was a problem tracking note-credits. Please contact support.");
+    }
+
+    @Override
+    protected void handleNotEnoughNoteCredits(GiftEntity foundGift, NoteCreditsEntity noteCredits, UserEntity submittingUser) throws ResponseStatusException {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There were not enough note-credits available to attach a note to the gift");
     }
 
 }

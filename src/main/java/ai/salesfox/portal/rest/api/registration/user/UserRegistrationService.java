@@ -13,6 +13,10 @@ import ai.salesfox.portal.database.inventory.InventoryEntity;
 import ai.salesfox.portal.database.inventory.InventoryRepository;
 import ai.salesfox.portal.database.inventory.restriction.InventoryUserRestrictionEntity;
 import ai.salesfox.portal.database.inventory.restriction.InventoryUserRestrictionRepository;
+import ai.salesfox.portal.database.note.credit.NoteCreditUserRestrictionEntity;
+import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
+import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
+import ai.salesfox.portal.database.note.credit.NoteCreditsUserRestrictionRepository;
 import ai.salesfox.portal.database.organization.OrganizationEntity;
 import ai.salesfox.portal.database.organization.OrganizationRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
@@ -45,14 +49,26 @@ public class UserRegistrationService {
     private final MembershipRepository membershipRepository;
     private final InventoryRepository inventoryRepository;
     private final InventoryUserRestrictionRepository inventoryUserRestrictionRepository;
+    private final NoteCreditsRepository noteCreditsRepository;
+    private final NoteCreditsUserRestrictionRepository noteCreditsUserRestrictionRepository;
     private final UserProfileService userProfileService;
     private final LicenseSeatManager licenseSeatManager;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserRegistrationService(UserRepository userRepository, LoginRepository loginRepository, RoleRepository roleRepository, OrganizationRepository organizationRepository, OrganizationAccountRepository organizationAccountRepository,
-                                   MembershipRepository membershipRepository, InventoryRepository inventoryRepository, InventoryUserRestrictionRepository inventoryUserRestrictionRepository,
-                                   UserProfileService userProfileService, LicenseSeatManager licenseSeatManager, PasswordEncoder passwordEncoder) {
+    public UserRegistrationService(UserRepository userRepository,
+                                   LoginRepository loginRepository,
+                                   RoleRepository roleRepository,
+                                   OrganizationRepository organizationRepository,
+                                   OrganizationAccountRepository organizationAccountRepository,
+                                   MembershipRepository membershipRepository,
+                                   InventoryRepository inventoryRepository,
+                                   InventoryUserRestrictionRepository inventoryUserRestrictionRepository,
+                                   NoteCreditsRepository noteCreditsRepository,
+                                   NoteCreditsUserRestrictionRepository noteCreditsUserRestrictionRepository,
+                                   UserProfileService userProfileService,
+                                   LicenseSeatManager licenseSeatManager,
+                                   PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.loginRepository = loginRepository;
         this.roleRepository = roleRepository;
@@ -61,6 +77,8 @@ public class UserRegistrationService {
         this.membershipRepository = membershipRepository;
         this.inventoryRepository = inventoryRepository;
         this.inventoryUserRestrictionRepository = inventoryUserRestrictionRepository;
+        this.noteCreditsRepository = noteCreditsRepository;
+        this.noteCreditsUserRestrictionRepository = noteCreditsUserRestrictionRepository;
         this.userProfileService = userProfileService;
         this.licenseSeatManager = licenseSeatManager;
         this.passwordEncoder = passwordEncoder;
@@ -111,6 +129,7 @@ public class UserRegistrationService {
         MembershipEntity membershipInfo = saveMembershipInfo(userEntity.getUserId(), orgAccount.getOrganizationAccountId(), roleEntity.getRoleId());
 
         createInventoryIfNecessary(userEntity.getUserId(), roleEntity);
+        createNoteCreditsIfNecessary(userEntity.getUserId(), roleEntity);
         userProfileService.initializeProfile(userEntity.getUserId());
 
         userEntity.setLoginEntity(loginInfo);
@@ -163,6 +182,16 @@ public class UserRegistrationService {
             InventoryEntity savedInventory = inventoryRepository.save(individualUserInventoryToSave);
             InventoryUserRestrictionEntity restrictionToSave = new InventoryUserRestrictionEntity(savedInventory.getInventoryId(), userId);
             inventoryUserRestrictionRepository.save(restrictionToSave);
+        }
+    }
+
+    private void createNoteCreditsIfNecessary(UUID userId, RoleEntity roleEntity) {
+        String roleLevel = roleEntity.getRoleLevel();
+        if (PortalAuthorityConstants.PORTAL_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(roleLevel)) {
+            NoteCreditsEntity noteCreditsToSave = new NoteCreditsEntity(null, 0);
+            NoteCreditsEntity savedNoteCredits = noteCreditsRepository.save(noteCreditsToSave);
+            NoteCreditUserRestrictionEntity restrictionToSave = new NoteCreditUserRestrictionEntity(savedNoteCredits.getNoteCreditId(), userId);
+            noteCreditsUserRestrictionRepository.save(restrictionToSave);
         }
     }
 

@@ -1,8 +1,5 @@
 package ai.salesfox.portal.rest.api.registration.organization;
 
-import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountNameToValidateModel;
-import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountRegistrationModel;
-import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountUserRegistrationModel;
 import ai.salesfox.portal.common.FieldValidationUtils;
 import ai.salesfox.portal.common.model.PortalAddressModel;
 import ai.salesfox.portal.database.account.entity.LicenseEntity;
@@ -12,6 +9,10 @@ import ai.salesfox.portal.database.inventory.InventoryEntity;
 import ai.salesfox.portal.database.inventory.InventoryRepository;
 import ai.salesfox.portal.database.inventory.restriction.InventoryOrganizationAccountRestrictionEntity;
 import ai.salesfox.portal.database.inventory.restriction.InventoryOrganizationAccountRestrictionRepository;
+import ai.salesfox.portal.database.note.credit.NoteCreditOrgAccountRestrictionEntity;
+import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
+import ai.salesfox.portal.database.note.credit.NoteCreditsOrgAccountRestrictionRepository;
+import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
 import ai.salesfox.portal.database.organization.OrganizationEntity;
 import ai.salesfox.portal.database.organization.OrganizationRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
@@ -23,6 +24,9 @@ import ai.salesfox.portal.database.organization.account.profile.OrganizationAcco
 import ai.salesfox.portal.rest.api.common.model.request.EmailToValidateModel;
 import ai.salesfox.portal.rest.api.common.model.response.ValidationResponseModel;
 import ai.salesfox.portal.rest.api.organization.common.OrganizationValidationService;
+import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountNameToValidateModel;
+import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountRegistrationModel;
+import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountUserRegistrationModel;
 import ai.salesfox.portal.rest.api.registration.user.UserRegistrationModel;
 import ai.salesfox.portal.rest.api.registration.user.UserRegistrationService;
 import ai.salesfox.portal.rest.api.user.profile.UserProfileService;
@@ -46,6 +50,8 @@ public class OrganizationAccountRegistrationService {
     private final OrganizationAccountProfileRepository organizationAccountProfileRepository;
     private final InventoryRepository inventoryRepository;
     private final InventoryOrganizationAccountRestrictionRepository inventoryOrgAcctRestrictionRepository;
+    private final NoteCreditsRepository noteCreditsRepository;
+    private final NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository;
     private final OrganizationValidationService organizationValidationService;
     private final UserRegistrationService userRegistrationService;
     private final UserProfileService userProfileService;
@@ -56,8 +62,14 @@ public class OrganizationAccountRegistrationService {
                                                   OrganizationAccountRepository organizationAccountRepository,
                                                   OrganizationAccountAddressRepository organizationAccountAddressRepository,
                                                   OrganizationAccountProfileRepository organizationAccountProfileRepository,
-                                                  InventoryRepository inventoryRepository, InventoryOrganizationAccountRestrictionRepository inventoryOrgAcctRestrictionRepository,
-                                                  OrganizationValidationService organizationValidationService, UserRegistrationService userRegistrationService, UserProfileService userProfileService) {
+                                                  InventoryRepository inventoryRepository,
+                                                  InventoryOrganizationAccountRestrictionRepository inventoryOrgAcctRestrictionRepository,
+                                                  NoteCreditsRepository noteCreditsRepository,
+                                                  NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository,
+                                                  OrganizationValidationService organizationValidationService,
+                                                  UserRegistrationService userRegistrationService,
+                                                  UserProfileService userProfileService
+    ) {
         this.licenseRepository = licenseRepository;
         this.organizationRepository = organizationRepository;
         this.organizationAccountRepository = organizationAccountRepository;
@@ -65,6 +77,8 @@ public class OrganizationAccountRegistrationService {
         this.organizationAccountProfileRepository = organizationAccountProfileRepository;
         this.inventoryRepository = inventoryRepository;
         this.inventoryOrgAcctRestrictionRepository = inventoryOrgAcctRestrictionRepository;
+        this.noteCreditsRepository = noteCreditsRepository;
+        this.noteCreditsOrgAccountRestrictionRepository = noteCreditsOrgAccountRestrictionRepository;
         this.organizationValidationService = organizationValidationService;
         this.userRegistrationService = userRegistrationService;
         this.userProfileService = userProfileService;
@@ -109,6 +123,7 @@ public class OrganizationAccountRegistrationService {
         registerOrganizationAccountOwner(registrationModel.getAccountOwner(), orgAccountEntity);
         createOrganizationAccountProfile(orgAccountEntity, registrationModel.getBusinessPhoneNumber());
         createInventory(orgAccountEntity);
+        createNoteCredits(orgAccountEntity);
     }
 
     private LicenseEntity getAndValidateLicenseByHash(UUID licenseHash) {
@@ -167,6 +182,13 @@ public class OrganizationAccountRegistrationService {
         InventoryEntity savedInventory = inventoryRepository.save(orgAcctInventoryToSave);
         InventoryOrganizationAccountRestrictionEntity restrictionToSave = new InventoryOrganizationAccountRestrictionEntity(savedInventory.getInventoryId(), orgAccountEntity.getOrganizationAccountId());
         inventoryOrgAcctRestrictionRepository.save(restrictionToSave);
+    }
+
+    private void createNoteCredits(OrganizationAccountEntity orgAccountEntity) {
+        NoteCreditsEntity noteCreditsToSave = new NoteCreditsEntity(null, 0);
+        NoteCreditsEntity savedNoteCredits = noteCreditsRepository.save(noteCreditsToSave);
+        NoteCreditOrgAccountRestrictionEntity restrictionToSave = new NoteCreditOrgAccountRestrictionEntity(savedNoteCredits.getNoteCreditId(), orgAccountEntity.getOrganizationAccountId());
+        noteCreditsOrgAccountRestrictionRepository.save(restrictionToSave);
     }
 
     private void activateLicense(LicenseEntity license) {

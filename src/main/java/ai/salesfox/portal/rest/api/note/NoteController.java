@@ -5,6 +5,7 @@ import ai.salesfox.portal.rest.api.note.model.MultiNoteModel;
 import ai.salesfox.portal.rest.api.note.model.NoteRequestModel;
 import ai.salesfox.portal.rest.api.note.model.NoteResponseModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -14,7 +15,7 @@ import java.util.UUID;
 public class NoteController {
     public static final String BASE_ENDPOINT = "/notes";
 
-    private NoteService noteService;
+    private final NoteService noteService;
 
     @Autowired
     public NoteController(NoteService noteService) {
@@ -32,11 +33,13 @@ public class NoteController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public NoteResponseModel createNote(@RequestBody NoteRequestModel requestModel) {
         return noteService.createNote(requestModel);
     }
 
     @PutMapping("/{noteId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateNote(@PathVariable UUID noteId, @RequestBody NoteRequestModel requestModel) {
         noteService.updateNote(noteId, requestModel);
     }
