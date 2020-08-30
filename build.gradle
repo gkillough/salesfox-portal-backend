@@ -54,7 +54,7 @@ subprojects {
 }
 
 group = 'ai.salesfox'
-version = '0.0.1-SNAPSHOT'
+version = '0.2.0-SNAPSHOT'
 mainClassName = 'ai.salesfox.portal.PortalApplication'
 
 apply from: 'buildSrc/tasks.gradle'
