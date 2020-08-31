@@ -9,5 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class NoteRequestModel {
     private String message;
+    private Integer fontSize;
+    private String fontColor;
+    private String handwritingStyle;
 
 }

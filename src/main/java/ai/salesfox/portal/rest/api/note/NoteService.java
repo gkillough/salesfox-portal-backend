@@ -1,11 +1,6 @@
 package ai.salesfox.portal.rest.api.note;
 
-import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
-import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
-import ai.salesfox.portal.rest.api.note.model.MultiNoteModel;
-import ai.salesfox.portal.rest.api.note.model.NoteRequestModel;
-import ai.salesfox.portal.rest.api.note.model.NoteResponseModel;
-import ai.salesfox.portal.rest.api.user.common.model.UserSummaryModel;
+import ai.salesfox.portal.common.service.note.NoteValidationUtils;
 import ai.salesfox.portal.common.time.PortalDateTimeUtils;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
@@ -19,7 +14,15 @@ import ai.salesfox.portal.database.note.restriction.NoteOrganizationAccountRestr
 import ai.salesfox.portal.database.note.restriction.NoteOrganizationAccountRestrictionRepository;
 import ai.salesfox.portal.database.note.restriction.NoteUserRestrictionEntity;
 import ai.salesfox.portal.database.note.restriction.NoteUserRestrictionRepository;
+import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
+import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
+import ai.salesfox.portal.rest.api.note.model.MultiNoteModel;
+import ai.salesfox.portal.rest.api.note.model.NoteRequestModel;
+import ai.salesfox.portal.rest.api.note.model.NoteResponseModel;
+import ai.salesfox.portal.rest.api.user.common.model.UserSummaryModel;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,13 +31,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class NoteService {
-    public static final int MESSAGE_LENGTH_CHAR_LIMIT = 2500;
+    public static final int DEFAULT_FONT_SIZE = 15;
+    public static final String DEFAULT_FONT_COLOR = "black";
+    public static final String DEFAULT_HANDWRITING_STYLE = "stafford";
 
     private final NoteRepository noteRepository;
     private final NoteOrganizationAccountRestrictionRepository noteOrgAcctRestrictionRepository;
@@ -81,7 +85,10 @@ public class NoteService {
         validateNoteRequestModel(requestModel);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
 
-        NoteEntity noteToSave = new NoteEntity(null, loggedInUser.getUserId(), PortalDateTimeUtils.getCurrentDateTime(), requestModel.getMessage());
+        Integer noteFontSize = ObjectUtils.defaultIfNull(requestModel.getFontSize(), DEFAULT_FONT_SIZE);
+        String noteFontColor = defaultIfBlank(requestModel.getFontColor(), DEFAULT_FONT_COLOR);
+        String noteHandwritingStyle = defaultIfBlank(requestModel.getHandwritingStyle(), DEFAULT_HANDWRITING_STYLE);
+        NoteEntity noteToSave = new NoteEntity(null, loggedInUser.getUserId(), PortalDateTimeUtils.getCurrentDateTime(), requestModel.getMessage(), noteFontSize, noteFontColor, noteHandwritingStyle);
         NoteEntity savedNote = noteRepository.save(noteToSave);
 
         if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
@@ -111,6 +118,15 @@ public class NoteService {
         foundNote.setUpdatedByUserId(loggedInUser.getUserId());
         foundNote.setDateModified(PortalDateTimeUtils.getCurrentDateTime());
         foundNote.setMessage(requestModel.getMessage());
+
+        Integer newFontSize = ObjectUtils.defaultIfNull(requestModel.getFontSize(), foundNote.getFontSizeMillimeters());
+        foundNote.setFontSizeMillimeters(newFontSize);
+
+        String newFontColor = defaultIfBlank(requestModel.getFontColor(), foundNote.getFontColor());
+        foundNote.setFontColor(newFontColor);
+
+        String newHandwritingStyle = defaultIfBlank(requestModel.getHandwritingStyle(), foundNote.getHandwritingStyle());
+        foundNote.setHandwritingStyle(newHandwritingStyle);
 
         noteRepository.save(foundNote);
     }
@@ -145,12 +161,31 @@ public class NoteService {
     }
 
     private void validateNoteRequestModel(NoteRequestModel noteRequestModel) {
+        List<String> errors = new ArrayList<>();
         if (noteRequestModel.getMessage() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The request field 'message' cannot be null");
+            errors.add("The request field 'message' cannot be null");
+        } else if (!NoteValidationUtils.isValidMessageSize(noteRequestModel.getMessage())) {
+            errors.add(String.format("The message cannot exceed %d characters", NoteValidationUtils.MAX_MESSAGE_CHARS));
         }
 
-        if (noteRequestModel.getMessage().length() > MESSAGE_LENGTH_CHAR_LIMIT) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The message cannot exceed %d characters", MESSAGE_LENGTH_CHAR_LIMIT));
+        Integer fontSize = noteRequestModel.getFontSize();
+        if (null != fontSize && !NoteValidationUtils.isValidFontSize(fontSize)) {
+            errors.add(String.format("The font size must be between %d and %d inclusive", NoteValidationUtils.MIN_ALLOWED_FONT_SIZE, NoteValidationUtils.MAX_ALLOWED_FONT_SIZE));
+        }
+
+        String fontColor = noteRequestModel.getFontColor();
+        if (StringUtils.isNotBlank(fontColor) && !NoteValidationUtils.isValidFontColor(fontColor)) {
+            errors.add(String.format("Invalid font color. Available colors: %s", Arrays.toString(NoteValidationUtils.ALLOWED_COLORS)));
+        }
+
+        String handwritingStyle = noteRequestModel.getHandwritingStyle();
+        if (StringUtils.isNotBlank(handwritingStyle) && !NoteValidationUtils.isValidHandwritingStyle(handwritingStyle)) {
+            errors.add(String.format("Invalid handwriting style. Available styles: %s", Arrays.toString(NoteValidationUtils.ALLOWED_HANDWRITING_STYLES)));
+        }
+
+        if (!errors.isEmpty()) {
+            String combinedErrors = String.join(", ", errors);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, combinedErrors);
         }
     }
 
@@ -180,6 +215,10 @@ public class NoteService {
         RestrictionModel restrictionModel = new RestrictionModel(restrictedOrgAcctId, restrictedUserId);
 
         return new NoteResponseModel(entity.getNoteId(), entity.getMessage(), entity.getDateModified(), updatedByUser, restrictionModel);
+    }
+
+    private String defaultIfBlank(String str, String defaultValue) {
+        return Optional.ofNullable(str).filter(StringUtils::isNotBlank).orElse(defaultValue);
     }
 
 }
