@@ -31,6 +31,15 @@ public class NoteEntity implements Serializable {
     @Column(name = "message")
     private String message;
 
+    @Column(name = "font_size_pt")
+    private Integer fontSize;
+
+    @Column(name = "font_color")
+    private String fontColor;
+
+    @Column(name = "handwriting_style")
+    private String handwritingStyle;
+
     @OneToOne
     @JoinColumn(name = "note_id", referencedColumnName = "note_id", insertable = false, updatable = false)
     private NoteOrganizationAccountRestrictionEntity noteOrganizationAccountRestrictionEntity;
@@ -43,11 +52,14 @@ public class NoteEntity implements Serializable {
     @JoinColumn(name = "updated_by_user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
     private UserEntity updatedByUserEntity;
 
-    public NoteEntity(UUID noteId, UUID updatedByUserId, OffsetDateTime dateModified, String message) {
+    public NoteEntity(UUID noteId, UUID updatedByUserId, OffsetDateTime dateModified, String message, Integer fontSize, String fontColor, String handwritingStyle) {
         this.noteId = noteId;
         this.updatedByUserId = updatedByUserId;
         this.dateModified = dateModified;
         this.message = message;
+        this.fontSize = fontSize;
+        this.fontColor = fontColor;
+        this.handwritingStyle = handwritingStyle;
     }
 
 }

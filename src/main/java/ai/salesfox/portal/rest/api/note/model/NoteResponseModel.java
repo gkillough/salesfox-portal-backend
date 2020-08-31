@@ -15,6 +15,9 @@ import java.util.UUID;
 public class NoteResponseModel {
     private UUID noteId;
     private String message;
+    private Integer fontSize;
+    private String fontColor;
+    private String handwritingStyle;
     private OffsetDateTime dateModified;
     private UserSummaryModel updatedByUser;
     private RestrictionModel restriction;

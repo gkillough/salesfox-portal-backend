@@ -6,3 +6,7 @@ databaseChangeLog:
   - include:
       file: note_credits.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: add_note_attributes.yaml
+      relativeToChangelogFile: true

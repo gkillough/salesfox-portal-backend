@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: note-attributes-1
+      author: gavinkillough
+      changes:
+        - addColumn:
+            schemaName: portal
+            tableName: notes
+            columns:
+              - column:
+                  name: font_size_pt
+                  type: INTEGER
+                  defaultValueNumeric: 15
+              - column:
+                  name: font_color
+                  type: VARCHAR
+                  value: 'black'
+              - column:
+                  name: handwriting_style
+                  type: VARCHAR
+                  value: 'stafford'
+
+  - changeSet:
+      id: note-attributes-2
+      author: gavinkillough
+      changes:
+        - addNotNullConstraint:
+            schemaName: portal
+            tableName: notes
+            columnName: font_size_pt
+        - addNotNullConstraint:
+            schemaName: portal
+            tableName: notes
+            columnName: font_color
+        - addNotNullConstraint:
+            schemaName: portal
+            tableName: notes
+            columnName: handwriting_style
+
