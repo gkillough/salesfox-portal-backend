@@ -8,7 +8,7 @@ databaseChangeLog:
             tableName: notes
             columns:
               - column:
-                  name: font_size_mm
+                  name: font_size_pt
                   type: INTEGER
                   defaultValueNumeric: 15
               - column:
@@ -27,7 +27,7 @@ databaseChangeLog:
         - addNotNullConstraint:
             schemaName: portal
             tableName: notes
-            columnName: font_size_mm
+            columnName: font_size_pt
         - addNotNullConstraint:
             schemaName: portal
             tableName: notes

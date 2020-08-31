@@ -119,8 +119,8 @@ public class NoteService {
         foundNote.setDateModified(PortalDateTimeUtils.getCurrentDateTime());
         foundNote.setMessage(requestModel.getMessage());
 
-        Integer newFontSize = ObjectUtils.defaultIfNull(requestModel.getFontSize(), foundNote.getFontSizeMillimeters());
-        foundNote.setFontSizeMillimeters(newFontSize);
+        Integer newFontSize = ObjectUtils.defaultIfNull(requestModel.getFontSize(), foundNote.getFontSize());
+        foundNote.setFontSize(newFontSize);
 
         String newFontColor = defaultIfBlank(requestModel.getFontColor(), foundNote.getFontColor());
         foundNote.setFontColor(newFontColor);
@@ -214,7 +214,7 @@ public class NoteService {
         UUID restrictedUserId = null != userRestriction ? userRestriction.getUserId() : null;
         RestrictionModel restrictionModel = new RestrictionModel(restrictedOrgAcctId, restrictedUserId);
 
-        return new NoteResponseModel(entity.getNoteId(), entity.getMessage(), entity.getDateModified(), updatedByUser, restrictionModel);
+        return new NoteResponseModel(entity.getNoteId(), entity.getMessage(), entity.getFontSize(), entity.getFontColor(), entity.getHandwritingStyle(), entity.getDateModified(), updatedByUser, restrictionModel);
     }
 
     private String defaultIfBlank(String str, String defaultValue) {
