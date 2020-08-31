@@ -1,4 +1,5 @@
 rootProject.name = 'portal'
-include 'integration-shipstation'
 include 'common'
+include 'integration-shipstation'
+include 'integration-scribeless'
 
