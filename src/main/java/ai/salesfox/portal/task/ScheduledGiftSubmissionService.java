@@ -1,7 +1,7 @@
 package ai.salesfox.portal.task;
 
 import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
-import ai.salesfox.portal.common.exception.PortalException;
+import ai.salesfox.integration.common.exception.PortalException;
 import ai.salesfox.portal.common.service.contact.ContactInteractionsService;
 import ai.salesfox.portal.common.service.email.EmailMessagingService;
 import ai.salesfox.portal.common.service.email.model.EmailMessageModel;

@@ -1,6 +1,6 @@
 package ai.salesfox.portal.common.service.email;
 
-import ai.salesfox.portal.common.exception.PortalException;
+import ai.salesfox.integration.common.exception.PortalException;
 
 public class PortalEmailException extends PortalException {
     public PortalEmailException() {

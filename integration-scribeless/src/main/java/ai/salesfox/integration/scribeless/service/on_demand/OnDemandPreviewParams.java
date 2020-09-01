@@ -1,11 +1,11 @@
-package ai.salesfox.integration.scribeless.model;
+package ai.salesfox.integration.scribeless.service.on_demand;
 
 import lombok.AllArgsConstructor;
 
 import java.util.Optional;
 
 @AllArgsConstructor
-public class OnDemandPreviewOptions {
+public class OnDemandPreviewParams {
     private Boolean testing;
     private Integer widthInMillimeters;
     private Integer heightInMillimeters;
@@ -13,8 +13,8 @@ public class OnDemandPreviewOptions {
     private String fontColor;
     private String handwritingStyle;
 
-    public static OnDemandPreviewOptions testing() {
-        return new OnDemandPreviewOptions(true, null, null, null, "blue", "usther");
+    public static OnDemandPreviewParams testing() {
+        return new OnDemandPreviewParams(true, null, null, null, "blue", "usther");
     }
 
     public Optional<Boolean> getTesting() {

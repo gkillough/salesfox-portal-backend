@@ -1,4 +1,7 @@
 dependencies {
+    // HTTP
+    api 'com.google.http-client:google-http-client-apache-v2:1.36.0'
+
     // Utilities
     api 'org.apache.commons:commons-lang3:3.8'
     api 'org.apache.commons:commons-csv:1.8'

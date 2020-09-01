@@ -1,8 +1,8 @@
 package ai.salesfox.portal.rest.api.organization.invitation;
 
+import ai.salesfox.integration.common.exception.PortalException;
 import ai.salesfox.portal.PortalConfiguration;
 import ai.salesfox.portal.common.FieldValidationUtils;
-import ai.salesfox.portal.common.exception.PortalException;
 import ai.salesfox.portal.common.service.email.EmailMessagingService;
 import ai.salesfox.portal.common.service.email.PortalEmailException;
 import ai.salesfox.portal.common.service.email.model.ButtonEmailMessageModel;

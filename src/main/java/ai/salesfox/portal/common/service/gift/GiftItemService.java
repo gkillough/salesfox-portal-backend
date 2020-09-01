@@ -1,6 +1,6 @@
 package ai.salesfox.portal.common.service.gift;
 
-import ai.salesfox.portal.common.exception.ThrowingConsumer;
+import ai.salesfox.integration.common.function.ThrowingConsumer;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;

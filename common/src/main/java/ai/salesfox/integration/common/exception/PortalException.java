@@ -1,4 +1,4 @@
-package ai.salesfox.portal.common.exception;
+package ai.salesfox.integration.common.exception;
 
 public class PortalException extends Exception {
     public PortalException() {
