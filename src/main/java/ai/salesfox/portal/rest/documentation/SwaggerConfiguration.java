@@ -4,6 +4,7 @@ import ai.salesfox.portal.rest.security.authentication.AnonymouslyAccessible;
 import ai.salesfox.portal.rest.security.common.SecurityInterface;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
@@ -22,7 +23,7 @@ public class SwaggerConfiguration implements AnonymouslyAccessible {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("ai.salesfox.portal.rest.api"))
+                .apis(RequestHandlerSelectors.withClassAnnotation(RestController.class))
                 .build()
                 .produces(Set.of("application/json"))
                 .consumes(Set.of("application/json"))
@@ -39,7 +40,7 @@ public class SwaggerConfiguration implements AnonymouslyAccessible {
     // FIXME fix this before release and make this class implement AdminOnlyAccessible
 //    @Override
     public static String[] adminOnlyStaticResourceEndpoints() {
-        return new String[]{
+        return new String[] {
                 "/swagger-ui.html",
                 "/webjars",
                 SecurityInterface.createSubDirectoryPattern("/webjars"),
