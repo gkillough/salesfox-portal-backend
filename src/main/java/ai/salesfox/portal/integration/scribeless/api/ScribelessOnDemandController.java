@@ -21,7 +21,7 @@ public class ScribelessOnDemandController {
         this.onDemandEndpointService = onDemandEndpointService;
     }
 
-    @GetMapping(produces = {MediaType.IMAGE_PNG_VALUE})
+    @GetMapping(value = "/preview", produces = {MediaType.IMAGE_PNG_VALUE})
     public ImageResponseModel getPreviewImage(
             @RequestParam String text,
             @RequestParam(required = false) Integer widthInMM,
