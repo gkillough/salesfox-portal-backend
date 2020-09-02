@@ -62,6 +62,7 @@ apply from: 'buildSrc/tasks.gradle'
 
 dependencies {
     implementation project(':common')
+    implementation project(':integration-scribeless')
     implementation project(':integration-shipstation')
 
     // Spring
