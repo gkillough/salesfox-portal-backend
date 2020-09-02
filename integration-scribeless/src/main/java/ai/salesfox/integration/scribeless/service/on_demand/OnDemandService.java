@@ -2,7 +2,7 @@ package ai.salesfox.integration.scribeless.service.on_demand;
 
 import ai.salesfox.integration.common.exception.SalesfoxException;
 import ai.salesfox.integration.common.http.HttpRequestConfig;
-import ai.salesfox.integration.common.http.HttpService;
+import ai.salesfox.integration.common.http.HttpServiceWrapper;
 import ai.salesfox.integration.common.http.QueryParamBuilder;
 import ai.salesfox.integration.scribeless.model.ApiKeyHolder;
 import com.google.api.client.http.HttpResponse;
@@ -23,7 +23,7 @@ public class OnDemandService {
     );
 
     private final ApiKeyHolder apiKeyHolder;
-    private final HttpService httpService;
+    private final HttpServiceWrapper httpServiceWrapper;
 
     // https://us-central1-hc-application-interface-prod.cloudfunctions.net/
 
@@ -39,13 +39,13 @@ public class OnDemandService {
         params.getHandwritingStyle().ifPresent(style -> queryParamBuilder.appendAdditionalParam("style", style));
 
         String requestSpec = ON_DEMAND_TEXT_ENDPOINT + queryParamBuilder.build();
-        HttpResponse response = httpService.executeGet(GET_PREVIEW_IMAGE_CONFIG, requestSpec);
+        HttpResponse response = httpServiceWrapper.executeGet(GET_PREVIEW_IMAGE_CONFIG, requestSpec);
         try {
             return ImageIO.read(response.getContent());
         } catch (IOException ioException) {
             throw new SalesfoxException(ioException);
         } finally {
-            httpService.disconnectResponse(response);
+            httpServiceWrapper.disconnectResponse(response);
         }
     }
 

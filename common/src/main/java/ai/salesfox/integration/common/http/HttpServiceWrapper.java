@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import java.io.IOException;
 
 @AllArgsConstructor
-public class HttpService {
+public class HttpServiceWrapper {
     private final String baseUrl;
     private final HttpRequestFactory httpRequestFactory;
 
