@@ -1,8 +1,8 @@
 package ai.salesfox.portal.common.service.license;
 
-import ai.salesfox.portal.common.exception.PortalException;
+import ai.salesfox.integration.common.exception.SalesfoxException;
 
-public class PortalLicenseSeatException extends PortalException {
+public class PortalLicenseSeatException extends SalesfoxException {
     public PortalLicenseSeatException() {
         super();
     }

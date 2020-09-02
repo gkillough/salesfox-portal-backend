@@ -1,7 +1,7 @@
 package ai.salesfox.portal.task;
 
+import ai.salesfox.integration.common.exception.SalesfoxException;
 import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
-import ai.salesfox.portal.common.exception.PortalException;
 import ai.salesfox.portal.common.service.contact.ContactInteractionsService;
 import ai.salesfox.portal.common.service.email.EmailMessagingService;
 import ai.salesfox.portal.common.service.email.model.EmailMessageModel;
@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @Slf4j
 @Component
-public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<PortalException> {
+public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<SalesfoxException> {
     public static final String FAILURE_MESSAGE_SUBJECT_LINE = "Salesfox - Scheduled Gift Submission Failure";
 
     private final GiftTrackingService giftTrackingService;
@@ -40,36 +40,36 @@ public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<Portal
     }
 
     @Override
-    protected void handleGiftNotSubmittable(GiftEntity foundGift, UserEntity submittingUser) throws PortalException {
+    protected void handleGiftNotSubmittable(GiftEntity foundGift, UserEntity submittingUser) throws SalesfoxException {
         unscheduleGift(foundGift, submittingUser);
         notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), String.format("A gift was scheduled to be submitted, but its status [%s] prevented this action.", foundGift.getGiftTrackingEntity().getStatus()));
     }
 
     @Override
-    protected void handleItemMissingFromInventory(GiftEntity foundGift, GiftItemDetailEntity giftItemDetail, UserEntity submittingUser) throws PortalException {
+    protected void handleItemMissingFromInventory(GiftEntity foundGift, GiftItemDetailEntity giftItemDetail, UserEntity submittingUser) throws SalesfoxException {
         unscheduleGift(foundGift, submittingUser);
         notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), "A gift was scheduled to be submitted, but the gift-item was unavailable in the account inventory.");
     }
 
     @Override
-    protected void handleItemOutOfStock(GiftEntity foundGift, InventoryItemEntity inventoryItemForGift, UserEntity submittingUser) throws PortalException {
+    protected void handleItemOutOfStock(GiftEntity foundGift, InventoryItemEntity inventoryItemForGift, UserEntity submittingUser) throws SalesfoxException {
         unscheduleGift(foundGift, submittingUser);
         notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), "A gift was scheduled to be submitted, but the gift-item was out of stock.");
     }
 
     @Override
-    protected void handleMissingNoteCredits(GiftEntity foundGift, UserEntity submittingUser) throws PortalException {
+    protected void handleMissingNoteCredits(GiftEntity foundGift, UserEntity submittingUser) throws SalesfoxException {
         unscheduleGift(foundGift, submittingUser);
         notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), "A gift was scheduled to be submitted, but the there was a problem tracking note-credits.");
     }
 
     @Override
-    protected void handleNotEnoughNoteCredits(GiftEntity foundGift, NoteCreditsEntity noteCredits, UserEntity submittingUser) throws PortalException {
+    protected void handleNotEnoughNoteCredits(GiftEntity foundGift, NoteCreditsEntity noteCredits, UserEntity submittingUser) throws SalesfoxException {
         unscheduleGift(foundGift, submittingUser);
         notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), "A gift was scheduled to be submitted, but the there were not enough note-credits.");
     }
 
-    private void notifyUserOfFailure(UUID giftId, String userEmail, String failureMessage) throws PortalException {
+    private void notifyUserOfFailure(UUID giftId, String userEmail, String failureMessage) throws SalesfoxException {
         EmailMessageModel giftSubmissionFailureMessage = new EmailMessageModel(List.of(userEmail), FAILURE_MESSAGE_SUBJECT_LINE, String.format("Gift ID: %s", giftId.toString()), failureMessage);
         emailMessagingService.sendMessage(giftSubmissionFailureMessage);
     }

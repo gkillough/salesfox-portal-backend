@@ -1,8 +1,8 @@
 package ai.salesfox.portal.rest.api.organization.invitation;
 
+import ai.salesfox.integration.common.exception.SalesfoxException;
 import ai.salesfox.portal.PortalConfiguration;
 import ai.salesfox.portal.common.FieldValidationUtils;
-import ai.salesfox.portal.common.exception.PortalException;
 import ai.salesfox.portal.common.service.email.EmailMessagingService;
 import ai.salesfox.portal.common.service.email.PortalEmailException;
 import ai.salesfox.portal.common.service.email.model.ButtonEmailMessageModel;
@@ -109,7 +109,7 @@ public class OrganizationInvitationService {
             if (!licenseSeatManager.hasAvailableSeats(orgLicense)) {
                 throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "No available license seats");
             }
-        } catch (PortalException e) {
+        } catch (SalesfoxException e) {
             log.error("There was a problem managing the organization license", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -140,7 +140,7 @@ public class OrganizationInvitationService {
             if (!licenseSeatManager.hasAvailableSeats(orgLicense)) {
                 throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "No available license seats");
             }
-        } catch (PortalException e) {
+        } catch (SalesfoxException e) {
             log.error("There was a problem managing the organization license", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -1,6 +1,6 @@
 package ai.salesfox.portal.common.service.note;
 
-import ai.salesfox.portal.common.exception.ThrowingConsumer;
+import ai.salesfox.integration.common.function.ThrowingConsumer;
 import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
 import org.springframework.beans.factory.annotation.Autowired;

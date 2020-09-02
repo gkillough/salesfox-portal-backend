@@ -1,11 +1,11 @@
 package ai.salesfox.portal.rest.api.image.icon;
 
-import ai.salesfox.portal.rest.api.image.model.ImageResponseModel;
 import ai.salesfox.portal.common.exception.PortalFileSystemException;
 import ai.salesfox.portal.common.service.icon.LocalIconManager;
 import ai.salesfox.portal.database.catalogue.icon.CatalogueItemIconEntity;
 import ai.salesfox.portal.database.catalogue.icon.CatalogueItemIconRepository;
 import ai.salesfox.portal.rest.api.image.HttpSafeImageUtility;
+import ai.salesfox.portal.rest.api.image.model.ImageResponseModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,9 +18,9 @@ import java.util.UUID;
 @Slf4j
 @Component
 public class CatalogueItemIconService {
-    private CatalogueItemIconRepository itemIconRepository;
-    private LocalIconManager localIconManager;
-    private HttpSafeImageUtility imageUtility;
+    private final CatalogueItemIconRepository itemIconRepository;
+    private final LocalIconManager localIconManager;
+    private final HttpSafeImageUtility imageUtility;
 
     @Autowired
     public CatalogueItemIconService(CatalogueItemIconRepository itemIconRepository, LocalIconManager localIconManager, HttpSafeImageUtility imageUtility) {

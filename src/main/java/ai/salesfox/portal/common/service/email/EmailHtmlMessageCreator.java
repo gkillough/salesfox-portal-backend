@@ -14,7 +14,7 @@ import java.io.StringWriter;
 public class EmailHtmlMessageCreator {
     public static final String DEFAULT_EMAIL_TEMPLATE_NAME = "email_default.ftl";
 
-    private Configuration freemarkerConfig;
+    private final Configuration freemarkerConfig;
 
     @Autowired
     public EmailHtmlMessageCreator(Configuration freemarkerConfig) {

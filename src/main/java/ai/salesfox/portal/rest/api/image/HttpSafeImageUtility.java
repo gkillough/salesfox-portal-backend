@@ -1,9 +1,9 @@
 package ai.salesfox.portal.rest.api.image;
 
-import ai.salesfox.portal.rest.api.image.model.ImageResponseModel;
 import ai.salesfox.portal.common.exception.PortalFileSystemException;
 import ai.salesfox.portal.common.model.IconFileNameProvider;
 import ai.salesfox.portal.common.service.icon.LocalIconManager;
+import ai.salesfox.portal.rest.api.image.model.ImageResponseModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;

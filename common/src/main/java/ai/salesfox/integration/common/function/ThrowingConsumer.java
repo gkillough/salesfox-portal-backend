@@ -1,4 +1,4 @@
-package ai.salesfox.portal.common.exception;
+package ai.salesfox.integration.common.function;
 
 @FunctionalInterface
 public interface ThrowingConsumer<T, E extends Throwable> {

@@ -12,8 +12,8 @@ import java.util.UUID;
 
 @Component
 public class LicenseSeatManager {
-    private LicenseRepository licenseRepository;
-    private OrganizationAccountRepository organizationAccountRepository;
+    private final LicenseRepository licenseRepository;
+    private final OrganizationAccountRepository organizationAccountRepository;
 
     @Autowired
     public LicenseSeatManager(LicenseRepository licenseRepository, OrganizationAccountRepository organizationAccountRepository) {

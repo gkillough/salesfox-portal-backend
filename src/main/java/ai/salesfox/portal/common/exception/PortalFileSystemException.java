@@ -1,6 +1,8 @@
 package ai.salesfox.portal.common.exception;
 
-public class PortalFileSystemException extends PortalException {
+import ai.salesfox.integration.common.exception.SalesfoxException;
+
+public class PortalFileSystemException extends SalesfoxException {
     public PortalFileSystemException() {
         super();
     }

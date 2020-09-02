@@ -1,6 +1,8 @@
 package ai.salesfox.portal.common.exception;
 
-public class PortalDatabaseIntegrityViolationException extends PortalException {
+import ai.salesfox.integration.common.exception.SalesfoxException;
+
+public class PortalDatabaseIntegrityViolationException extends SalesfoxException {
     public PortalDatabaseIntegrityViolationException() {
         super();
     }

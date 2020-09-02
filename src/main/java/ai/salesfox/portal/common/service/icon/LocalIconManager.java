@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Component
 public class LocalIconManager {
-    private ResourceDirectoryConfiguration resourceDirConfig;
+    private final ResourceDirectoryConfiguration resourceDirConfig;
 
     @Autowired
     public LocalIconManager(ResourceDirectoryConfiguration resourceDirConfig) {

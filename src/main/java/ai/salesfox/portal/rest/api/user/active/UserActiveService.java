@@ -1,7 +1,5 @@
 package ai.salesfox.portal.rest.api.user.active;
 
-import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
-import ai.salesfox.portal.rest.api.user.common.UserAccessService;
 import ai.salesfox.portal.common.exception.PortalDatabaseIntegrityViolationException;
 import ai.salesfox.portal.common.service.license.LicenseSeatManager;
 import ai.salesfox.portal.common.service.license.PortalLicenseSeatException;
@@ -10,6 +8,8 @@ import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
+import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
+import ai.salesfox.portal.rest.api.user.common.UserAccessService;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,10 +21,10 @@ import java.util.UUID;
 
 @Component
 public class UserActiveService {
-    private UserAccessService userAccessService;
-    private UserRepository userRepository;
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private LicenseSeatManager licenseSeatManager;
+    private final UserAccessService userAccessService;
+    private final UserRepository userRepository;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final LicenseSeatManager licenseSeatManager;
 
     @Autowired
     public UserActiveService(UserAccessService userAccessService, UserRepository userRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService, LicenseSeatManager licenseSeatManager) {
