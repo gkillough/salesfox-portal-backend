@@ -1,6 +1,6 @@
 package ai.salesfox.portal.common.service.license;
 
-import ai.salesfox.portal.common.exception.PortalDatabaseIntegrityViolationException;
+import ai.salesfox.portal.common.exception.SalesfoxDatabaseIntegrityViolationException;
 import ai.salesfox.portal.database.account.entity.LicenseEntity;
 import ai.salesfox.portal.database.account.repository.LicenseRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
@@ -12,8 +12,8 @@ import java.util.UUID;
 
 @Component
 public class LicenseSeatManager {
-    private LicenseRepository licenseRepository;
-    private OrganizationAccountRepository organizationAccountRepository;
+    private final LicenseRepository licenseRepository;
+    private final OrganizationAccountRepository organizationAccountRepository;
 
     @Autowired
     public LicenseSeatManager(LicenseRepository licenseRepository, OrganizationAccountRepository organizationAccountRepository) {
@@ -21,14 +21,14 @@ public class LicenseSeatManager {
         this.organizationAccountRepository = organizationAccountRepository;
     }
 
-    public LicenseEntity getLicenseForOrganizationAccount(OrganizationAccountEntity organizationAccountEntity) throws PortalDatabaseIntegrityViolationException {
+    public LicenseEntity getLicenseForOrganizationAccount(OrganizationAccountEntity organizationAccountEntity) throws SalesfoxDatabaseIntegrityViolationException {
         return getLicenseForOrganizationAccountId(organizationAccountEntity.getOrganizationAccountId());
     }
 
-    public LicenseEntity getLicenseForOrganizationAccountId(UUID orgAccountId) throws PortalDatabaseIntegrityViolationException {
+    public LicenseEntity getLicenseForOrganizationAccountId(UUID orgAccountId) throws SalesfoxDatabaseIntegrityViolationException {
         return organizationAccountRepository.findById(orgAccountId)
                 .flatMap(orgAcct -> licenseRepository.findById(orgAcct.getLicenseId()))
-                .orElseThrow(() -> new PortalDatabaseIntegrityViolationException(String.format("Missing license for Organization Account Entity with id: [%d]", orgAccountId)));
+                .orElseThrow(() -> new SalesfoxDatabaseIntegrityViolationException(String.format("Missing license for Organization Account Entity with id: [%d]", orgAccountId)));
     }
 
     public boolean hasAvailableSeats(LicenseEntity licenseEntity) {
@@ -38,25 +38,25 @@ public class LicenseSeatManager {
     /**
      * @return the updated LicenseEntity
      */
-    public LicenseEntity fillSeat(LicenseEntity licenseEntity) throws PortalLicenseSeatException {
+    public LicenseEntity fillSeat(LicenseEntity licenseEntity) throws SalesfoxLicenseSeatException {
         if (hasAvailableSeats(licenseEntity)) {
             Long availableLicenseSeats = licenseEntity.getAvailableLicenseSeats();
             licenseEntity.setAvailableLicenseSeats(availableLicenseSeats - 1);
             return licenseRepository.save(licenseEntity);
         }
-        throw new PortalLicenseSeatException("No available license seats");
+        throw new SalesfoxLicenseSeatException("No available license seats");
     }
 
     /**
      * @return the updated LicenseEntity
      */
-    public LicenseEntity vacateSeat(LicenseEntity licenseEntity) throws PortalLicenseSeatException {
+    public LicenseEntity vacateSeat(LicenseEntity licenseEntity) throws SalesfoxLicenseSeatException {
         if (licenseEntity.getAvailableLicenseSeats() != licenseEntity.getMaxLicenseSeats()) {
             Long availableLicenseSeats = licenseEntity.getAvailableLicenseSeats();
             licenseEntity.setAvailableLicenseSeats(availableLicenseSeats + 1);
             return licenseRepository.save(licenseEntity);
         }
-        throw new PortalLicenseSeatException("No license seats occupied");
+        throw new SalesfoxLicenseSeatException("No license seats occupied");
     }
 
 }

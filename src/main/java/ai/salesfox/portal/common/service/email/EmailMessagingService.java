@@ -26,7 +26,7 @@ public class EmailMessagingService {
         this.emailHtmlMessageCreator = emailHtmlMessageCreator;
     }
 
-    public void sendMessage(EmailMessageModel emailMessageModel) throws PortalEmailException {
+    public void sendMessage(EmailMessageModel emailMessageModel) throws SalesfoxEmailException {
         validateEmailConfiguration();
         validateEmailMessageModel(emailMessageModel);
         try {
@@ -35,32 +35,32 @@ public class EmailMessagingService {
             sendMessage(smtpMailServerSession, mimeMessage);
         } catch (MessagingException e) {
             log.error("There was an issue sending the email message with the subject line [{}] to  the following recipients: {}", emailMessageModel.getSubjectLine(), emailMessageModel.getRecipients(), e);
-            throw new PortalEmailException(e);
+            throw new SalesfoxEmailException(e);
         }
     }
 
-    private void validateEmailConfiguration() throws PortalEmailException {
+    private void validateEmailConfiguration() throws SalesfoxEmailException {
         if (StringUtils.isBlank(emailConfiguration.getSmtpHost())) {
-            throw new PortalEmailException("No email server configured");
+            throw new SalesfoxEmailException("No email server configured");
         }
     }
 
-    private void validateEmailMessageModel(EmailMessageModel emailMessageModel) throws PortalEmailException {
+    private void validateEmailMessageModel(EmailMessageModel emailMessageModel) throws SalesfoxEmailException {
         if (StringUtils.isBlank(emailMessageModel.getSubjectLine())) {
-            throw new PortalEmailException("Cannot send an email with a blank subject line");
+            throw new SalesfoxEmailException("Cannot send an email with a blank subject line");
         }
         if (StringUtils.isBlank(emailMessageModel.getMessageTitle())) {
-            throw new PortalEmailException("Cannot send an email with a blank title");
+            throw new SalesfoxEmailException("Cannot send an email with a blank title");
         }
         if (StringUtils.isBlank(emailMessageModel.getPrimaryMessage())) {
-            throw new PortalEmailException("Cannot send an email with a blank message");
+            throw new SalesfoxEmailException("Cannot send an email with a blank message");
         }
         if (emailMessageModel.getRecipients() == null || emailMessageModel.getRecipients().isEmpty()) {
-            throw new PortalEmailException("Cannot send an email without recipients");
+            throw new SalesfoxEmailException("Cannot send an email without recipients");
         }
     }
 
-    private MimeMessage createMimeMessage(Session session, EmailMessageModel emailMessageModel) throws PortalEmailException, MessagingException {
+    private MimeMessage createMimeMessage(Session session, EmailMessageModel emailMessageModel) throws SalesfoxEmailException, MessagingException {
         MimeMessage mimeMessage = new MimeMessage(session);
         mimeMessage.setSubject(emailMessageModel.getSubjectLine());
         mimeMessage.setFrom(emailConfiguration.getSmtpFrom());
@@ -88,7 +88,7 @@ public class EmailMessagingService {
         return mimeMessage;
     }
 
-    private Address[] createAddresses(List<String> recipients) throws PortalEmailException, AddressException {
+    private Address[] createAddresses(List<String> recipients) throws SalesfoxEmailException, AddressException {
         List<Address> recipientEmailAddresses = new ArrayList<>();
         for (String recipientEmailAddressString : recipients) {
             try {
@@ -105,7 +105,7 @@ public class EmailMessagingService {
         }
 
         if (recipientEmailAddresses.isEmpty()) {
-            throw new PortalEmailException("No recipient addresses were valid email addresses");
+            throw new SalesfoxEmailException("No recipient addresses were valid email addresses");
         }
 
         Address[] addressesArray = new Address[recipientEmailAddresses.size()];

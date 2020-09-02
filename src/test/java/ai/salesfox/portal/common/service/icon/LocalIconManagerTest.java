@@ -1,6 +1,6 @@
 package ai.salesfox.portal.common.service.icon;
 
-import ai.salesfox.portal.common.exception.PortalFileSystemException;
+import ai.salesfox.portal.common.exception.SalesfoxFileSystemException;
 import ai.salesfox.portal.common.file_system.ResourceDirectoryConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -12,8 +12,8 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.*;
 
 public class LocalIconManagerTest {
     public static final String TEST_RESOURCES_DIR = "src/test/resources";
@@ -21,8 +21,8 @@ public class LocalIconManagerTest {
     public static final String TEST_ICON_OUTPUT_DIR_NAME = "ignoredTestOutput";
     public static final String TEST_ICON_UNQUALIFIED_NAME = "test_icon01.jpg";
 
-    private static ResourceDirectoryConfiguration mockInputResourceDir = Mockito.mock(ResourceDirectoryConfiguration.class);
-    private static ResourceDirectoryConfiguration mockOutputResourceDir = Mockito.mock(ResourceDirectoryConfiguration.class);
+    private static final ResourceDirectoryConfiguration mockInputResourceDir = Mockito.mock(ResourceDirectoryConfiguration.class);
+    private static final ResourceDirectoryConfiguration mockOutputResourceDir = Mockito.mock(ResourceDirectoryConfiguration.class);
 
     @BeforeAll
     public static void init() throws IOException {
@@ -64,7 +64,7 @@ public class LocalIconManagerTest {
     }
 
     @Test
-    public void saveAndDeleteIconTest() throws PortalFileSystemException, FileNotFoundException {
+    public void saveAndDeleteIconTest() throws SalesfoxFileSystemException, FileNotFoundException {
         File outputIconDir = new File(mockOutputResourceDir.getIconDir());
         assumeTrue(outputIconDir.canWrite(), "Cannot write to the output directory");
 
@@ -85,7 +85,7 @@ public class LocalIconManagerTest {
     }
 
     @Test
-    public void retrieveIconTest() throws PortalFileSystemException {
+    public void retrieveIconTest() throws SalesfoxFileSystemException {
         File outputIconDir = new File(mockInputResourceDir.getIconDir());
         assumeTrue(outputIconDir.canRead(), "Cannot read from the input directory");
 

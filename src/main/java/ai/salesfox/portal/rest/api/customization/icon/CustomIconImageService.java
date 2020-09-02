@@ -1,6 +1,6 @@
 package ai.salesfox.portal.rest.api.customization.icon;
 
-import ai.salesfox.portal.common.exception.PortalFileSystemException;
+import ai.salesfox.portal.common.exception.SalesfoxFileSystemException;
 import ai.salesfox.portal.database.customization.icon.CustomIconEntity;
 import ai.salesfox.portal.database.customization.icon.CustomIconFileEntity;
 import ai.salesfox.portal.database.customization.icon.CustomIconFileRepository;
@@ -49,7 +49,7 @@ public class CustomIconImageService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         try {
             return imageUtility.getImageResponseModel(foundCustomIconFileEntity::getFileName);
-        } catch (PortalFileSystemException e) {
+        } catch (SalesfoxFileSystemException e) {
             log.error("There was a problem retrieving custom icon with id [{}]: {}", foundCustomIconFileEntity.getCustomIconId(), e.getMessage());
             log.debug("Icon retrieval error stack trace", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);

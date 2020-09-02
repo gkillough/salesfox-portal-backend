@@ -1,6 +1,6 @@
 package ai.salesfox.portal.common.service.icon;
 
-import ai.salesfox.portal.common.exception.PortalFileSystemException;
+import ai.salesfox.portal.common.exception.SalesfoxFileSystemException;
 import ai.salesfox.portal.common.file_system.ResourceDirectoryConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,22 +13,22 @@ import java.util.Optional;
 
 @Component
 public class LocalIconManager {
-    private ResourceDirectoryConfiguration resourceDirConfig;
+    private final ResourceDirectoryConfiguration resourceDirConfig;
 
     @Autowired
     public LocalIconManager(ResourceDirectoryConfiguration resourceDirConfig) {
         this.resourceDirConfig = resourceDirConfig;
     }
 
-    public File saveIcon(InputStream imageFileInputStream, String imageFileExtension) throws PortalFileSystemException {
+    public File saveIcon(InputStream imageFileInputStream, String imageFileExtension) throws SalesfoxFileSystemException {
         try {
             return writeInputStreamToFile(imageFileInputStream, imageFileExtension);
         } catch (IOException e) {
-            throw new PortalFileSystemException("Could not read file as image", e);
+            throw new SalesfoxFileSystemException("Could not read file as image", e);
         }
     }
 
-    public Optional<BufferedImage> retrieveIcon(String iconFileName) throws PortalFileSystemException {
+    public Optional<BufferedImage> retrieveIcon(String iconFileName) throws SalesfoxFileSystemException {
         File iconDir = retrieveIconDirAsFile();
         File iconFile = new File(iconDir, iconFileName);
         if (iconFile.exists()) {
@@ -36,13 +36,13 @@ public class LocalIconManager {
                 BufferedImage iconBufferedImage = ImageIO.read(iconFile);
                 return Optional.of(iconBufferedImage);
             } catch (IOException e) {
-                throw new PortalFileSystemException(e);
+                throw new SalesfoxFileSystemException(e);
             }
         }
         return Optional.empty();
     }
 
-    public boolean deleteIcon(String iconFileName) throws PortalFileSystemException {
+    public boolean deleteIcon(String iconFileName) throws SalesfoxFileSystemException {
         File iconDir = retrieveIconDirAsFile();
 
         File iconFile = new File(iconDir, iconFileName);
@@ -52,23 +52,23 @@ public class LocalIconManager {
         return false;
     }
 
-    private File retrieveIconDirAsFile() throws PortalFileSystemException {
+    private File retrieveIconDirAsFile() throws SalesfoxFileSystemException {
         String iconDirName = resourceDirConfig.getIconDir();
         File iconDir = new File(iconDirName);
 
         if (iconDir.exists() && iconDir.isDirectory()) {
             return iconDir;
         }
-        throw new PortalFileSystemException("The image directory could not be loaded");
+        throw new SalesfoxFileSystemException("The image directory could not be loaded");
     }
 
-    private File writeInputStreamToFile(InputStream imageFileInputStream, String imageExtension) throws IOException, PortalFileSystemException {
+    private File writeInputStreamToFile(InputStream imageFileInputStream, String imageExtension) throws IOException, SalesfoxFileSystemException {
         BufferedImage bufferedImage = ImageIO.read(imageFileInputStream);
 
         ByteArrayOutputStream imageByteArrayOutputStream = new ByteArrayOutputStream();
         boolean hadAppropriateWriter = ImageIO.write(bufferedImage, imageExtension, imageByteArrayOutputStream);
         if (!hadAppropriateWriter) {
-            throw new PortalFileSystemException("No appropriate image writer");
+            throw new SalesfoxFileSystemException("No appropriate image writer");
         }
 
         byte[] imageBytes = imageByteArrayOutputStream.toByteArray();

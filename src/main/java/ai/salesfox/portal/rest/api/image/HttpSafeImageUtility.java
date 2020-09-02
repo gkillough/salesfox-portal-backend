@@ -1,9 +1,9 @@
 package ai.salesfox.portal.rest.api.image;
 
-import ai.salesfox.portal.rest.api.image.model.ImageResponseModel;
-import ai.salesfox.portal.common.exception.PortalFileSystemException;
+import ai.salesfox.portal.common.exception.SalesfoxFileSystemException;
 import ai.salesfox.portal.common.model.IconFileNameProvider;
 import ai.salesfox.portal.common.service.icon.LocalIconManager;
+import ai.salesfox.portal.rest.api.image.model.ImageResponseModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,18 +29,18 @@ public class HttpSafeImageUtility {
         this.localIconManager = localIconManager;
     }
 
-    public ImageResponseModel getImageResponseModel(IconFileNameProvider fileNameProvider) throws PortalFileSystemException {
+    public ImageResponseModel getImageResponseModel(IconFileNameProvider fileNameProvider) throws SalesfoxFileSystemException {
         return getImageResponseModel(fileNameProvider, MediaType.IMAGE_JPEG);
     }
 
-    public ImageResponseModel getImageResponseModel(IconFileNameProvider fileNameProvider, MediaType mediaType) throws PortalFileSystemException {
+    public ImageResponseModel getImageResponseModel(IconFileNameProvider fileNameProvider, MediaType mediaType) throws SalesfoxFileSystemException {
         if (!MediaType.IMAGE_JPEG.equals(mediaType) && MediaType.IMAGE_PNG.equals(mediaType)) {
             log.error("Invalid media type: [{}]", mediaType);
             throw new IllegalArgumentException("Invalid media type: " + mediaType);
         }
 
         BufferedImage bufferedIcon = localIconManager.retrieveIcon(fileNameProvider.getFileName())
-                .orElseThrow(() -> new PortalFileSystemException(String.format("Image with file name [%s] not found", fileNameProvider.getFileName())));
+                .orElseThrow(() -> new SalesfoxFileSystemException(String.format("Image with file name [%s] not found", fileNameProvider.getFileName())));
         return new ImageResponseModel(bufferedIcon, mediaType);
     }
 
@@ -56,7 +56,7 @@ public class HttpSafeImageUtility {
             }
 
             return localIconManager.saveIcon(fileInputStream, iconFileExtension);
-        } catch (PortalFileSystemException fileSystemException) {
+        } catch (SalesfoxFileSystemException fileSystemException) {
             log.debug("Failed to upload image file", fileSystemException);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The provided file was an invalid image");
         } catch (IOException ioException) {
@@ -68,7 +68,7 @@ public class HttpSafeImageUtility {
     public boolean deleteImageByName(String fileName) {
         try {
             return localIconManager.deleteIcon(fileName);
-        } catch (PortalFileSystemException e) {
+        } catch (SalesfoxFileSystemException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete existing image");
         }
     }

@@ -1,9 +1,9 @@
 package ai.salesfox.portal.rest.api.registration.user;
 
 import ai.salesfox.portal.common.FieldValidationUtils;
-import ai.salesfox.portal.common.exception.PortalDatabaseIntegrityViolationException;
+import ai.salesfox.portal.common.exception.SalesfoxDatabaseIntegrityViolationException;
 import ai.salesfox.portal.common.service.license.LicenseSeatManager;
-import ai.salesfox.portal.common.service.license.PortalLicenseSeatException;
+import ai.salesfox.portal.common.service.license.SalesfoxLicenseSeatException;
 import ai.salesfox.portal.database.account.entity.*;
 import ai.salesfox.portal.database.account.repository.LoginRepository;
 import ai.salesfox.portal.database.account.repository.MembershipRepository;
@@ -156,10 +156,10 @@ public class UserRegistrationService {
         try {
             LicenseEntity orgLicense = licenseSeatManager.getLicenseForOrganizationAccount(orgAccount);
             licenseSeatManager.fillSeat(orgLicense);
-        } catch (PortalDatabaseIntegrityViolationException e) {
+        } catch (SalesfoxDatabaseIntegrityViolationException e) {
             log.error("There was a problem managing the organization license", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (PortalLicenseSeatException e) {
+        } catch (SalesfoxLicenseSeatException e) {
             throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, e.getMessage());
         }
     }

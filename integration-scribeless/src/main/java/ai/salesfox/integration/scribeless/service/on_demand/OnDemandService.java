@@ -1,6 +1,6 @@
 package ai.salesfox.integration.scribeless.service.on_demand;
 
-import ai.salesfox.integration.common.exception.PortalException;
+import ai.salesfox.integration.common.exception.SalesfoxException;
 import ai.salesfox.integration.common.http.HttpRequestConfig;
 import ai.salesfox.integration.common.http.HttpService;
 import ai.salesfox.integration.scribeless.model.ApiKeyHolder;
@@ -27,7 +27,7 @@ public class OnDemandService {
 
     // https://us-central1-hc-application-interface-prod.cloudfunctions.net/
 
-    public BufferedImage generatePreviewImage(String text, OnDemandPreviewParams params) throws PortalException {
+    public BufferedImage generatePreviewImage(String text, OnDemandPreviewParams params) throws SalesfoxException {
         StringBuilder requestSpecBuilder = new StringBuilder(ON_DEMAND_TEXT_ENDPOINT);
         appendParam(requestSpecBuilder, '?', ApiKeyHolder.PARAM_NAME_API_KEY, apiKeyHolder.getApiKey());
 
@@ -43,7 +43,7 @@ public class OnDemandService {
         try {
             return ImageIO.read(response.getContent());
         } catch (IOException ioException) {
-            throw new PortalException(ioException);
+            throw new SalesfoxException(ioException);
         } finally {
             httpService.disconnectResponse(response);
         }

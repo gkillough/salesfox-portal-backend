@@ -14,21 +14,21 @@ import java.io.StringWriter;
 public class EmailHtmlMessageCreator {
     public static final String DEFAULT_EMAIL_TEMPLATE_NAME = "email_default.ftl";
 
-    private Configuration freemarkerConfig;
+    private final Configuration freemarkerConfig;
 
     @Autowired
     public EmailHtmlMessageCreator(Configuration freemarkerConfig) {
         this.freemarkerConfig = freemarkerConfig;
     }
 
-    public String createHtmlMessage(String templateName, EmailMessageModel emailMessageModel) throws PortalEmailException {
+    public String createHtmlMessage(String templateName, EmailMessageModel emailMessageModel) throws SalesfoxEmailException {
         try {
             Template template = freemarkerConfig.getTemplate(templateName);
             StringWriter stringWriter = new StringWriter();
             template.process(emailMessageModel, stringWriter);
             return stringWriter.toString();
         } catch (IOException | TemplateException e) {
-            throw new PortalEmailException(e.getMessage(), e);
+            throw new SalesfoxEmailException(e.getMessage(), e);
         }
     }
 
