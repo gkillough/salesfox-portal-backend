@@ -2,7 +2,7 @@ package ai.salesfox.portal.rest.api.password;
 
 import ai.salesfox.portal.PortalConfiguration;
 import ai.salesfox.portal.common.service.email.EmailMessagingService;
-import ai.salesfox.portal.common.service.email.SalesfoxEmailException;
+import ai.salesfox.portal.common.service.email.PortalEmailException;
 import ai.salesfox.portal.common.service.email.model.ButtonEmailMessageModel;
 import ai.salesfox.portal.common.service.email.model.EmailMessageModel;
 import ai.salesfox.portal.common.time.PortalDateTimeUtils;
@@ -183,7 +183,7 @@ public class PasswordService {
         try {
             emailMessagingService.sendMessage(emailMessage);
             return true;
-        } catch (SalesfoxEmailException e) {
+        } catch (PortalEmailException e) {
             log.error("Problem sending password reset email", e);
         }
         return false;

@@ -21,14 +21,14 @@ public class EmailHtmlMessageCreator {
         this.freemarkerConfig = freemarkerConfig;
     }
 
-    public String createHtmlMessage(String templateName, EmailMessageModel emailMessageModel) throws SalesfoxEmailException {
+    public String createHtmlMessage(String templateName, EmailMessageModel emailMessageModel) throws PortalEmailException {
         try {
             Template template = freemarkerConfig.getTemplate(templateName);
             StringWriter stringWriter = new StringWriter();
             template.process(emailMessageModel, stringWriter);
             return stringWriter.toString();
         } catch (IOException | TemplateException e) {
-            throw new SalesfoxEmailException(e.getMessage(), e);
+            throw new PortalEmailException(e.getMessage(), e);
         }
     }
 

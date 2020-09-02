@@ -4,7 +4,7 @@ import ai.salesfox.integration.common.exception.SalesfoxException;
 import ai.salesfox.portal.PortalConfiguration;
 import ai.salesfox.portal.common.FieldValidationUtils;
 import ai.salesfox.portal.common.service.email.EmailMessagingService;
-import ai.salesfox.portal.common.service.email.SalesfoxEmailException;
+import ai.salesfox.portal.common.service.email.PortalEmailException;
 import ai.salesfox.portal.common.service.email.model.ButtonEmailMessageModel;
 import ai.salesfox.portal.common.service.email.model.EmailMessageModel;
 import ai.salesfox.portal.common.service.license.LicenseSeatManager;
@@ -262,7 +262,7 @@ public class OrganizationInvitationService {
         EmailMessageModel emailMessage = createInvitationMessageModel(email, organizationAccountName, invitationUrl);
         try {
             emailMessagingService.sendMessage(emailMessage);
-        } catch (SalesfoxEmailException e) {
+        } catch (PortalEmailException e) {
             log.error("Problem sending organization account invitation email", e);
         }
     }

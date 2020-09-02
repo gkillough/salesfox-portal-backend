@@ -1,8 +1,8 @@
 package ai.salesfox.portal.rest.api.user.active;
 
-import ai.salesfox.portal.common.exception.SalesfoxDatabaseIntegrityViolationException;
+import ai.salesfox.portal.common.exception.PortalDatabaseIntegrityViolationException;
 import ai.salesfox.portal.common.service.license.LicenseSeatManager;
-import ai.salesfox.portal.common.service.license.SalesfoxLicenseSeatException;
+import ai.salesfox.portal.common.service.license.PortalLicenseSeatException;
 import ai.salesfox.portal.database.account.entity.LicenseEntity;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
@@ -76,9 +76,9 @@ public class UserActiveService {
             } else {
                 licenseSeatManager.vacateSeat(orgLicense);
             }
-        } catch (SalesfoxDatabaseIntegrityViolationException e) {
+        } catch (PortalDatabaseIntegrityViolationException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (SalesfoxLicenseSeatException e) {
+        } catch (PortalLicenseSeatException e) {
             throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, e.getMessage());
         }
     }

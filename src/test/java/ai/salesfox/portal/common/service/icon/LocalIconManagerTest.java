@@ -1,6 +1,6 @@
 package ai.salesfox.portal.common.service.icon;
 
-import ai.salesfox.portal.common.exception.SalesfoxFileSystemException;
+import ai.salesfox.portal.common.exception.PortalFileSystemException;
 import ai.salesfox.portal.common.file_system.ResourceDirectoryConfiguration;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -64,7 +64,7 @@ public class LocalIconManagerTest {
     }
 
     @Test
-    public void saveAndDeleteIconTest() throws SalesfoxFileSystemException, FileNotFoundException {
+    public void saveAndDeleteIconTest() throws PortalFileSystemException, FileNotFoundException {
         File outputIconDir = new File(mockOutputResourceDir.getIconDir());
         assumeTrue(outputIconDir.canWrite(), "Cannot write to the output directory");
 
@@ -85,7 +85,7 @@ public class LocalIconManagerTest {
     }
 
     @Test
-    public void retrieveIconTest() throws SalesfoxFileSystemException {
+    public void retrieveIconTest() throws PortalFileSystemException {
         File outputIconDir = new File(mockInputResourceDir.getIconDir());
         assumeTrue(outputIconDir.canRead(), "Cannot read from the input directory");
 

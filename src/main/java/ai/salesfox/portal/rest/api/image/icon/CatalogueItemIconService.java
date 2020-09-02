@@ -1,6 +1,6 @@
 package ai.salesfox.portal.rest.api.image.icon;
 
-import ai.salesfox.portal.common.exception.SalesfoxFileSystemException;
+import ai.salesfox.portal.common.exception.PortalFileSystemException;
 import ai.salesfox.portal.common.service.icon.LocalIconManager;
 import ai.salesfox.portal.database.catalogue.icon.CatalogueItemIconEntity;
 import ai.salesfox.portal.database.catalogue.icon.CatalogueItemIconRepository;
@@ -35,7 +35,7 @@ public class CatalogueItemIconService {
         // TODO check permissions
         try {
             return imageUtility.getImageResponseModel(foundIcon::getFileName);
-        } catch (SalesfoxFileSystemException e) {
+        } catch (PortalFileSystemException e) {
             log.error("There was a problem retrieving icon with id [{}]: {}", iconId, e.getMessage());
             log.debug("Icon retrieval error stack trace", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -53,7 +53,7 @@ public class CatalogueItemIconService {
                 return;
             }
             log.error("Could not delete icon with id [{}] from the file system", iconId);
-        } catch (SalesfoxFileSystemException e) {
+        } catch (PortalFileSystemException e) {
             log.error("There was a problem deleting the icon file", e);
         }
         throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
