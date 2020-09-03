@@ -1,6 +1,5 @@
 package ai.salesfox.portal.rest.api.user.profile;
 
-import ai.salesfox.portal.rest.api.user.profile.model.UserProfileUpdateModel;
 import ai.salesfox.portal.common.FieldValidationUtils;
 import ai.salesfox.portal.common.model.PortalAddressModel;
 import ai.salesfox.portal.database.account.entity.ProfileEntity;
@@ -11,6 +10,7 @@ import ai.salesfox.portal.database.account.repository.UserAddressRepository;
 import ai.salesfox.portal.database.account.repository.UserRepository;
 import ai.salesfox.portal.rest.api.user.common.UserAccessService;
 import ai.salesfox.portal.rest.api.user.profile.model.UserProfileModel;
+import ai.salesfox.portal.rest.api.user.profile.model.UserProfileUpdateModel;
 import ai.salesfox.portal.rest.api.user.role.model.UserRoleModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,9 +142,8 @@ public class UserProfileService {
         }
 
         UserAddressEntity newAddress = new UserAddressEntity(userId);
-        newAddress.setStreetNumber(0);
-        newAddress.setStreetName("");
-        newAddress.setAptSuite("");
+        newAddress.setAddressLine1("");
+        newAddress.setAddressLine2("");
         newAddress.setCity("");
         newAddress.setState("");
         newAddress.setZipCode("");

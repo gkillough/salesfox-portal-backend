@@ -1,11 +1,10 @@
 package ai.salesfox.portal.common.service.contact.model;
 
-import ai.salesfox.portal.rest.api.contact.model.ContactUploadModel;
 import ai.salesfox.portal.common.model.PortalAddressModel;
+import ai.salesfox.portal.rest.api.contact.model.ContactUploadModel;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -20,9 +19,8 @@ public class ContactCSVWrapper implements Closeable {
     public static final String HEADER_EMAIL = "Email";
     public static final String HEADER_EMAIL_ADDRESS = "Email Address";
 
-    public static final String HEADER_ADDRESS_STREET_NUMBER = "Street Number";
-    public static final String HEADER_ADDRESS_STREET_NAME = "Street Name";
-    public static final String HEADER_ADDRESS_APT_SUITE = "Apt Suite";
+    public static final String HEADER_ADDRESS_LINE_1 = "Address Line 1";
+    public static final String HEADER_ADDRESS_LINE_2 = "Address Line 2";
     public static final String HEADER_ADDRESS_CITY = "City";
     public static final String HEADER_ADDRESS_STATE = "State";
     public static final String HEADER_ADDRESS_ZIP = "Zip";
@@ -34,8 +32,8 @@ public class ContactCSVWrapper implements Closeable {
     public static final String HEADER_MOBILE_NUMBER = "Mobile Number";
     public static final String HEADER_BUSINESS_NUMBER = "Business Number";
 
-    private CSVParser contactCSVParser;
-    private Map<String, Integer> headerMap;
+    private final CSVParser contactCSVParser;
+    private final Map<String, Integer> headerMap;
 
     public ContactCSVWrapper(CSVParser contactCSVParser) {
         this.contactCSVParser = contactCSVParser;
@@ -75,13 +73,9 @@ public class ContactCSVWrapper implements Closeable {
         return StringUtils.trimToNull(fieldValue);
     }
 
-    // TODO consider a single address field and "address lines" headers in the future
     private PortalAddressModel extractAddress(CSVRecord csvRecord) {
-        Integer streetNumber = Optional.ofNullable(extractTrimmedField(csvRecord, HEADER_ADDRESS_STREET_NUMBER))
-                .map(NumberUtils::createInteger)
-                .orElse(null);
-        String streetName = extractTrimmedField(csvRecord, HEADER_ADDRESS_STREET_NAME);
-        String aptSuite = extractTrimmedField(csvRecord, HEADER_ADDRESS_APT_SUITE);
+        String addressLine1 = extractTrimmedField(csvRecord, HEADER_ADDRESS_LINE_1);
+        String addressLine2 = extractTrimmedField(csvRecord, HEADER_ADDRESS_LINE_2);
         String city = extractTrimmedField(csvRecord, HEADER_ADDRESS_CITY);
         String state = extractTrimmedField(csvRecord, HEADER_ADDRESS_STATE);
         String zip = Optional.ofNullable(extractTrimmedField(csvRecord, HEADER_ADDRESS_ZIP)).orElseGet(() -> extractTrimmedField(csvRecord, HEADER_ADDRESS_ZIP_CODE));
@@ -89,7 +83,7 @@ public class ContactCSVWrapper implements Closeable {
                 .map(Boolean::parseBoolean)
                 .orElse(true);
 
-        return new PortalAddressModel(streetNumber, streetName, aptSuite, city, state, zip, isBusiness);
+        return new PortalAddressModel(addressLine1, addressLine2, city, state, zip, isBusiness);
     }
 
     @Override

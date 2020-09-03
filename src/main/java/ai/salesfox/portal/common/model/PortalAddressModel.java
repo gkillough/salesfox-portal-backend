@@ -10,9 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PortalAddressModel {
-    private Integer streetNumber;
-    private String streetName;
-    private String aptSuite;
+    private String addressLine1;
+    private String addressLine2;
     private String city;
     private String state;
     private String zipCode;
@@ -20,9 +19,8 @@ public class PortalAddressModel {
 
     public static PortalAddressModel fromEntity(AbstractAddressEntity entity) {
         return new PortalAddressModel(
-                entity.getStreetNumber(),
-                entity.getStreetName(),
-                entity.getAptSuite(),
+                entity.getAddressLine1(),
+                entity.getAddressLine2(),
                 entity.getCity(),
                 entity.getState(),
                 entity.getZipCode(),
@@ -31,9 +29,8 @@ public class PortalAddressModel {
     }
 
     public void copyFieldsToEntity(AbstractAddressEntity entity) {
-        entity.setStreetNumber(getStreetNumber());
-        entity.setStreetName(getStreetName());
-        entity.setAptSuite(getAptSuite());
+        entity.setAddressLine1(getAddressLine1());
+        entity.setAddressLine2(getAddressLine2());
         entity.setCity(getCity());
         entity.setState(StringUtils.upperCase(getState()));
         entity.setZipCode(getZipCode());
