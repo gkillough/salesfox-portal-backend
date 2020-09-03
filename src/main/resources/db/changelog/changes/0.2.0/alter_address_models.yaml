@@ -1,0 +1,96 @@
+databaseChangeLog:
+  - changeSet:
+      id: alter-address-models-1a
+      author: gavinkillough
+      changes:
+        - renameColumn:
+            schemaName: portal
+            tableName: user_addresses
+            oldColumnName: apt_suite
+            newColumnName: address_line_2
+        - addColumn:
+            schemaName: portal
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: address_line_1
+                  type: VARCHAR
+
+  - changeSet:
+      id: alter-address-models-1b
+      author: gavinkillough
+      changes:
+        - sql:
+            sql: UPDATE portal.user_addresses SET address_line_1 = (CAST(street_number AS text) || ' ' || street_name);
+        - dropColumn:
+            schemaName: portal
+            tableName: user_addresses
+            columns:
+              - column:
+                  name: street_number
+              - column:
+                  name: street_name
+
+  - changeSet:
+      id: alter-address-models-2a
+      author: gavinkillough
+      changes:
+        - renameColumn:
+            schemaName: portal
+            tableName: organization_account_addresses
+            oldColumnName: apt_suite
+            newColumnName: address_line_2
+        - addColumn:
+            schemaName: portal
+            tableName: organization_account_addresses
+            columns:
+              - column:
+                  name: address_line_1
+                  type: VARCHAR
+
+  - changeSet:
+      id: alter-address-models-2b
+      author: gavinkillough
+      changes:
+        - sql:
+            sql: UPDATE portal.organization_account_addresses SET address_line_1 = (CAST(street_number AS text) || ' ' || street_name);
+        - dropColumn:
+            schemaName: portal
+            tableName: organization_account_addresses
+            columns:
+              - column:
+                  name: street_number
+              - column:
+                  name: street_name
+
+  - changeSet:
+      id: alter-address-models-3a
+      author: gavinkillough
+      changes:
+        - renameColumn:
+            schemaName: portal
+            tableName: organization_account_contact_addresses
+            oldColumnName: apt_suite
+            newColumnName: address_line_2
+        - addColumn:
+            schemaName: portal
+            tableName: organization_account_contact_addresses
+            columns:
+              - column:
+                  name: address_line_1
+                  type: VARCHAR
+
+  - changeSet:
+      id: alter-address-models-3b
+      author: gavinkillough
+      changes:
+        - sql:
+            sql: UPDATE portal.organization_account_contact_addresses SET address_line_1 = (CAST(street_number AS text) || ' ' || street_name);
+        - dropColumn:
+            schemaName: portal
+            tableName: organization_account_contact_addresses
+            columns:
+              - column:
+                  name: street_number
+              - column:
+                  name: street_name

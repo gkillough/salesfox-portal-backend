@@ -1,9 +1,9 @@
 package ai.salesfox.portal.common.service.contact.model;
 
-import ai.salesfox.portal.rest.api.contact.model.ContactUploadModel;
 import ai.salesfox.portal.common.service.contact.ContactCSVFileUtils;
 import ai.salesfox.portal.common.service.contact.ContactCSVFileUtilsTest;
 import ai.salesfox.portal.common.service.contact.ContactFieldValidationUtils;
+import ai.salesfox.portal.rest.api.contact.model.ContactUploadModel;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,8 +25,8 @@ public class ContactCSVWrapperTest {
                 assertHeader(headerNames, ContactCSVWrapper.HEADER_LAST_NAME);
                 assertHeader(headerNames, ContactCSVWrapper.HEADER_EMAIL);
 
-                assertHeader(headerNames, ContactCSVWrapper.HEADER_ADDRESS_STREET_NUMBER);
-                assertHeader(headerNames, ContactCSVWrapper.HEADER_ADDRESS_APT_SUITE);
+                assertHeader(headerNames, ContactCSVWrapper.HEADER_ADDRESS_LINE_1);
+                assertHeader(headerNames, ContactCSVWrapper.HEADER_ADDRESS_LINE_2);
                 assertHeader(headerNames, ContactCSVWrapper.HEADER_ADDRESS_CITY);
                 assertHeader(headerNames, ContactCSVWrapper.HEADER_ADDRESS_STATE);
                 assertHeader(headerNames, ContactCSVWrapper.HEADER_ADDRESS_ZIP);
@@ -41,7 +41,7 @@ public class ContactCSVWrapperTest {
     }
 
     @Test
-    public void test() throws IOException {
+    public void validateUploadModelTest() throws IOException {
         File testCSVFile = ContactCSVFileUtilsTest.getTestCSVFile(getClass().getClassLoader());
         try (FileInputStream testCsvFileInputStream = new FileInputStream(testCSVFile)) {
             try (ContactCSVWrapper csvWrapper = ContactCSVFileUtils.createCSVWrapper(testCsvFileInputStream, ContactCSVFileUtils.portalCSVFormat())) {

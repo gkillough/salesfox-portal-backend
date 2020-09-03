@@ -13,14 +13,11 @@ import java.io.Serializable;
 @AllArgsConstructor
 @MappedSuperclass
 public abstract class AbstractAddressEntity implements Serializable {
-    @Column(name = "street_number")
-    private Integer streetNumber;
+    @Column(name = "address_line_1")
+    private String addressLine1;
 
-    @Column(name = "street_name")
-    private String streetName;
-
-    @Column(name = "apt_suite")
-    private String aptSuite;
+    @Column(name = "address_line_2")
+    private String addressLine2;
 
     @Column(name = "city")
     private String city;

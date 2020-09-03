@@ -1,4 +1,4 @@
-First Name|Last Name|Email|Street Number|Street Name|Apt Suite|City|State|Zip|Is Business|Organization|Title|Mobile Number|Business Number
-Test|User|test.user@awebsite.com|1|Main Street|Suite A|New York|NY|12345-6789|true|Test Org|Some Title|5551234567|
-Test|User2|test.user2@awebsite.com|2|Main Street|Suite B|New York|NY|12345-6789|false|Test Org 2|Some Title|5551234567|5551234567
-Test|User3|test.user3@awebsite.com|3|Main Street|Suite C|New York|NY|12345|true|Test Org 3|Some Title||5551234567
+First Name|Last Name|Email|Address Line 1|Address Line 2|City|State|Zip|Is Business|Organization|Title|Mobile Number|Business Number
+Test|User|test.user@awebsite.com|1 Main Street|Suite A|New York|NY|12345-6789|true|Test Org|Some Title|5551234567|
+Test|User2|test.user2@awebsite.com|2 Main Street|Suite B|New York|NY|12345-6789|false|Test Org 2|Some Title|5551234567|5551234567
+Test|User3|test.user3@awebsite.com|3 Main Street|Suite C|New York|NY|12345|true|Test Org 3|Some Title||5551234567
