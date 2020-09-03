@@ -84,3 +84,23 @@ databaseChangeLog:
             onDelete: RESTRICT
             onUpdate: CASCADE
             validate: true
+
+  - changeSet:
+      id: add-fk-5
+      author: gavinkillough
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: organization_account_addresses
+            constraintName: organization_account_id_fk
+        - addForeignKeyConstraint:
+            constraintName: org_acct_addresses_org_acct_id_fk
+            baseTableSchemaName: portal
+            baseTableName: organization_account_addresses
+            baseColumnNames: organization_account_id
+            referencedTableSchemaName: portal
+            referencedTableName: organization_accounts
+            referencedColumnNames: organization_account_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true
