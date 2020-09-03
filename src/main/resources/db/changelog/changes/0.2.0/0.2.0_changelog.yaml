@@ -14,3 +14,7 @@ databaseChangeLog:
   - include:
       file: alter_address_models.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: add_on_delete_update_fk.yaml
+      relativeToChangelogFile: true
