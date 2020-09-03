@@ -10,3 +10,7 @@ databaseChangeLog:
   - include:
       file: add_note_attributes.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: alter_address_models.yaml
+      relativeToChangelogFile: true

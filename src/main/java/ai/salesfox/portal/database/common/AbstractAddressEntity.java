@@ -19,7 +19,11 @@ public abstract class AbstractAddressEntity implements Serializable {
     @Column(name = "street_name")
     private String streetName;
 
-    @Column(name = "apt_suite")
+    @Column(name = "address_line_1")
+    private String addressLine1;
+
+    // TODO rename this variable
+    @Column(name = "address_line_2")
     private String aptSuite;
 
     @Column(name = "city")
