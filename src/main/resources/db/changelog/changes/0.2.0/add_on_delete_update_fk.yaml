@@ -53,3 +53,18 @@ databaseChangeLog:
             onUpdate: CASCADE
             validate: true
 
+  - changeSet:
+      id: add-fk-3
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: user_profiles_user_id_fk
+            baseTableSchemaName: portal
+            baseTableName: user_profiles
+            baseColumnNames: user_id
+            referencedTableSchemaName: portal
+            referencedTableName: users
+            referencedColumnNames: user_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true
