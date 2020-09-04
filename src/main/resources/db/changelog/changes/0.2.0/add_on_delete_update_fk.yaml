@@ -104,3 +104,23 @@ databaseChangeLog:
             onDelete: CASCADE
             onUpdate: CASCADE
             validate: true
+
+  - changeSet:
+      id: add-fk-6
+      author: gavinkillough
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: user_addresses
+            constraintName: user_id_fk
+        - addForeignKeyConstraint:
+            constraintName: user_acct_addresses_user_id_fk
+            baseTableSchemaName: portal
+            baseTableName: user_addresses
+            baseColumnNames: user_id
+            referencedTableSchemaName: portal
+            referencedTableName: users
+            referencedColumnNames: user_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true
