@@ -254,3 +254,38 @@ databaseChangeLog:
             onDelete: CASCADE
             onUpdate: CASCADE
             validate: true
+
+  - changeSet:
+      id: add-fk-12
+      author: gavinkillough
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: catalogue_item_organization_account_restrictions
+            constraintName: catalog_item_org_acct_restrictions_item_id_fk
+        - addForeignKeyConstraint:
+            constraintName: catalog_item_org_acct_restrictions_item_id_fk
+            baseTableSchemaName: portal
+            baseTableName: catalogue_item_organization_account_restrictions
+            baseColumnNames: item_id
+            referencedTableSchemaName: portal
+            referencedTableName: catalogue_items
+            referencedColumnNames: item_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: catalogue_item_organization_account_restrictions
+            constraintName: catalog_item_org_acct_restrictions_org_account_id_fk
+        - addForeignKeyConstraint:
+            constraintName: catalog_item_org_acct_restrictions_org_account_id_fk
+            baseTableSchemaName: portal
+            baseTableName: catalogue_item_organization_account_restrictions
+            baseColumnNames: organization_account_id
+            referencedTableSchemaName: portal
+            referencedTableName: organization_accounts
+            referencedColumnNames: organization_account_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+            validate: true
