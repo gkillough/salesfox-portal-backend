@@ -73,13 +73,10 @@ databaseChangeLog:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test1@usepipeline.com')
               - column:
-                  name: street_number
-                  valueNumeric: 1
+                  name: address_line_1
+                  value: 1 A Street
               - column:
-                  name: street_name
-                  value: A Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: Unit 1
               - column:
                   name: city
@@ -185,13 +182,10 @@ databaseChangeLog:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test2@usepipeline.com')
               - column:
-                  name: street_number
-                  valueNumeric: 1
+                  name: address_line_1
+                  value: 1 A Street
               - column:
-                  name: street_name
-                  value: A Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: Unit 2
               - column:
                   name: city
@@ -297,13 +291,10 @@ databaseChangeLog:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test3@usepipeline.com')
               - column:
-                  name: street_number
-                  valueNumeric: 1
+                  name: address_line_1
+                  value: 1 A Street
               - column:
-                  name: street_name
-                  value: A Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: Unit 3
               - column:
                   name: city
@@ -409,13 +400,10 @@ databaseChangeLog:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test4@usepipeline.com')
               - column:
-                  name: street_number
-                  valueNumeric: 1
+                  name: address_line_1
+                  value: 1 A Street
               - column:
-                  name: street_name
-                  value: A Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: Unit 4
               - column:
                   name: city
@@ -521,13 +509,10 @@ databaseChangeLog:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test5@usepipeline.com')
               - column:
-                  name: street_number
-                  valueNumeric: 1
+                  name: address_line_1
+                  value: 1 A Street
               - column:
-                  name: street_name
-                  value: A Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: Unit 5
               - column:
                   name: city
@@ -633,13 +618,10 @@ databaseChangeLog:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test6@usepipeline.com')
               - column:
-                  name: street_number
-                  valueNumeric: 1
+                  name: address_line_1
+                  value: 1 A Street
               - column:
-                  name: street_name
-                  value: A Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: Unit 6
               - column:
                   name: city
@@ -745,13 +727,10 @@ databaseChangeLog:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test7@usepipeline.com')
               - column:
-                  name: street_number
-                  valueNumeric: 1
+                  name: address_line_1
+                  value: 1 A Street
               - column:
-                  name: street_name
-                  value: A Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: Unit 7
               - column:
                   name: city
@@ -857,13 +836,10 @@ databaseChangeLog:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('test8@usepipeline.com')
               - column:
-                  name: street_number
-                  valueNumeric: 1
+                  name: address_line_1
+                  value: 1 A Street
               - column:
-                  name: street_name
-                  value: A Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: Unit 8
               - column:
                   name: city

@@ -49,13 +49,10 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact9@salesfox.ai')
               - column:
-                  name: street_number
-                  valueNumeric: 9
+                  name: address_line_1
+                  value: 9 Contact Street
               - column:
-                  name: street_name
-                  value: Contact Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: ''
               - column:
                   name: city
@@ -146,13 +143,10 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact10@salesfox.ai')
               - column:
-                  name: street_number
-                  valueNumeric: 10
+                  name: address_line_1
+                  value: 10 Contact Street
               - column:
-                  name: street_name
-                  value: Contact Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: ''
               - column:
                   name: city
@@ -243,13 +237,10 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact11@salesfox.ai')
               - column:
-                  name: street_number
-                  valueNumeric: 11
+                  name: address_line_1
+                  value: 11 Contact Street
               - column:
-                  name: street_name
-                  value: Contact Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: ''
               - column:
                   name: city
@@ -340,13 +331,10 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact12@salesfox.ai')
               - column:
-                  name: street_number
-                  valueNumeric: 12
+                  name: address_line_1
+                  value: 12 Contact Street
               - column:
-                  name: street_name
-                  value: Contact Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: ''
               - column:
                   name: city
@@ -437,13 +425,10 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact13@salesfox.ai')
               - column:
-                  name: street_number
-                  valueNumeric: 13
+                  name: address_line_1
+                  value: 13 Contact Street
               - column:
-                  name: street_name
-                  value: Contact Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: ''
               - column:
                   name: city
@@ -534,13 +519,10 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact14@salesfox.ai')
               - column:
-                  name: street_number
-                  valueNumeric: 14
+                  name: address_line_1
+                  value: 14 Contact Street
               - column:
-                  name: street_name
-                  value: Contact Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: ''
               - column:
                   name: city
@@ -631,13 +613,10 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact15@salesfox.ai')
               - column:
-                  name: street_number
-                  valueNumeric: 15
+                  name: address_line_1
+                  value: 15 Contact Street
               - column:
-                  name: street_name
-                  value: Contact Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: ''
               - column:
                   name: city
@@ -728,13 +707,10 @@ databaseChangeLog:
                   name: contact_id
                   valueComputed: GET_CONTACT_ID_BY_EMAIL('contact16@salesfox.ai')
               - column:
-                  name: street_number
-                  valueNumeric: 16
+                  name: address_line_1
+                  value: 16 Contact Street
               - column:
-                  name: street_name
-                  value: Contact Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: ''
               - column:
                   name: city
