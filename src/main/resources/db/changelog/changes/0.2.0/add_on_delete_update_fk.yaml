@@ -394,3 +394,38 @@ databaseChangeLog:
             onDelete: RESTRICT
             onUpdate: CASCADE
             validate: true
+
+  - changeSet:
+      id: add-fk-16
+      author: gavinkillough
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: inventory_items
+            constraintName: inventory_items_catalogue_item_id_fk
+        - addForeignKeyConstraint:
+            constraintName: inventory_items_catalogue_item_id_fk
+            baseTableSchemaName: portal
+            baseTableName: inventory_items
+            baseColumnNames: catalogue_item_id
+            referencedTableSchemaName: portal
+            referencedTableName: catalogue_items
+            referencedColumnNames: item_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+            validate: true
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: inventory_items
+            constraintName: inventory_items_inventory_id_fk
+        - addForeignKeyConstraint:
+            constraintName: inventory_items_inventory_id_fk
+            baseTableSchemaName: portal
+            baseTableName: inventory_items
+            baseColumnNames: inventory_id
+            referencedTableSchemaName: portal
+            referencedTableName: inventories
+            referencedColumnNames: inventory_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+            validate: true
