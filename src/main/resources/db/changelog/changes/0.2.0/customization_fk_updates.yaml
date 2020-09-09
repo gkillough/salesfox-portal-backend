@@ -22,3 +22,19 @@ databaseChangeLog:
             onDelete: SET NULL
             onUpdate: CASCADE
             validate: true
+
+  - changeSet:
+      id: customization-fk-updates-2
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: custom_icon_files_custom_icon_id_fk
+            baseTableSchemaName: portal
+            baseTableName: custom_icon_files
+            baseColumnNames: custom_icon_id
+            referencedTableSchemaName: portal
+            referencedTableName: custom_icons
+            referencedColumnNames: custom_icon_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+            validate: true
