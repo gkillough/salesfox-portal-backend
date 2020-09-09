@@ -108,3 +108,27 @@ databaseChangeLog:
             onDelete: RESTRICT
             onUpdate: CASCADE
             validate: true
+
+  - changeSet:
+      id: customization-fk-updates-5
+      author: gavinkillough
+      changes:
+        - dropNotNullConstraint:
+            schemaName: portal
+            tableName: custom_branding_texts
+            columnName: uploader_id
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: custom_branding_texts
+            constraintName: cust_brand_txts_uploader_id_fk
+        - addForeignKeyConstraint:
+            constraintName: cust_brand_txts_uploader_id_fk
+            baseTableSchemaName: portal
+            baseTableName: custom_branding_texts
+            baseColumnNames: uploader_id
+            referencedTableSchemaName: portal
+            referencedTableName: users
+            referencedColumnNames: user_id
+            onDelete: SET NULL
+            onUpdate: CASCADE
+            validate: true
