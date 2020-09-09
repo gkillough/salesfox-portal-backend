@@ -18,3 +18,7 @@ databaseChangeLog:
   - include:
       file: add_on_delete_update_fk.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: customization_fk_updates.yaml
+      relativeToChangelogFile: true

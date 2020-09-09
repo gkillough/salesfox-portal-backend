@@ -506,7 +506,7 @@ databaseChangeLog:
             referencedTableSchemaName: portal
             referencedTableName: users
             referencedColumnNames: user_id
-            onDelete: SET NULL
+            onDelete: RESTRICT
             onUpdate: CASCADE
             validate: true
 

@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: customization-fk-updates-1
+      author: gavinkillough
+      changes:
+        - dropNotNullConstraint:
+            schemaName: portal
+            tableName: custom_icons
+            columnName: uploader_id
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: custom_icons
+            constraintName: custom_icons_uploader_id_fk
+        - addForeignKeyConstraint:
+            constraintName: custom_icons_uploader_id_fk
+            baseTableSchemaName: portal
+            baseTableName: custom_icons
+            baseColumnNames: uploader_id
+            referencedTableSchemaName: portal
+            referencedTableName: users
+            referencedColumnNames: user_id
+            onDelete: SET NULL
+            onUpdate: CASCADE
+            validate: true
