@@ -565,13 +565,48 @@ databaseChangeLog:
             baseTableName: note_organization_account_restrictions
             constraintName: note_org_acct_restrictions_org_acct_id_id_fk
         - addForeignKeyConstraint:
-            constraintName: note_org_acct_restrictions_org_acct_id_id_fk
+            constraintName: note_org_acct_restrictions_org_acct_id_fk
             baseTableSchemaName: portal
             baseTableName: note_organization_account_restrictions
             baseColumnNames: organization_account_id
             referencedTableSchemaName: portal
             referencedTableName: organization_accounts
             referencedColumnNames: organization_account_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true
+
+  - changeSet:
+      id: add-fk-20
+      author: gavinkillough
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: note_user_restrictions
+            constraintName: note_user_restrictions_note_id_fk
+        - addForeignKeyConstraint:
+            constraintName: note_user_restrictions_note_id_fk
+            baseTableSchemaName: portal
+            baseTableName: note_user_restrictions
+            baseColumnNames: note_id
+            referencedTableSchemaName: portal
+            referencedTableName: notes
+            referencedColumnNames: note_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: note_user_restrictions
+            constraintName: note_user_restrictions_user_id_id_fk
+        - addForeignKeyConstraint:
+            constraintName: note_user_restrictions_user_id_fk
+            baseTableSchemaName: portal
+            baseTableName: note_user_restrictions
+            baseColumnNames: user_id
+            referencedTableSchemaName: portal
+            referencedTableName: users
+            referencedColumnNames: user_id
             onDelete: CASCADE
             onUpdate: CASCADE
             validate: true
