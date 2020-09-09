@@ -509,3 +509,34 @@ databaseChangeLog:
             onDelete: SET NULL
             onUpdate: CASCADE
             validate: true
+
+  - changeSet:
+      id: add-fk-18
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: order_request_statuses_order_id_fk
+            baseTableSchemaName: portal
+            baseTableName: order_request_statuses
+            baseColumnNames: order_id
+            referencedTableSchemaName: portal
+            referencedTableName: order_requests
+            referencedColumnNames: order_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: order_request_statuses
+            constraintName: order_request_statuses_changed_by_user_id_fk
+        - addForeignKeyConstraint:
+            constraintName: order_request_statuses_changed_by_user_id_fk
+            baseTableSchemaName: portal
+            baseTableName: order_request_statuses
+            baseColumnNames: changed_by_user_id
+            referencedTableSchemaName: portal
+            referencedTableName: users
+            referencedColumnNames: user_id
+            onDelete: SET NULL
+            onUpdate: CASCADE
+            validate: true
