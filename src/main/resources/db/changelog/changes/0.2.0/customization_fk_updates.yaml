@@ -73,3 +73,38 @@ databaseChangeLog:
             onDelete: RESTRICT
             onUpdate: CASCADE
             validate: true
+
+  - changeSet:
+      id: customization-fk-updates-4
+      author: gavinkillough
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: custom_icon_organization_account_restrictions
+            constraintName: custom_icon_org_acct_restrictions_custom_icon_id_fk
+        - addForeignKeyConstraint:
+            constraintName: custom_icon_org_acct_restrictions_custom_icon_id_fk
+            baseTableSchemaName: portal
+            baseTableName: custom_icon_organization_account_restrictions
+            baseColumnNames: custom_icon_id
+            referencedTableSchemaName: portal
+            referencedTableName: custom_icons
+            referencedColumnNames: custom_icon_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: custom_icon_organization_account_restrictions
+            constraintName: custom_icon_org_acct_restrictions_org_acct_id_fk
+        - addForeignKeyConstraint:
+            constraintName: custom_icon_org_acct_restrictions_org_acct_id_fk
+            baseTableSchemaName: portal
+            baseTableName: custom_icon_organization_account_restrictions
+            baseColumnNames: organization_account_id
+            referencedTableSchemaName: portal
+            referencedTableName: organization_accounts
+            referencedColumnNames: organization_account_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+            validate: true
