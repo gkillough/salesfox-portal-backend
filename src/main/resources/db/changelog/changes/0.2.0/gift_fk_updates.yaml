@@ -103,3 +103,38 @@ databaseChangeLog:
             onDelete: RESTRICT
             onUpdate: CASCADE
             validate: true
+
+  - changeSet:
+      id: gift-fk-updates-4
+      author: gavinkillough
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: gift_note_details
+            constraintName: gift_note_detail_gift_id_fk
+        - addForeignKeyConstraint:
+            constraintName: gift_note_detail_gift_id_fk
+            baseTableSchemaName: portal
+            baseTableName: gift_note_details
+            baseColumnNames: gift_id
+            referencedTableSchemaName: portal
+            referencedTableName: gifts
+            referencedColumnNames: gift_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true
+        - dropForeignKeyConstraint:
+            baseTableSchemaName: portal
+            baseTableName: gift_note_details
+            constraintName: gift_note_detail_note_id_fk
+        - addForeignKeyConstraint:
+            constraintName: gift_note_detail_note_id_fk
+            baseTableSchemaName: portal
+            baseTableName: gift_note_details
+            baseColumnNames: note_id
+            referencedTableSchemaName: portal
+            referencedTableName: notes
+            referencedColumnNames: note_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+            validate: true
