@@ -22,3 +22,7 @@ databaseChangeLog:
   - include:
       file: customization_fk_updates.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: gift_fk_updates.yaml
+      relativeToChangelogFile: true
