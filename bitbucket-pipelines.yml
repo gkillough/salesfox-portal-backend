@@ -1,0 +1,39 @@
+image: openjdk:11
+
+pipelines:
+  default:
+    - step:
+        caches:
+          - gradle
+        services:
+          - postgres
+        script:
+          - bash ./gradlew test
+    - step:
+        image: salesfox/pack
+        services:
+          - docker
+        script:
+          - ./container_publish.sh
+
+
+  branches:
+    master:
+      - step:
+          caches:
+            - gradle
+          services:
+            - postgres
+          script:
+            - bash ./gradlew test
+      - step:
+          image: salesfox/pack
+          services:
+            - docker
+          script:
+            - ./container_publish.sh
+
+definitions:
+  services:
+    postgres:
+      image: postgres:12.3-alpine
