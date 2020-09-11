@@ -87,13 +87,10 @@ databaseChangeLog:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
               - column:
-                  name: street_number
-                  valueNumeric: 100
+                  name: address_line_1
+                  value: 100 Main Street
               - column:
-                  name: street_name
-                  value: Main Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: Suite B
               - column:
                   name: city
@@ -218,13 +215,10 @@ databaseChangeLog:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
               - column:
-                  name: street_number
-                  valueNumeric: 100
+                  name: address_line_1
+                  value: 100 Main Street
               - column:
-                  name: street_name
-                  value: Main Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: Suite A
               - column:
                   name: city
@@ -368,13 +362,10 @@ databaseChangeLog:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
               - column:
-                  name: street_number
-                  valueNumeric: 100
+                  name: address_line_1
+                  value: 100 Side Street
               - column:
-                  name: street_name
-                  value: Side Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: ''
               - column:
                   name: city
@@ -499,13 +490,10 @@ databaseChangeLog:
                   name: organization_account_id
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
               - column:
-                  name: street_number
-                  valueNumeric: 100
+                  name: address_line_1
+                  value: 100 Side Street
               - column:
-                  name: street_name
-                  value: Side Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: ''
               - column:
                   name: city

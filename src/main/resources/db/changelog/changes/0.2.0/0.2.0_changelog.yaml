@@ -14,3 +14,19 @@ databaseChangeLog:
   - include:
       file: alter_address_models.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: add_on_delete_update_fk.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: customization_fk_updates.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: gift_fk_updates.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: note_fk_updates.yaml
+      relativeToChangelogFile: true

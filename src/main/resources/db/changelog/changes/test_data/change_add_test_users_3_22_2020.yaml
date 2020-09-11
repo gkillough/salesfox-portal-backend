@@ -88,13 +88,10 @@ databaseChangeLog:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com')
               - column:
-                  name: street_number
-                  valueNumeric: 123
+                  name: address_line_1
+                  value: 123 Sesame Street
               - column:
-                  name: street_name
-                  value: Sesame Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: Suite A
               - column:
                   name: city
@@ -258,13 +255,10 @@ databaseChangeLog:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com')
               - column:
-                  name: street_number
-                  valueNumeric: 1024
+                  name: address_line_1
+                  value: 1024 Main Street
               - column:
-                  name: street_name
-                  value: Main Street
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: Unit 5
               - column:
                   name: city
@@ -428,13 +422,10 @@ databaseChangeLog:
                   name: user_id
                   valueComputed: GET_USER_ID_BY_EMAIL('admin@usepipeline.com')
               - column:
-                  name: street_number
-                  valueNumeric: 42
+                  name: address_line_1
+                  value: 42 West Blvd
               - column:
-                  name: street_name
-                  value: West Blvd
-              - column:
-                  name: apt_suite
+                  name: address_line_2
                   value: ''
               - column:
                   name: city
