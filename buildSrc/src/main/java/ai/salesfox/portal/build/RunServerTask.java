@@ -50,6 +50,8 @@ public class RunServerTask extends Exec {
         envVars.put("PORTAL_SMTP_PASSWORD", "yptjlvfodhkuxdly");
         envVars.put("PORTAL_SMTP_FROM", "accounts@getboostr.com");
 
+        envVars.put("PORTAL_CORS_ALLOWED_ORIGINS", "*localhost*");
+
         getEnvironment().putAll(envVars);
 
         String version = (String) project.getVersion();
