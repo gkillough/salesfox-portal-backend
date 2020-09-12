@@ -50,6 +50,8 @@ public class RunServerTask extends Exec {
         envVars.put("PORTAL_SMTP_PASSWORD", "yptjlvfodhkuxdly");
         envVars.put("PORTAL_SMTP_FROM", "accounts@getboostr.com");
 
+        envVars.put("PORTAL_CORS_ALLOWED_ORIGINS", "*");
+
         getEnvironment().putAll(envVars);
 
         String version = (String) project.getVersion();
@@ -102,6 +104,7 @@ public class RunServerTask extends Exec {
                 "--embedded.postgresql.password=root",
                 "--embedded.postgresql.initScriptPath=file:buildSrc/src/main/resources/init_test_db.sql",
 
+                "--spring.liquibase.change-log=classpath:db/changelog/changes/test_data/development-master.yaml",
                 "--spring.liquibase.user=portaladmin",
                 "--spring.liquibase.password=Port@l!23",
 

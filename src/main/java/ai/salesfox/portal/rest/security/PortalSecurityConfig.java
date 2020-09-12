@@ -24,7 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
-import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -88,10 +87,7 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private HttpSecurity configureCors(HttpSecurity security) throws Exception {
-        CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
-        corsConfiguration.setAllowCredentials(Boolean.TRUE);
         return security.cors()
-                .configurationSource(request -> corsConfiguration)
                 .and();
     }
 

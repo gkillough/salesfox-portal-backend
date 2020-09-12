@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
+// FIXME replace this session-based mechanism with JWT
 public class CsrfTokenProviderController implements AnonymouslyAccessible {
     public static final String CSRF_TOKEN_REQUEST_ENDPOINT = "/csrf/token";
     private final CsrfTokenRepository csrfTokenRepository;
