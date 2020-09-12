@@ -20,8 +20,9 @@ public class PortalCorsConfiguration {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
         corsConfiguration.setAllowedOrigins(getAllowedOrigins());
+        corsConfiguration.setAllowedHeaders(List.of(CorsConfiguration.ALL));
         corsConfiguration.setAllowedMethods(
                 List.of(
                         HttpMethod.GET.name(),
