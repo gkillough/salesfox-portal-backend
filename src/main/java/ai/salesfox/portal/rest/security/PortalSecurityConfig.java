@@ -11,12 +11,10 @@ import ai.salesfox.portal.rest.security.authentication.user.PortalUserDetailsSer
 import ai.salesfox.portal.rest.security.authorization.AdminOnlyAccessible;
 import ai.salesfox.portal.rest.security.authorization.CsrfIgnorable;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
-import ai.salesfox.portal.rest.security.authorization.PortalCorsConfiguration;
 import ai.salesfox.portal.rest.security.common.DefaultAllowedEndpoints;
 import ai.salesfox.portal.rest.security.common.SecurityInterface;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,13 +24,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Component;
-import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Component
 @EnableWebSecurity
@@ -43,7 +39,6 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     private final CsrfTokenRepository csrfTokenRepository;
     private final RoleRepository roleRepository;
     private final List<CsrfIgnorable> csrfIgnorables;
-    private final PortalCorsConfiguration portalCorsConfiguration;
     private final List<AnonymouslyAccessible> anonymouslyAccessibles;
     private final List<AdminOnlyAccessible> adminOnlyAccessibles;
     private final PortalUserDetailsService userDetailsService;
@@ -51,12 +46,11 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public PortalSecurityConfig(CsrfTokenRepository csrfTokenRepository, RoleRepository roleRepository,
-                                List<CsrfIgnorable> csrfIgnorables, PortalCorsConfiguration portalCorsConfiguration, List<AnonymouslyAccessible> anonymouslyAccessibles, List<AdminOnlyAccessible> adminOnlyAccessibles,
+                                List<CsrfIgnorable> csrfIgnorables, List<AnonymouslyAccessible> anonymouslyAccessibles, List<AdminOnlyAccessible> adminOnlyAccessibles,
                                 PortalUserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         this.csrfTokenRepository = csrfTokenRepository;
         this.roleRepository = roleRepository;
         this.csrfIgnorables = csrfIgnorables;
-        this.portalCorsConfiguration = portalCorsConfiguration;
         this.anonymouslyAccessibles = anonymouslyAccessibles;
         this.adminOnlyAccessibles = adminOnlyAccessibles;
         this.userDetailsService = userDetailsService;
@@ -93,16 +87,7 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private HttpSecurity configureCors(HttpSecurity security) throws Exception {
-        CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
-        corsConfiguration.setAllowCredentials(Boolean.TRUE);
-        corsConfiguration.setAllowedOrigins(portalCorsConfiguration.getAllowedOrigins());
-        corsConfiguration.setAllowedMethods(
-                Arrays.stream(HttpMethod.values())
-                        .map(Enum::name)
-                        .collect(Collectors.toUnmodifiableList())
-        );
         return security.cors()
-                .configurationSource(request -> corsConfiguration)
                 .and();
     }
 

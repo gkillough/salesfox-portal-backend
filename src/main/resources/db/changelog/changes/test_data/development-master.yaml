@@ -1,5 +1,9 @@
 databaseChangeLog:
   - include:
+      file: db/changelog/changelog-master.yaml
+      relativeToChangelogFile: false
+
+  - include:
       file: change_add_test_users_3_22_2020.yaml
       relativeToChangelogFile: true
 
