@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -34,17 +35,15 @@ public class GiftEntity implements Serializable {
     @Column(name = "requesting_user_id")
     private UUID requestingUserId;
 
-    @PrimaryKeyJoinColumn
-    @Column(name = "contact_id")
-    private UUID contactId;
-
     @OneToOne
     @JoinColumn(name = "requesting_user_id", referencedColumnName = "user_id", updatable = false, insertable = false)
     private UserEntity requestingUserEntity;
 
-    @OneToOne
-    @JoinColumn(name = "contact_id", referencedColumnName = "contact_id", updatable = false, insertable = false)
-    private OrganizationAccountContactEntity contactEntity;
+    @ManyToMany
+    @JoinTable(name = "gift_recipients", joinColumns =
+    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
+    )
+    private List<OrganizationAccountContactEntity> giftRecipients;
 
     @OneToOne
     @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
@@ -82,10 +81,9 @@ public class GiftEntity implements Serializable {
     @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
     private GiftScheduleEntity giftScheduleEntity;
 
-    public GiftEntity(UUID giftId, UUID requestingUserId, UUID contactId) {
+    public GiftEntity(UUID giftId, UUID requestingUserId) {
         this.giftId = giftId;
         this.requestingUserId = requestingUserId;
-        this.contactId = contactId;
     }
 
     public boolean isSubmittable() {

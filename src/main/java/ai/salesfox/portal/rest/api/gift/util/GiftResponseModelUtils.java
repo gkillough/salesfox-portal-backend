@@ -1,10 +1,5 @@
 package ai.salesfox.portal.rest.api.gift.util;
 
-import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
-import ai.salesfox.portal.rest.api.contact.model.ContactSummaryModel;
-import ai.salesfox.portal.rest.api.gift.model.GiftResponseModel;
-import ai.salesfox.portal.rest.api.gift.model.GiftTrackingModel;
-import ai.salesfox.portal.rest.api.user.common.model.UserSummaryModel;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomIconDetailEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomTextDetailEntity;
@@ -13,6 +8,11 @@ import ai.salesfox.portal.database.gift.note.GiftNoteDetailEntity;
 import ai.salesfox.portal.database.gift.restriction.GiftOrgAccountRestrictionEntity;
 import ai.salesfox.portal.database.gift.restriction.GiftUserRestrictionEntity;
 import ai.salesfox.portal.database.gift.tracking.GiftTrackingEntity;
+import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
+import ai.salesfox.portal.rest.api.contact.model.ContactSummaryModel;
+import ai.salesfox.portal.rest.api.gift.model.GiftResponseModel;
+import ai.salesfox.portal.rest.api.gift.model.GiftTrackingModel;
+import ai.salesfox.portal.rest.api.user.common.model.UserSummaryModel;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -21,7 +21,12 @@ import java.util.function.Function;
 public class GiftResponseModelUtils {
     public static GiftResponseModel convertToResponseModel(GiftEntity gift) {
         UserSummaryModel requestingUserModel = UserSummaryModel.fromEntity(gift.getRequestingUserEntity());
-        ContactSummaryModel contactModel = ContactSummaryModel.fromEntity(gift.getContactEntity());
+        // TODO update this when multiple recipients are allowed
+        ContactSummaryModel contactModel = gift.getGiftRecipients()
+                .stream()
+                .map(ContactSummaryModel::fromEntity)
+                .findFirst()
+                .orElse(null);
 
         UUID noteId = extractDetailIdOrNull(gift.getGiftNoteDetailEntity(), GiftNoteDetailEntity::getNoteId);
         UUID itemId = extractDetailIdOrNull(gift.getGiftItemDetailEntity(), GiftItemDetailEntity::getItemId);
