@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: multiple-gift-contacts-1
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: gift_recipients
+            columns:
+              - column:
+                  name: gift_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: contact_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+        - addForeignKeyConstraint:
+            constraintName: gift_recipients_gift_id_fk
+            baseTableSchemaName: portal
+            baseTableName: gift_recipients
+            baseColumnNames: gift_id
+            referencedTableSchemaName: portal
+            referencedTableName: gifts
+            referencedColumnNames: gift_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true
+        - addForeignKeyConstraint:
+            constraintName: gift_recipients_contact_id_fk
+            baseTableSchemaName: portal
+            baseTableName: gift_recipients
+            baseColumnNames: contact_id
+            referencedTableSchemaName: portal
+            referencedTableName: organization_account_contacts
+            referencedColumnNames: contact_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+            validate: true
