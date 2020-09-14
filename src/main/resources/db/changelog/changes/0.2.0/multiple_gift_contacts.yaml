@@ -48,3 +48,12 @@ databaseChangeLog:
       author: gavinkillough
       changes:
         - sql: INSERT INTO portal.gift_recipients (gift_id, contact_id) (SELECT g.gift_id, g.contact_id FROM portal.gifts g);
+
+  - changeSet:
+      id: multiple-gift-contacts-3
+      author: gavinkillough
+      changes:
+        - dropColumn:
+            schemaName: portal
+            tableName: gifts
+            columnName: contact_id
