@@ -1,5 +1,8 @@
 package ai.salesfox.portal.rest.api.gift;
 
+import ai.salesfox.portal.common.enumeration.AccessOperation;
+import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
+import ai.salesfox.portal.common.time.PortalDateTimeUtils;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.catalogue.item.CatalogueItemRepository;
@@ -13,15 +16,6 @@ import ai.salesfox.portal.database.customization.icon.CustomIconEntity;
 import ai.salesfox.portal.database.customization.icon.CustomIconRepository;
 import ai.salesfox.portal.database.customization.icon.restriction.CustomIconOrganizationAccountRestrictionEntity;
 import ai.salesfox.portal.database.customization.icon.restriction.CustomIconUserRestrictionEntity;
-import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
-import ai.salesfox.portal.rest.api.gift.model.DraftGiftRequestModel;
-import ai.salesfox.portal.rest.api.gift.model.GiftResponseModel;
-import ai.salesfox.portal.rest.api.gift.model.MultiGiftModel;
-import ai.salesfox.portal.rest.api.gift.util.GiftAccessService;
-import ai.salesfox.portal.rest.api.gift.util.GiftResponseModelUtils;
-import ai.salesfox.portal.common.enumeration.AccessOperation;
-import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
-import ai.salesfox.portal.common.time.PortalDateTimeUtils;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.GiftRepository;
 import ai.salesfox.portal.database.gift.customization.GiftCustomIconDetailEntity;
@@ -32,6 +26,8 @@ import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailRepository;
 import ai.salesfox.portal.database.gift.note.GiftNoteDetailEntity;
 import ai.salesfox.portal.database.gift.note.GiftNoteDetailRepository;
+import ai.salesfox.portal.database.gift.recipient.GiftRecipientEntity;
+import ai.salesfox.portal.database.gift.recipient.GiftRecipientRepository;
 import ai.salesfox.portal.database.gift.restriction.GiftOrgAccountRestrictionEntity;
 import ai.salesfox.portal.database.gift.restriction.GiftOrgAccountRestrictionRepository;
 import ai.salesfox.portal.database.gift.restriction.GiftUserRestrictionEntity;
@@ -42,6 +38,12 @@ import ai.salesfox.portal.database.note.NoteEntity;
 import ai.salesfox.portal.database.note.NoteRepository;
 import ai.salesfox.portal.database.note.restriction.NoteOrganizationAccountRestrictionEntity;
 import ai.salesfox.portal.database.note.restriction.NoteUserRestrictionEntity;
+import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
+import ai.salesfox.portal.rest.api.gift.model.DraftGiftRequestModel;
+import ai.salesfox.portal.rest.api.gift.model.GiftResponseModel;
+import ai.salesfox.portal.rest.api.gift.model.MultiGiftModel;
+import ai.salesfox.portal.rest.api.gift.util.GiftAccessService;
+import ai.salesfox.portal.rest.api.gift.util.GiftResponseModelUtils;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +63,7 @@ import java.util.stream.Collectors;
 @Component
 public class GiftService {
     private final GiftRepository giftRepository;
+    private final GiftRecipientRepository giftRecipientRepository;
     private final GiftNoteDetailRepository noteDetailRepository;
     private final GiftItemDetailRepository itemDetailRepository;
     private final GiftCustomIconDetailRepository customIconDetailRepository;
@@ -79,7 +82,7 @@ public class GiftService {
     @Autowired
     public GiftService(
             GiftRepository giftRepository,
-            GiftNoteDetailRepository noteDetailRepository,
+            GiftRecipientRepository giftRecipientRepository, GiftNoteDetailRepository noteDetailRepository,
             GiftItemDetailRepository itemDetailRepository,
             GiftCustomIconDetailRepository customIconDetailRepository,
             GiftCustomTextDetailRepository giftCustomTextDetailRepository,
@@ -95,6 +98,7 @@ public class GiftService {
             HttpSafeUserMembershipRetrievalService membershipRetrievalService
     ) {
         this.giftRepository = giftRepository;
+        this.giftRecipientRepository = giftRecipientRepository;
         this.noteDetailRepository = noteDetailRepository;
         this.itemDetailRepository = itemDetailRepository;
         this.customIconDetailRepository = customIconDetailRepository;
@@ -124,7 +128,7 @@ public class GiftService {
 
         List<GiftResponseModel> responseModels = accessibleGifts
                 .stream()
-                .map(GiftResponseModelUtils::convertToResponseModel)
+                .map(gift -> GiftResponseModelUtils.convertToResponseModel(gift, gift.getGiftRecipients()))
                 .collect(Collectors.toList());
         return new MultiGiftModel(responseModels, accessibleGifts);
     }
@@ -134,7 +138,8 @@ public class GiftService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.READ);
-        return GiftResponseModelUtils.convertToResponseModel(foundGift);
+
+        return GiftResponseModelUtils.convertToResponseModel(foundGift, foundGift.getGiftRecipients());
     }
 
     @Transactional
@@ -143,7 +148,8 @@ public class GiftService {
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         validateRequestModel(loggedInUser, userMembership, requestModel);
 
-        GiftEntity giftToSave = new GiftEntity(null, loggedInUser.getUserId(), requestModel.getContactId());
+        // FIXME update request/response models for multiple contacts
+        GiftEntity giftToSave = new GiftEntity(null, loggedInUser.getUserId());
         GiftEntity savedGift = giftRepository.save(giftToSave);
         saveDetails(savedGift, requestModel);
 
@@ -163,8 +169,10 @@ public class GiftService {
         }
 
         savedGift.setRequestingUserEntity(loggedInUser);
-        contactRepository.findById(savedGift.getContactId()).ifPresent(savedGift::setContactEntity);
-        return GiftResponseModelUtils.convertToResponseModel(savedGift);
+        List<OrganizationAccountContactEntity> recipients = contactRepository.findById(requestModel.getContactId())
+                .map(List::of)
+                .orElseGet(List::of);
+        return GiftResponseModelUtils.convertToResponseModel(savedGift, recipients);
     }
 
     @Transactional
@@ -182,7 +190,10 @@ public class GiftService {
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         validateRequestModel(loggedInUser, userMembership, requestModel);
 
-        foundGift.setContactId(requestModel.getContactId());
+        // TODO update gift recipient multiplicity when appropriate
+        contactRepository.findById(requestModel.getContactId())
+                .map(List::of)
+                .ifPresent(foundGift::setGiftRecipients);
         saveDetails(foundGift, requestModel);
 
         GiftTrackingEntity giftTrackingToUpdate = foundGift.getGiftTrackingEntity();
@@ -207,6 +218,12 @@ public class GiftService {
     }
 
     private void saveDetails(GiftEntity savedGift, DraftGiftRequestModel requestModel) {
+        if (requestModel.getContactId() != null) {
+            // TODO remove this when multiple contacts are possible
+            GiftRecipientEntity recipientToSave = new GiftRecipientEntity(savedGift.getGiftId(), requestModel.getContactId());
+            giftRecipientRepository.save(recipientToSave);
+        }
+
         if (requestModel.getNoteId() != null) {
             GiftNoteDetailEntity noteDetailToSave = new GiftNoteDetailEntity(savedGift.getGiftId(), requestModel.getNoteId());
             GiftNoteDetailEntity savedNoteDetail = noteDetailRepository.save(noteDetailToSave);

@@ -7,6 +7,7 @@ import ai.salesfox.portal.common.service.contact.ContactInteractionsService;
 import ai.salesfox.portal.common.service.note.NoteCreditAvailabilityService;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
+import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.gift.note.GiftNoteDetailEntity;
@@ -17,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 public abstract class GiftSubmissionUtility<E extends Throwable> {
@@ -66,10 +68,11 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
             }
         }
 
+        UUID giftContactId = getContactId(gift);
         giftTrackingService.updateGiftTrackingInfo(gift, submittingUser, GiftTrackingStatus.SUBMITTED.name());
-        contactInteractionsService.addContactInteraction(submittingUser, gift.getContactId(), InteractionMedium.MAIL, InteractionClassification.OUTGOING, "(Auto-generated) Sent gift/note")
+        contactInteractionsService.addContactInteraction(submittingUser, giftContactId, InteractionMedium.MAIL, InteractionClassification.OUTGOING, "(Auto-generated) Sent gift/note")
                 .ifPresentOrElse(ignored -> {
-                }, () -> log.warn("Failed to add auto-generated gift submission interaction to contact with id: [{}]", gift.getContactId()));
+                }, () -> log.warn("Failed to add auto-generated gift submission interaction to contact with id: [{}]", giftContactId));
         return Optional.of(gift);
     }
 
@@ -82,5 +85,14 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
     protected abstract void handleMissingNoteCredits(GiftEntity foundGift, UserEntity submittingUser) throws E;
 
     protected abstract void handleNotEnoughNoteCredits(GiftEntity foundGift, NoteCreditsEntity noteCredits, UserEntity submittingUser) throws E;
+
+    // FIXME replace this when multiplicities are involved in gifting
+    private UUID getContactId(GiftEntity gift) {
+        return gift.getGiftRecipients()
+                .stream()
+                .findFirst()
+                .map(OrganizationAccountContactEntity::getContactId)
+                .orElse(null);
+    }
 
 }

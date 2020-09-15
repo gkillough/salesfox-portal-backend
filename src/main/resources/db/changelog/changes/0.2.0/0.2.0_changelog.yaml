@@ -30,3 +30,7 @@ databaseChangeLog:
   - include:
       file: note_fk_updates.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: multiple_gift_contacts.yaml
+      relativeToChangelogFile: true

@@ -1,6 +1,5 @@
 package ai.salesfox.portal.rest.api.gift.util;
 
-import ai.salesfox.portal.rest.api.inventory.InventoryAccessService;
 import ai.salesfox.portal.common.enumeration.AccessOperation;
 import ai.salesfox.portal.common.service.contact.ContactAccessOperationUtility;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
@@ -14,6 +13,7 @@ import ai.salesfox.portal.database.inventory.InventoryEntity;
 import ai.salesfox.portal.database.inventory.InventoryRepository;
 import ai.salesfox.portal.database.inventory.item.InventoryItemPK;
 import ai.salesfox.portal.database.inventory.item.InventoryItemRepository;
+import ai.salesfox.portal.rest.api.inventory.InventoryAccessService;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -43,8 +44,15 @@ public class GiftAccessService {
 
     public void validateGiftAccess(GiftEntity gift, UserEntity userRequestingAccess, AccessOperation contactAccessOperation) {
         validateGiftEntityAccess(gift, userRequestingAccess);
-        if (!contactAccessOperationUtility.canUserAccessContact(userRequestingAccess, gift.getContactEntity(), contactAccessOperation)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot perform the gifting operation for this contact");
+
+        // FIXME replace this when multiplicities are involved in gifting
+        Optional<OrganizationAccountContactEntity> giftContact = gift.getGiftRecipients()
+                .stream()
+                .findFirst();
+        if (giftContact.isPresent()) {
+            if (!contactAccessOperationUtility.canUserAccessContact(userRequestingAccess, giftContact.get(), contactAccessOperation)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot perform the gifting operation for this contact");
+            }
         }
     }
 
