@@ -128,7 +128,7 @@ public class GiftService {
 
         List<GiftResponseModel> responseModels = accessibleGifts
                 .stream()
-                .map(GiftResponseModelUtils::convertToResponseModel)
+                .map(gift -> GiftResponseModelUtils.convertToResponseModel(gift, gift.getGiftRecipients()))
                 .collect(Collectors.toList());
         return new MultiGiftModel(responseModels, accessibleGifts);
     }
@@ -138,7 +138,8 @@ public class GiftService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.READ);
-        return GiftResponseModelUtils.convertToResponseModel(foundGift);
+
+        return GiftResponseModelUtils.convertToResponseModel(foundGift, foundGift.getGiftRecipients());
     }
 
     @Transactional
@@ -168,10 +169,10 @@ public class GiftService {
         }
 
         savedGift.setRequestingUserEntity(loggedInUser);
-        contactRepository.findById(requestModel.getContactId())
+        List<OrganizationAccountContactEntity> recipients = contactRepository.findById(requestModel.getContactId())
                 .map(List::of)
-                .ifPresent(savedGift::setGiftRecipients);
-        return GiftResponseModelUtils.convertToResponseModel(savedGift);
+                .orElseGet(List::of);
+        return GiftResponseModelUtils.convertToResponseModel(savedGift, recipients);
     }
 
     @Transactional

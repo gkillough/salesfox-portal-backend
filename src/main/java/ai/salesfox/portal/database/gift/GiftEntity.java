@@ -40,8 +40,15 @@ public class GiftEntity implements Serializable {
     private UserEntity requestingUserEntity;
 
     @ManyToMany
-    @JoinTable(name = "gift_recipients", joinColumns =
-    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
+    @JoinTable(
+            schema = "portal",
+            name = "gift_recipients",
+            joinColumns = {
+                    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "contact_id", referencedColumnName = "contact_id", updatable = false, insertable = false)
+            }
     )
     private List<OrganizationAccountContactEntity> giftRecipients;
 

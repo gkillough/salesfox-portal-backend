@@ -1,5 +1,6 @@
 package ai.salesfox.portal.rest.api.gift.util;
 
+import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomIconDetailEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomTextDetailEntity;
@@ -14,15 +15,20 @@ import ai.salesfox.portal.rest.api.gift.model.GiftResponseModel;
 import ai.salesfox.portal.rest.api.gift.model.GiftTrackingModel;
 import ai.salesfox.portal.rest.api.user.common.model.UserSummaryModel;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
 public class GiftResponseModelUtils {
     public static GiftResponseModel convertToResponseModel(GiftEntity gift) {
+        return convertToResponseModel(gift, List.of());
+    }
+
+    // TODO update this when recipients are managed by their own endpoint
+    public static GiftResponseModel convertToResponseModel(GiftEntity gift, List<OrganizationAccountContactEntity> recipients) {
         UserSummaryModel requestingUserModel = UserSummaryModel.fromEntity(gift.getRequestingUserEntity());
-        // TODO update this when multiple recipients are allowed
-        ContactSummaryModel contactModel = gift.getGiftRecipients()
+        ContactSummaryModel contactModel = recipients
                 .stream()
                 .map(ContactSummaryModel::fromEntity)
                 .findFirst()
