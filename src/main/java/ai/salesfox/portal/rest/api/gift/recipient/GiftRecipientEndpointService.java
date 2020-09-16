@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -64,9 +65,17 @@ public class GiftRecipientEndpointService {
         throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
     }
 
+    @Transactional
     public void deleteRecipients(UUID giftId, GiftRecipientRequestModel recipientRequest) {
-        // FIXME implement
-        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
+        GiftEntity foundGift = findExistingGift(giftId);
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.INTERACT);
+
+        List<GiftRecipientEntity> giftRecipientEntitiesToDelete = recipientRequest.getContactIds()
+                .stream()
+                .map(contactId -> new GiftRecipientEntity(giftId, contactId))
+                .collect(Collectors.toList());
+        giftRecipientRepository.deleteInBatch(giftRecipientEntitiesToDelete);
     }
 
     private GiftEntity findExistingGift(UUID giftId) {
