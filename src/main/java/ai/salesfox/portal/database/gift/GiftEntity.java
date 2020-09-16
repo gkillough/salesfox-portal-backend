@@ -39,6 +39,7 @@ public class GiftEntity implements Serializable {
     @JoinColumn(name = "requesting_user_id", referencedColumnName = "user_id", updatable = false, insertable = false)
     private UserEntity requestingUserEntity;
 
+    // FIXME remove for the sake of paging
     @ManyToMany
     @JoinTable(
             schema = "portal",
