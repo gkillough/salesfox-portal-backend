@@ -12,7 +12,6 @@ import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactRepository;
 import ai.salesfox.portal.database.contact.interaction.ContactInteractionEntity;
 import ai.salesfox.portal.database.contact.interaction.ContactInteractionRepository;
-import ai.salesfox.portal.database.contact.profile.OrganizationAccountContactProfileRepository;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
 import ai.salesfox.portal.rest.api.contact.interaction.model.ContactInteractionRequestModel;
 import ai.salesfox.portal.rest.api.contact.interaction.model.ContactInteractionsResponseModel;
@@ -44,14 +43,14 @@ public class ContactInteractionEndpointService {
     private final ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
 
     @Autowired
-    public ContactInteractionEndpointService(OrganizationAccountContactRepository contactRepository, OrganizationAccountContactProfileRepository contactProfileRepository, ContactInteractionRepository contactInteractionRepository,
+    public ContactInteractionEndpointService(OrganizationAccountContactRepository contactRepository, ContactInteractionRepository contactInteractionRepository,
                                              ContactInteractionsService contactInteractionsService, UserRepository userRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.contactRepository = contactRepository;
         this.contactInteractionRepository = contactInteractionRepository;
         this.contactInteractionsService = contactInteractionsService;
         this.userRepository = userRepository;
         this.membershipRetrievalService = membershipRetrievalService;
-        this.contactAccessOperationUtility = new ContactAccessOperationUtility<>(membershipRetrievalService, contactProfileRepository);
+        this.contactAccessOperationUtility = new ContactAccessOperationUtility<>(contactRepository);
     }
 
     public MultiInteractionModel getInteractions(UUID contactId, Integer offset, Integer limit) {

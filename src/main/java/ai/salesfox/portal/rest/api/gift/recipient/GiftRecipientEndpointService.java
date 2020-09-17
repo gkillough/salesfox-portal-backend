@@ -1,6 +1,7 @@
 package ai.salesfox.portal.rest.api.gift.recipient;
 
 import ai.salesfox.portal.common.enumeration.AccessOperation;
+import ai.salesfox.portal.common.service.contact.ContactAccessOperationUtility;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactRepository;
 import ai.salesfox.portal.database.gift.GiftEntity;
@@ -30,6 +31,7 @@ public class GiftRecipientEndpointService {
     private final OrganizationAccountContactRepository contactRepository;
     private final GiftAccessService giftAccessService;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
 
     @Autowired
     public GiftRecipientEndpointService(GiftRepository giftRepository, GiftRecipientRepository giftRecipientRepository, OrganizationAccountContactRepository contactRepository, GiftAccessService giftAccessService, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
@@ -38,16 +40,22 @@ public class GiftRecipientEndpointService {
         this.contactRepository = contactRepository;
         this.giftAccessService = giftAccessService;
         this.membershipRetrievalService = membershipRetrievalService;
+        this.contactAccessOperationUtility = new ContactAccessOperationUtility<>(contactRepository);
     }
 
     public MultiGiftRecipientResponseModel getRecipients(UUID giftId, Integer pageOffset, Integer pageLimit) {
         PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
         GiftEntity foundGift = findExistingGift(giftId);
+
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.READ);
+        giftAccessService.validateGiftEntityAccess(foundGift, loggedInUser);
 
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
         Page<UUID> giftRecipientIds = giftRecipientRepository.findByGiftId(giftId, pageRequest).map(GiftRecipientEntity::getContactId);
+        if (giftRecipientIds.isEmpty()) {
+            return MultiGiftRecipientResponseModel.empty();
+        }
+
         List<ContactSummaryModel> recipientModels = contactRepository.findAllById(giftRecipientIds)
                 .stream()
                 .map(ContactSummaryModel::fromEntity)
@@ -75,7 +83,6 @@ public class GiftRecipientEndpointService {
     @Transactional
     public void deleteRecipients(UUID giftId, GiftRecipientRequestModel recipientRequest) {
         findExistingGiftAndValidateInteraction(giftId, recipientRequest);
-        validateRequest(recipientRequest);
 
         List<GiftRecipientEntity> giftRecipientEntitiesToDelete = createGiftRecipientEntities(giftId, recipientRequest.getContactIds());
         giftRecipientRepository.deleteInBatch(giftRecipientEntitiesToDelete);
@@ -89,8 +96,16 @@ public class GiftRecipientEndpointService {
     private void findExistingGiftAndValidateInteraction(UUID giftId, GiftRecipientRequestModel requestModel) {
         GiftEntity foundGift = findExistingGift(giftId);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.INTERACT);
-        validateRequest(requestModel);
+        giftAccessService.validateGiftEntityAccess(foundGift, loggedInUser);
+
+        List<UUID> requestedContactIds = requestModel.getContactIds();
+        if (null == requestedContactIds || requestedContactIds.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'contactIds' is required and must not be empty");
+        }
+
+        if (!contactAccessOperationUtility.canUserAccessContacts(loggedInUser, requestedContactIds, AccessOperation.INTERACT)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Not all contacts provided are accessible by this user");
+        }
     }
 
     private List<GiftRecipientEntity> createGiftRecipientEntities(UUID giftId, List<UUID> contactIds) {
@@ -98,10 +113,6 @@ public class GiftRecipientEndpointService {
                 .stream()
                 .map(contactId -> new GiftRecipientEntity(giftId, contactId))
                 .collect(Collectors.toList());
-    }
-
-    private void validateRequest(GiftRecipientRequestModel requestModel) {
-        // FIXME implement
     }
 
 }

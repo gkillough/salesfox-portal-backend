@@ -5,7 +5,7 @@ import ai.salesfox.portal.common.service.contact.ContactAccessOperationUtility;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
-import ai.salesfox.portal.database.contact.profile.OrganizationAccountContactProfileRepository;
+import ai.salesfox.portal.database.contact.OrganizationAccountContactRepository;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.restriction.GiftOrgAccountRestrictionEntity;
 import ai.salesfox.portal.database.gift.restriction.GiftUserRestrictionEntity;
@@ -33,13 +33,13 @@ public class GiftAccessService {
     private final InventoryAccessService inventoryAccessService;
 
     @Autowired
-    public GiftAccessService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccountContactProfileRepository contactProfileRepository,
+    public GiftAccessService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccountContactRepository contactRepository,
                              InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository, InventoryAccessService inventoryAccessService) {
         this.membershipRetrievalService = membershipRetrievalService;
         this.inventoryRepository = inventoryRepository;
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryAccessService = inventoryAccessService;
-        this.contactAccessOperationUtility = new ContactAccessOperationUtility<>(membershipRetrievalService, contactProfileRepository);
+        this.contactAccessOperationUtility = new ContactAccessOperationUtility<>(contactRepository);
     }
 
     public void validateGiftAccess(GiftEntity gift, UserEntity userRequestingAccess, AccessOperation contactAccessOperation) {
@@ -76,7 +76,7 @@ public class GiftAccessService {
         }
     }
 
-    private void validateGiftEntityAccess(GiftEntity entity, UserEntity loggedInUser) {
+    public void validateGiftEntityAccess(GiftEntity entity, UserEntity loggedInUser) {
         if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return;
         }
