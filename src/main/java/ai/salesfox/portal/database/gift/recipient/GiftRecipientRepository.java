@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface GiftRecipientRepository extends JpaRepository<GiftRecipientEntity, GiftRecipientPK> {
     Page<GiftRecipientEntity> findByGiftId(UUID giftId, Pageable pageable);
 
+    void deleteByGiftId(UUID giftId);
+
 }

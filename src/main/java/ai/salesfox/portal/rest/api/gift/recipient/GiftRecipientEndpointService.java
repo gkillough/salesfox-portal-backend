@@ -57,25 +57,28 @@ public class GiftRecipientEndpointService {
 
     @Transactional
     public void setRecipients(UUID giftId, GiftRecipientRequestModel recipientRequest) {
-        GiftEntity foundGift = findExistingGiftAndValidateInteraction(giftId, recipientRequest);
-        deleteRecipients(giftId, recipientRequest.getContactIds());
-        addRecipients();
+        findExistingGiftAndValidateInteraction(giftId, recipientRequest);
 
-        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
+        giftRecipientRepository.deleteByGiftId(giftId);
+        List<GiftRecipientEntity> giftRecipients = createGiftRecipientEntities(giftId, recipientRequest.getContactIds());
+        giftRecipientRepository.saveAll(giftRecipients);
     }
 
     @Transactional
     public void appendRecipients(UUID giftId, GiftRecipientRequestModel recipientRequest) {
-        GiftEntity foundGift = findExistingGiftAndValidateInteraction(giftId, recipientRequest);
-        addRecipients();
-        // FIXME implement
-        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED);
+        findExistingGiftAndValidateInteraction(giftId, recipientRequest);
+
+        List<GiftRecipientEntity> giftRecipients = createGiftRecipientEntities(giftId, recipientRequest.getContactIds());
+        giftRecipientRepository.saveAll(giftRecipients);
     }
 
     @Transactional
     public void deleteRecipients(UUID giftId, GiftRecipientRequestModel recipientRequest) {
         findExistingGiftAndValidateInteraction(giftId, recipientRequest);
-        deleteRecipients(giftId, recipientRequest.getContactIds());
+        validateRequest(recipientRequest);
+
+        List<GiftRecipientEntity> giftRecipientEntitiesToDelete = createGiftRecipientEntities(giftId, recipientRequest.getContactIds());
+        giftRecipientRepository.deleteInBatch(giftRecipientEntitiesToDelete);
     }
 
     private GiftEntity findExistingGift(UUID giftId) {
@@ -83,24 +86,18 @@ public class GiftRecipientEndpointService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    private GiftEntity findExistingGiftAndValidateInteraction(UUID giftId, GiftRecipientRequestModel requestModel) {
+    private void findExistingGiftAndValidateInteraction(UUID giftId, GiftRecipientRequestModel requestModel) {
         GiftEntity foundGift = findExistingGift(giftId);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.INTERACT);
         validateRequest(requestModel);
-        return foundGift;
     }
 
-    private void deleteRecipients(UUID giftId, List<UUID> contactIds) {
-        List<GiftRecipientEntity> giftRecipientEntitiesToDelete = contactIds
+    private List<GiftRecipientEntity> createGiftRecipientEntities(UUID giftId, List<UUID> contactIds) {
+        return contactIds
                 .stream()
                 .map(contactId -> new GiftRecipientEntity(giftId, contactId))
                 .collect(Collectors.toList());
-        giftRecipientRepository.deleteInBatch(giftRecipientEntitiesToDelete);
-    }
-
-    public void addRecipients() {
-        // FIXME implement asynchronously
     }
 
     private void validateRequest(GiftRecipientRequestModel requestModel) {
