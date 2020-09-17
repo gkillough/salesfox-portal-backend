@@ -10,6 +10,8 @@ pipelines:
         script:
           - bash ./gradlew test
     - step:
+        caches:
+          - docker
         image: salesfox/pack:11
         services:
           - docker
@@ -17,6 +19,7 @@ pipelines:
           - ./ci-scripts/container_build.sh
           - ./ci-scripts/container_scan.sh
           - ./ci-scripts/app_scan.sh
+          - ./ci-scripts/container_publish.sh
         artifacts:
           - reports/*
 
