@@ -1,0 +1,26 @@
+image: openjdk:11
+
+pipelines:
+  default:
+    - step:
+        caches:
+          - gradle
+        services:
+          - postgres
+        script:
+          - bash ./gradlew test
+    - step:
+        image: salesfox/pack:11
+        services:
+          - docker
+        script:
+          - ./ci-scripts/container_build.sh
+          - ./ci-scripts/container_scan.sh
+          - ./ci-scripts/app_scan.sh
+        artifacts:
+          - reports/*
+
+definitions:
+  services:
+    postgres:
+      image: postgres:12.3-alpine
