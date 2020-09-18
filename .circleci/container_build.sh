@@ -4,7 +4,7 @@ set -e
 
 SHORT_SHA=${CIRCLE_SHA1:0:7}
 
-DOCKER_IMAGE_NAME=${CIRCLE_BRANCH}-${SHORT_SHA}
+docker_image_name=${CIRCLE_BRANCH}-${SHORT_SHA}
 repository="salesfox/portal-backend"
 
 docker login -u salesfox -p ${DOCKERHUB_PASSWORD}
