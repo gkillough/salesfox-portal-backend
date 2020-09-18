@@ -10,6 +10,6 @@ repository="salesfox/portal-backend"
 pack build -v $repository:$docker_image_name \
   --builder heroku/buildpacks:18 \
   --buildpack heroku/java \
-  --buildpack heroku/gradle
+  --buildpack heroku/gradle \
   --buildpack heroku/procfile \
   --path .
