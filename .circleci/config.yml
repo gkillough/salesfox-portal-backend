@@ -17,6 +17,7 @@ jobs:
       - run: tar xvf pack-v0.13.1-linux.tgz
       - run: mv pack /usr/local/bin/pack
       - run: apk add --update bash
+      - setup_remote_docker
       - run:
           name: Build Container
           command: .circleci/container_build.sh
