@@ -26,6 +26,8 @@ jobs:
       - run:
           name: Container Security Scan
           command: .circleci/container_publish.sh
+      - store_artifacts:
+          path: ./reports
 
 workflows:
   version: 2
