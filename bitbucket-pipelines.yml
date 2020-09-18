@@ -2,13 +2,13 @@ image: openjdk:11
 
 pipelines:
   default:
-    - step:
-        caches:
-          - gradle
+    # - step:
+    #     caches:
+    #       - gradle
         # services:
         #   - postgres
-        script:
-          - bash ./gradlew test
+        # script:
+        #   - bash ./gradlew test
     - step:
         caches:
           - docker
