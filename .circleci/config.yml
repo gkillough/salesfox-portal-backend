@@ -23,9 +23,9 @@ jobs:
       - run:
           name: App Security Scan
           command: .circleci/app_scan.sh
-      - run:
-          name: Container Security Scan
-          command: .circleci/container_publish.sh
+      # - run:
+      #     name: Container Security Scan
+      #     command: .circleci/container_publish.sh
       - store_artifacts:
           path: ./reports
 
