@@ -12,5 +12,4 @@ pack build -v $repository:$docker_image_name \
   --buildpack heroku/java \
   --buildpack heroku/gradle
   --buildpack heroku/procfile \
-  --path . \
-  --publish
+  --path .
