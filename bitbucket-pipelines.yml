@@ -5,8 +5,8 @@ pipelines:
     - step:
         caches:
           - gradle
-        services:
-          - postgres
+        # services:
+        #   - postgres
         script:
           - bash ./gradlew test
     - step:
