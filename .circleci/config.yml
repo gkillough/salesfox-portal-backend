@@ -1,0 +1,37 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: openjdk:11
+    steps:
+      - checkout
+      - run:
+          name: Test
+          command: bash ./gradlew test
+  build:
+    docker:
+    - image: salesfox/pack:11
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Container
+          command: ./ci-scripts/container_build.sh
+      - run:
+          name: Container Security Scan
+          command: ./ci-scripts/container_scan.sh
+      - run:
+          name: App Security Scan
+          command: ./ci-scripts/app_scan.sh
+      - run:
+          name: Container Security Scan
+          command: ./ci-scripts/container_publish.sh
+
+workflows:
+  version: 2
+  test_and_build:
+    jobs:
+      - test
+      - build:
+          requires:
+            - test
