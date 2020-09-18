@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-SHORT_SHA=${BITBUCKET_COMMIT:0:7}
+SHORT_SHA=${CIRCLE_SHA1:0:7}
 
-docker_image_name=${BITBUCKET_BRANCH}-${SHORT_SHA}
+docker_image_name=${CIRCLE_BRANCH}-${SHORT_SHA}
 repository="salesfox/portal-backend"
 
 trivy image \
