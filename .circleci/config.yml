@@ -16,16 +16,16 @@ jobs:
       - setup_remote_docker
       - run:
           name: Build Container
-          command: ./circleci/container_build.sh
+          command: .circleci/container_build.sh
       - run:
           name: Container Security Scan
-          command: ./circleci/container_scan.sh
+          command: .circleci/container_scan.sh
       - run:
           name: App Security Scan
-          command: ./circleci/app_scan.sh
+          command: .circleci/app_scan.sh
       - run:
           name: Container Security Scan
-          command: ./circleci/container_publish.sh
+          command: .circleci/container_publish.sh
 
 workflows:
   version: 2
