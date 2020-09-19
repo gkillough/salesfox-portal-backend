@@ -11,8 +11,11 @@ import ai.salesfox.portal.database.contact.interaction.ContactInteractionReposit
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 public class ContactInteractionsService {
@@ -22,6 +25,14 @@ public class ContactInteractionsService {
     public ContactInteractionsService(OrganizationAccountContactRepository contactRepository, ContactInteractionRepository contactInteractionRepository) {
         this.contactRepository = contactRepository;
         this.contactInteractionRepository = contactInteractionRepository;
+    }
+
+    public List<ContactInteractionEntity> addContactInteractions(UserEntity interactingUser, Collection<UUID> contactIds, InteractionMedium medium, InteractionClassification classification, String note) {
+        List<ContactInteractionEntity> contactInteractions = contactRepository.findAllById(contactIds)
+                .stream()
+                .map(contact -> createInteractionEntity(interactingUser, contact, medium, classification, note, PortalDateTimeUtils.getCurrentDate()))
+                .collect(Collectors.toList());
+        return contactInteractionRepository.saveAll(contactInteractions);
     }
 
     public Optional<ContactInteractionEntity> addContactInteraction(UserEntity interactingUser, UUID contactId, InteractionMedium medium, InteractionClassification classification, String note) {
@@ -34,8 +45,12 @@ public class ContactInteractionsService {
     }
 
     public ContactInteractionEntity addContactInteraction(UserEntity interactingUser, OrganizationAccountContactEntity contact, InteractionMedium medium, InteractionClassification classification, String note, LocalDate date) {
-        ContactInteractionEntity interactionToSave = new ContactInteractionEntity(null, contact.getContactId(), interactingUser.getUserId(), medium.name(), classification.name(), date, note);
+        ContactInteractionEntity interactionToSave = createInteractionEntity(interactingUser, contact, medium, classification, note, date);
         return contactInteractionRepository.save(interactionToSave);
+    }
+
+    private ContactInteractionEntity createInteractionEntity(UserEntity interactingUser, OrganizationAccountContactEntity contact, InteractionMedium medium, InteractionClassification classification, String note, LocalDate date) {
+        return new ContactInteractionEntity(null, contact.getContactId(), interactingUser.getUserId(), medium.name(), classification.name(), date, note);
     }
 
 }
