@@ -1,0 +1,32 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: openjdk:11
+    steps:
+      - checkout
+      - run:
+          name: Test
+          command: bash ./gradlew test
+  build:
+    docker:
+    - image: docker:18.06.1-ce-git
+    steps:
+      - checkout
+      - run: wget https://github.com/buildpacks/pack/releases/download/v0.13.1/pack-v0.13.1-linux.tgz
+      - run: tar xvf pack-v0.13.1-linux.tgz
+      - run: mv pack /usr/local/bin/pack
+      - run: apk add --update bash
+      - setup_remote_docker
+      - run:
+          name: Build Container
+          command: .circleci/container_build.sh
+
+workflows:
+  version: 2
+  test_and_build:
+    jobs:
+      - test
+      - build:
+          requires:
+            - test

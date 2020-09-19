@@ -6,6 +6,7 @@ tempResources/
 !**/src/main/**
 !**/src/test/**
 src/test/resources/ignoredTestOutput/
+**/bin
 
 ### STS ###
 .apt_generated
