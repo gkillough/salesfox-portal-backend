@@ -16,11 +16,12 @@ public class ContactSummaryModel {
     private UUID contactId;
     private String firstName;
     private String lastName;
+    private String email;
     private String companyName;
 
     public static ContactSummaryModel fromEntity(OrganizationAccountContactEntity contactEntity) {
         String companyName = Optional.ofNullable(contactEntity.getContactProfileEntity()).map(OrganizationAccountContactProfileEntity::getContactOrganizationName).orElse("Company Unknown");
-        return new ContactSummaryModel(contactEntity.getContactId(), contactEntity.getFirstName(), contactEntity.getLastName(), companyName);
+        return new ContactSummaryModel(contactEntity.getContactId(), contactEntity.getFirstName(), contactEntity.getLastName(), contactEntity.getEmail(), companyName);
     }
 
 }
