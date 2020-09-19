@@ -1,6 +1,5 @@
 package ai.salesfox.portal.rest.api.gift.util;
 
-import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomIconDetailEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomTextDetailEntity;
@@ -10,29 +9,17 @@ import ai.salesfox.portal.database.gift.restriction.GiftOrgAccountRestrictionEnt
 import ai.salesfox.portal.database.gift.restriction.GiftUserRestrictionEntity;
 import ai.salesfox.portal.database.gift.tracking.GiftTrackingEntity;
 import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
-import ai.salesfox.portal.rest.api.contact.model.ContactSummaryModel;
 import ai.salesfox.portal.rest.api.gift.model.GiftResponseModel;
 import ai.salesfox.portal.rest.api.gift.model.GiftTrackingModel;
 import ai.salesfox.portal.rest.api.user.common.model.UserSummaryModel;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
 public class GiftResponseModelUtils {
     public static GiftResponseModel convertToResponseModel(GiftEntity gift) {
-        return convertToResponseModel(gift, List.of());
-    }
-
-    // TODO update this when recipients are managed by their own endpoint
-    public static GiftResponseModel convertToResponseModel(GiftEntity gift, List<OrganizationAccountContactEntity> recipients) {
         UserSummaryModel requestingUserModel = UserSummaryModel.fromEntity(gift.getRequestingUserEntity());
-        ContactSummaryModel contactModel = recipients
-                .stream()
-                .map(ContactSummaryModel::fromEntity)
-                .findFirst()
-                .orElse(null);
 
         UUID noteId = extractDetailIdOrNull(gift.getGiftNoteDetailEntity(), GiftNoteDetailEntity::getNoteId);
         UUID itemId = extractDetailIdOrNull(gift.getGiftItemDetailEntity(), GiftItemDetailEntity::getItemId);
@@ -44,7 +31,7 @@ public class GiftResponseModelUtils {
         RestrictionModel restrictionModel = new RestrictionModel();
         Optional.ofNullable(gift.getGiftOrgAccountRestrictionEntity()).map(GiftOrgAccountRestrictionEntity::getOrgAccountId).ifPresent(restrictionModel::setOrganizationAccountId);
         Optional.ofNullable(gift.getGiftUserRestrictionEntity()).map(GiftUserRestrictionEntity::getUserId).ifPresent(restrictionModel::setUserId);
-        return new GiftResponseModel(gift.getGiftId(), requestingUserModel, contactModel, noteId, itemId, customTextId, customIconId, trackingModel, restrictionModel);
+        return new GiftResponseModel(gift.getGiftId(), requestingUserModel, noteId, itemId, customTextId, customIconId, trackingModel, restrictionModel);
     }
 
     public static GiftTrackingModel createTrackingModel(GiftTrackingEntity giftTracking) {

@@ -10,7 +10,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DraftGiftRequestModel {
-    private UUID contactId;
     private UUID noteId;
     private UUID itemId;
     private UUID customTextId;

@@ -1,7 +1,6 @@
 package ai.salesfox.portal.rest.api.gift.model;
 
 import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
-import ai.salesfox.portal.rest.api.contact.model.ContactSummaryModel;
 import ai.salesfox.portal.rest.api.user.common.model.UserSummaryModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +14,6 @@ import java.util.UUID;
 public class GiftResponseModel {
     private UUID giftId;
     private UserSummaryModel requestingUser;
-    private ContactSummaryModel contact;
     private UUID noteId;
     private UUID itemId;
     private UUID customTextId;
