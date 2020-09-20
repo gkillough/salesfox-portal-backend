@@ -2,7 +2,6 @@ package ai.salesfox.portal.database.gift;
 
 import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
 import ai.salesfox.portal.database.account.entity.UserEntity;
-import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomIconDetailEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomTextDetailEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
@@ -17,7 +16,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -38,19 +36,6 @@ public class GiftEntity implements Serializable {
     @OneToOne
     @JoinColumn(name = "requesting_user_id", referencedColumnName = "user_id", updatable = false, insertable = false)
     private UserEntity requestingUserEntity;
-
-    @ManyToMany
-    @JoinTable(
-            schema = "portal",
-            name = "gift_recipients",
-            joinColumns = {
-                    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
-            },
-            inverseJoinColumns = {
-                    @JoinColumn(name = "contact_id", referencedColumnName = "contact_id", updatable = false, insertable = false)
-            }
-    )
-    private List<OrganizationAccountContactEntity> giftRecipients;
 
     @OneToOne
     @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)

@@ -12,6 +12,7 @@ import ai.salesfox.portal.common.service.note.NoteCreditAvailabilityService;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
+import ai.salesfox.portal.database.gift.recipient.GiftRecipientRepository;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
@@ -31,12 +32,18 @@ public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<Salesf
     private final EmailMessagingService emailMessagingService;
 
     @Autowired
-    public ScheduledGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService,
+    public ScheduledGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService, GiftRecipientRepository giftRecipientRepository,
                                           NoteCreditsRepository noteCreditsRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
-                                          ContactInteractionsService contactInteractionsService, GiftTrackingService giftTrackingService1, EmailMessagingService emailMessagingService) {
-        super(giftTrackingService, giftItemService, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService);
-        this.giftTrackingService = giftTrackingService1;
+                                          ContactInteractionsService contactInteractionsService, EmailMessagingService emailMessagingService) {
+        super(giftTrackingService, giftItemService, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService);
+        this.giftTrackingService = giftTrackingService;
         this.emailMessagingService = emailMessagingService;
+    }
+
+    @Override
+    protected void handleNoRecipients(GiftEntity foundGift, UserEntity submittingUser) throws SalesfoxException {
+        unscheduleGift(foundGift, submittingUser);
+        notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), "A gift was scheduled to be submitted, but it had no recipients.");
     }
 
     @Override

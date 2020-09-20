@@ -6,7 +6,6 @@ import ai.salesfox.portal.common.time.PortalDateTimeUtils;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.catalogue.item.CatalogueItemRepository;
-import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactRepository;
 import ai.salesfox.portal.database.customization.branding_text.CustomBrandingTextEntity;
 import ai.salesfox.portal.database.customization.branding_text.CustomBrandingTextRepository;
@@ -26,7 +25,6 @@ import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailRepository;
 import ai.salesfox.portal.database.gift.note.GiftNoteDetailEntity;
 import ai.salesfox.portal.database.gift.note.GiftNoteDetailRepository;
-import ai.salesfox.portal.database.gift.recipient.GiftRecipientEntity;
 import ai.salesfox.portal.database.gift.recipient.GiftRecipientRepository;
 import ai.salesfox.portal.database.gift.restriction.GiftOrgAccountRestrictionEntity;
 import ai.salesfox.portal.database.gift.restriction.GiftOrgAccountRestrictionRepository;
@@ -128,7 +126,7 @@ public class GiftService {
 
         List<GiftResponseModel> responseModels = accessibleGifts
                 .stream()
-                .map(gift -> GiftResponseModelUtils.convertToResponseModel(gift, gift.getGiftRecipients()))
+                .map(GiftResponseModelUtils::convertToResponseModel)
                 .collect(Collectors.toList());
         return new MultiGiftModel(responseModels, accessibleGifts);
     }
@@ -139,7 +137,7 @@ public class GiftService {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.READ);
 
-        return GiftResponseModelUtils.convertToResponseModel(foundGift, foundGift.getGiftRecipients());
+        return GiftResponseModelUtils.convertToResponseModel(foundGift);
     }
 
     @Transactional
@@ -169,10 +167,7 @@ public class GiftService {
         }
 
         savedGift.setRequestingUserEntity(loggedInUser);
-        List<OrganizationAccountContactEntity> recipients = contactRepository.findById(requestModel.getContactId())
-                .map(List::of)
-                .orElseGet(List::of);
-        return GiftResponseModelUtils.convertToResponseModel(savedGift, recipients);
+        return GiftResponseModelUtils.convertToResponseModel(savedGift);
     }
 
     @Transactional
@@ -189,11 +184,6 @@ public class GiftService {
 
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         validateRequestModel(loggedInUser, userMembership, requestModel);
-
-        // TODO update gift recipient multiplicity when appropriate
-        contactRepository.findById(requestModel.getContactId())
-                .map(List::of)
-                .ifPresent(foundGift::setGiftRecipients);
         saveDetails(foundGift, requestModel);
 
         GiftTrackingEntity giftTrackingToUpdate = foundGift.getGiftTrackingEntity();
@@ -218,12 +208,6 @@ public class GiftService {
     }
 
     private void saveDetails(GiftEntity savedGift, DraftGiftRequestModel requestModel) {
-        if (requestModel.getContactId() != null) {
-            // TODO remove this when multiple contacts are possible
-            GiftRecipientEntity recipientToSave = new GiftRecipientEntity(savedGift.getGiftId(), requestModel.getContactId());
-            giftRecipientRepository.save(recipientToSave);
-        }
-
         if (requestModel.getNoteId() != null) {
             GiftNoteDetailEntity noteDetailToSave = new GiftNoteDetailEntity(savedGift.getGiftId(), requestModel.getNoteId());
             GiftNoteDetailEntity savedNoteDetail = noteDetailRepository.save(noteDetailToSave);
@@ -263,17 +247,7 @@ public class GiftService {
     // TODO clean this method up after a common restriction interface is implemented
     private void validateRequestModel(UserEntity loggedInUser, MembershipEntity userMembership, DraftGiftRequestModel requestModel) {
         List<String> errors = new ArrayList<>();
-        if (requestModel.getContactId() == null) {
-            errors.add("The request field 'contactId' is required");
-        } else {
-            Optional<OrganizationAccountContactEntity> optionalContact = contactRepository.findById(requestModel.getContactId());
-            if (optionalContact.isPresent()) {
-                giftAccessService.validateUserGiftSendingAccessForContact(loggedInUser, optionalContact.get());
-            } else {
-                errors.add("The contactId provided is invalid");
-            }
-        }
-
+        
         if (requestModel.getNoteId() == null && requestModel.getItemId() == null) {
             errors.add("A gift needs at least one note or one item");
         } else {

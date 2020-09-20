@@ -8,6 +8,7 @@ import ai.salesfox.portal.common.service.note.NoteCreditAvailabilityService;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
+import ai.salesfox.portal.database.gift.recipient.GiftRecipientRepository;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
@@ -19,10 +20,15 @@ import org.springframework.web.server.ResponseStatusException;
 @Component
 public class EndpointGiftSubmissionService extends GiftSubmissionUtility<ResponseStatusException> {
     @Autowired
-    public EndpointGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService,
+    public EndpointGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService, GiftRecipientRepository giftRecipientRepository,
                                          NoteCreditsRepository noteCreditsRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
                                          ContactInteractionsService contactInteractionsService) {
-        super(giftTrackingService, giftItemService, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService);
+        super(giftTrackingService, giftItemService, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService);
+    }
+
+    @Override
+    protected void handleNoRecipients(GiftEntity foundGift, UserEntity submittingUser) throws ResponseStatusException {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This gift has no recipients");
     }
 
     @Override
@@ -42,7 +48,7 @@ public class EndpointGiftSubmissionService extends GiftSubmissionUtility<Respons
 
     @Override
     protected void handleMissingNoteCredits(GiftEntity foundGift, UserEntity submittingUser) throws ResponseStatusException {
-        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "There was a problem tracking note-credits. Please contact support.");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough note-credits. Please purchase more.");
     }
 
     @Override
