@@ -48,7 +48,7 @@ public class EndpointGiftSubmissionService extends GiftSubmissionUtility<Respons
 
     @Override
     protected void handleMissingNoteCredits(GiftEntity foundGift, UserEntity submittingUser) throws ResponseStatusException {
-        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "There was a problem tracking note-credits. Please contact support.");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough note-credits. Please purchase more.");
     }
 
     @Override

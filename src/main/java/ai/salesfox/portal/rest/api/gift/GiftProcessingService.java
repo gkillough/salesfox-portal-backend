@@ -63,6 +63,11 @@ public class GiftProcessingService {
         GiftEntity foundGift = giftRepository.findById(giftId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        if (!foundGift.isSubmittable()) {
+            GiftTrackingEntity giftTrackingEntity = foundGift.getGiftTrackingEntity();
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Cannot submit a gift with the status '%s'", giftTrackingEntity.getStatus()));
+        }
+
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.INTERACT);
 
@@ -76,6 +81,10 @@ public class GiftProcessingService {
     public GiftResponseModel cancelGift(UUID giftId) {
         GiftEntity foundGift = giftRepository.findById(giftId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (foundGift.isSubmittable()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot cancel a gift that has not been submitted. Please discard it instead.");
+        }
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftAccess(foundGift, loggedInUser, AccessOperation.INTERACT);

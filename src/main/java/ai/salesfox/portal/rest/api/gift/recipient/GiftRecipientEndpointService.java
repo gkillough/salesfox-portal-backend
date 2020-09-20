@@ -95,6 +95,10 @@ public class GiftRecipientEndpointService {
 
     private void findExistingGiftAndValidateInteraction(UUID giftId, GiftRecipientRequestModel requestModel) {
         GiftEntity foundGift = findExistingGift(giftId);
+        if (!foundGift.isSubmittable()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot modify the recipients of a gift that has been submitted");
+        }
+
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         giftAccessService.validateGiftEntityAccess(foundGift, loggedInUser);
 
