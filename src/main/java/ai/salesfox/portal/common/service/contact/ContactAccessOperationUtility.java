@@ -7,6 +7,7 @@ import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactRepository;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +22,7 @@ public class ContactAccessOperationUtility<E extends Throwable> {
         return canUserAccessContacts(userRequestingAccess, List.of(contact.getContactId()), requestedAccessOperation);
     }
 
-    public boolean canUserAccessContacts(UserEntity userRequestingAccess, List<UUID> contactIds, AccessOperation requestedAccessOperation) {
+    public boolean canUserAccessContacts(UserEntity userRequestingAccess, Collection<UUID> contactIds, AccessOperation requestedAccessOperation) {
         MembershipEntity userMembership = userRequestingAccess.getMembershipEntity();
         String userRoleLevel = userMembership.getRoleEntity().getRoleLevel();
         if (PortalAuthorityConstants.PORTAL_ADMIN.equals(userRoleLevel)) {

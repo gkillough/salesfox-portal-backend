@@ -4,9 +4,10 @@ import ai.salesfox.portal.common.enumeration.AccessOperation;
 import ai.salesfox.portal.common.service.contact.ContactAccessOperationUtility;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
-import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactRepository;
 import ai.salesfox.portal.database.gift.GiftEntity;
+import ai.salesfox.portal.database.gift.recipient.GiftRecipientEntity;
+import ai.salesfox.portal.database.gift.recipient.GiftRecipientRepository;
 import ai.salesfox.portal.database.gift.restriction.GiftOrgAccountRestrictionEntity;
 import ai.salesfox.portal.database.gift.restriction.GiftUserRestrictionEntity;
 import ai.salesfox.portal.database.inventory.InventoryEntity;
@@ -21,21 +22,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 public class GiftAccessService {
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private final ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
+    private final GiftRecipientRepository giftRecipientRepository;
     private final InventoryRepository inventoryRepository;
     private final InventoryItemRepository inventoryItemRepository;
     private final InventoryAccessService inventoryAccessService;
 
     @Autowired
     public GiftAccessService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccountContactRepository contactRepository,
-                             InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository, InventoryAccessService inventoryAccessService) {
+                             GiftRecipientRepository giftRecipientRepository, InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository, InventoryAccessService inventoryAccessService) {
         this.membershipRetrievalService = membershipRetrievalService;
+        this.giftRecipientRepository = giftRecipientRepository;
         this.inventoryRepository = inventoryRepository;
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryAccessService = inventoryAccessService;
@@ -45,20 +49,12 @@ public class GiftAccessService {
     public void validateGiftAccess(GiftEntity gift, UserEntity userRequestingAccess, AccessOperation contactAccessOperation) {
         validateGiftEntityAccess(gift, userRequestingAccess);
 
-        // FIXME replace this when multiplicities are involved in gifting
-        Optional<OrganizationAccountContactEntity> giftContact = gift.getGiftRecipients()
+        Set<UUID> giftContactIds = giftRecipientRepository.findByGiftId(gift.getGiftId())
                 .stream()
-                .findFirst();
-        if (giftContact.isPresent()) {
-            if (!contactAccessOperationUtility.canUserAccessContact(userRequestingAccess, giftContact.get(), contactAccessOperation)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot perform the gifting operation for this contact");
-            }
-        }
-    }
-
-    public void validateUserGiftSendingAccessForContact(UserEntity userRequestingAccess, OrganizationAccountContactEntity contact) {
-        if (!contactAccessOperationUtility.canUserAccessContact(userRequestingAccess, contact, AccessOperation.INTERACT)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot send gifts to this contact");
+                .map(GiftRecipientEntity::getContactId)
+                .collect(Collectors.toSet());
+        if (!contactAccessOperationUtility.canUserAccessContacts(userRequestingAccess, giftContactIds, contactAccessOperation)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot perform the gifting operation for this contact");
         }
     }
 
