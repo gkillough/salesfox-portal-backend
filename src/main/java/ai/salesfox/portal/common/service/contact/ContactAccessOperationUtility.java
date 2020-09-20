@@ -11,7 +11,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-public class ContactAccessOperationUtility<E extends Throwable> {
+// TODO make this a service
+public class ContactAccessOperationUtility {
     private final OrganizationAccountContactRepository contactRepository;
 
     public ContactAccessOperationUtility(OrganizationAccountContactRepository contactRepository) {

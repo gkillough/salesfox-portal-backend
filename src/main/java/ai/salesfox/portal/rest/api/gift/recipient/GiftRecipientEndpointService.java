@@ -31,7 +31,7 @@ public class GiftRecipientEndpointService {
     private final OrganizationAccountContactRepository contactRepository;
     private final GiftAccessService giftAccessService;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private final ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
+    private final ContactAccessOperationUtility contactAccessOperationUtility;
 
     @Autowired
     public GiftRecipientEndpointService(GiftRepository giftRepository, GiftRecipientRepository giftRecipientRepository, OrganizationAccountContactRepository contactRepository, GiftAccessService giftAccessService, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
@@ -40,7 +40,7 @@ public class GiftRecipientEndpointService {
         this.contactRepository = contactRepository;
         this.giftAccessService = giftAccessService;
         this.membershipRetrievalService = membershipRetrievalService;
-        this.contactAccessOperationUtility = new ContactAccessOperationUtility<>(contactRepository);
+        this.contactAccessOperationUtility = new ContactAccessOperationUtility(contactRepository);
     }
 
     public MultiGiftRecipientResponseModel getRecipients(UUID giftId, Integer pageOffset, Integer pageLimit) {

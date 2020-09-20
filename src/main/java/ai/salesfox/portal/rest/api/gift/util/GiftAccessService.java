@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Component
 public class GiftAccessService {
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private final ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
+    private final ContactAccessOperationUtility contactAccessOperationUtility;
     private final GiftRecipientRepository giftRecipientRepository;
     private final InventoryRepository inventoryRepository;
     private final InventoryItemRepository inventoryItemRepository;
@@ -43,7 +43,7 @@ public class GiftAccessService {
         this.inventoryRepository = inventoryRepository;
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryAccessService = inventoryAccessService;
-        this.contactAccessOperationUtility = new ContactAccessOperationUtility<>(contactRepository);
+        this.contactAccessOperationUtility = new ContactAccessOperationUtility(contactRepository);
     }
 
     public void validateGiftAccess(GiftEntity gift, UserEntity userRequestingAccess, AccessOperation contactAccessOperation) {

@@ -45,7 +45,7 @@ public class ContactService {
     private final ContactOrganizationAccountRestrictionRepository contactOrgAcctRestrictionRepository;
     private final OrganizationAccountContactAddressRepository contactAddressRepository;
     private final OrganizationAccountContactProfileRepository contactProfileRepository;
-    private final ContactAccessOperationUtility<ResponseStatusException> contactAccessOperationUtility;
+    private final ContactAccessOperationUtility contactAccessOperationUtility;
 
     @Autowired
     public ContactService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, UserRepository userRepository, OrganizationAccountContactRepository contactRepository,
@@ -58,7 +58,7 @@ public class ContactService {
         this.contactOrgAcctRestrictionRepository = contactOrgAcctRestrictionRepository;
         this.contactAddressRepository = contactAddressRepository;
         this.contactProfileRepository = contactProfileRepository;
-        this.contactAccessOperationUtility = new ContactAccessOperationUtility<>(contactRepository);
+        this.contactAccessOperationUtility = new ContactAccessOperationUtility(contactRepository);
     }
 
     public MultiContactModel getContacts(boolean contactActiveStatus, Integer pageOffset, Integer pageLimit) {
