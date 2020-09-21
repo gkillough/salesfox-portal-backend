@@ -59,12 +59,17 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
             return Optional.empty();
         }
 
+        Integer recipientCount = giftRecipientIds.size();
+
         MembershipEntity userMembership = submittingUser.getMembershipEntity();
         GiftItemDetailEntity giftItemDetail = gift.getGiftItemDetailEntity();
         if (null != giftItemDetail) {
             Optional<InventoryItemEntity> optionalGiftItem = giftItemService.findInventoryItemForGift(submittingUser, userMembership, giftItemDetail);
             if (optionalGiftItem.isPresent()) {
-                giftItemService.decrementItemQuantityOrElse(optionalGiftItem.get(), giftItem -> handleItemOutOfStock(gift, giftItem, submittingUser));
+                boolean inventorySuccess = giftItemService.decrementItemQuantityOrElse(optionalGiftItem.get(), recipientCount.longValue(), giftItem -> handleItemOutOfStock(gift, giftItem, submittingUser));
+                if (!inventorySuccess) {
+                    return Optional.empty();
+                }
             } else {
                 handleItemMissingFromInventory(gift, giftItemDetail, submittingUser);
                 return Optional.empty();
@@ -75,13 +80,17 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
         if (null != giftNoteDetail) {
             Optional<NoteCreditsEntity> optionalNoteCredits = noteCreditsRepository.findAccessibleNoteCredits(userMembership.getOrganizationAccountId(), submittingUser.getUserId());
             if (optionalNoteCredits.isPresent()) {
-                noteCreditAvailabilityService.decrementNoteCreditsOrElse(optionalNoteCredits.get(), noteCredits -> handleNotEnoughNoteCredits(gift, noteCredits, submittingUser));
+                boolean noteCreditSuccess = noteCreditAvailabilityService.decrementNoteCreditsOrElse(optionalNoteCredits.get(), recipientCount, noteCredits -> handleNotEnoughNoteCredits(gift, noteCredits, submittingUser));
+                if (!noteCreditSuccess) {
+                    return Optional.empty();
+                }
             } else {
                 handleMissingNoteCredits(gift, submittingUser);
                 return Optional.empty();
             }
         }
 
+        // TODO replace giftTrackingService with something like a "GiftPartnerFulfilmentService" that calls it after sending the gift request to our partners
         giftTrackingService.updateGiftTrackingInfo(gift, submittingUser, GiftTrackingStatus.SUBMITTED.name());
         contactInteractionsService.addContactInteractions(submittingUser, giftRecipientIds, InteractionMedium.MAIL, InteractionClassification.OUTGOING, "(Auto-generated) Sent gift/note");
         return Optional.of(gift);

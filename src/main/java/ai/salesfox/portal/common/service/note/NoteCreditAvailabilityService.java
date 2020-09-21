@@ -24,12 +24,13 @@ public class NoteCreditAvailabilityService {
         noteCreditsRepository.save(noteCredit);
     }
 
-    public <E extends Throwable> void decrementNoteCreditsOrElse(NoteCreditsEntity noteCredits, ThrowingConsumer<NoteCreditsEntity, E> outOfCreditsHandler) throws E {
-        if (noteCredits.getAvailableCredits() < 1) {
+    public <E extends Throwable> boolean decrementNoteCreditsOrElse(NoteCreditsEntity noteCredits, int quantity, ThrowingConsumer<NoteCreditsEntity, E> outOfCreditsHandler) throws E {
+        if (noteCredits.getAvailableCredits() < quantity) {
             outOfCreditsHandler.accept(noteCredits);
-        } else {
-            incrementNoteCredits(noteCredits, -1);
+            return false;
         }
+        incrementNoteCredits(noteCredits, -quantity);
+        return true;
     }
 
 }

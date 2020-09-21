@@ -38,13 +38,14 @@ public class GiftItemService {
         inventoryItemRepository.save(inventoryItemForGift);
     }
 
-    public <E extends Throwable> void decrementItemQuantityOrElse(InventoryItemEntity inventoryItemForGift, ThrowingConsumer<InventoryItemEntity, E> outOfStockHandler) throws E {
-        if (inventoryItemForGift.getQuantity() < 1L) {
+    public <E extends Throwable> boolean decrementItemQuantityOrElse(InventoryItemEntity inventoryItemForGift, long quantity, ThrowingConsumer<InventoryItemEntity, E> outOfStockHandler) throws E {
+        if (inventoryItemForGift.getQuantity() < quantity) {
             outOfStockHandler.accept(inventoryItemForGift);
-        } else {
-            inventoryItemForGift.setQuantity(inventoryItemForGift.getQuantity() - 1L);
-            inventoryItemRepository.save(inventoryItemForGift);
+            return false;
         }
+        inventoryItemForGift.setQuantity(inventoryItemForGift.getQuantity() - quantity);
+        inventoryItemRepository.save(inventoryItemForGift);
+        return true;
     }
 
 }
