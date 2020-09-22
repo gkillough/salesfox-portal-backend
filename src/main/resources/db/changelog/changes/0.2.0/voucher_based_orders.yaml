@@ -3,5 +3,7 @@ databaseChangeLog:
       id: voucher-based-orders-1
       author: gavinkillough
       changes:
-        # FIXME placeholder
-        - sql: SELECT COUNT(*) FROM portal.orders;
+        - dropTable:
+            schemaName: portal
+            tableName: order_request_statuses
+            cascadeConstraints: true
