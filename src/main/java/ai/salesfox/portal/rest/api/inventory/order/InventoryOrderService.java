@@ -1,12 +1,6 @@
 package ai.salesfox.portal.rest.api.inventory.order;
 
-import ai.salesfox.portal.rest.api.inventory.order.model.InventoryOrderProcessingRequestModel;
-import ai.salesfox.portal.rest.api.inventory.order.model.InventoryOrderRequestModel;
-import ai.salesfox.portal.rest.api.inventory.order.model.InventoryOrderResponseModel;
-import ai.salesfox.portal.rest.api.inventory.order.model.MultiInventoryOrderModel;
-import ai.salesfox.portal.common.enumeration.InventoryOrderRequestStatus;
 import ai.salesfox.portal.common.service.catalogue.CatalogueItemAccessUtils;
-import ai.salesfox.portal.common.time.PortalDateTimeUtils;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.catalogue.item.CatalogueItemEntity;
@@ -16,35 +10,25 @@ import ai.salesfox.portal.database.inventory.InventoryRepository;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
 import ai.salesfox.portal.database.inventory.item.InventoryItemPK;
 import ai.salesfox.portal.database.inventory.item.InventoryItemRepository;
-import ai.salesfox.portal.database.order.InventoryOrderRequestEntity;
-import ai.salesfox.portal.database.order.InventoryOrderRequestRepository;
-import ai.salesfox.portal.database.order.status.InventoryOrderRequestStatusEntity;
-import ai.salesfox.portal.database.order.status.InventoryOrderRequestStatusRepository;
-import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
 import ai.salesfox.portal.rest.api.inventory.InventoryAccessService;
+import ai.salesfox.portal.rest.api.inventory.order.model.InventoryOrderRequestModel;
+import ai.salesfox.portal.rest.api.inventory.order.model.InventoryOrderResponseModel;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.EnumUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 @Component
 public class InventoryOrderService {
-    private final InventoryOrderRequestRepository orderRequestRepository;
-    private final InventoryOrderRequestStatusRepository orderRequestStatusRepository;
     private final CatalogueItemRepository catalogueItemRepository;
     private final InventoryRepository inventoryRepository;
     private final InventoryItemRepository inventoryItemRepository;
@@ -52,48 +36,13 @@ public class InventoryOrderService {
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
-    public InventoryOrderService(InventoryOrderRequestRepository orderRequestRepository, InventoryOrderRequestStatusRepository orderRequestStatusRepository,
-                                 CatalogueItemRepository catalogueItemRepository, InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository,
+    public InventoryOrderService(CatalogueItemRepository catalogueItemRepository, InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository,
                                  InventoryAccessService inventoryAccessService, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
-        this.orderRequestRepository = orderRequestRepository;
-        this.orderRequestStatusRepository = orderRequestStatusRepository;
         this.catalogueItemRepository = catalogueItemRepository;
         this.inventoryRepository = inventoryRepository;
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryAccessService = inventoryAccessService;
         this.membershipRetrievalService = membershipRetrievalService;
-    }
-
-    // TODO consider adding an option to filter by requesting-user
-    public MultiInventoryOrderModel getOrders(UUID inventoryId, Integer pageOffset, Integer pageLimit) {
-        findInventoryAndValidateAccess(inventoryId);
-        PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
-
-        Page<InventoryOrderRequestEntity> accessibleOrderRequests = getAccessibleOrderRequests(inventoryId, pageOffset, pageLimit);
-        if (accessibleOrderRequests.isEmpty()) {
-            return MultiInventoryOrderModel.empty();
-        }
-
-        List<InventoryOrderResponseModel> responseModels = accessibleOrderRequests
-                .stream()
-                .map(this::convertToResponseModel)
-                .collect(Collectors.toList());
-        return new MultiInventoryOrderModel(responseModels, accessibleOrderRequests);
-    }
-
-    public InventoryOrderResponseModel getOrder(UUID inventoryId, UUID orderId) {
-        findInventoryAndValidateAccess(inventoryId);
-        InventoryOrderRequestEntity foundOrder = orderRequestRepository.findById(orderId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        CatalogueItemEntity targetItem = catalogueItemRepository.findById(foundOrder.getCatalogueItemId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", foundOrder.getCatalogueItemId())));
-        validateReadAccess(foundOrder, targetItem);
-
-        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        validateItemAccess(loggedInUser, targetItem);
-
-        return convertToResponseModel(foundOrder);
     }
 
     @Transactional
@@ -110,8 +59,12 @@ public class InventoryOrderService {
                 .filter(CatalogueItemEntity::getIsActive)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", requestModel.getCatalogueItemId())));
         validateItemAccess(loggedInUser, targetItem);
-        validateItemQuantity(targetItem, requestModel.getQuantity());
 
+        Integer requestedQuantity = requestModel.getQuantity();
+        validateItemQuantity(targetItem, requestedQuantity);
+
+        // TODO insert payment processing in the middle of this step
+        /*
         InventoryOrderRequestEntity orderToSave = new InventoryOrderRequestEntity(
                 null,
                 targetItem.getItemId(),
@@ -119,7 +72,7 @@ public class InventoryOrderService {
                 userMembership.getOrganizationAccountId(),
                 loggedInUser.getUserId(),
                 loggedInUser.getUserId(),
-                requestModel.getQuantity(),
+                requestedQuantity,
                 targetItem.getPrice()
         );
         InventoryOrderRequestEntity savedOrder = orderRequestRepository.save(orderToSave);
@@ -134,50 +87,19 @@ public class InventoryOrderService {
         savedOrder.setInventoryOrderRequestStatusEntity(savedStatus);
 
         return convertToResponseModel(savedOrder);
-    }
+         */
 
-    @Transactional
-    // TODO clean this method up
-    public void processOrder(UUID inventoryId, UUID orderId, InventoryOrderProcessingRequestModel requestModel) {
-        findInventoryAndValidateAccess(inventoryId);
-        InventoryOrderRequestEntity foundOrder = orderRequestRepository.findById(orderId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        InventoryItemEntity itemToSave = findOrCreateInventoryItemEntity(foundInventory, targetItem);
+        Long newInventoryItemQuantity = Math.addExact(itemToSave.getQuantity(), requestedQuantity);
+        itemToSave.setQuantity(newInventoryItemQuantity);
+        inventoryItemRepository.save(itemToSave);
 
-        InventoryOrderRequestStatusEntity orderStatusEntity = orderRequestStatusRepository.findByOrderId(orderId)
-                .orElseThrow(() -> {
-                    log.error("No order request status found for order with order id [{}]", orderId);
-                    return new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-                });
-        if (InventoryOrderRequestStatus.COMPLETED.name().equals(orderStatusEntity.getProcessingStatus())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot update the status of a completed order");
-        }
+        Long newCatalogItemQuantity = Math.subtractExact(targetItem.getQuantity(), requestedQuantity);
+        targetItem.setQuantity(newCatalogItemQuantity);
+        catalogueItemRepository.save(targetItem);
 
-        if (StringUtils.isBlank(requestModel.getNewStatus())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'newStatus' cannot be blank");
-        } else if (orderStatusEntity.getProcessingStatus().equals(requestModel.getNewStatus())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'newStatus' cannot be the same as the current order status");
-        } else if (!EnumUtils.isValidEnum(InventoryOrderRequestStatus.class, requestModel.getNewStatus())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The field 'newStatus' is not a valid status. Acceptable values: %s", Arrays.toString(InventoryOrderRequestStatus.values())));
-        }
-
-        InventoryOrderRequestStatus newOrderStatus = InventoryOrderRequestStatus.valueOf(requestModel.getNewStatus());
-        if (InventoryOrderRequestStatus.COMPLETED.equals(newOrderStatus)) {
-            CatalogueItemEntity orderedItem = foundOrder.getCatalogueItemEntity();
-            validateItemQuantity(orderedItem, foundOrder.getQuantity());
-
-            InventoryItemEntity itemToSave = findOrCreateInventoryItemEntity(foundOrder);
-            Long newInventoryItemQuantity = Math.addExact(itemToSave.getQuantity(), foundOrder.getQuantity());
-            itemToSave.setQuantity(newInventoryItemQuantity);
-            inventoryItemRepository.save(itemToSave);
-
-            Long newCatalogItemQuantity = Math.subtractExact(orderedItem.getQuantity(), foundOrder.getQuantity());
-            orderedItem.setQuantity(newCatalogItemQuantity);
-            catalogueItemRepository.save(orderedItem);
-        }
-
-        orderStatusEntity.setDateUpdated(PortalDateTimeUtils.getCurrentDateTime());
-        orderStatusEntity.setProcessingStatus(requestModel.getNewStatus());
-        orderRequestStatusRepository.save(orderStatusEntity);
+        // TODO fix this when this method is broken up for payment processing
+        return null;
     }
 
     private InventoryEntity findInventoryAndValidateAccess(UUID inventoryId) {
@@ -185,32 +107,6 @@ public class InventoryOrderService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         inventoryAccessService.validateInventoryAccess(foundInventory);
         return foundInventory;
-    }
-
-    private Page<InventoryOrderRequestEntity> getAccessibleOrderRequests(UUID inventoryId, Integer pageOffset, Integer pageLimit) {
-        PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
-        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
-            return orderRequestRepository.findAll(pageRequest);
-        }
-        // TODO should viewing orders be restricted for non org acct owners/managers?
-        return orderRequestRepository.findByInventoryId(inventoryId, pageRequest);
-    }
-
-    private void validateReadAccess(InventoryOrderRequestEntity order, CatalogueItemEntity catalogueItem) {
-        if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
-            return;
-        }
-
-        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        if (loggedInUser.getUserId().equals(order.getRequestingUserId())) {
-            // The user who created the order should have access to view it, even if the item is restricted now.
-            return;
-        }
-
-        if (CatalogueItemAccessUtils.doesUserHaveItemAccess(loggedInUser, catalogueItem)) {
-            return;
-        }
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
 
     private void validateSubmitOrderAccess(String loggedInUserRoleLevel) {
@@ -259,34 +155,13 @@ public class InventoryOrderService {
         }
     }
 
-    private InventoryItemEntity findOrCreateInventoryItemEntity(InventoryOrderRequestEntity orderEntity) {
-        UUID inventoryId = orderEntity.getInventoryId();
-        UUID catalogueItemId = orderEntity.getCatalogueItemId();
+    private InventoryItemEntity findOrCreateInventoryItemEntity(InventoryEntity inventory, CatalogueItemEntity catalogItem) {
+        UUID inventoryId = inventory.getInventoryId();
+        UUID catalogueItemId = catalogItem.getItemId();
         InventoryItemPK inventoryItemPK = new InventoryItemPK(catalogueItemId, inventoryId);
 
         return inventoryItemRepository.findById(inventoryItemPK)
-                .orElseGet(() -> new InventoryItemEntity(orderEntity.getCatalogueItemId(), orderEntity.getInventoryId(), 0L));
-    }
-
-    private InventoryOrderResponseModel convertToResponseModel(InventoryOrderRequestEntity entity) {
-        BigDecimal bigDecimalQuantity = new BigDecimal(entity.getQuantity());
-        BigDecimal totalPrice = entity.getItemPrice().multiply(bigDecimalQuantity);
-        InventoryOrderRequestStatusEntity foundOrderStatus = entity.getInventoryOrderRequestStatusEntity();
-        return new InventoryOrderResponseModel(
-                entity.getOrderId(),
-                entity.getOrganizationAccountId(),
-                entity.getRequestingUserId(),
-                entity.getInventoryId(),
-                entity.getCatalogueItemId(),
-                entity.getCatalogueItemEntity().getName(),
-                entity.getQuantity(),
-                entity.getItemPrice(),
-                totalPrice,
-                foundOrderStatus.getChangedByUserId(),
-                foundOrderStatus.getDateSubmitted(),
-                foundOrderStatus.getDateUpdated(),
-                foundOrderStatus.getProcessingStatus()
-        );
+                .orElseGet(() -> new InventoryItemEntity(catalogueItemId, inventoryId, 0L));
     }
 
 }

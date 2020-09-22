@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: voucher-based-orders-1
+      author: gavinkillough
+      changes:
+        # FIXME placeholder
+        - sql: SELECT COUNT(*) FROM portal.orders;
