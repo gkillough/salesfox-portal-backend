@@ -1,10 +1,6 @@
 package ai.salesfox.portal.rest.api.catalogue;
 
-import ai.salesfox.portal.rest.api.catalogue.model.CatalogueItemRequestModel;
-import ai.salesfox.portal.rest.api.catalogue.model.CatalogueItemResponseModel;
-import ai.salesfox.portal.rest.api.catalogue.model.MultiCatalogueItemModel;
 import ai.salesfox.portal.common.service.catalogue.CatalogueItemAccessUtils;
-import ai.salesfox.portal.common.service.icon.LocalIconManager;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserRepository;
@@ -17,6 +13,9 @@ import ai.salesfox.portal.database.catalogue.restriction.CatalogueItemOrganizati
 import ai.salesfox.portal.database.catalogue.restriction.CatalogueItemUserRestrictionEntity;
 import ai.salesfox.portal.database.catalogue.restriction.CatalogueItemUserRestrictionRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
+import ai.salesfox.portal.rest.api.catalogue.model.CatalogueItemRequestModel;
+import ai.salesfox.portal.rest.api.catalogue.model.CatalogueItemResponseModel;
+import ai.salesfox.portal.rest.api.catalogue.model.MultiCatalogueItemModel;
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
@@ -48,14 +47,13 @@ public class CatalogueService {
     private final OrganizationAccountRepository organizationAccountRepository;
     private final UserRepository userRepository;
     private final HttpSafeImageUtility imageUtility;
-    private final LocalIconManager localIconManager;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
     public CatalogueService(CatalogueItemRepository catalogueItemRepository, CatalogueItemOrganizationAccountRestrictionRepository catItemOrgAcctRestrictionRepository,
                             CatalogueItemUserRestrictionRepository catItemUserRestrictionRepository, CatalogueItemIconRepository catalogueItemIconRepository,
                             OrganizationAccountRepository organizationAccountRepository, UserRepository userRepository,
-                            HttpSafeImageUtility imageUtility, LocalIconManager localIconManager, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+                            HttpSafeImageUtility imageUtility, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.catalogueItemRepository = catalogueItemRepository;
         this.catItemOrgAcctRestrictionRepository = catItemOrgAcctRestrictionRepository;
         this.catItemUserRestrictionRepository = catItemUserRestrictionRepository;
@@ -63,7 +61,6 @@ public class CatalogueService {
         this.organizationAccountRepository = organizationAccountRepository;
         this.userRepository = userRepository;
         this.imageUtility = imageUtility;
-        this.localIconManager = localIconManager;
         this.membershipRetrievalService = membershipRetrievalService;
     }
 
@@ -96,7 +93,7 @@ public class CatalogueService {
 
         RestrictionModel restrictionRequestModel = itemRequestModel.getRestriction();
         boolean isRestricted = restrictionRequestModel != null;
-        CatalogueItemEntity newItem = new CatalogueItemEntity(null, itemRequestModel.getName(), itemRequestModel.getPrice(), itemRequestModel.getQuantity(), null, true);
+        CatalogueItemEntity newItem = new CatalogueItemEntity(null, itemRequestModel.getName(), itemRequestModel.getPrice(), null, true);
 
         CatalogueItemEntity savedItem = catalogueItemRepository.save(newItem);
 
@@ -139,7 +136,6 @@ public class CatalogueService {
 
         existingItem.setName(itemRequestModel.getName());
         existingItem.setPrice(itemRequestModel.getPrice());
-        existingItem.setQuantity(itemRequestModel.getQuantity());
         CatalogueItemEntity savedItem = catalogueItemRepository.save(existingItem);
 
         if (isRestricted) {
@@ -211,10 +207,6 @@ public class CatalogueService {
             errors.add("The field 'Price' cannot be less than $0.00");
         }
 
-        if (requestModel.getQuantity() < 0) {
-            errors.add("The field 'Quantity' cannot be less than 0");
-        }
-
         RestrictionModel restriction = requestModel.getRestriction();
         if (restriction != null) {
             if (restriction.getOrganizationAccountId() == null) {
@@ -248,7 +240,7 @@ public class CatalogueService {
         if (null != userRestriction) {
             userId = userRestriction.getUserId();
         }
-        return new CatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getPrice(), entity.getQuantity(), entity.getIconId(), entity.getIsActive(), organizationAccountId, userId);
+        return new CatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getPrice(), entity.getIconId(), entity.getIsActive(), organizationAccountId, userId);
     }
 
 }

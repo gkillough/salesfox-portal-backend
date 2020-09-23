@@ -27,9 +27,6 @@ public class CatalogueItemEntity implements Serializable {
     @Column(name = "price")
     private BigDecimal price;
 
-    @Column(name = "quantity")
-    private Long quantity;
-
     @PrimaryKeyJoinColumn
     @Column(name = "icon_id")
     private UUID iconId;
@@ -45,11 +42,10 @@ public class CatalogueItemEntity implements Serializable {
     @JoinColumn(name = "item_id", referencedColumnName = "item_id", insertable = false, updatable = false)
     private CatalogueItemUserRestrictionEntity catalogueItemUserRestrictionEntity;
 
-    public CatalogueItemEntity(UUID itemId, String name, BigDecimal price, Long quantity, UUID iconId, Boolean isActive) {
+    public CatalogueItemEntity(UUID itemId, String name, BigDecimal price, UUID iconId, Boolean isActive) {
         this.itemId = itemId;
         this.name = name;
         this.price = price;
-        this.quantity = quantity;
         this.iconId = iconId;
         this.isActive = isActive;
     }

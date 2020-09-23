@@ -46,6 +46,8 @@ public class InventoryOrderService {
     }
 
     @Transactional
+    // TODO this class and method were gutted to pave the way for "voucher" based inventories
+    //  this is a temporary state until we add a payment processing integration
     public InventoryOrderResponseModel submitOrder(UUID inventoryId, InventoryOrderRequestModel requestModel) {
         InventoryEntity foundInventory = findInventoryAndValidateAccess(inventoryId);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
@@ -59,9 +61,6 @@ public class InventoryOrderService {
                 .filter(CatalogueItemEntity::getIsActive)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", requestModel.getCatalogueItemId())));
         validateItemAccess(loggedInUser, targetItem);
-
-        Integer requestedQuantity = requestModel.getQuantity();
-        validateItemQuantity(targetItem, requestedQuantity);
 
         // TODO insert payment processing in the middle of this step
         /*
@@ -89,14 +88,11 @@ public class InventoryOrderService {
         return convertToResponseModel(savedOrder);
          */
 
+        Integer requestedQuantity = requestModel.getQuantity();
         InventoryItemEntity itemToSave = findOrCreateInventoryItemEntity(foundInventory, targetItem);
         Long newInventoryItemQuantity = Math.addExact(itemToSave.getQuantity(), requestedQuantity);
         itemToSave.setQuantity(newInventoryItemQuantity);
         inventoryItemRepository.save(itemToSave);
-
-        Long newCatalogItemQuantity = Math.subtractExact(targetItem.getQuantity(), requestedQuantity);
-        targetItem.setQuantity(newCatalogItemQuantity);
-        catalogueItemRepository.save(targetItem);
 
         // TODO fix this when this method is broken up for payment processing
         return null;
@@ -121,15 +117,11 @@ public class InventoryOrderService {
         }
     }
 
+    // TODO this concept may be irrelevant
+    //  the original idea was to have certain catalog items that would only be available to certain users/orgs
     private void validateItemAccess(UserEntity userRequestingAccess, CatalogueItemEntity targetItem) {
         if (!CatalogueItemAccessUtils.doesUserHaveItemAccess(userRequestingAccess, targetItem)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-    }
-
-    private void validateItemQuantity(CatalogueItemEntity catalogueItem, Integer orderQuantity) {
-        if (catalogueItem.getQuantity() < orderQuantity) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The requested quantity is more than the available quantity");
         }
     }
 

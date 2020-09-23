@@ -23,4 +23,6 @@ public class InventoryOrderController {
         inventoryOrderService.submitOrder(inventoryId, requestModel);
     }
 
+    // TODO add a callback for payment processing to confirm an order
+
 }
