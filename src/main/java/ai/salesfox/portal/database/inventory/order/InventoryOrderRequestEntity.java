@@ -1,8 +1,8 @@
-package ai.salesfox.portal.database.order;
+package ai.salesfox.portal.database.inventory.order;
 
 import ai.salesfox.portal.database.catalogue.item.CatalogueItemEntity;
 import ai.salesfox.portal.database.inventory.InventoryEntity;
-import ai.salesfox.portal.database.order.status.InventoryOrderRequestStatusEntity;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +13,7 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "order_requests")
 public class InventoryOrderRequestEntity implements Serializable {
@@ -59,19 +60,5 @@ public class InventoryOrderRequestEntity implements Serializable {
     @OneToOne
     @JoinColumn(name = "inventory_id", referencedColumnName = "inventory_id", insertable = false, updatable = false)
     private InventoryEntity inventoryEntity;
-
-    @OneToOne(mappedBy = "inventoryOrderRequestEntity")
-    private InventoryOrderRequestStatusEntity inventoryOrderRequestStatusEntity;
-
-    public InventoryOrderRequestEntity(UUID orderId, UUID catalogueItemId, UUID inventoryId, UUID organizationAccountId, UUID userId, UUID requestingUserId, Integer quantity, BigDecimal itemPrice) {
-        this.orderId = orderId;
-        this.catalogueItemId = catalogueItemId;
-        this.inventoryId = inventoryId;
-        this.organizationAccountId = organizationAccountId;
-        this.userId = userId;
-        this.requestingUserId = requestingUserId;
-        this.quantity = quantity;
-        this.itemPrice = itemPrice;
-    }
 
 }

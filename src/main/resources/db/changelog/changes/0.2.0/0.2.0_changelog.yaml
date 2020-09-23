@@ -34,3 +34,7 @@ databaseChangeLog:
   - include:
       file: multiple_gift_contacts.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: voucher_based_orders.yaml
+      relativeToChangelogFile: true

@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: voucher-based-orders-1
+      author: gavinkillough
+      changes:
+        - dropTable:
+            schemaName: portal
+            tableName: order_request_statuses
+            cascadeConstraints: true
+
+  - changeSet:
+      id: voucher-based-orders-2
+      author: gavinkillough
+      changes:
+        - dropColumn:
+            schemaName: portal
+            tableName: catalogue_items
+            columnName: quantity
+
+  - changeSet:
+      id: voucher-based-orders-3
+      author: gavinkillough
+      changes:
+        - addColumn:
+            schemaName: portal
+            tableName: catalogue_items
+            columns:
+              - column:
+                  name: shipping_cost
+                  type: double precision
+                  defaultValueNumeric: 1.00
+                  constraints:
+                    nullable: false

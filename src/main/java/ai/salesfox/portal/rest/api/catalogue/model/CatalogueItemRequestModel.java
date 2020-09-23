@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 public class CatalogueItemRequestModel {
     private String name;
     private BigDecimal price;
-    private Long quantity;
+    private BigDecimal shippingCost;
     private RestrictionModel restriction;
 
 }
