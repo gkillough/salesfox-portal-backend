@@ -93,7 +93,7 @@ public class CatalogueService {
 
         RestrictionModel restrictionRequestModel = itemRequestModel.getRestriction();
         boolean isRestricted = restrictionRequestModel != null;
-        CatalogueItemEntity newItem = new CatalogueItemEntity(null, itemRequestModel.getName(), itemRequestModel.getPrice(), null, true);
+        CatalogueItemEntity newItem = new CatalogueItemEntity(null, itemRequestModel.getName(), itemRequestModel.getPrice(), itemRequestModel.getShippingCost(), null, true);
 
         CatalogueItemEntity savedItem = catalogueItemRepository.save(newItem);
 
@@ -136,6 +136,7 @@ public class CatalogueService {
 
         existingItem.setName(itemRequestModel.getName());
         existingItem.setPrice(itemRequestModel.getPrice());
+        existingItem.setShippingCost(itemRequestModel.getShippingCost());
         CatalogueItemEntity savedItem = catalogueItemRepository.save(existingItem);
 
         if (isRestricted) {
@@ -203,8 +204,16 @@ public class CatalogueService {
             errors.add("The field 'Item Name' cannot be blank");
         }
 
-        if (requestModel.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+        if (null == requestModel.getPrice()) {
+            errors.add("The field 'Price' is required");
+        } else if (requestModel.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
             errors.add("The field 'Price' cannot be less than $0.00");
+        }
+
+        if (null == requestModel.getShippingCost()) {
+            errors.add("The field 'Shipping Cost' is required");
+        } else if (requestModel.getShippingCost().compareTo(BigDecimal.ZERO) <= 0) {
+            errors.add("The field 'Shipping Cost' cannot be less than $0.00");
         }
 
         RestrictionModel restriction = requestModel.getRestriction();
@@ -240,7 +249,7 @@ public class CatalogueService {
         if (null != userRestriction) {
             userId = userRestriction.getUserId();
         }
-        return new CatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getPrice(), entity.getIconId(), entity.getIsActive(), organizationAccountId, userId);
+        return new CatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getPrice(), entity.getShippingCost(), entity.getIconId(), entity.getIsActive(), organizationAccountId, userId);
     }
 
 }

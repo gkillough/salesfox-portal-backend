@@ -16,3 +16,18 @@ databaseChangeLog:
             schemaName: portal
             tableName: catalogue_items
             columnName: quantity
+
+  - changeSet:
+      id: voucher-based-orders-3
+      author: gavinkillough
+      changes:
+        - addColumn:
+            schemaName: portal
+            tableName: catalogue_items
+            columns:
+              - column:
+                  name: shipping_cost
+                  type: double precision
+                  defaultValueNumeric: 1.00
+                  constraints:
+                    nullable: false
