@@ -1,6 +1,7 @@
 package ai.salesfox.integration.scribeless.service.campaign.model;
 
 import ai.salesfox.integration.scribeless.model.ScribelessAddressModel;
+import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,20 +12,30 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CampaignCreationRequestModel {
-    private String paper_size;
-    private String handwriting_style;
+    @SerializedName("paper_size")
+    private String paperSize;
+    @SerializedName("handwriting_style")
+    private String handwritingStyle;
     private String title;
     private String product;
     private String text;
     private String inserts;
-    private String due_date; // dd/mm/yyyy
+    @SerializedName("due_date")
+    private String dueDate; // dd/mm/yyyy
     private String notes;
+    @SerializedName("headerImage")
     private String header_image;
+    @SerializedName("headerType")
     private String header_type;
+    @SerializedName("headerFont")
     private String header_font;
+    @SerializedName("headerText")
     private String header_text;
+    @SerializedName("footerText")
     private String footer_text;
+    @SerializedName("footerFont")
     private String footer_font;
+    @SerializedName("returnAddress")
     private ScribelessAddressModel return_address;
     private List<ScribelessAddressModel> recipients;
 

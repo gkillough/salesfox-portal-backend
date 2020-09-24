@@ -13,6 +13,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+@Deprecated
 @AllArgsConstructor
 public class OnDemandService {
     public static final String ON_DEMAND_TEXT_ENDPOINT = "/on-demand/text";
