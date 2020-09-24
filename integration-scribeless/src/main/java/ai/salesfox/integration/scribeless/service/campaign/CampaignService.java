@@ -20,16 +20,14 @@ public class CampaignService {
         this(false, apiKeyHolder, httpServiceWrapper);
     }
 
-    public CampaignResponseModel create(CampaignCreationRequestModel creationRequestModel) {
+    public CampaignResponseModel create(CampaignCreationRequestModel creationRequestModel) throws SalesfoxException {
         String requestSpec = createRequestSpec("");
-        // FIXME implement
-        return null;
+        return httpServiceWrapper.executePost(requestSpec, creationRequestModel, CampaignResponseModel.class);
     }
 
-    public CampaignResponseModel addRecipients(String campaignId, CampaignUpdateRequestModel updateRequestModel) {
+    public CampaignResponseModel addRecipients(String campaignId, CampaignUpdateRequestModel updateRequestModel) throws SalesfoxException {
         String requestSpec = createRequestSpec(campaignId);
-        // FIXME implement
-        return null;
+        return httpServiceWrapper.executePut(requestSpec, updateRequestModel, CampaignResponseModel.class);
     }
 
     public CampaignResponseModel get(String campaignId) throws SalesfoxException {
@@ -37,10 +35,9 @@ public class CampaignService {
         return httpServiceWrapper.executeGet(requestSpec, CampaignResponseModel.class);
     }
 
-    public CampaignDeleteResponseModel delete(String campaignId) {
+    public CampaignDeleteResponseModel delete(String campaignId) throws SalesfoxException {
         String requestSpec = createRequestSpec(campaignId);
-        // FIXME implement
-        return null;
+        return httpServiceWrapper.executeDelete(requestSpec, CampaignDeleteResponseModel.class);
     }
 
     private String createRequestSpec(String campaignId) {
