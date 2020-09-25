@@ -1,4 +1,4 @@
-package ai.salesfox.integration.scribeless.service.on_demand;
+package ai.salesfox.integration.scribeless.service.on_demand.model;
 
 import lombok.AllArgsConstructor;
 

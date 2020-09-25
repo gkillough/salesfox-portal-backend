@@ -4,8 +4,8 @@ import ai.salesfox.integration.common.exception.SalesfoxException;
 import ai.salesfox.integration.common.util.SalesfoxEnumUtils;
 import ai.salesfox.integration.scribeless.enumeration.ScribelessFontColors;
 import ai.salesfox.integration.scribeless.enumeration.ScribelessHandwritingStyles;
-import ai.salesfox.integration.scribeless.service.on_demand.OnDemandPreviewParams;
-import ai.salesfox.integration.scribeless.service.on_demand.OnDemandService;
+import ai.salesfox.integration.scribeless.service.on_demand.OnDemandPreviewService;
+import ai.salesfox.integration.scribeless.service.on_demand.model.OnDemandPreviewParams;
 import ai.salesfox.portal.rest.api.image.model.ImageResponseModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
@@ -20,20 +20,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Deprecated(forRemoval = true)
 @Slf4j
 @Component
 public class ScribelessOnDemandEndpointService {
-    private final OnDemandService onDemandService;
+    private final OnDemandPreviewService onDemandPreviewService;
 
     @Autowired
-    public ScribelessOnDemandEndpointService(OnDemandService onDemandService) {
-        this.onDemandService = onDemandService;
+    public ScribelessOnDemandEndpointService(OnDemandPreviewService onDemandPreviewService) {
+        this.onDemandPreviewService = onDemandPreviewService;
     }
 
     public ImageResponseModel getPreviewImage(String text, Integer widthInMM, Integer heightInMM, Integer sizeInMM, String fontColor, String handwritingStyle) {
         OnDemandPreviewParams previewParams = populateParamsObject(widthInMM, heightInMM, sizeInMM, fontColor, handwritingStyle);
         try {
-            BufferedImage previewImage = onDemandService.getPreviewImage(text, previewParams);
+            BufferedImage previewImage = onDemandPreviewService.getPreviewImage(text, previewParams);
             return new ImageResponseModel(previewImage, MediaType.IMAGE_PNG);
         } catch (SalesfoxException e) {
             log.error("Error with request to generate a Scribeless preview image", e);

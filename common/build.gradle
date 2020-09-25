@@ -3,6 +3,7 @@ dependencies {
     api 'com.google.http-client:google-http-client-apache-v2:1.36.0'
 
     // Utilities
+    api 'com.google.code.gson:gson:2.8.6'
     api 'org.apache.commons:commons-lang3:3.8'
     api 'org.apache.commons:commons-csv:1.8'
     api 'commons-io:commons-io:2.6'

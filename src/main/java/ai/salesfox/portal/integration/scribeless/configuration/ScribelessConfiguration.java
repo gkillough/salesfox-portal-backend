@@ -3,7 +3,7 @@ package ai.salesfox.portal.integration.scribeless.configuration;
 import ai.salesfox.integration.common.http.HttpServiceWrapper;
 import ai.salesfox.integration.common.http.HttpServicesFactory;
 import ai.salesfox.integration.scribeless.model.ApiKeyHolder;
-import ai.salesfox.integration.scribeless.service.on_demand.OnDemandService;
+import ai.salesfox.integration.scribeless.service.on_demand.OnDemandPreviewService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -25,8 +25,8 @@ public class ScribelessConfiguration {
     private CharSequence scribelessApiKey;
 
     @Bean
-    public OnDemandService scribelessOnDemandService() {
-        return new OnDemandService(scribelessApiKeyHolder(), scribelessHttpServiceWrapper());
+    public OnDemandPreviewService scribelessOnDemandPreviewService() {
+        return new OnDemandPreviewService(scribelessApiKeyHolder(), scribelessHttpServiceWrapper());
     }
 
     @Bean
