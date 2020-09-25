@@ -13,7 +13,7 @@ public class ScribelessApiUtils {
      * Creates a string of the format "?api_key={api_key}&testing={testing}"
      */
     public static String createDefaultQueryParams(ApiKeyHolder apiKeyHolder, boolean testing) {
-        return String.format("?api_key=%s&testing=%b", apiKeyHolder.getApiKey(), testing);
+        return String.format("?%s=%s&testing=%b", ApiKeyHolder.PARAM_NAME_API_KEY, apiKeyHolder.getApiKey(), testing);
     }
 
     public static <T> T parseResponseOrImproveError(HttpServiceWrapper httpServiceWrapper, HttpResponse scribelessResponse, Type responseType) throws SalesfoxException {
