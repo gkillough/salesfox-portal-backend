@@ -7,7 +7,8 @@ import ai.salesfox.integration.scribeless.service.campaign.model.CampaignCreatio
 import ai.salesfox.integration.scribeless.service.campaign.model.CampaignDeleteResponseModel;
 import ai.salesfox.integration.scribeless.service.campaign.model.CampaignResponseModel;
 import ai.salesfox.integration.scribeless.service.campaign.model.CampaignUpdateRequestModel;
-import ai.salesfox.integration.scribeless.util.ScribelessRequestSpecUtils;
+import ai.salesfox.integration.scribeless.util.ScribelessApiUtils;
+import com.google.api.client.http.HttpResponse;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -22,27 +23,31 @@ public class CampaignService {
 
     public CampaignResponseModel create(CampaignCreationRequestModel creationRequestModel) throws SalesfoxException {
         String requestSpec = createRequestSpec("");
-        return httpServiceWrapper.executePost(requestSpec, creationRequestModel, CampaignResponseModel.class);
+        HttpResponse response = httpServiceWrapper.executePost(requestSpec, creationRequestModel);
+        return ScribelessApiUtils.parseResponseOrImproveError(httpServiceWrapper, response, CampaignResponseModel.class);
     }
 
     public CampaignResponseModel addRecipients(String campaignId, CampaignUpdateRequestModel updateRequestModel) throws SalesfoxException {
         String requestSpec = createRequestSpec(campaignId);
-        return httpServiceWrapper.executePut(requestSpec, updateRequestModel, CampaignResponseModel.class);
+        HttpResponse response = httpServiceWrapper.executePut(requestSpec, updateRequestModel);
+        return ScribelessApiUtils.parseResponseOrImproveError(httpServiceWrapper, response, CampaignResponseModel.class);
     }
 
     public CampaignResponseModel get(String campaignId) throws SalesfoxException {
         String requestSpec = createRequestSpec(campaignId);
-        return httpServiceWrapper.executeGet(requestSpec, CampaignResponseModel.class);
+        HttpResponse response = httpServiceWrapper.executeGet(requestSpec);
+        return ScribelessApiUtils.parseResponseOrImproveError(httpServiceWrapper, response, CampaignResponseModel.class);
     }
 
     public CampaignDeleteResponseModel delete(String campaignId) throws SalesfoxException {
         String requestSpec = createRequestSpec(campaignId);
-        return httpServiceWrapper.executeDelete(requestSpec, CampaignDeleteResponseModel.class);
+        HttpResponse response = httpServiceWrapper.executeDelete(requestSpec);
+        return ScribelessApiUtils.parseResponseOrImproveError(httpServiceWrapper, response, CampaignDeleteResponseModel.class);
     }
 
     private String createRequestSpec(String campaignId) {
-        String defaultQueryParams = ScribelessRequestSpecUtils.createDefaultQueryParams(apiKeyHolder, testing);
-        return String.format("/campaign/%s%s", campaignId, defaultQueryParams);
+        String defaultQueryParams = ScribelessApiUtils.createDefaultQueryParams(apiKeyHolder, testing);
+        return String.format("/api/v2/campaign/%s%s", campaignId, defaultQueryParams);
     }
 
 }

@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+// TODO create builder with defaults
 public class CampaignCreationRequestModel {
     @SerializedName("paper_size")
     private String paperSize;

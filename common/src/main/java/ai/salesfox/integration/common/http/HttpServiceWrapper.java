@@ -108,8 +108,6 @@ public class HttpServiceWrapper {
         HttpResponse response = executeRequestFunction.get();
         try {
             return parseResponse(response, responseType);
-        } catch (IOException ioException) {
-            throw new SalesfoxException(ioException);
         } finally {
             disconnectResponse(response);
         }
@@ -140,6 +138,7 @@ public class HttpServiceWrapper {
         }
     }
 
+    // TODO the methods below this line could be abstracted
     // =======================
     // || RESPONSE HANDLING ||
     // =======================
@@ -155,9 +154,13 @@ public class HttpServiceWrapper {
         }
     }
 
-    public <T> T parseResponse(HttpResponse response, Type responseType) throws IOException {
-        String responseJson = response.parseAsString();
-        return gson.fromJson(responseJson, responseType);
+    public <T> T parseResponse(HttpResponse response, Type responseType) throws SalesfoxException {
+        try {
+            String responseJson = response.parseAsString();
+            return gson.fromJson(responseJson, responseType);
+        } catch (IOException e) {
+            throw new SalesfoxException(e);
+        }
     }
 
     // ============================

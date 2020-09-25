@@ -28,6 +28,8 @@ public class OnDemandService {
 
     // https://us-central1-hc-application-interface-prod.cloudfunctions.net/
 
+    // TODO delete this and create a similar service to OnDemandService
+
     public BufferedImage getPreviewImage(String text, OnDemandPreviewParams params) throws SalesfoxException {
         QueryParamBuilder queryParamBuilder = new QueryParamBuilder(ApiKeyHolder.PARAM_NAME_API_KEY, apiKeyHolder.getApiKey());
         queryParamBuilder.appendAdditionalParam("text", text);
