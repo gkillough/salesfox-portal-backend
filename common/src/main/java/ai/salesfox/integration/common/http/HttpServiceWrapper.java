@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.lang.reflect.Type;
 
@@ -44,19 +45,19 @@ public class HttpServiceWrapper {
     // || POST ||
     // ==========
 
-    public <T> T executePost(String uriSpec, Object requestContent, Class<T> responseType) throws SalesfoxException {
+    public <T> T executePost(String uriSpec, @Nullable Object requestContent, Class<T> responseType) throws SalesfoxException {
         return executePost(HttpRequestConfig.DEFAULT, uriSpec, requestContent, responseType);
     }
 
-    public <T> T executePost(HttpRequestConfig requestConfig, String uriSpec, Object requestContent, Class<T> responseType) throws SalesfoxException {
+    public <T> T executePost(HttpRequestConfig requestConfig, String uriSpec, @Nullable Object requestContent, Class<T> responseType) throws SalesfoxException {
         return executeRequestAndParseResponse(() -> executePost(requestConfig, uriSpec, requestContent), responseType);
     }
 
-    public HttpResponse executePost(String uriSpec, Object requestContent) throws SalesfoxException {
+    public HttpResponse executePost(String uriSpec, @Nullable Object requestContent) throws SalesfoxException {
         return executeContentRequest(httpRequestFactory::buildPostRequest, uriSpec, requestContent);
     }
 
-    public HttpResponse executePost(HttpRequestConfig requestConfig, String uriSpec, Object requestContent) throws SalesfoxException {
+    public HttpResponse executePost(HttpRequestConfig requestConfig, String uriSpec, @Nullable Object requestContent) throws SalesfoxException {
         return executeContentRequest(requestConfig, httpRequestFactory::buildPostRequest, uriSpec, requestContent);
     }
 
@@ -64,19 +65,19 @@ public class HttpServiceWrapper {
     // || PUT ||
     // =========
 
-    public <T> T executePut(String uriSpec, Object requestContent, Class<T> responseType) throws SalesfoxException {
+    public <T> T executePut(String uriSpec, @Nullable Object requestContent, Class<T> responseType) throws SalesfoxException {
         return executePut(HttpRequestConfig.DEFAULT, uriSpec, requestContent, responseType);
     }
 
-    public <T> T executePut(HttpRequestConfig requestConfig, String uriSpec, Object requestContent, Class<T> responseType) throws SalesfoxException {
+    public <T> T executePut(HttpRequestConfig requestConfig, String uriSpec, @Nullable Object requestContent, Class<T> responseType) throws SalesfoxException {
         return executeRequestAndParseResponse(() -> executePut(requestConfig, uriSpec, requestContent), responseType);
     }
 
-    public HttpResponse executePut(String uriSpec, Object requestContent) throws SalesfoxException {
+    public HttpResponse executePut(String uriSpec, @Nullable Object requestContent) throws SalesfoxException {
         return executeContentRequest(httpRequestFactory::buildPutRequest, uriSpec, requestContent);
     }
 
-    public HttpResponse executePut(HttpRequestConfig requestConfig, String uriSpec, Object requestContent) throws SalesfoxException {
+    public HttpResponse executePut(HttpRequestConfig requestConfig, String uriSpec, @Nullable Object requestContent) throws SalesfoxException {
         return executeContentRequest(requestConfig, httpRequestFactory::buildPutRequest, uriSpec, requestContent);
     }
 
@@ -113,13 +114,18 @@ public class HttpServiceWrapper {
         }
     }
 
-    public HttpResponse executeContentRequest(ThrowingBiFunction<GenericUrl, HttpContent, HttpRequest, IOException> buildRequest, String uriSpec, Object requestContent) throws SalesfoxException {
+    public HttpResponse executeContentRequest(ThrowingBiFunction<GenericUrl, HttpContent, HttpRequest, IOException> buildRequest, String uriSpec, @Nullable Object requestContent) throws SalesfoxException {
         return executeContentRequest(HttpRequestConfig.DEFAULT, buildRequest, uriSpec, requestContent);
     }
 
-    public HttpResponse executeContentRequest(HttpRequestConfig requestConfig, ThrowingBiFunction<GenericUrl, HttpContent, HttpRequest, IOException> buildRequest, String uriSpec, Object requestContent) throws SalesfoxException {
-        String jsonContent = toJson(requestContent);
-        HttpContent httpContent = ByteArrayContent.fromString(requestConfig.getContentType(), jsonContent);
+    public HttpResponse executeContentRequest(HttpRequestConfig requestConfig, ThrowingBiFunction<GenericUrl, HttpContent, HttpRequest, IOException> buildRequest, String uriSpec, @Nullable Object requestContent) throws SalesfoxException {
+        HttpContent httpContent;
+        if (null == requestContent) {
+            httpContent = null;
+        } else {
+            String jsonContent = toJson(requestContent);
+            httpContent = ByteArrayContent.fromString(requestConfig.getContentType(), jsonContent);
+        }
         return executeRequest(requestConfig, (genericUrl) -> buildRequest.apply(genericUrl, httpContent), uriSpec);
     }
 
