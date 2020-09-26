@@ -6,5 +6,5 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public interface GiftScribelessStatusRepository extends JpaRepository<UUID, GiftScribelessStatusEntity> {
+public interface GiftScribelessStatusRepository extends JpaRepository<GiftScribelessStatusEntity, UUID> {
 }

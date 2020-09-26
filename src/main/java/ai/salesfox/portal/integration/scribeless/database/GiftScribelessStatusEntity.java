@@ -1,5 +1,6 @@
 package ai.salesfox.portal.integration.scribeless.database;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "gift_scribeless_status")
 public class GiftScribelessStatusEntity implements Serializable {

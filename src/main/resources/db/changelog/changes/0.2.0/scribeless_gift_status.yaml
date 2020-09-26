@@ -48,3 +48,8 @@ databaseChangeLog:
             onDelete: RESTRICT
             onUpdate: CASCADE
             validate: true
+        - addUniqueConstraint:
+            schemaName: portal
+            tableName: gift_scribeless_status
+            columnNames: gift_id, campaign_id
+
