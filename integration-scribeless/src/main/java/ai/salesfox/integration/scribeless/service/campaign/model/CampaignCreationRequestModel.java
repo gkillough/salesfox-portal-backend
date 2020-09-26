@@ -13,6 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 // TODO create builder with defaults
 public class CampaignCreationRequestModel {
+    public static final String SCRIBELESS_DATE_FORMAT = "dd/MM/yyy";
+
     @SerializedName("paper_size")
     private String paperSize;
     @SerializedName("handwriting_style")
@@ -22,25 +24,25 @@ public class CampaignCreationRequestModel {
     private String text;
     private String inserts;
     @SerializedName("due_date")
-    private String dueDate; // dd/mm/yyyy
+    private String dueDate;
     private String notes;
-    @SerializedName("headerImage")
-    private String header_image;
-    @SerializedName("headerType")
-    private String header_type;
-    @SerializedName("headerFont")
-    private String header_font;
-    @SerializedName("headerText")
-    private String header_text;
-    @SerializedName("footerText")
-    private String footer_text;
-    @SerializedName("footerFont")
-    private String footer_font;
-    @SerializedName("returnAddress")
-    private ScribelessAddressModel return_address;
+    @SerializedName("header_image")
+    private String headerImage;
+    @SerializedName("header_type")
+    private String headerType;
+    @SerializedName("header_font")
+    private String headerFont;
+    @SerializedName("header_text")
+    private String headerText;
+    @SerializedName("footer_text")
+    private String footerText;
+    @SerializedName("footer_font")
+    private String footerFont;
+    @SerializedName("return_address")
+    private ScribelessAddressModel returnAddress;
     private List<ScribelessAddressModel> recipients;
 
-    /*
+    /* FIXME remove when correct default values are determined
     {
   "paper_size": "A5",
   "handwriting_style": "Jane",
