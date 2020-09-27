@@ -1,8 +1,8 @@
 package ai.salesfox.portal.database.customization.icon;
 
+import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.customization.icon.restriction.CustomIconOrganizationAccountRestrictionEntity;
 import ai.salesfox.portal.database.customization.icon.restriction.CustomIconUserRestrictionEntity;
-import ai.salesfox.portal.database.account.entity.UserEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -24,6 +24,9 @@ public class CustomIconEntity implements Serializable {
     @Column(name = "label")
     private String label;
 
+    @Column(name = "icon_url")
+    private String iconUrl;
+
     @PrimaryKeyJoinColumn
     @Column(name = "uploader_id")
     private UUID uploaderId;
@@ -43,9 +46,10 @@ public class CustomIconEntity implements Serializable {
     @JoinColumn(name = "uploader_id", referencedColumnName = "user_id", insertable = false, updatable = false)
     private UserEntity uploaderEntity;
 
-    public CustomIconEntity(UUID customIconId, String label, UUID uploaderId, Boolean isActive) {
+    public CustomIconEntity(UUID customIconId, String label, String iconUrl, UUID uploaderId, Boolean isActive) {
         this.customIconId = customIconId;
         this.label = label;
+        this.iconUrl = iconUrl;
         this.uploaderId = uploaderId;
         this.isActive = isActive;
     }

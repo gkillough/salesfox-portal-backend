@@ -14,6 +14,7 @@ import java.util.UUID;
 public class CustomIconResponseModel {
     private UUID customIconId;
     private String label;
+    private String iconUrl;
     private UserSummaryModel uploader;
     private Boolean isActive;
     private RestrictionModel restriction;

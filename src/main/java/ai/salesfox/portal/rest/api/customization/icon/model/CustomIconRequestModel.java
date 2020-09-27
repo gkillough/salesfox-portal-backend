@@ -9,5 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CustomIconRequestModel {
     private String label;
+    private String iconUrl;
 
 }

@@ -1,8 +1,6 @@
 package ai.salesfox.portal.rest.api.customization.icon;
 
-import ai.salesfox.portal.rest.api.customization.icon.model.CustomIconRequestModel;
-import ai.salesfox.portal.rest.api.customization.icon.model.CustomIconResponseModel;
-import ai.salesfox.portal.rest.api.customization.icon.model.MultiCustomIconResponseModel;
+import ai.salesfox.portal.common.FieldValidationUtils;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.customization.icon.CustomIconEntity;
@@ -14,6 +12,9 @@ import ai.salesfox.portal.database.customization.icon.restriction.CustomIconUser
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
+import ai.salesfox.portal.rest.api.customization.icon.model.CustomIconRequestModel;
+import ai.salesfox.portal.rest.api.customization.icon.model.CustomIconResponseModel;
+import ai.salesfox.portal.rest.api.customization.icon.model.MultiCustomIconResponseModel;
 import ai.salesfox.portal.rest.api.user.common.model.UserSummaryModel;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.apache.commons.lang3.StringUtils;
@@ -77,7 +78,7 @@ public class CustomIconService {
         validateRequestModel(requestModel);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
 
-        CustomIconEntity customIconToSave = new CustomIconEntity(null, requestModel.getLabel(), loggedInUser.getUserId(), true);
+        CustomIconEntity customIconToSave = new CustomIconEntity(null, requestModel.getLabel(), requestModel.getIconUrl(), loggedInUser.getUserId(), true);
         CustomIconEntity savedCustomIcon = customIconRepository.save(customIconToSave);
 
         if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
@@ -105,6 +106,7 @@ public class CustomIconService {
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         foundCustomIcon.setLabel(requestModel.getLabel());
+        foundCustomIcon.setIconUrl(requestModel.getIconUrl());
         foundCustomIcon.setUploaderId(loggedInUser.getUserId());
         customIconRepository.save(foundCustomIcon);
     }
@@ -138,6 +140,10 @@ public class CustomIconService {
         if (StringUtils.isBlank(requestModel.getLabel())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The request field 'label' cannot be blank");
         }
+
+        if (FieldValidationUtils.isValidUrl(requestModel.getIconUrl(), true)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The request field 'iconUrl' was invalid");
+        }
     }
 
     private CustomIconResponseModel convertToResponseModel(CustomIconEntity entity) {
@@ -152,7 +158,7 @@ public class CustomIconService {
         Optional.ofNullable(entity.getCustomIconUserRestrictionEntity())
                 .map(CustomIconUserRestrictionEntity::getUserId)
                 .ifPresent(restrictionModel::setUserId);
-        return new CustomIconResponseModel(entity.getCustomIconId(), entity.getLabel(), uploaderModel, entity.getIsActive(), restrictionModel);
+        return new CustomIconResponseModel(entity.getCustomIconId(), entity.getLabel(), entity.getIconUrl(), uploaderModel, entity.getIsActive(), restrictionModel);
     }
 
 }

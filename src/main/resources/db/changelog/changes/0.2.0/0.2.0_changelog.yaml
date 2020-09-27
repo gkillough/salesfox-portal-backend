@@ -44,5 +44,5 @@ databaseChangeLog:
       relativeToChangelogFile: true
 
   - include:
-      file: catalog_icon_urls.yaml
+      file: uploaded_icon_urls.yaml
       relativeToChangelogFile: true
