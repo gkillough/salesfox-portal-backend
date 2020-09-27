@@ -1,0 +1,55 @@
+databaseChangeLog:
+  - changeSet:
+      id: scribeless-gift-status-1
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: gift_scribeless_status
+            columns:
+              - column:
+                  name: gift_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: campaign_id
+                  type: VARCHAR
+                  constraints:
+                    nullable: true
+              - column:
+                  name: status
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_created
+                  type: timestamp with timezone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_updated
+                  type: timestamp with timezone
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: scribeless-gift-status-2
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: gift_scribeless_status_gift_id_fk
+            baseTableSchemaName: portal
+            baseTableName: gift_scribeless_status
+            baseColumnNames: gift_id
+            referencedTableSchemaName: portal
+            referencedTableName: gifts
+            referencedColumnNames: gift_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+            validate: true
+        - addUniqueConstraint:
+            schemaName: portal
+            tableName: gift_scribeless_status
+            columnNames: gift_id, campaign_id
+

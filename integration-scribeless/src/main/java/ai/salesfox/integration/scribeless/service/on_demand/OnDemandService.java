@@ -17,14 +17,14 @@ public class OnDemandService {
     public OnDemandResponseModel requestPrint(String campaignId) throws SalesfoxException {
         String requestSpec = String.format("/api/campaign/%s/request_print", campaignId);
         requestSpec = appendApiKey(requestSpec);
-        HttpResponse response = httpServiceWrapper.executeGet(requestSpec);
+        HttpResponse response = httpServiceWrapper.executePut(requestSpec, null);
         return ScribelessApiUtils.parseResponseOrImproveError(httpServiceWrapper, response, OnDemandResponseModel.class);
     }
 
     public OnDemandRecipientResponseModel requestPrintForRecipient(String campaignId, String recipientId) throws SalesfoxException {
         String requestSpec = String.format("/api/campaign/%s/recipient/%s/request_print", campaignId, recipientId);
         requestSpec = appendApiKey(requestSpec);
-        HttpResponse response = httpServiceWrapper.executeGet(requestSpec);
+        HttpResponse response = httpServiceWrapper.executePut(requestSpec, null);
         return ScribelessApiUtils.parseResponseOrImproveError(httpServiceWrapper, response, OnDemandRecipientResponseModel.class);
     }
 

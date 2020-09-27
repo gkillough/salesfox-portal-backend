@@ -38,3 +38,7 @@ databaseChangeLog:
   - include:
       file: voucher_based_orders.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: scribeless_gift_status.yaml
+      relativeToChangelogFile: true
