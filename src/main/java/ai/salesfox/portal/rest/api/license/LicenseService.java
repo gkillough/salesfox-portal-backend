@@ -6,13 +6,14 @@ import ai.salesfox.portal.common.service.license.LicenseGenerator;
 import ai.salesfox.portal.database.account.entity.LicenseEntity;
 import ai.salesfox.portal.database.account.repository.LicenseRepository;
 import ai.salesfox.portal.database.organization.OrganizationEntity;
-import ai.salesfox.portal.database.organization.OrganizationRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
-import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
+import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
 import ai.salesfox.portal.rest.api.license.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -28,17 +29,13 @@ import java.util.stream.Stream;
 
 @Component
 public class LicenseService {
-    private LicenseRepository licenseRepository;
-    private LicenseGenerator licenseGenerator;
-    private OrganizationRepository organizationRepository;
-    private OrganizationAccountRepository organizationAccountRepository;
+    private final LicenseRepository licenseRepository;
+    private final LicenseGenerator licenseGenerator;
 
     @Autowired
-    public LicenseService(LicenseRepository licenseRepository, LicenseGenerator licenseGenerator, OrganizationRepository organizationRepository, OrganizationAccountRepository organizationAccountRepository) {
+    public LicenseService(LicenseRepository licenseRepository, LicenseGenerator licenseGenerator) {
         this.licenseRepository = licenseRepository;
         this.licenseGenerator = licenseGenerator;
-        this.organizationRepository = organizationRepository;
-        this.organizationAccountRepository = organizationAccountRepository;
     }
 
     public LicenseModel getLicense(UUID licenseId) {
@@ -47,13 +44,20 @@ public class LicenseService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    // TODO this may need to be replaced with paging in the future
-    public MultiLicenseModel getAllLicenses() {
-        List<LicenseModel> allLicenses = licenseRepository.findAll()
+    public MultiLicenseModel getAllLicenses(Integer pageOffset, Integer pageLimit, String query) {
+        PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
+
+        PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
+        Page<LicenseEntity> requestedLicenses = licenseRepository.findLicenseByQuery(query, pageRequest);
+        if (requestedLicenses.isEmpty()) {
+            return MultiLicenseModel.empty();
+        }
+
+        List<LicenseModel> licenses = requestedLicenses
                 .stream()
                 .map(this::convertToLicenseModel)
                 .collect(Collectors.toList());
-        return new MultiLicenseModel(allLicenses);
+        return new MultiLicenseModel(licenses, requestedLicenses);
     }
 
     public LicenseModel createLicense(LicenseCreationRequestModel requestModel) {
@@ -125,14 +129,10 @@ public class LicenseService {
     }
 
     private LicenseModel convertToLicenseModel(LicenseEntity licenseEntity) {
-        if (licenseEntity.getIsActive()) {
-            OrganizationAccountEntity organizationAccount = organizationAccountRepository.findFirstByLicenseId(licenseEntity.getLicenseId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Organization account is missing from the database"));
-            String organizationName = organizationRepository.findById(organizationAccount.getOrganizationId())
-                    .map(OrganizationEntity::getOrganizationName)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Organization is missing from the database"));
-
-            LicensedOrganizationAccountModel licensedAccount = new LicensedOrganizationAccountModel(organizationAccount.getOrganizationAccountId(), organizationName, organizationAccount.getOrganizationAccountName());
+        OrganizationAccountEntity orgAcct = licenseEntity.getOrganizationAccountEntity();
+        if (licenseEntity.getIsActive() && null != orgAcct) {
+            OrganizationEntity org = orgAcct.getOrganizationEntity();
+            LicensedOrganizationAccountModel licensedAccount = new LicensedOrganizationAccountModel(orgAcct.getOrganizationAccountId(), org.getOrganizationName(), orgAcct.getOrganizationAccountName());
             return ActiveLicenseModel.fromLicenseEntity(licenseEntity, licensedAccount);
         }
         return LicenseModel.fromEntity(licenseEntity);
