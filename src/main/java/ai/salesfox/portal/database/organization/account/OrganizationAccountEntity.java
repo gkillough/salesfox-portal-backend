@@ -1,6 +1,7 @@
 package ai.salesfox.portal.database.organization.account;
 
-import lombok.AllArgsConstructor;
+import ai.salesfox.portal.database.account.entity.LicenseEntity;
+import ai.salesfox.portal.database.organization.OrganizationEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +11,6 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "organization_accounts")
 public class OrganizationAccountEntity implements Serializable {
@@ -32,5 +32,21 @@ public class OrganizationAccountEntity implements Serializable {
 
     @Column(name = "is_active")
     private Boolean isActive;
+
+    @OneToOne
+    @JoinColumn(name = "organization_id", referencedColumnName = "organization_id", insertable = false, updatable = false)
+    private OrganizationEntity organizationEntity;
+
+    @OneToOne
+    @JoinColumn(name = "license_id", referencedColumnName = "license_id", insertable = false, updatable = false)
+    private LicenseEntity licenseEntity;
+
+    public OrganizationAccountEntity(UUID organizationAccountId, String organizationAccountName, UUID licenseId, UUID organizationId, Boolean isActive) {
+        this.organizationAccountId = organizationAccountId;
+        this.organizationAccountName = organizationAccountName;
+        this.licenseId = licenseId;
+        this.organizationId = organizationId;
+        this.isActive = isActive;
+    }
 
 }

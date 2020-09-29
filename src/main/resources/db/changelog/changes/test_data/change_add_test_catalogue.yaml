@@ -29,9 +29,6 @@ databaseChangeLog:
                   name: price
                   valueNumeric: 24.99
               - column:
-                  name: quantity
-                  valueNumeric: 10
-              - column:
                   name: icon_id
                   value: 5be2c2dc-9f93-43a5-b14b-559277825e6e
               - column:
@@ -68,9 +65,6 @@ databaseChangeLog:
                   name: price
                   valueNumeric: 12.50
               - column:
-                  name: quantity
-                  valueNumeric: 40
-              - column:
                   name: icon_id
                   value: 65ad1457-7959-439e-a7e2-2c0990dcf69c
               - column:
@@ -106,9 +100,6 @@ databaseChangeLog:
               - column:
                   name: price
                   valueNumeric: 17.00
-              - column:
-                  name: quantity
-                  valueNumeric: 100
               - column:
                   name: icon_id
                   value: 541ae772-61db-453b-8ec5-d0d31081bbfc
@@ -148,9 +139,6 @@ databaseChangeLog:
               - column:
                   name: price
                   valueNumeric: 19.99
-              - column:
-                  name: quantity
-                  valueNumeric: 25
               - column:
                   name: icon_id
                   value: 282444ca-28db-4db2-9706-24b6104f2c17
