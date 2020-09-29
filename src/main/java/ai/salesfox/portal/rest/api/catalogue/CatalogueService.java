@@ -1,9 +1,12 @@
 package ai.salesfox.portal.rest.api.catalogue;
 
+import ai.salesfox.portal.common.enumeration.DistributorNames;
 import ai.salesfox.portal.common.service.catalogue.CatalogueItemAccessUtils;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserRepository;
+import ai.salesfox.portal.database.catalogue.external.CatalogueItemExternalDetailsEntity;
+import ai.salesfox.portal.database.catalogue.external.CatalogueItemExternalDetailsRepository;
 import ai.salesfox.portal.database.catalogue.icon.CatalogueItemIconEntity;
 import ai.salesfox.portal.database.catalogue.icon.CatalogueItemIconRepository;
 import ai.salesfox.portal.database.catalogue.item.CatalogueItemEntity;
@@ -13,9 +16,7 @@ import ai.salesfox.portal.database.catalogue.restriction.CatalogueItemOrganizati
 import ai.salesfox.portal.database.catalogue.restriction.CatalogueItemUserRestrictionEntity;
 import ai.salesfox.portal.database.catalogue.restriction.CatalogueItemUserRestrictionRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
-import ai.salesfox.portal.rest.api.catalogue.model.CatalogueItemRequestModel;
-import ai.salesfox.portal.rest.api.catalogue.model.CatalogueItemResponseModel;
-import ai.salesfox.portal.rest.api.catalogue.model.MultiCatalogueItemModel;
+import ai.salesfox.portal.rest.api.catalogue.model.*;
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
@@ -23,6 +24,7 @@ import ai.salesfox.portal.rest.api.image.HttpSafeImageUtility;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -41,6 +43,7 @@ import java.util.*;
 @Component
 public class CatalogueService {
     private final CatalogueItemRepository catalogueItemRepository;
+    private final CatalogueItemExternalDetailsRepository externalDetailsRepository;
     private final CatalogueItemOrganizationAccountRestrictionRepository catItemOrgAcctRestrictionRepository;
     private final CatalogueItemUserRestrictionRepository catItemUserRestrictionRepository;
     private final CatalogueItemIconRepository catalogueItemIconRepository;
@@ -50,11 +53,12 @@ public class CatalogueService {
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
-    public CatalogueService(CatalogueItemRepository catalogueItemRepository, CatalogueItemOrganizationAccountRestrictionRepository catItemOrgAcctRestrictionRepository,
-                            CatalogueItemUserRestrictionRepository catItemUserRestrictionRepository, CatalogueItemIconRepository catalogueItemIconRepository,
-                            OrganizationAccountRepository organizationAccountRepository, UserRepository userRepository,
+    public CatalogueService(CatalogueItemRepository catalogueItemRepository, CatalogueItemExternalDetailsRepository externalDetailsRepository,
+                            CatalogueItemOrganizationAccountRestrictionRepository catItemOrgAcctRestrictionRepository, CatalogueItemUserRestrictionRepository catItemUserRestrictionRepository,
+                            CatalogueItemIconRepository catalogueItemIconRepository, OrganizationAccountRepository organizationAccountRepository, UserRepository userRepository,
                             HttpSafeImageUtility imageUtility, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.catalogueItemRepository = catalogueItemRepository;
+        this.externalDetailsRepository = externalDetailsRepository;
         this.catItemOrgAcctRestrictionRepository = catItemOrgAcctRestrictionRepository;
         this.catItemUserRestrictionRepository = catItemUserRestrictionRepository;
         this.catalogueItemIconRepository = catalogueItemIconRepository;
@@ -108,6 +112,12 @@ public class CatalogueService {
                 catItemUserRestrictionRepository.save(userRestriction);
             }
         }
+
+        CatalogueItemExternalDetailsModel externalDetailsRequestModel = itemRequestModel.getExternalDetails();
+        CatalogueItemExternalDetailsEntity externalDetailsToSave = new CatalogueItemExternalDetailsEntity(savedItem.getItemId(), externalDetailsRequestModel.getDistributor(), externalDetailsRequestModel.getExternalId());
+        CatalogueItemExternalDetailsEntity savedExternalDetails = externalDetailsRepository.save(externalDetailsToSave);
+        savedItem.setCatalogueItemExternalDetailsEntity(savedExternalDetails);
+
         return convertToResponseModel(savedItem);
     }
 
@@ -165,6 +175,13 @@ public class CatalogueService {
             Optional.ofNullable(savedItem.getCatalogueItemUserRestrictionEntity())
                     .ifPresent(catItemUserRestrictionRepository::delete);
         }
+
+        CatalogueItemExternalDetailsModel externalDetailsRequestModel = itemRequestModel.getExternalDetails();
+        CatalogueItemExternalDetailsEntity externalDetailsToSave = Optional.ofNullable(existingItem.getCatalogueItemExternalDetailsEntity())
+                .orElseGet(() -> new CatalogueItemExternalDetailsEntity(existingItem.getItemId(), null, null));
+        externalDetailsToSave.setDistributor(externalDetailsRequestModel.getDistributor());
+        externalDetailsToSave.setExternalId(externalDetailsRequestModel.getExternalId());
+        externalDetailsRepository.save(externalDetailsToSave);
     }
 
     @Transactional
@@ -229,6 +246,22 @@ public class CatalogueService {
             }
         }
 
+        CatalogueItemExternalDetailsModel externalDetails = requestModel.getExternalDetails();
+        if (null == externalDetails) {
+            errors.add("The field 'externalDetails' is required");
+        } else {
+            String distributor = externalDetails.getDistributor();
+            if (StringUtils.isBlank(distributor)) {
+                errors.add("The Distributor specified for the external details cannot be blank");
+            } else if (!EnumUtils.isValidEnumIgnoreCase(DistributorNames.class, distributor)) {
+                errors.add("The Distributor must be one of the following: " + Arrays.toString(DistributorNames.values()));
+            }
+
+            if (StringUtils.isBlank(externalDetails.getExternalId())) {
+                errors.add("The External ID cannot be blank");
+            }
+        }
+
         if (!errors.isEmpty()) {
             String combinedErrors = String.join(", ", errors);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("There were errors with the request: %s", combinedErrors));
@@ -248,6 +281,12 @@ public class CatalogueService {
         CatalogueItemUserRestrictionEntity userRestriction = entity.getCatalogueItemUserRestrictionEntity();
         if (null != userRestriction) {
             userId = userRestriction.getUserId();
+        }
+
+        CatalogueItemExternalDetailsEntity externalDetailsEntity = entity.getCatalogueItemExternalDetailsEntity();
+        if (null != externalDetailsEntity && membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
+            CatalogueItemExternalDetailsModel externalDetailsModel = new CatalogueItemExternalDetailsModel(externalDetailsEntity.getDistributor(), externalDetailsEntity.getExternalId());
+            return new AdminCatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getPrice(), entity.getShippingCost(), entity.getIconId(), entity.getIsActive(), organizationAccountId, userId, externalDetailsModel);
         }
         return new CatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getPrice(), entity.getShippingCost(), entity.getIconId(), entity.getIsActive(), organizationAccountId, userId);
     }

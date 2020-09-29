@@ -15,5 +15,6 @@ public class CatalogueItemRequestModel {
     private BigDecimal price;
     private BigDecimal shippingCost;
     private RestrictionModel restriction;
+    private CatalogueItemExternalDetailsModel externalDetails;
 
 }
