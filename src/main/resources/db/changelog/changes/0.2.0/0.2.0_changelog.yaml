@@ -42,3 +42,7 @@ databaseChangeLog:
   - include:
       file: scribeless_gift_status.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: catalog_item_external_id.yaml
+      relativeToChangelogFile: true
