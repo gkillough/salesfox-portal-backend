@@ -253,7 +253,7 @@ public class CatalogueService {
             String distributor = externalDetails.getDistributor();
             if (StringUtils.isBlank(distributor)) {
                 errors.add("The Distributor specified for the external details cannot be blank");
-            } else if (EnumUtils.isValidEnumIgnoreCase(DistributorNames.class, distributor)) {
+            } else if (!EnumUtils.isValidEnumIgnoreCase(DistributorNames.class, distributor)) {
                 errors.add("The Distributor must be one of the following: " + Arrays.toString(DistributorNames.values()));
             }
 

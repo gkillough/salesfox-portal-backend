@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(schema = "portal", name = "catalogue_items")
+@Table(schema = "portal", name = "catalogue_item_external_details")
 public class CatalogueItemExternalDetailsEntity implements Serializable {
     @Id
     @PrimaryKeyJoinColumn
