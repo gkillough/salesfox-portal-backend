@@ -79,7 +79,7 @@ public class ScribelessCampaignRequestModelCreator {
                 ScribelessCampaignDefaults.DEFAULT_PAPER_SIZE_USA,
                 giftNote.getHandwritingStyle(),
                 giftNote.getFontColor(),
-                null, // TODO replace stored "font size" with a Small, Medium, or Large string
+                giftNote.getFontSize(),
                 "Salesfox Gift Id: " + giftId,
                 ScribelessProductType.ON_DEMAND.getText(),
                 giftNote.getMessage(),
