@@ -1,6 +1,7 @@
 package ai.salesfox.portal.integration.scribeless.workflow;
 
 import ai.salesfox.integration.common.exception.SalesfoxException;
+import ai.salesfox.integration.scribeless.enumeration.ScribelessProductType;
 import ai.salesfox.integration.scribeless.model.ScribelessAddressModel;
 import ai.salesfox.integration.scribeless.service.campaign.model.CampaignCreationRequestModel;
 import ai.salesfox.integration.scribeless.service.campaign.model.CampaignUpdateRequestModel;
@@ -34,8 +35,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class ScribelessCampaignRequestModelCreator {
-    public static final PageRequest DEFAULT_PAGE_REQUEST = PageRequest.of(0, 100);
-    public static final String DEFAULT_ADDRESS_COUNTRY = "USA";
+    public static final PageRequest DEFAULT_PAGE_REQUEST = PageRequest.of(0, 500);
 
     private final GiftRecipientRepository giftRecipientRepository;
     private final OrganizationAccountContactRepository contactRepository;
@@ -71,19 +71,21 @@ public class ScribelessCampaignRequestModelCreator {
         Optional<CustomIconEntity> optionalIcon = retrieveCustomIcon(gift);
         if (optionalIcon.isPresent()) {
             headerImageUrl = retrieveCustomIconUrl(optionalIcon.get());
-            headerType = "Logo";
+            headerType = ScribelessCampaignDefaults.DEFAULT_HEADER_TYPE; // TODO determine if this is correct
         }
 
         // TODO determine valid defaults for these
         CampaignCreationRequestModel creationRequestModel = new CampaignCreationRequestModel(
-                "A5",
+                ScribelessCampaignDefaults.DEFAULT_PAPER_SIZE_USA,
                 giftNote.getHandwritingStyle(),
+                giftNote.getFontColor(),
+                null, // TODO replace stored "font size" with a Small, Medium, or Large string
                 "Salesfox Gift Id: " + giftId,
-                "Advanced",
+                ScribelessProductType.ON_DEMAND.getText(),
                 giftNote.getMessage(),
                 null,
                 null,
-                null,
+                null, // TODO maybe this is where distributor info will go?
                 headerImageUrl,
                 headerType,
                 null,
@@ -124,7 +126,7 @@ public class ScribelessCampaignRequestModelCreator {
                 address.getAddressLine2(),
                 null,
                 address.getCity(),
-                DEFAULT_ADDRESS_COUNTRY,
+                ScribelessCampaignDefaults.DEFAULT_COUNTRY,
                 address.getState(),
                 address.getZipCode()
         );

@@ -19,7 +19,12 @@ public class CampaignCreationRequestModel {
     private String paperSize;
     @SerializedName("handwriting_style")
     private String handwritingStyle;
+    @SerializedName("handwriting_colour")
+    private String handwritingColour;
+    @SerializedName("handwriting_size")
+    private String handwritingSize;
     private String title;
+    // TODO add "delivery" field (object - "delivery: {"sender": "STRING"})
     private String product;
     private String text;
     private String inserts;
@@ -42,50 +47,8 @@ public class CampaignCreationRequestModel {
     private ScribelessAddressModel returnAddress;
     private List<ScribelessAddressModel> recipients;
 
-    /* FIXME remove when correct default values are determined
-    {
-  "paper_size": "A5",
-  "handwriting_style": "Jane",
-  "title": "My campaign",
-  "product": "Advanced",
-  "text": "Hello {{{first name}}},This is a test!",
-  "inserts": "$5 Starbucks gift card",
-  "due_date": "31/01/2021",
-  "notes": "Campaign notes",
-  "header_image": "http://app.thehandwriting.company/static/images/your_logo.png",
-  "header_type": "Logo",
-  "header_font": "josefin",
-  "header_text": "Header text",
-  "footer_text": "Footer text",
-  "footer_font": "josefin",
-  "return_address": {
-    "address line 1": "Flat 1",
-    "address line 2": "123 Broom Road",
-    "address line 3": "Bathwick hill",
-    "city": "London",
-    "country": "United Kingdom",
-    "department": "HR",
-    "first name": "Tim",
-    "last name": "Johnson",
-    "state/region": "London",
-    "title": "Mr",
-    "zip/postal code": "TW11 9PG"
-  },
-  "recipients": [
-    {
-      "address line 1": "Flat 1",
-      "address line 2": "123 Broom Road",
-      "address line 3": "Bathwick hill",
-      "city": "London",
-      "country": "United Kingdom",
-      "department": "HR",
-      "first name": "Tim",
-      "last name": "Johnson",
-      "state/region": "London",
-      "title": "Mr",
-      "zip/postal code": "TW11 9PG"
-    }
-  ]
-}
+    /* FIXME this is the only missing field (as far as can be determined)
+    {"delivery":{"sender":"Print on Request"}}
      */
+
 }

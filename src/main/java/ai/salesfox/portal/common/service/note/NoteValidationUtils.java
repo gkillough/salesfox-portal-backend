@@ -1,7 +1,7 @@
 package ai.salesfox.portal.common.service.note;
 
 import ai.salesfox.integration.common.util.SalesfoxEnumUtils;
-import ai.salesfox.integration.scribeless.enumeration.ScribelessFontColors;
+import ai.salesfox.integration.scribeless.enumeration.ScribelessHandwritingColors;
 import ai.salesfox.integration.scribeless.enumeration.ScribelessHandwritingStyles;
 
 import java.util.Arrays;
@@ -11,7 +11,7 @@ public class NoteValidationUtils {
     public static final int MIN_ALLOWED_FONT_SIZE = 8;
     public static final int MAX_ALLOWED_FONT_SIZE = 24;
 
-    public static final String[] ALLOWED_COLORS = SalesfoxEnumUtils.lowercaseValues(ScribelessFontColors.values());
+    public static final String[] ALLOWED_COLORS = SalesfoxEnumUtils.lowercaseValues(ScribelessHandwritingColors.values());
     public static final String[] ALLOWED_HANDWRITING_STYLES = SalesfoxEnumUtils.lowercaseValues(ScribelessHandwritingStyles.values());
 
     public static boolean isValidMessageSize(String message) {
