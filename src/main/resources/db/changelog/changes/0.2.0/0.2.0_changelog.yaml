@@ -46,3 +46,7 @@ databaseChangeLog:
   - include:
       file: catalog_item_external_id.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: scribeless_note_updates.yaml
+      relativeToChangelogFile: true
