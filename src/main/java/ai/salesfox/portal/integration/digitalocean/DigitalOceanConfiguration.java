@@ -1,0 +1,46 @@
+package ai.salesfox.portal.integration.digitalocean;
+
+import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+
+import java.net.URI;
+
+@Data
+@Configuration
+public class DigitalOceanConfiguration {
+    public static final String DIGITAL_OCEAN_BUCKET_DOMAIN_NAME = "nyc3.digitaloceanspaces.com";
+    public static final String AWS_ENDPOINT_OVERRIDE = "https://" + DIGITAL_OCEAN_BUCKET_DOMAIN_NAME;
+
+    @Value("${ai.salesfox.portal.integration.digitalocean.catalog.bucket.name:}")
+    private String catalogBucketName;
+
+    @Value("${ai.salesfox.portal.integration.digitalocean.user.bucket.name:}")
+    private String userUploadsBucketName;
+
+    @Value("${ai.salesfox.portal.integration.digitalocean.aws.accessKeyId:}")
+    private String awsAccessKeyId;
+
+    @Value("${ai.salesfox.portal.integration.digitalocean.aws.secretAccessKey:}")
+    private String awsSecretAccessKey;
+
+    @Bean
+    public S3Client s3Client() {
+        return S3Client
+                .builder()
+                .endpointOverride(URI.create(AWS_ENDPOINT_OVERRIDE))
+                .region(Region.AP_NORTHEAST_1)
+                .credentialsProvider(this::createCredentials)
+                .build();
+    }
+
+    private AwsCredentials createCredentials() {
+        return AwsBasicCredentials.create(awsAccessKeyId, awsSecretAccessKey);
+    }
+
+}
