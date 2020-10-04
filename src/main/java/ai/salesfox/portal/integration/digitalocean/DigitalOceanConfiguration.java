@@ -13,7 +13,8 @@ import java.net.URI;
 
 @Configuration
 public class DigitalOceanConfiguration {
-    public static final String DIGITAL_OCEAN_BUCKET_DOMAIN_NAME = "nyc3.digitaloceanspaces.com";
+    public static final String DIGITAL_OCEAN_BUCKET_REGION_NAME = "nyc3";
+    public static final String DIGITAL_OCEAN_BUCKET_DOMAIN_NAME = DIGITAL_OCEAN_BUCKET_REGION_NAME + ".digitaloceanspaces.com";
     public static final String AWS_ENDPOINT_OVERRIDE = "https://" + DIGITAL_OCEAN_BUCKET_DOMAIN_NAME;
 
     @Getter
@@ -35,7 +36,7 @@ public class DigitalOceanConfiguration {
         return S3Client
                 .builder()
                 .endpointOverride(URI.create(AWS_ENDPOINT_OVERRIDE))
-                .region(Region.AP_NORTHEAST_1)
+                .region(Region.of(DIGITAL_OCEAN_BUCKET_REGION_NAME))
                 .credentialsProvider(this::createCredentials)
                 .build();
     }
