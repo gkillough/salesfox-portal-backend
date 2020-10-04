@@ -1,6 +1,6 @@
 package ai.salesfox.portal.integration.digitalocean;
 
-import lombok.Data;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,15 +11,16 @@ import software.amazon.awssdk.services.s3.S3Client;
 
 import java.net.URI;
 
-@Data
 @Configuration
 public class DigitalOceanConfiguration {
     public static final String DIGITAL_OCEAN_BUCKET_DOMAIN_NAME = "nyc3.digitaloceanspaces.com";
     public static final String AWS_ENDPOINT_OVERRIDE = "https://" + DIGITAL_OCEAN_BUCKET_DOMAIN_NAME;
 
+    @Getter
     @Value("${ai.salesfox.portal.integration.digitalocean.catalog.bucket.name:}")
     private String catalogBucketName;
 
+    @Getter
     @Value("${ai.salesfox.portal.integration.digitalocean.user.bucket.name:}")
     private String userUploadsBucketName;
 
