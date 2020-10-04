@@ -21,7 +21,6 @@ import ai.salesfox.portal.rest.api.note.model.NoteRequestModel;
 import ai.salesfox.portal.rest.api.note.model.NoteResponseModel;
 import ai.salesfox.portal.rest.api.user.common.model.UserSummaryModel;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,7 +35,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class NoteService {
-    public static final int DEFAULT_FONT_SIZE = 15;
+    public static final String DEFAULT_FONT_SIZE = "Medium";
     public static final String DEFAULT_FONT_COLOR = "black";
     public static final String DEFAULT_HANDWRITING_STYLE = "stafford";
 
@@ -85,7 +84,7 @@ public class NoteService {
         validateNoteRequestModel(requestModel);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
 
-        Integer noteFontSize = ObjectUtils.defaultIfNull(requestModel.getFontSize(), DEFAULT_FONT_SIZE);
+        String noteFontSize = defaultIfBlank(requestModel.getFontSize(), DEFAULT_FONT_SIZE);
         String noteFontColor = defaultIfBlank(requestModel.getFontColor(), DEFAULT_FONT_COLOR);
         String noteHandwritingStyle = defaultIfBlank(requestModel.getHandwritingStyle(), DEFAULT_HANDWRITING_STYLE);
         NoteEntity noteToSave = new NoteEntity(null, loggedInUser.getUserId(), PortalDateTimeUtils.getCurrentDateTime(), requestModel.getMessage(), noteFontSize, noteFontColor, noteHandwritingStyle);
@@ -119,7 +118,7 @@ public class NoteService {
         foundNote.setDateModified(PortalDateTimeUtils.getCurrentDateTime());
         foundNote.setMessage(requestModel.getMessage());
 
-        Integer newFontSize = ObjectUtils.defaultIfNull(requestModel.getFontSize(), foundNote.getFontSize());
+        String newFontSize = defaultIfBlank(requestModel.getFontSize(), foundNote.getFontSize());
         foundNote.setFontSize(newFontSize);
 
         String newFontColor = defaultIfBlank(requestModel.getFontColor(), foundNote.getFontColor());
@@ -168,9 +167,9 @@ public class NoteService {
             errors.add(String.format("The message cannot exceed %d characters", NoteValidationUtils.MAX_MESSAGE_CHARS));
         }
 
-        Integer fontSize = noteRequestModel.getFontSize();
-        if (null != fontSize && !NoteValidationUtils.isValidFontSize(fontSize)) {
-            errors.add(String.format("The font size must be between %d and %d inclusive", NoteValidationUtils.MIN_ALLOWED_FONT_SIZE, NoteValidationUtils.MAX_ALLOWED_FONT_SIZE));
+        String fontSize = noteRequestModel.getFontSize();
+        if (StringUtils.isNotBlank(fontSize) && !NoteValidationUtils.isValidFontSize(fontSize)) {
+            errors.add(String.format("Invalid font size. Available sizes: %s", Arrays.toString(NoteValidationUtils.ALLOWED_FONT_SIZES)));
         }
 
         String fontColor = noteRequestModel.getFontColor();

@@ -1,5 +1,6 @@
 package ai.salesfox.portal.database.catalogue.item;
 
+import ai.salesfox.portal.database.catalogue.external.CatalogueItemExternalDetailsEntity;
 import ai.salesfox.portal.database.catalogue.restriction.CatalogueItemOrganizationAccountRestrictionEntity;
 import ai.salesfox.portal.database.catalogue.restriction.CatalogueItemUserRestrictionEntity;
 import lombok.Data;
@@ -35,6 +36,10 @@ public class CatalogueItemEntity implements Serializable {
 
     @Column(name = "is_active")
     private Boolean isActive;
+
+    @OneToOne
+    @JoinColumn(name = "item_id", referencedColumnName = "item_id", insertable = false, updatable = false)
+    private CatalogueItemExternalDetailsEntity catalogueItemExternalDetailsEntity;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "item_id", referencedColumnName = "item_id", insertable = false, updatable = false)

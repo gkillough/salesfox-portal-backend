@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: update-scribeless-note-models-1
+      author: gavinkillough
+      changes:
+        - dropColumn:
+            schemaName: portal
+            tableName: notes
+            columnName: font_size_pt
+
+  - changeSet:
+      id: update-scribeless-note-models-2
+      author: gavinkillough
+      changes:
+        - addColumn:
+            schemaName: portal
+            tableName: notes
+            columns:
+              - column:
+                  name: font_size
+                  type: VARCHAR
+                  value: 'Medium'
+                  constraints:
+                    nullable: false

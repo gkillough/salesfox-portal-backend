@@ -1,6 +1,6 @@
 package ai.salesfox.integration.scribeless.enumeration;
 
-public enum ScribelessFontColors {
+public enum ScribelessHandwritingColors {
     BLACK,
     BLUE
 
