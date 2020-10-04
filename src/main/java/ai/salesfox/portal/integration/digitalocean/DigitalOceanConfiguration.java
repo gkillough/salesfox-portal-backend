@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
 import software.amazon.awssdk.regions.Region;
@@ -12,7 +13,9 @@ import software.amazon.awssdk.services.s3.S3Client;
 import java.net.URI;
 
 @Configuration
+@PropertySource(DigitalOceanConfiguration.DIGITAL_OCEAN_CONFIGURATION_FILE_NAME)
 public class DigitalOceanConfiguration {
+    public static final String DIGITAL_OCEAN_CONFIGURATION_FILE_NAME = "digitalocean.properties";
     public static final String DIGITAL_OCEAN_BUCKET_REGION_NAME = "nyc3";
     public static final String DIGITAL_OCEAN_BUCKET_DOMAIN_NAME = DIGITAL_OCEAN_BUCKET_REGION_NAME + ".digitaloceanspaces.com";
     public static final String AWS_ENDPOINT_OVERRIDE = "https://" + DIGITAL_OCEAN_BUCKET_DOMAIN_NAME;
