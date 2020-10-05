@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @Component
 public class DigitalOceanBucketService implements ExternalImageStorageService {
-    public static final int DEFAULT_BYTE_BUFFER_UNIT_SIZE = 5242880;
+    public static final int MAX_BYTE_BUFFER_UNIT_SIZE = 5242880;
 
     private final DigitalOceanConfiguration digitalOceanConfig;
     private final S3Client s3Client;
@@ -61,6 +61,12 @@ public class DigitalOceanBucketService implements ExternalImageStorageService {
             throw new PortalException("Failed to get uploaded bytes");
         }
 
+        int numberOfParts = multipartFileBytes.length / MAX_BYTE_BUFFER_UNIT_SIZE;
+        int numberOfExtraBytes = multipartFileBytes.length % MAX_BYTE_BUFFER_UNIT_SIZE;
+        if (numberOfExtraBytes != 0) {
+            numberOfParts++;
+        }
+
         ByteBuffer byteBuffer = ByteBuffer.wrap(multipartFileBytes);
 
         int partNumber = 1;
@@ -73,8 +79,15 @@ public class DigitalOceanBucketService implements ExternalImageStorageService {
                     .partNumber(partNumber)
                     .build();
 
-            ByteBuffer byteBufferSlice = byteBuffer.alignedSlice(DEFAULT_BYTE_BUFFER_UNIT_SIZE);
-            RequestBody uploadPartRequestBody = RequestBody.fromByteBuffer(byteBufferSlice);
+            int offset = MAX_BYTE_BUFFER_UNIT_SIZE * (partNumber - 1);
+            ByteBuffer partialByteBuffer;
+            if (partNumber == numberOfParts) {
+                partialByteBuffer = byteBuffer.get(new byte[numberOfExtraBytes], offset, numberOfExtraBytes);
+            } else {
+                partialByteBuffer = byteBuffer.get(new byte[MAX_BYTE_BUFFER_UNIT_SIZE], offset, MAX_BYTE_BUFFER_UNIT_SIZE);
+            }
+
+            RequestBody uploadPartRequestBody = RequestBody.fromByteBuffer(partialByteBuffer);
             UploadPartResponse uploadPartResponse = s3Client.uploadPart(uploadPartRequest, uploadPartRequestBody);
 
             CompletedPart completedPart = CompletedPart
@@ -84,7 +97,7 @@ public class DigitalOceanBucketService implements ExternalImageStorageService {
                     .build();
             completedParts.add(completedPart);
             partNumber++;
-        } while (byteBuffer.hasRemaining());
+        } while (partNumber <= numberOfParts);
 
         return completedParts;
     }
