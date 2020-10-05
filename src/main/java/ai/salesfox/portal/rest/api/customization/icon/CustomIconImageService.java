@@ -1,5 +1,8 @@
 package ai.salesfox.portal.rest.api.customization.icon;
 
+import ai.salesfox.portal.common.enumeration.PortalImageStorageDestination;
+import ai.salesfox.portal.common.exception.PortalException;
+import ai.salesfox.portal.common.service.icon.ExternalImageStorageService;
 import ai.salesfox.portal.database.customization.icon.CustomIconEntity;
 import ai.salesfox.portal.database.customization.icon.CustomIconRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -16,12 +19,14 @@ import java.util.UUID;
 @Component
 public class CustomIconImageService {
     private final CustomIconRepository customIconRepository;
+    private final ExternalImageStorageService externalImageStorageService;
     private final CustomIconAccessService customIconAccessService;
     private final CustomIconGiftStatusValidator customIconGiftStatusValidator;
 
     @Autowired
-    public CustomIconImageService(CustomIconRepository customIconRepository, CustomIconAccessService customIconAccessService, CustomIconGiftStatusValidator customIconGiftStatusValidator) {
+    public CustomIconImageService(CustomIconRepository customIconRepository, ExternalImageStorageService externalImageStorageService, CustomIconAccessService customIconAccessService, CustomIconGiftStatusValidator customIconGiftStatusValidator) {
         this.customIconRepository = customIconRepository;
+        this.externalImageStorageService = externalImageStorageService;
         this.customIconAccessService = customIconAccessService;
         this.customIconGiftStatusValidator = customIconGiftStatusValidator;
     }
@@ -33,26 +38,20 @@ public class CustomIconImageService {
         customIconAccessService.validateImageAccess(foundCustomIconEntity);
         customIconGiftStatusValidator.validateCustomIconGiftStatus(customIconId);
 
+        // FIXME validate things about the image
+
         // TODO consider restrictions around uploader id
 
-        // FIXME upload to CDN and retrieve url
-        String iconUrl = null;
-        foundCustomIconEntity.setIconUrl(iconUrl);
+        String iconUrl;
+        try {
+            iconUrl = externalImageStorageService.storeImageAndRetrieveUrl(PortalImageStorageDestination.USER_IMAGES, iconFile);
+        } catch (PortalException e) {
+            log.error("There was a problem uploading an image", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload the image. If this problem persists, please contact support.");
+        }
 
-//        File savedImageFile = imageUtility.saveImage(iconFile);
-//        Optional<CustomIconFileEntity> optionalExistingFileEntity = customIconFileRepository.findById(customIconId);
-//        CustomIconFileEntity customIconFileToSave;
-//        if (optionalExistingFileEntity.isPresent()) {
-//            customIconFileToSave = optionalExistingFileEntity.get();
-//            String oldFileName = customIconFileToSave.getFileName();
-//            imageUtility.deleteImageByName(oldFileName);
-//        } else {
-//            customIconFileToSave = new CustomIconFileEntity(customIconId, null);
-//        }
-//
-//        String savedImageFileName = FilenameUtils.getName(savedImageFile.getName());
-//        customIconFileToSave.(savedImageFileName);
-//        customIconFileRepository.save(customIconFileToSave);
+        foundCustomIconEntity.setIconUrl(iconUrl);
+        customIconRepository.save(foundCustomIconEntity);
     }
 
 }

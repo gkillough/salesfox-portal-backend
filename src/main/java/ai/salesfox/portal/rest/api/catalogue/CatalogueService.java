@@ -2,7 +2,10 @@ package ai.salesfox.portal.rest.api.catalogue;
 
 import ai.salesfox.portal.common.FieldValidationUtils;
 import ai.salesfox.portal.common.enumeration.DistributorNames;
+import ai.salesfox.portal.common.enumeration.PortalImageStorageDestination;
+import ai.salesfox.portal.common.exception.PortalException;
 import ai.salesfox.portal.common.service.catalogue.CatalogueItemAccessUtils;
+import ai.salesfox.portal.common.service.icon.ExternalImageStorageService;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserRepository;
@@ -44,18 +47,20 @@ public class CatalogueService {
     private final CatalogueItemUserRestrictionRepository catItemUserRestrictionRepository;
     private final OrganizationAccountRepository organizationAccountRepository;
     private final UserRepository userRepository;
+    private final ExternalImageStorageService externalImageStorageService;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
     public CatalogueService(CatalogueItemRepository catalogueItemRepository, CatalogueItemExternalDetailsRepository externalDetailsRepository,
                             CatalogueItemOrganizationAccountRestrictionRepository catItemOrgAcctRestrictionRepository, CatalogueItemUserRestrictionRepository catItemUserRestrictionRepository,
-                            OrganizationAccountRepository organizationAccountRepository, UserRepository userRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+                            OrganizationAccountRepository organizationAccountRepository, UserRepository userRepository, ExternalImageStorageService externalImageStorageService, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.catalogueItemRepository = catalogueItemRepository;
         this.externalDetailsRepository = externalDetailsRepository;
         this.catItemOrgAcctRestrictionRepository = catItemOrgAcctRestrictionRepository;
         this.catItemUserRestrictionRepository = catItemUserRestrictionRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.userRepository = userRepository;
+        this.externalImageStorageService = externalImageStorageService;
         this.membershipRetrievalService = membershipRetrievalService;
     }
 
@@ -117,12 +122,13 @@ public class CatalogueService {
         CatalogueItemEntity exitingItem = catalogueItemRepository.findById(itemId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        // FIXME upload to CDN and retrieve url
-        String iconUrl = null;
-//        File savedIcon = imageUtility.saveImage(iconFile);
-//        String savedIconName = FilenameUtils.getName(savedIcon.getName());
-//        CatalogueItemIconEntity iconEntityToSave = new CatalogueItemIconEntity(null, savedIconName);
-//        CatalogueItemIconEntity savedIconEntity = catalogueItemIconRepository.save(iconEntityToSave);
+        String iconUrl;
+        try {
+            iconUrl = externalImageStorageService.storeImageAndRetrieveUrl(PortalImageStorageDestination.CATALOG_IMAGES, iconFile);
+        } catch (PortalException e) {
+            log.error("Failed to upload catalog image", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, String.format("There was a problem uploading the image to the Digital Ocean / AWS bucket: %s", e.getMessage()));
+        }
 
         exitingItem.setIconUrl(iconUrl);
         catalogueItemRepository.save(exitingItem);

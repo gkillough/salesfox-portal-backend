@@ -1,6 +1,9 @@
 package ai.salesfox.portal.integration.digitalocean;
 
-import ai.salesfox.integration.common.exception.SalesfoxException;
+import ai.salesfox.portal.common.enumeration.PortalImageStorageDestination;
+import ai.salesfox.portal.common.exception.PortalException;
+import ai.salesfox.portal.common.exception.PortalRuntimeException;
+import ai.salesfox.portal.common.service.icon.ExternalImageStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-public class DigitalOceanBucketService {
+public class DigitalOceanBucketService implements ExternalImageStorageService {
     public static final int DEFAULT_BYTE_BUFFER_UNIT_SIZE = 5242880;
 
     private final DigitalOceanConfiguration digitalOceanConfig;
@@ -27,8 +30,9 @@ public class DigitalOceanBucketService {
         this.s3Client = s3Client;
     }
 
-    public Object storeImageAndRetrieveUrl(DigitalOceanBucketType bucketType, MultipartFile multipartFile) {
-        String bucketName = getBucketName(bucketType);
+    @Override
+    public String storeImageAndRetrieveUrl(PortalImageStorageDestination destination, MultipartFile multipartFile) throws PortalException {
+        String bucketName = getBucketName(destination);
         String uploadKey = UUID.randomUUID().toString();
 
         CreateMultipartUploadRequest uploadRequest = createMultipartUploadRequest(bucketName, uploadKey, multipartFile.getContentType());
@@ -49,12 +53,12 @@ public class DigitalOceanBucketService {
                 .build();
     }
 
-    private List<CompletedPart> uploadFileParts(String bucketName, String uploadKey, String uploadId, MultipartFile multipartFile) {
+    private List<CompletedPart> uploadFileParts(String bucketName, String uploadKey, String uploadId, MultipartFile multipartFile) throws PortalException {
         byte[] multipartFileBytes;
         try {
             multipartFileBytes = multipartFile.getBytes();
         } catch (IOException ioException) {
-            throw new RuntimeException(new SalesfoxException("Failed to get uploaded bytes"));
+            throw new PortalException("Failed to get uploaded bytes");
         }
 
         ByteBuffer byteBuffer = ByteBuffer.wrap(multipartFileBytes);
@@ -100,14 +104,14 @@ public class DigitalOceanBucketService {
         return s3Client.completeMultipartUpload(completeMultipartUploadRequest);
     }
 
-    private String getBucketName(DigitalOceanBucketType bucketType) {
+    private String getBucketName(PortalImageStorageDestination bucketType) {
         switch (bucketType) {
             case CATALOG_IMAGES:
                 return digitalOceanConfig.getCatalogBucketName();
             case USER_IMAGES:
                 return digitalOceanConfig.getUserUploadsBucketName();
             default:
-                throw new UnsupportedOperationException(String.format("No known buckets for option: %s", bucketType.name()));
+                throw new PortalRuntimeException(String.format("No known buckets for option: %s", bucketType.name()));
         }
     }
 
