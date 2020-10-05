@@ -6,6 +6,7 @@ import ai.salesfox.portal.common.exception.PortalRuntimeException;
 import ai.salesfox.portal.common.service.icon.ExternalImageStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -15,7 +16,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class DigitalOceanBucketService implements ExternalImageStorageService {
@@ -32,16 +32,18 @@ public class DigitalOceanBucketService implements ExternalImageStorageService {
 
     @Override
     public String storeImageAndRetrieveUrl(PortalImageStorageDestination destination, MultipartFile multipartFile) throws PortalException {
-        String bucketName = getBucketName(destination);
-        String uploadKey = UUID.randomUUID().toString();
+        byte[] multipartFileBytes = getMultipartFileBytes(multipartFile);
+        String uploadKey = DigestUtils.md5DigestAsHex(multipartFileBytes);
+        String unqualifiedBucketName = getUnqualifiedBucketName(destination);
+        String fullyQualifiedBucketName = digitalOceanConfig.getBucketQualifyingPrefix() + unqualifiedBucketName;
 
-        CreateMultipartUploadRequest uploadRequest = createMultipartUploadRequest(bucketName, uploadKey, multipartFile.getContentType());
+        CreateMultipartUploadRequest uploadRequest = createMultipartUploadRequest(fullyQualifiedBucketName, uploadKey, multipartFile.getContentType());
         CreateMultipartUploadResponse uploadResponse = s3Client.createMultipartUpload(uploadRequest);
 
         String uploadId = uploadResponse.uploadId();
-        List<CompletedPart> completedParts = uploadFileParts(bucketName, uploadKey, uploadId, multipartFile);
-        CompleteMultipartUploadResponse completeMultipartUploadResponse = completeMultipartUpload(bucketName, uploadKey, uploadId, completedParts);
-        return completeMultipartUploadResponse.location();
+        List<CompletedPart> completedParts = uploadFileParts(fullyQualifiedBucketName, uploadKey, uploadId, multipartFileBytes);
+        completeMultipartUpload(fullyQualifiedBucketName, uploadKey, uploadId, completedParts);
+        return constructSubdomainUrl(unqualifiedBucketName, uploadKey);
     }
 
     private CreateMultipartUploadRequest createMultipartUploadRequest(String bucketName, String uploadKey, String contentType) {
@@ -53,14 +55,7 @@ public class DigitalOceanBucketService implements ExternalImageStorageService {
                 .build();
     }
 
-    private List<CompletedPart> uploadFileParts(String bucketName, String uploadKey, String uploadId, MultipartFile multipartFile) throws PortalException {
-        byte[] multipartFileBytes;
-        try {
-            multipartFileBytes = multipartFile.getBytes();
-        } catch (IOException ioException) {
-            throw new PortalException("Failed to get uploaded bytes");
-        }
-
+    private List<CompletedPart> uploadFileParts(String bucketName, String uploadKey, String uploadId, byte[] multipartFileBytes) {
         int numberOfParts = multipartFileBytes.length / MAX_BYTE_BUFFER_UNIT_SIZE;
         int numberOfExtraBytes = multipartFileBytes.length % MAX_BYTE_BUFFER_UNIT_SIZE;
         if (numberOfExtraBytes != 0) {
@@ -117,7 +112,15 @@ public class DigitalOceanBucketService implements ExternalImageStorageService {
         return s3Client.completeMultipartUpload(completeMultipartUploadRequest);
     }
 
-    private String getBucketName(PortalImageStorageDestination bucketType) {
+    private byte[] getMultipartFileBytes(MultipartFile multipartFile) throws PortalException {
+        try {
+            return multipartFile.getBytes();
+        } catch (IOException ioException) {
+            throw new PortalException("Failed to get uploaded bytes");
+        }
+    }
+
+    private String getUnqualifiedBucketName(PortalImageStorageDestination bucketType) {
         switch (bucketType) {
             case CATALOG_IMAGES:
                 return digitalOceanConfig.getCatalogBucketName();
@@ -126,6 +129,11 @@ public class DigitalOceanBucketService implements ExternalImageStorageService {
             default:
                 throw new PortalRuntimeException(String.format("No known buckets for option: %s", bucketType.name()));
         }
+    }
+
+    private String constructSubdomainUrl(String unqualifiedBucketName, String uploadKey) {
+        // TODO use config variable for portal domain
+        return String.format("https://%s.salesfox.ai/%s", unqualifiedBucketName, uploadKey);
     }
 
 }
