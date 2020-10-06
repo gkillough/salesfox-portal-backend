@@ -44,6 +44,10 @@ databaseChangeLog:
       relativeToChangelogFile: true
 
   - include:
+      file: uploaded_icon_urls.yaml
+      relativeToChangelogFile: true
+
+  - include:
       file: catalog_item_external_id.yaml
       relativeToChangelogFile: true
 

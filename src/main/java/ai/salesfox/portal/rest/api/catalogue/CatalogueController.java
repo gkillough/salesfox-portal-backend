@@ -1,8 +1,8 @@
 package ai.salesfox.portal.rest.api.catalogue;
 
 import ai.salesfox.portal.rest.api.catalogue.model.CatalogueItemRequestModel;
-import ai.salesfox.portal.rest.api.catalogue.model.MultiCatalogueItemModel;
 import ai.salesfox.portal.rest.api.catalogue.model.CatalogueItemResponseModel;
+import ai.salesfox.portal.rest.api.catalogue.model.MultiCatalogueItemModel;
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import ai.salesfox.portal.rest.api.common.page.PageMetadata;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
@@ -18,7 +18,7 @@ import java.util.UUID;
 public class CatalogueController {
     public static final String BASE_ENDPOINT = "/catalogue/items";
 
-    private CatalogueService catalogueService;
+    private final CatalogueService catalogueService;
 
     @Autowired
     public CatalogueController(CatalogueService catalogueService) {
@@ -43,7 +43,7 @@ public class CatalogueController {
 
     @PostMapping("/{itemId}/icon")
     @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
-    public void setItemIcon(@PathVariable UUID itemId, @RequestParam MultipartFile iconFile) {
+    public void uploadItemIcon(@PathVariable UUID itemId, @RequestParam MultipartFile iconFile) {
         catalogueService.setItemIcon(itemId, iconFile);
     }
 

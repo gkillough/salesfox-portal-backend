@@ -21,11 +21,15 @@ public class DigitalOceanConfiguration {
     public static final String AWS_ENDPOINT_OVERRIDE = "https://" + DIGITAL_OCEAN_BUCKET_DOMAIN_NAME;
 
     @Getter
-    @Value("${ai.salesfox.portal.integration.digitalocean.catalog.bucket.name:}")
+    @Value("${ai.salesfox.portal.integration.digitalocean.bucket.qualifying.prefix:}")
+    private String bucketQualifyingPrefix;
+
+    @Getter
+    @Value("${ai.salesfox.portal.integration.digitalocean.catalog.unqualified.bucket.name:}")
     private String catalogBucketName;
 
     @Getter
-    @Value("${ai.salesfox.portal.integration.digitalocean.user.bucket.name:}")
+    @Value("${ai.salesfox.portal.integration.digitalocean.user.unqualified.bucket.name:}")
     private String userUploadsBucketName;
 
     @Value("${ai.salesfox.portal.integration.digitalocean.aws.accessKeyId:}")
@@ -33,6 +37,14 @@ public class DigitalOceanConfiguration {
 
     @Value("${ai.salesfox.portal.integration.digitalocean.aws.secretAccessKey:}")
     private String awsSecretAccessKey;
+
+    public String createQualifiedCatalogBucketName() {
+        return getBucketQualifyingPrefix() + getCatalogBucketName();
+    }
+
+    public String createQualifiedUserUploadsBucketName() {
+        return getBucketQualifyingPrefix() + getUserUploadsBucketName();
+    }
 
     @Bean
     public S3Client s3Client() {

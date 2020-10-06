@@ -31,9 +31,8 @@ public class CatalogueItemEntity implements Serializable {
     @Column(name = "shipping_cost")
     private BigDecimal shippingCost;
 
-    @PrimaryKeyJoinColumn
-    @Column(name = "icon_id")
-    private UUID iconId;
+    @Column(name = "icon_url")
+    private String iconUrl;
 
     @Column(name = "is_active")
     private Boolean isActive;
@@ -50,12 +49,12 @@ public class CatalogueItemEntity implements Serializable {
     @JoinColumn(name = "item_id", referencedColumnName = "item_id", insertable = false, updatable = false)
     private CatalogueItemUserRestrictionEntity catalogueItemUserRestrictionEntity;
 
-    public CatalogueItemEntity(UUID itemId, String name, BigDecimal price, BigDecimal shippingCost, UUID iconId, Boolean isActive) {
+    public CatalogueItemEntity(UUID itemId, String name, BigDecimal price, BigDecimal shippingCost, String iconUrl, Boolean isActive) {
         this.itemId = itemId;
         this.name = name;
         this.price = price;
         this.shippingCost = shippingCost;
-        this.iconId = iconId;
+        this.iconUrl = iconUrl;
         this.isActive = isActive;
     }
 

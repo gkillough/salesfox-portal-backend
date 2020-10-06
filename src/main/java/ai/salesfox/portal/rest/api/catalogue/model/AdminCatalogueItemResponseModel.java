@@ -13,8 +13,8 @@ import java.util.UUID;
 public class AdminCatalogueItemResponseModel extends CatalogueItemResponseModel {
     private CatalogueItemExternalDetailsModel externalDetails;
 
-    public AdminCatalogueItemResponseModel(UUID itemId, String name, BigDecimal price, BigDecimal shippingCost, UUID iconId, Boolean isActive, UUID organizationAccountId, UUID userId, CatalogueItemExternalDetailsModel externalDetails) {
-        super(itemId, name, price, shippingCost, iconId, isActive, organizationAccountId, userId);
+    public AdminCatalogueItemResponseModel(UUID itemId, String name, BigDecimal price, BigDecimal shippingCost, String iconUrl, Boolean isActive, UUID organizationAccountId, UUID userId, CatalogueItemExternalDetailsModel externalDetails) {
+        super(itemId, name, price, shippingCost, iconUrl, isActive, organizationAccountId, userId);
         this.externalDetails = externalDetails;
     }
 

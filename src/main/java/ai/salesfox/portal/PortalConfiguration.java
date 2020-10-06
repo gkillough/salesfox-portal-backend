@@ -13,9 +13,11 @@ public class PortalConfiguration {
     @Getter
     @Value("${ai.salesfox.portal.baseUrl:}")
     private String portalBaseUrl;
+
     @Getter
     @Value("${ai.salesfox.portal.resetPasswordLinkSpec:}")
     private String resetPasswordLinkSpec;
+    
     @Getter
     @Value("${ai.salesfox.portal.inviteOrganizationAccountUserLinkSpec:}")
     private String inviteOrganizationAccountUserLinkSpec;

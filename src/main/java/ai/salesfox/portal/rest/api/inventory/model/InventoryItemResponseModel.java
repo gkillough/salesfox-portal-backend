@@ -17,6 +17,6 @@ public class InventoryItemResponseModel {
     // TODO should price be listed here if the user has already paid for the voucher?
     private BigDecimal price;
     private Long inventoryQuantity;
-    private UUID iconId;
+    private String iconUrl;
 
 }
