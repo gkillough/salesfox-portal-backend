@@ -29,7 +29,10 @@ public class CustomIconController {
     }
 
     @GetMapping
-    public MultiCustomIconResponseModel getCustomIcons(@RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset, @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit) {
+    public MultiCustomIconResponseModel getCustomIcons(
+            @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset,
+            @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit
+    ) {
         return customIconService.getCustomIcons(offset, limit);
     }
 
@@ -40,7 +43,7 @@ public class CustomIconController {
 
     @PostMapping("/{customIconId}/image")
     @PreAuthorize(PortalAuthorityConstants.NON_ACCOUNT_REP_AUTH_CHECK)
-    public void getCustomIconImage(@PathVariable UUID customIconId, @RequestParam MultipartFile customIconFile) {
+    public void uploadCustomIconImage(@PathVariable UUID customIconId, @RequestParam MultipartFile customIconFile) {
         customIconImageService.setCustomIconImage(customIconId, customIconFile);
     }
 

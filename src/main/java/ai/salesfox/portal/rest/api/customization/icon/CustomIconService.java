@@ -141,7 +141,7 @@ public class CustomIconService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The request field 'label' cannot be blank");
         }
 
-        if (FieldValidationUtils.isValidUrl(requestModel.getIconUrl(), true)) {
+        if (!FieldValidationUtils.isValidUrl(requestModel.getIconUrl(), true)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The request field 'iconUrl' was invalid");
         }
     }
