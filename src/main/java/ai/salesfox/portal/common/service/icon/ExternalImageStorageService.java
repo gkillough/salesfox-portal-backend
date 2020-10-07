@@ -5,6 +5,6 @@ import ai.salesfox.portal.common.exception.PortalException;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ExternalImageStorageService {
-    String storeImageAndRetrieveUrl(PortalImageStorageDestination destination, MultipartFile multipartFile) throws PortalException;
+    String storeImageAndRetrieveUrl(PortalImageStorageDestination destination, MultipartFile multipartFile, boolean publiclyVisible) throws PortalException;
 
 }
