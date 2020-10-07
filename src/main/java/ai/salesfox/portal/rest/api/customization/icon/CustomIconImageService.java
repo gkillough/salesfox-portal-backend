@@ -39,6 +39,9 @@ public class CustomIconImageService {
         customIconGiftStatusValidator.validateCustomIconGiftStatus(customIconId);
 
         // FIXME validate things about the image
+        if (null == iconFile) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'iconFile' is required");
+        }
 
         // TODO consider restrictions around uploader id
 
