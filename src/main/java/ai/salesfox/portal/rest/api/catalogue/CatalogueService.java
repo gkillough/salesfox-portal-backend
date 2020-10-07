@@ -122,6 +122,10 @@ public class CatalogueService {
         CatalogueItemEntity exitingItem = catalogueItemRepository.findById(itemId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        if (null == iconFile) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'iconFile' is required");
+        }
+
         String iconUrl;
         try {
             iconUrl = externalImageStorageService.storeImageAndRetrieveUrl(PortalImageStorageDestination.CATALOG_IMAGES, iconFile);

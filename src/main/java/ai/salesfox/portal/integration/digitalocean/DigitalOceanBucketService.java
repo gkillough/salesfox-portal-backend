@@ -4,6 +4,7 @@ import ai.salesfox.portal.common.enumeration.PortalImageStorageDestination;
 import ai.salesfox.portal.common.exception.PortalException;
 import ai.salesfox.portal.common.exception.PortalRuntimeException;
 import ai.salesfox.portal.common.service.icon.ExternalImageStorageService;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
@@ -33,7 +34,7 @@ public class DigitalOceanBucketService implements ExternalImageStorageService {
     @Override
     public String storeImageAndRetrieveUrl(PortalImageStorageDestination destination, MultipartFile multipartFile) throws PortalException {
         byte[] multipartFileBytes = getMultipartFileBytes(multipartFile);
-        String uploadKey = DigestUtils.md5DigestAsHex(multipartFileBytes);
+        String uploadKey = createUploadKey(multipartFileBytes, multipartFile.getOriginalFilename());
         String unqualifiedBucketName = getUnqualifiedBucketName(destination);
         String fullyQualifiedBucketName = digitalOceanConfig.getBucketQualifyingPrefix() + unqualifiedBucketName;
 
@@ -129,6 +130,12 @@ public class DigitalOceanBucketService implements ExternalImageStorageService {
             default:
                 throw new PortalRuntimeException(String.format("No known buckets for option: %s", bucketType.name()));
         }
+    }
+
+    private String createUploadKey(byte[] multipartFileBytes, String originalFileName) {
+        String hashedFileName = DigestUtils.md5DigestAsHex(multipartFileBytes);
+        String fileExtension = FilenameUtils.getExtension(originalFileName);
+        return String.format("%s.%s", hashedFileName, fileExtension);
     }
 
     private String constructSubdomainUrl(String unqualifiedBucketName, String uploadKey) {
