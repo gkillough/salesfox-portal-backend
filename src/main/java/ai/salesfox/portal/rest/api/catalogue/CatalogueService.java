@@ -128,7 +128,7 @@ public class CatalogueService {
 
         String iconUrl;
         try {
-            iconUrl = externalImageStorageService.storeImageAndRetrieveUrl(PortalImageStorageDestination.CATALOG_IMAGES, iconFile);
+            iconUrl = externalImageStorageService.storeImageAndRetrieveUrl(PortalImageStorageDestination.CATALOG_IMAGES, iconFile, true);
         } catch (PortalException e) {
             log.error("Failed to upload catalog image", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, String.format("There was a problem uploading the image to the Digital Ocean / AWS bucket: %s", e.getMessage()));

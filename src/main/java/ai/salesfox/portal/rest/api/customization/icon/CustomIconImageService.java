@@ -47,7 +47,7 @@ public class CustomIconImageService {
 
         String iconUrl;
         try {
-            iconUrl = externalImageStorageService.storeImageAndRetrieveUrl(PortalImageStorageDestination.USER_IMAGES, iconFile);
+            iconUrl = externalImageStorageService.storeImageAndRetrieveUrl(PortalImageStorageDestination.USER_IMAGES, iconFile, true);
         } catch (PortalException e) {
             log.error("There was a problem uploading an image", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload the image. If this problem persists, please contact support.");

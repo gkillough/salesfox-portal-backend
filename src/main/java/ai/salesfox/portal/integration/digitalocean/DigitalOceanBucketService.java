@@ -32,13 +32,13 @@ public class DigitalOceanBucketService implements ExternalImageStorageService {
     }
 
     @Override
-    public String storeImageAndRetrieveUrl(PortalImageStorageDestination destination, MultipartFile multipartFile) throws PortalException {
+    public String storeImageAndRetrieveUrl(PortalImageStorageDestination destination, MultipartFile multipartFile, boolean publiclyVisible) throws PortalException {
         byte[] multipartFileBytes = getMultipartFileBytes(multipartFile);
         String uploadKey = createUploadKey(multipartFileBytes, multipartFile.getOriginalFilename());
         String unqualifiedBucketName = getUnqualifiedBucketName(destination);
         String fullyQualifiedBucketName = digitalOceanConfig.getBucketQualifyingPrefix() + unqualifiedBucketName;
 
-        CreateMultipartUploadRequest uploadRequest = createMultipartUploadRequest(fullyQualifiedBucketName, uploadKey, multipartFile.getContentType());
+        CreateMultipartUploadRequest uploadRequest = createMultipartUploadRequest(fullyQualifiedBucketName, uploadKey, multipartFile.getContentType(), publiclyVisible);
         CreateMultipartUploadResponse uploadResponse = s3Client.createMultipartUpload(uploadRequest);
 
         String uploadId = uploadResponse.uploadId();
@@ -47,13 +47,16 @@ public class DigitalOceanBucketService implements ExternalImageStorageService {
         return constructSubdomainUrl(unqualifiedBucketName, uploadKey);
     }
 
-    private CreateMultipartUploadRequest createMultipartUploadRequest(String bucketName, String uploadKey, String contentType) {
-        return CreateMultipartUploadRequest
+    private CreateMultipartUploadRequest createMultipartUploadRequest(String bucketName, String uploadKey, String contentType, boolean publiclyVisible) {
+        CreateMultipartUploadRequest.Builder requestBuilder = CreateMultipartUploadRequest
                 .builder()
                 .key(uploadKey)
                 .bucket(bucketName)
-                .contentType(contentType)
-                .build();
+                .contentType(contentType);
+        if (publiclyVisible) {
+            requestBuilder.acl(ObjectCannedACL.PUBLIC_READ);
+        }
+        return requestBuilder.build();
     }
 
     private List<CompletedPart> uploadFileParts(String bucketName, String uploadKey, String uploadId, byte[] multipartFileBytes) {
