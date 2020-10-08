@@ -59,6 +59,11 @@ public class ScribelessNoteManager {
             return;
         }
 
+        if (null != gift.getGiftItemDetailEntity()) {
+            // The note will be fulfilled through one of our partners
+            return;
+        }
+
         CampaignCreationRequestHolder requestHolder = campaignRequestModelCreator.createRequestHolder(gift);
         CampaignResponseModel campaign = createCampaign(gift, requestHolder.getCampaignCreationRequestModel());
         String campaignId = campaign.getId();

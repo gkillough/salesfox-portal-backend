@@ -68,9 +68,9 @@ public class ScribelessCampaignRequestModelCreator {
 
         String headerImageUrl = null;
         String headerType = null;
-        Optional<CustomIconEntity> optionalIcon = retrieveCustomIcon(gift);
+        Optional<String> optionalIcon = retrieveCustomIconUrl(gift);
         if (optionalIcon.isPresent()) {
-            headerImageUrl = retrieveCustomIconUrl(optionalIcon.get());
+            headerImageUrl = optionalIcon.get();
             headerType = ScribelessCampaignDefaults.DEFAULT_HEADER_TYPE; // TODO determine if this is correct
         }
 
@@ -81,18 +81,19 @@ public class ScribelessCampaignRequestModelCreator {
                 giftNote.getFontColor(),
                 giftNote.getFontSize(),
                 "Salesfox Gift Id: " + giftId,
-                ScribelessProductType.ON_DEMAND.getText(),
+                ScribelessProductType.FULL_SERVICE.getText(),
                 giftNote.getMessage(),
                 null,
                 null,
-                null, // TODO maybe this is where distributor info will go?
+                null,
                 headerImageUrl,
                 headerType,
                 null,
                 null,
                 footerText,
                 footerFont,
-                null,
+                ScribelessCampaignDefaults.DEFAULT_DELIVERY_MODEL,
+                null, // TODO use the user's profile for this
                 List.of()
         );
 
@@ -150,17 +151,13 @@ public class ScribelessCampaignRequestModelCreator {
         return customBrandingTextRepository.findById(giftCustomTextDetail.getCustomTextId());
     }
 
-    private Optional<CustomIconEntity> retrieveCustomIcon(GiftEntity gift) {
+    private Optional<String> retrieveCustomIconUrl(GiftEntity gift) {
         GiftCustomIconDetailEntity giftCustomIconDetail = gift.getGiftCustomIconDetailEntity();
         if (null == giftCustomIconDetail) {
             return Optional.empty();
         }
-        return customIconRepository.findById(giftCustomIconDetail.getCustomIconId());
-    }
-
-    private String retrieveCustomIconUrl(CustomIconEntity customIcon) {
-        // FIXME update this when it is a url
-        return null;
+        return customIconRepository.findById(giftCustomIconDetail.getCustomIconId())
+                .map(CustomIconEntity::getIconUrl);
     }
 
 }

@@ -1,6 +1,7 @@
 package ai.salesfox.integration.scribeless.service.campaign.model;
 
 import ai.salesfox.integration.scribeless.model.ScribelessAddressModel;
+import ai.salesfox.integration.scribeless.model.ScribelessRequestDeliveryModel;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -43,12 +44,9 @@ public class CampaignCreationRequestModel {
     private String footerText;
     @SerializedName("footer_font")
     private String footerFont;
+    private ScribelessRequestDeliveryModel delivery;
     @SerializedName("return_address")
     private ScribelessAddressModel returnAddress;
     private List<ScribelessAddressModel> recipients;
-
-    /* FIXME this is the only missing field (as far as can be determined)
-    {"delivery":{"sender":"Print on Request"}}
-     */
 
 }
