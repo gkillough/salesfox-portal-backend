@@ -11,9 +11,9 @@ public class NoteValidationUtils {
     public static final int MAX_MESSAGE_CHARS = 2500;
 
     // TODO add ALLOWED_<THINGS>_STRING constants
-    public static final String[] ALLOWED_COLORS = SalesfoxEnumUtils.lowercaseValues(ScribelessHandwritingColors.values());
+    public static final String[] ALLOWED_COLORS = SalesfoxEnumUtils.capitalizeValues(ScribelessHandwritingColors.values());
     public static final String[] ALLOWED_FONT_SIZES = SalesfoxEnumUtils.capitalizeValues(ScribelessHandwritingSize.values());
-    public static final String[] ALLOWED_HANDWRITING_STYLES = SalesfoxEnumUtils.lowercaseValues(ScribelessHandwritingStyles.values());
+    public static final String[] ALLOWED_HANDWRITING_STYLES = SalesfoxEnumUtils.capitalizeValues(ScribelessHandwritingStyles.values());
 
     public static boolean isValidMessageSize(String message) {
         return message.length() <= MAX_MESSAGE_CHARS;
@@ -32,8 +32,7 @@ public class NoteValidationUtils {
     }
 
     private static boolean anyMatch(String[] allowedValues, String strToTest) {
-        return Arrays.stream(allowedValues)
-                .anyMatch(strToTest::equalsIgnoreCase);
+        return Arrays.asList(allowedValues).contains(strToTest);
     }
 
 }
