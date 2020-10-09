@@ -5,9 +5,13 @@ import ai.salesfox.integration.scribeless.enumeration.ScribelessProductType;
 import ai.salesfox.integration.scribeless.model.ScribelessAddressModel;
 import ai.salesfox.integration.scribeless.service.campaign.model.CampaignCreationRequestModel;
 import ai.salesfox.integration.scribeless.service.campaign.model.CampaignUpdateRequestModel;
+import ai.salesfox.portal.database.account.entity.UserAddressEntity;
+import ai.salesfox.portal.database.account.entity.UserEntity;
+import ai.salesfox.portal.database.account.repository.UserAddressRepository;
 import ai.salesfox.portal.database.common.AbstractAddressEntity;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactRepository;
+import ai.salesfox.portal.database.contact.profile.OrganizationAccountContactProfileEntity;
 import ai.salesfox.portal.database.customization.branding_text.CustomBrandingTextEntity;
 import ai.salesfox.portal.database.customization.branding_text.CustomBrandingTextRepository;
 import ai.salesfox.portal.database.customization.icon.CustomIconEntity;
@@ -27,6 +31,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -42,15 +47,17 @@ public class ScribelessCampaignRequestModelCreator {
     private final NoteRepository noteRepository;
     private final CustomBrandingTextRepository customBrandingTextRepository;
     private final CustomIconRepository customIconRepository;
+    private final UserAddressRepository userAddressRepository;
 
     @Autowired
     public ScribelessCampaignRequestModelCreator(GiftRecipientRepository giftRecipientRepository, OrganizationAccountContactRepository contactRepository, NoteRepository noteRepository,
-                                                 CustomBrandingTextRepository customBrandingTextRepository, CustomIconRepository customIconRepository) {
+                                                 CustomBrandingTextRepository customBrandingTextRepository, CustomIconRepository customIconRepository, UserAddressRepository userAddressRepository) {
         this.giftRecipientRepository = giftRecipientRepository;
         this.contactRepository = contactRepository;
         this.noteRepository = noteRepository;
         this.customBrandingTextRepository = customBrandingTextRepository;
         this.customIconRepository = customIconRepository;
+        this.userAddressRepository = userAddressRepository;
     }
 
     public CampaignCreationRequestHolder createRequestHolder(GiftEntity gift) throws SalesfoxException {
@@ -63,7 +70,7 @@ public class ScribelessCampaignRequestModelCreator {
                 .map(CustomBrandingTextEntity::getCustomBrandingText);
         if (optionalBrandingText.isPresent()) {
             footerText = optionalBrandingText.get();
-            footerFont = "Arial";
+            footerFont = ScribelessCampaignDefaults.DEFAULT_FOOTER_FONT;
         }
 
         String headerImageUrl = null;
@@ -71,10 +78,11 @@ public class ScribelessCampaignRequestModelCreator {
         Optional<String> optionalIcon = retrieveCustomIconUrl(gift);
         if (optionalIcon.isPresent()) {
             headerImageUrl = optionalIcon.get();
-            headerType = ScribelessCampaignDefaults.DEFAULT_HEADER_TYPE; // TODO determine if this is correct
+            headerType = ScribelessCampaignDefaults.DEFAULT_HEADER_TYPE;
         }
 
-        // TODO determine valid defaults for these
+        ScribelessAddressModel returnAddress = retrieveReturnAddress(gift);
+
         CampaignCreationRequestModel creationRequestModel = new CampaignCreationRequestModel(
                 ScribelessCampaignDefaults.DEFAULT_PAPER_SIZE_USA,
                 giftNote.getHandwritingStyle(),
@@ -93,7 +101,7 @@ public class ScribelessCampaignRequestModelCreator {
                 footerText,
                 footerFont,
                 ScribelessCampaignDefaults.DEFAULT_DELIVERY_MODEL,
-                null, // TODO use the user's profile for this
+                returnAddress,
                 List.of()
         );
 
@@ -114,12 +122,17 @@ public class ScribelessCampaignRequestModelCreator {
     }
 
     public ScribelessAddressModel createAddressModel(OrganizationAccountContactEntity contact) {
-        return createAddressModel(contact.getFirstName(), contact.getLastName(), contact.getContactAddressEntity());
+        String title = Optional.ofNullable(contact.getContactProfileEntity()).map(OrganizationAccountContactProfileEntity::getTitle).orElse(null);
+        return createAddressModel(contact.getFirstName(), contact.getLastName(), contact.getContactAddressEntity(), title);
     }
 
     public ScribelessAddressModel createAddressModel(String firstName, String lastName, AbstractAddressEntity address) {
+        return createAddressModel(firstName, lastName, address, null);
+    }
+
+    public ScribelessAddressModel createAddressModel(String firstName, String lastName, AbstractAddressEntity address, @Nullable String title) {
         return new ScribelessAddressModel(
-                null,
+                title,
                 firstName,
                 lastName,
                 null,
@@ -131,6 +144,13 @@ public class ScribelessCampaignRequestModelCreator {
                 address.getState(),
                 address.getZipCode()
         );
+    }
+
+    private ScribelessAddressModel retrieveReturnAddress(GiftEntity gift) throws SalesfoxException {
+        UserEntity requestingUser = gift.getRequestingUserEntity();
+        UserAddressEntity requestingUserAddress = userAddressRepository.findById(requestingUser.getUserId())
+                .orElseThrow(() -> new SalesfoxException("The requesting Salesfox user does not have an address"));
+        return createAddressModel(requestingUser.getFirstName(), requestingUser.getLastName(), requestingUserAddress);
     }
 
     private NoteEntity retrieveNote(GiftEntity gift) throws SalesfoxException {

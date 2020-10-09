@@ -12,7 +12,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-// TODO create builder with defaults
 public class CampaignCreationRequestModel {
     public static final String SCRIBELESS_DATE_FORMAT = "dd/MM/yyy";
 
@@ -25,7 +24,6 @@ public class CampaignCreationRequestModel {
     @SerializedName("handwriting_size")
     private String handwritingSize;
     private String title;
-    // TODO add "delivery" field (object - "delivery: {"sender": "STRING"})
     private String product;
     private String text;
     private String inserts;
@@ -44,6 +42,7 @@ public class CampaignCreationRequestModel {
     private String footerText;
     @SerializedName("footer_font")
     private String footerFont;
+    // TODO determine what this does
     private ScribelessRequestDeliveryModel delivery;
     @SerializedName("return_address")
     private ScribelessAddressModel returnAddress;

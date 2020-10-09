@@ -8,6 +8,7 @@ import ai.salesfox.integration.scribeless.service.campaign.model.CampaignRespons
 import ai.salesfox.integration.scribeless.service.campaign.model.CampaignUpdateRequestModel;
 import ai.salesfox.integration.scribeless.service.on_demand.OnDemandService;
 import ai.salesfox.integration.scribeless.service.on_demand.model.OnDemandResponseModel;
+import ai.salesfox.portal.common.service.email.EmailMessagingService;
 import ai.salesfox.portal.common.time.PortalDateTimeUtils;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.GiftRepository;
@@ -26,26 +27,33 @@ import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * This class is for sending "Solo Notes" (i.e. Notes without a Gift Item).
+ */
 @Slf4j
 @Component
-public class ScribelessNoteManager {
+public class ScribelessSoloNoteManager {
     private final GiftRepository giftRepository;
     private final GiftScribelessStatusRepository scribelessStatusRepository;
     private final ScribelessCampaignRequestModelCreator campaignRequestModelCreator;
     private final CampaignService campaignService;
     private final OnDemandService onDemandService;
+    private final EmailMessagingService emailMessagingService;
 
     @Autowired
-    public ScribelessNoteManager(GiftRepository giftRepository, GiftScribelessStatusRepository scribelessStatusRepository,
-                                 ScribelessCampaignRequestModelCreator campaignRequestModelCreator,
-                                 CampaignService campaignService, OnDemandService onDemandService) {
+    public ScribelessSoloNoteManager(GiftRepository giftRepository, GiftScribelessStatusRepository scribelessStatusRepository,
+                                     ScribelessCampaignRequestModelCreator campaignRequestModelCreator,
+                                     CampaignService campaignService, OnDemandService onDemandService,
+                                     EmailMessagingService emailMessagingService) {
         this.giftRepository = giftRepository;
         this.scribelessStatusRepository = scribelessStatusRepository;
         this.campaignRequestModelCreator = campaignRequestModelCreator;
         this.campaignService = campaignService;
         this.onDemandService = onDemandService;
+        this.emailMessagingService = emailMessagingService;
     }
 
+    @Transactional
     public void submitNoteToScribeless(UUID giftId) throws SalesfoxException {
         GiftEntity foundGift = giftRepository.findById(giftId)
                 .orElseThrow(() -> new SalesfoxException(String.format("No gift with id: %s", giftId)));
@@ -79,6 +87,7 @@ public class ScribelessNoteManager {
         trackCampaignStatus(gift, campaignId, ScribelessNoteManagerCampaignStatus.SUCCESS_SUBMITTED);
     }
 
+    @Transactional
     public void deleteNoteCampaignFromScribeless(GiftEntity gift) {
         UUID giftId = gift.getGiftId();
         String campaignId = scribelessStatusRepository.findById(giftId)
