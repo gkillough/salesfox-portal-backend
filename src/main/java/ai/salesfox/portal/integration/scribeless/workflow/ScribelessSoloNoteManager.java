@@ -9,7 +9,10 @@ import ai.salesfox.integration.scribeless.service.campaign.model.CampaignUpdateR
 import ai.salesfox.integration.scribeless.service.on_demand.OnDemandService;
 import ai.salesfox.integration.scribeless.service.on_demand.model.OnDemandResponseModel;
 import ai.salesfox.portal.common.service.email.EmailMessagingService;
+import ai.salesfox.portal.common.service.email.PortalEmailException;
+import ai.salesfox.portal.common.service.email.model.EmailMessageModel;
 import ai.salesfox.portal.common.time.PortalDateTimeUtils;
+import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.GiftRepository;
 import ai.salesfox.portal.database.gift.recipient.GiftRecipientEntity;
@@ -23,7 +26,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Nullable;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -128,6 +133,7 @@ public class ScribelessSoloNoteManager {
         } catch (SalesfoxException e) {
             log.debug("Creating Scribeless campaign failed for gift with id: " + gift.getGiftId(), e);
             trackCampaignStatus(gift, null, ScribelessNoteManagerCampaignStatus.FAILURE_CREATION);
+            sendFailureEmail(gift, null);
             throw e;
         }
     }
@@ -137,7 +143,7 @@ public class ScribelessSoloNoteManager {
             campaignService.addRecipients(campaignId, requestModel);
         } catch (SalesfoxException e) {
             log.debug("Adding Scribeless recipients failed for gift with id: " + gift.getGiftId(), e);
-            updateCampaignStatus(gift, ScribelessNoteManagerCampaignStatus.FAILURE_ADD_RECIPIENTS);
+            updateCampaignErrorStatus(gift, ScribelessNoteManagerCampaignStatus.FAILURE_ADD_RECIPIENTS);
             throw e;
         }
     }
@@ -147,12 +153,12 @@ public class ScribelessSoloNoteManager {
             return onDemandService.requestPrint(campaignId);
         } catch (SalesfoxException e) {
             log.debug("Requesting Scribeless print failed for gift with id: " + gift.getGiftId(), e);
-            updateCampaignStatus(gift, ScribelessNoteManagerCampaignStatus.FAILURE_REQUEST_PRINT);
+            updateCampaignErrorStatus(gift, ScribelessNoteManagerCampaignStatus.FAILURE_REQUEST_PRINT);
             throw e;
         }
     }
 
-    private void updateCampaignStatus(GiftEntity gift, ScribelessNoteManagerCampaignStatus campaignStatus) {
+    private void updateCampaignErrorStatus(GiftEntity gift, ScribelessNoteManagerCampaignStatus campaignStatus) {
         UUID giftId = gift.getGiftId();
         Optional<GiftScribelessStatusEntity> optionalCampaignStatus = scribelessStatusRepository.findById(giftId);
         if (optionalCampaignStatus.isPresent()) {
@@ -160,15 +166,34 @@ public class ScribelessSoloNoteManager {
             scribelessStatus.setStatus(campaignStatus.name());
             scribelessStatus.setDateUpdated(PortalDateTimeUtils.getCurrentDateTime());
             scribelessStatusRepository.save(scribelessStatus);
+            sendFailureEmail(gift, scribelessStatus.getCampaignId());
         } else {
             log.error("Could not find Scribeless campaign status where one should exist for gift with id: {}", giftId);
+            sendFailureEmail(gift, null);
         }
+
     }
 
     private void trackCampaignStatus(GiftEntity gift, String campaignId, ScribelessNoteManagerCampaignStatus campaignStatus) {
         OffsetDateTime currentDateTime = PortalDateTimeUtils.getCurrentDateTime();
         GiftScribelessStatusEntity scribelessStatus = new GiftScribelessStatusEntity(gift.getGiftId(), campaignId, campaignStatus.name(), currentDateTime, currentDateTime);
         scribelessStatusRepository.save(scribelessStatus);
+    }
+
+    private void sendFailureEmail(GiftEntity gift, @Nullable String campaignId) {
+        String userFriendlyCampaignId = Optional.ofNullable(campaignId).orElse("NONE (The campaign could not be created)");
+        try {
+            UserEntity requestingUser = gift.getRequestingUserEntity();
+            EmailMessageModel failureEmailMessage = new EmailMessageModel(
+                    List.of(requestingUser.getEmail()),
+                    "[Salesfox] Note Send Failure",
+                    "Failed to send note(s)",
+                    String.format("Gift ID: %s <br/>Campaign ID: %s <br/>Please login to Salesfox for more information or contact support.", gift.getGiftId(), userFriendlyCampaignId)
+            );
+            emailMessagingService.sendMessage(failureEmailMessage);
+        } catch (PortalEmailException e) {
+            log.error("Failed to send 'Note Failure Email'", e);
+        }
     }
 
 }
