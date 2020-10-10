@@ -12,6 +12,7 @@ import ai.salesfox.portal.database.gift.recipient.GiftRecipientRepository;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
+import ai.salesfox.portal.event.GiftSubmittedEventPublisher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -22,8 +23,8 @@ public class EndpointGiftSubmissionService extends GiftSubmissionUtility<Respons
     @Autowired
     public EndpointGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService, GiftRecipientRepository giftRecipientRepository,
                                          NoteCreditsRepository noteCreditsRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
-                                         ContactInteractionsService contactInteractionsService) {
-        super(giftTrackingService, giftItemService, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService);
+                                         ContactInteractionsService contactInteractionsService, GiftSubmittedEventPublisher giftSubmittedEventPublisher) {
+        super(giftTrackingService, giftItemService, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService, giftSubmittedEventPublisher);
     }
 
     @Override

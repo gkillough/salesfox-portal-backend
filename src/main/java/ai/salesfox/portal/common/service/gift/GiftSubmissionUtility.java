@@ -15,6 +15,7 @@ import ai.salesfox.portal.database.gift.recipient.GiftRecipientRepository;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
+import ai.salesfox.portal.event.GiftSubmittedEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,16 +32,18 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
     private final NoteCreditsRepository noteCreditsRepository;
     private final NoteCreditAvailabilityService noteCreditAvailabilityService;
     private final ContactInteractionsService contactInteractionsService;
+    private final GiftSubmittedEventPublisher giftSubmittedEventPublisher;
 
     public GiftSubmissionUtility(GiftTrackingService giftTrackingService, GiftItemService giftItemService,
                                  GiftRecipientRepository giftRecipientRepository, NoteCreditsRepository noteCreditsRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
-                                 ContactInteractionsService contactInteractionsService) {
+                                 ContactInteractionsService contactInteractionsService, GiftSubmittedEventPublisher giftSubmittedEventPublisher) {
         this.giftItemService = giftItemService;
         this.giftRecipientRepository = giftRecipientRepository;
         this.noteCreditsRepository = noteCreditsRepository;
         this.noteCreditAvailabilityService = noteCreditAvailabilityService;
         this.contactInteractionsService = contactInteractionsService;
         this.giftTrackingService = giftTrackingService;
+        this.giftSubmittedEventPublisher = giftSubmittedEventPublisher;
     }
 
     @Transactional
@@ -90,9 +93,12 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
             }
         }
 
-        // TODO replace giftTrackingService with something like a "GiftPartnerFulfilmentService" that calls it after sending the gift request to our partners
+        // TODO consider moving this to the event handler
         giftTrackingService.updateGiftTrackingInfo(gift, submittingUser, GiftTrackingStatus.SUBMITTED.name());
         contactInteractionsService.addContactInteractions(submittingUser, giftRecipientIds, InteractionMedium.MAIL, InteractionClassification.OUTGOING, "(Auto-generated) Sent gift/note");
+
+        giftSubmittedEventPublisher.fireGiftSubmittedEvent(gift.getGiftId(), submittingUser.getUserId());
+
         return Optional.of(gift);
     }
 

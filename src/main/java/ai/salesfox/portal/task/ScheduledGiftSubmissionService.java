@@ -16,6 +16,7 @@ import ai.salesfox.portal.database.gift.recipient.GiftRecipientRepository;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
+import ai.salesfox.portal.event.GiftSubmittedEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,8 +35,8 @@ public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<Salesf
     @Autowired
     public ScheduledGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService, GiftRecipientRepository giftRecipientRepository,
                                           NoteCreditsRepository noteCreditsRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
-                                          ContactInteractionsService contactInteractionsService, EmailMessagingService emailMessagingService) {
-        super(giftTrackingService, giftItemService, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService);
+                                          ContactInteractionsService contactInteractionsService, EmailMessagingService emailMessagingService, GiftSubmittedEventPublisher giftSubmittedEventPublisher) {
+        super(giftTrackingService, giftItemService, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService, giftSubmittedEventPublisher);
         this.giftTrackingService = giftTrackingService;
         this.emailMessagingService = emailMessagingService;
     }

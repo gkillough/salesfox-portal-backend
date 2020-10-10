@@ -23,6 +23,7 @@ public class OnDemandPreviewService {
             ContentType.APPLICATION_OCTET_STREAM.getMimeType()
     );
 
+    private final boolean testing;
     private final ApiKeyHolder apiKeyHolder;
     private final HttpServiceWrapper httpServiceWrapper;
 
@@ -34,7 +35,7 @@ public class OnDemandPreviewService {
         QueryParamBuilder queryParamBuilder = new QueryParamBuilder(ApiKeyHolder.PARAM_NAME_API_KEY, apiKeyHolder.getApiKey());
         queryParamBuilder.appendAdditionalParam("text", text);
 
-        params.getTesting().ifPresent(testing -> queryParamBuilder.appendAdditionalParam("testing", testing.toString()));
+        queryParamBuilder.appendAdditionalParam("testing", Boolean.toString(testing));
         params.getWidthInMillimeters().ifPresent(width -> queryParamBuilder.appendAdditionalParam("width", width.toString()));
         params.getHeightInMillimeters().ifPresent(height -> queryParamBuilder.appendAdditionalParam("height", height.toString()));
         params.getSizeInMillimeters().ifPresent(size -> queryParamBuilder.appendAdditionalParam("size", size.toString()));

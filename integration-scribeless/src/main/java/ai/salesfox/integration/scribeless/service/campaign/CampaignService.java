@@ -17,10 +17,6 @@ public class CampaignService {
     private final ApiKeyHolder apiKeyHolder;
     private final HttpServiceWrapper httpServiceWrapper;
 
-    public CampaignService(ApiKeyHolder apiKeyHolder, HttpServiceWrapper httpServiceWrapper) {
-        this(false, apiKeyHolder, httpServiceWrapper);
-    }
-
     public CampaignResponseModel create(CampaignCreationRequestModel creationRequestModel) throws SalesfoxException {
         String requestSpec = createRequestSpec("");
         HttpResponse response = httpServiceWrapper.executePost(requestSpec, creationRequestModel);
