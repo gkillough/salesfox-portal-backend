@@ -1,15 +1,13 @@
 package ai.salesfox.portal.rest.api.customization.icon;
 
-import ai.salesfox.portal.rest.api.customization.icon.model.CustomIconRequestModel;
-import ai.salesfox.portal.rest.api.customization.icon.model.CustomIconResponseModel;
-import ai.salesfox.portal.rest.api.customization.icon.model.MultiCustomIconResponseModel;
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import ai.salesfox.portal.rest.api.common.page.PageMetadata;
 import ai.salesfox.portal.rest.api.customization.CustomizationEndpointConstants;
-import ai.salesfox.portal.rest.api.image.model.ImageResponseModel;
+import ai.salesfox.portal.rest.api.customization.icon.model.CustomIconRequestModel;
+import ai.salesfox.portal.rest.api.customization.icon.model.CustomIconResponseModel;
+import ai.salesfox.portal.rest.api.customization.icon.model.MultiCustomIconResponseModel;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,8 +19,8 @@ import java.util.UUID;
 public class CustomIconController {
     public static final String BASE_ENDPOINT = CustomizationEndpointConstants.BASE_ENDPOINT + "/icons";
 
-    private CustomIconService customIconService;
-    private CustomIconImageService customIconImageService;
+    private final CustomIconService customIconService;
+    private final CustomIconImageService customIconImageService;
 
     @Autowired
     public CustomIconController(CustomIconService customIconService, CustomIconImageService customIconImageService) {
@@ -31,7 +29,10 @@ public class CustomIconController {
     }
 
     @GetMapping
-    public MultiCustomIconResponseModel getCustomIcons(@RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset, @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit) {
+    public MultiCustomIconResponseModel getCustomIcons(
+            @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset,
+            @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit
+    ) {
         return customIconService.getCustomIcons(offset, limit);
     }
 
@@ -40,14 +41,9 @@ public class CustomIconController {
         return customIconService.getCustomIcon(customIconId);
     }
 
-    @GetMapping(value = "/{customIconId}/image", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
-    public ImageResponseModel getCustomIconImage(@PathVariable UUID customIconId) {
-        return customIconImageService.getCustomIconImage(customIconId);
-    }
-
     @PostMapping("/{customIconId}/image")
     @PreAuthorize(PortalAuthorityConstants.NON_ACCOUNT_REP_AUTH_CHECK)
-    public void getCustomIconImage(@PathVariable UUID customIconId, @RequestParam MultipartFile customIconFile) {
+    public void uploadCustomIconImage(@PathVariable UUID customIconId, @RequestParam MultipartFile customIconFile) {
         customIconImageService.setCustomIconImage(customIconId, customIconFile);
     }
 

@@ -1,0 +1,46 @@
+databaseChangeLog:
+  - changeSet:
+      id: catalog-icon-urls-1
+      author: gavinkillough
+      changes:
+        - addColumn:
+            schemaName: portal
+            tableName: catalogue_items
+            columns:
+              - column:
+                  name: icon_url
+                  type: VARCHAR
+        - dropColumn:
+            schemaName: portal
+            tableName: catalogue_items
+            columnName: icon_id
+
+  - changeSet:
+      id: catalog-icon-urls-2
+      author: gavinkillough
+      changes:
+        - dropTable:
+            schemaName: portal
+            tableName: catalogue_item_icons
+            cascadeConstraints: true
+
+  - changeSet:
+      id: custom-icon-urls-1
+      author: gavinkillough
+      changes:
+        - addColumn:
+            schemaName: portal
+            tableName: custom_icons
+            columns:
+              - column:
+                  name: icon_url
+                  type: VARCHAR
+
+  - changeSet:
+      id: custom-icon-urls-2
+      author: gavinkillough
+      changes:
+        - dropTable:
+            schemaName: portal
+            tableName: custom_icon_files
+            cascadeConstraints: true

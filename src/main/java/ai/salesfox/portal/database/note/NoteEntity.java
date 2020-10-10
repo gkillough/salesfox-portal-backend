@@ -31,8 +31,8 @@ public class NoteEntity implements Serializable {
     @Column(name = "message")
     private String message;
 
-    @Column(name = "font_size_pt")
-    private Integer fontSize;
+    @Column(name = "font_size")
+    private String fontSize;
 
     @Column(name = "font_color")
     private String fontColor;
@@ -52,7 +52,7 @@ public class NoteEntity implements Serializable {
     @JoinColumn(name = "updated_by_user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
     private UserEntity updatedByUserEntity;
 
-    public NoteEntity(UUID noteId, UUID updatedByUserId, OffsetDateTime dateModified, String message, Integer fontSize, String fontColor, String handwritingStyle) {
+    public NoteEntity(UUID noteId, UUID updatedByUserId, OffsetDateTime dateModified, String message, String fontSize, String fontColor, String handwritingStyle) {
         this.noteId = noteId;
         this.updatedByUserId = updatedByUserId;
         this.dateModified = dateModified;

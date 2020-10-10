@@ -1,20 +1,5 @@
 databaseChangeLog:
   - changeSet:
-      id: test-catalogue-icons-1
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: catalogue_item_icons
-            columns:
-              - column:
-                  name: icon_id
-                  value: 5be2c2dc-9f93-43a5-b14b-559277825e6e
-              - column:
-                  name: file_name
-                  value: generic_book.jpg
-
-  - changeSet:
       id: test-catalogue-items-1
       author: gavinkillough
       changes:
@@ -29,29 +14,14 @@ databaseChangeLog:
                   name: price
                   valueNumeric: 24.99
               - column:
-                  name: quantity
-                  valueNumeric: 10
+                  name: shipping_cost
+                  valueNumeric: 2.59
               - column:
-                  name: icon_id
-                  value: 5be2c2dc-9f93-43a5-b14b-559277825e6e
+                  name: icon_url
+                  value: https://comps.canstockphoto.com/how-to-become-rich-generic-book-stock-illustration_csp33877986.jpg
               - column:
                   name: is_active
                   value: true
-
-  - changeSet:
-      id: test-catalogue-icons-2
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: catalogue_item_icons
-            columns:
-              - column:
-                  name: icon_id
-                  value: 65ad1457-7959-439e-a7e2-2c0990dcf69c
-              - column:
-                  name: file_name
-                  value: generic_water_bottle.jpg
 
   - changeSet:
       id: test-catalogue-items-2
@@ -68,29 +38,14 @@ databaseChangeLog:
                   name: price
                   valueNumeric: 12.50
               - column:
-                  name: quantity
-                  valueNumeric: 40
+                  name: shipping_cost
+                  valueNumeric: 1.99
               - column:
-                  name: icon_id
-                  value: 65ad1457-7959-439e-a7e2-2c0990dcf69c
+                  name: icon_url
+                  value: https://s3.dualstack.us-east-1.amazonaws.com/static.customizedgirl.com/images/design/32e5cb40be39cb71318b71930dd7b958_3719478_0_superbig.jpg
               - column:
                   name: is_active
                   value: true
-
-  - changeSet:
-      id: test-catalogue-icons-3
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: catalogue_item_icons
-            columns:
-              - column:
-                  name: icon_id
-                  value: 541ae772-61db-453b-8ec5-d0d31081bbfc
-              - column:
-                  name: file_name
-                  value: tote_bag_custom_text.jpg
 
   - changeSet:
       id: test-catalogue-items-3
@@ -107,29 +62,14 @@ databaseChangeLog:
                   name: price
                   valueNumeric: 17.00
               - column:
-                  name: quantity
-                  valueNumeric: 100
+                  name: shipping_cost
+                  valueNumeric: 3.99
               - column:
-                  name: icon_id
-                  value: 541ae772-61db-453b-8ec5-d0d31081bbfc
+                  name: icon_url
+                  value: https://s3.dualstack.us-east-1.amazonaws.com/static.customizedgirl.com/images/design/32e5cb40be39cb71318b71930dd7b958_3719478_0_superbig.jpg
               - column:
                   name: is_active
                   value: true
-
-  - changeSet:
-      id: test-catalogue-icons-4
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: catalogue_item_icons
-            columns:
-              - column:
-                  name: icon_id
-                  value: 282444ca-28db-4db2-9706-24b6104f2c17
-              - column:
-                  name: file_name
-                  value: tumbler_custom_text.jpg
 
   - changeSet:
       id: test-catalogue-items-4
@@ -149,11 +89,11 @@ databaseChangeLog:
                   name: price
                   valueNumeric: 19.99
               - column:
-                  name: quantity
-                  valueNumeric: 25
+                  name: shipping_cost
+                  valueNumeric: 3.00
               - column:
-                  name: icon_id
-                  value: 282444ca-28db-4db2-9706-24b6104f2c17
+                  name: icon_url
+                  value: https://images-na.ssl-images-amazon.com/images/I/61Z25kSrnuL._AC_SY879_.jpg
               - column:
                   name: is_active
                   value: true

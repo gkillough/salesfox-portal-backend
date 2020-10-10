@@ -1,11 +1,16 @@
 package ai.salesfox.portal.rest.api.catalogue;
 
+import ai.salesfox.portal.common.FieldValidationUtils;
+import ai.salesfox.portal.common.enumeration.DistributorNames;
+import ai.salesfox.portal.common.enumeration.PortalImageStorageDestination;
+import ai.salesfox.portal.common.exception.PortalException;
 import ai.salesfox.portal.common.service.catalogue.CatalogueItemAccessUtils;
+import ai.salesfox.portal.common.service.icon.ExternalImageStorageService;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserRepository;
-import ai.salesfox.portal.database.catalogue.icon.CatalogueItemIconEntity;
-import ai.salesfox.portal.database.catalogue.icon.CatalogueItemIconRepository;
+import ai.salesfox.portal.database.catalogue.external.CatalogueItemExternalDetailsEntity;
+import ai.salesfox.portal.database.catalogue.external.CatalogueItemExternalDetailsRepository;
 import ai.salesfox.portal.database.catalogue.item.CatalogueItemEntity;
 import ai.salesfox.portal.database.catalogue.item.CatalogueItemRepository;
 import ai.salesfox.portal.database.catalogue.restriction.CatalogueItemOrganizationAccountRestrictionEntity;
@@ -13,16 +18,13 @@ import ai.salesfox.portal.database.catalogue.restriction.CatalogueItemOrganizati
 import ai.salesfox.portal.database.catalogue.restriction.CatalogueItemUserRestrictionEntity;
 import ai.salesfox.portal.database.catalogue.restriction.CatalogueItemUserRestrictionRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
-import ai.salesfox.portal.rest.api.catalogue.model.CatalogueItemRequestModel;
-import ai.salesfox.portal.rest.api.catalogue.model.CatalogueItemResponseModel;
-import ai.salesfox.portal.rest.api.catalogue.model.MultiCatalogueItemModel;
+import ai.salesfox.portal.rest.api.catalogue.model.*;
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
-import ai.salesfox.portal.rest.api.image.HttpSafeImageUtility;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -41,26 +42,25 @@ import java.util.*;
 @Component
 public class CatalogueService {
     private final CatalogueItemRepository catalogueItemRepository;
+    private final CatalogueItemExternalDetailsRepository externalDetailsRepository;
     private final CatalogueItemOrganizationAccountRestrictionRepository catItemOrgAcctRestrictionRepository;
     private final CatalogueItemUserRestrictionRepository catItemUserRestrictionRepository;
-    private final CatalogueItemIconRepository catalogueItemIconRepository;
     private final OrganizationAccountRepository organizationAccountRepository;
     private final UserRepository userRepository;
-    private final HttpSafeImageUtility imageUtility;
+    private final ExternalImageStorageService externalImageStorageService;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
-    public CatalogueService(CatalogueItemRepository catalogueItemRepository, CatalogueItemOrganizationAccountRestrictionRepository catItemOrgAcctRestrictionRepository,
-                            CatalogueItemUserRestrictionRepository catItemUserRestrictionRepository, CatalogueItemIconRepository catalogueItemIconRepository,
-                            OrganizationAccountRepository organizationAccountRepository, UserRepository userRepository,
-                            HttpSafeImageUtility imageUtility, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+    public CatalogueService(CatalogueItemRepository catalogueItemRepository, CatalogueItemExternalDetailsRepository externalDetailsRepository,
+                            CatalogueItemOrganizationAccountRestrictionRepository catItemOrgAcctRestrictionRepository, CatalogueItemUserRestrictionRepository catItemUserRestrictionRepository,
+                            OrganizationAccountRepository organizationAccountRepository, UserRepository userRepository, ExternalImageStorageService externalImageStorageService, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.catalogueItemRepository = catalogueItemRepository;
+        this.externalDetailsRepository = externalDetailsRepository;
         this.catItemOrgAcctRestrictionRepository = catItemOrgAcctRestrictionRepository;
         this.catItemUserRestrictionRepository = catItemUserRestrictionRepository;
-        this.catalogueItemIconRepository = catalogueItemIconRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.userRepository = userRepository;
-        this.imageUtility = imageUtility;
+        this.externalImageStorageService = externalImageStorageService;
         this.membershipRetrievalService = membershipRetrievalService;
     }
 
@@ -93,7 +93,7 @@ public class CatalogueService {
 
         RestrictionModel restrictionRequestModel = itemRequestModel.getRestriction();
         boolean isRestricted = restrictionRequestModel != null;
-        CatalogueItemEntity newItem = new CatalogueItemEntity(null, itemRequestModel.getName(), itemRequestModel.getPrice(), itemRequestModel.getShippingCost(), null, true);
+        CatalogueItemEntity newItem = new CatalogueItemEntity(null, itemRequestModel.getName(), itemRequestModel.getPrice(), itemRequestModel.getShippingCost(), itemRequestModel.getIconUrl(), true);
 
         CatalogueItemEntity savedItem = catalogueItemRepository.save(newItem);
 
@@ -108,6 +108,12 @@ public class CatalogueService {
                 catItemUserRestrictionRepository.save(userRestriction);
             }
         }
+
+        CatalogueItemExternalDetailsModel externalDetailsRequestModel = itemRequestModel.getExternalDetails();
+        CatalogueItemExternalDetailsEntity externalDetailsToSave = new CatalogueItemExternalDetailsEntity(savedItem.getItemId(), externalDetailsRequestModel.getDistributor(), externalDetailsRequestModel.getExternalId());
+        CatalogueItemExternalDetailsEntity savedExternalDetails = externalDetailsRepository.save(externalDetailsToSave);
+        savedItem.setCatalogueItemExternalDetailsEntity(savedExternalDetails);
+
         return convertToResponseModel(savedItem);
     }
 
@@ -116,12 +122,19 @@ public class CatalogueService {
         CatalogueItemEntity exitingItem = catalogueItemRepository.findById(itemId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        File savedIcon = imageUtility.saveImage(iconFile);
-        String savedIconName = FilenameUtils.getName(savedIcon.getName());
-        CatalogueItemIconEntity iconEntityToSave = new CatalogueItemIconEntity(null, savedIconName);
-        CatalogueItemIconEntity savedIconEntity = catalogueItemIconRepository.save(iconEntityToSave);
+        if (null == iconFile) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'iconFile' is required");
+        }
 
-        exitingItem.setIconId(savedIconEntity.getIconId());
+        String iconUrl;
+        try {
+            iconUrl = externalImageStorageService.storeImageAndRetrieveUrl(PortalImageStorageDestination.CATALOG_IMAGES, iconFile, true);
+        } catch (PortalException e) {
+            log.error("Failed to upload catalog image", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, String.format("There was a problem uploading the image to the Digital Ocean / AWS bucket: %s", e.getMessage()));
+        }
+
+        exitingItem.setIconUrl(iconUrl);
         catalogueItemRepository.save(exitingItem);
     }
 
@@ -137,6 +150,7 @@ public class CatalogueService {
         existingItem.setName(itemRequestModel.getName());
         existingItem.setPrice(itemRequestModel.getPrice());
         existingItem.setShippingCost(itemRequestModel.getShippingCost());
+        existingItem.setIconUrl(itemRequestModel.getIconUrl());
         CatalogueItemEntity savedItem = catalogueItemRepository.save(existingItem);
 
         if (isRestricted) {
@@ -165,6 +179,13 @@ public class CatalogueService {
             Optional.ofNullable(savedItem.getCatalogueItemUserRestrictionEntity())
                     .ifPresent(catItemUserRestrictionRepository::delete);
         }
+
+        CatalogueItemExternalDetailsModel externalDetailsRequestModel = itemRequestModel.getExternalDetails();
+        CatalogueItemExternalDetailsEntity externalDetailsToSave = Optional.ofNullable(existingItem.getCatalogueItemExternalDetailsEntity())
+                .orElseGet(() -> new CatalogueItemExternalDetailsEntity(existingItem.getItemId(), null, null));
+        externalDetailsToSave.setDistributor(externalDetailsRequestModel.getDistributor());
+        externalDetailsToSave.setExternalId(externalDetailsRequestModel.getExternalId());
+        externalDetailsRepository.save(externalDetailsToSave);
     }
 
     @Transactional
@@ -216,6 +237,10 @@ public class CatalogueService {
             errors.add("The field 'Shipping Cost' cannot be less than $0.00");
         }
 
+        if (!FieldValidationUtils.isValidUrl(requestModel.getIconUrl(), true)) {
+            errors.add("The field 'Icon URL' is invalid");
+        }
+
         RestrictionModel restriction = requestModel.getRestriction();
         if (restriction != null) {
             if (restriction.getOrganizationAccountId() == null) {
@@ -226,6 +251,22 @@ public class CatalogueService {
 
             if (restriction.getUserId() != null && !userRepository.existsById(restriction.getUserId())) {
                 errors.add("The userId specified for the restriction is invalid");
+            }
+        }
+
+        CatalogueItemExternalDetailsModel externalDetails = requestModel.getExternalDetails();
+        if (null == externalDetails) {
+            errors.add("The field 'externalDetails' is required");
+        } else {
+            String distributor = externalDetails.getDistributor();
+            if (StringUtils.isBlank(distributor)) {
+                errors.add("The Distributor specified for the external details cannot be blank");
+            } else if (!EnumUtils.isValidEnumIgnoreCase(DistributorNames.class, distributor)) {
+                errors.add("The Distributor must be one of the following: " + Arrays.toString(DistributorNames.values()));
+            }
+
+            if (StringUtils.isBlank(externalDetails.getExternalId())) {
+                errors.add("The External ID cannot be blank");
             }
         }
 
@@ -249,7 +290,13 @@ public class CatalogueService {
         if (null != userRestriction) {
             userId = userRestriction.getUserId();
         }
-        return new CatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getPrice(), entity.getShippingCost(), entity.getIconId(), entity.getIsActive(), organizationAccountId, userId);
+
+        CatalogueItemExternalDetailsEntity externalDetailsEntity = entity.getCatalogueItemExternalDetailsEntity();
+        if (null != externalDetailsEntity && membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
+            CatalogueItemExternalDetailsModel externalDetailsModel = new CatalogueItemExternalDetailsModel(externalDetailsEntity.getDistributor(), externalDetailsEntity.getExternalId());
+            return new AdminCatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getPrice(), entity.getShippingCost(), entity.getIconUrl(), entity.getIsActive(), organizationAccountId, userId, externalDetailsModel);
+        }
+        return new CatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getPrice(), entity.getShippingCost(), entity.getIconUrl(), entity.getIsActive(), organizationAccountId, userId);
     }
 
 }

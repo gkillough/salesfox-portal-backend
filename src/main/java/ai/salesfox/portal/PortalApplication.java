@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableAsync
 @EnableScheduling
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = {"ai.salesfox.portal.database"})
+@EnableJpaRepositories(basePackages = {"ai.salesfox.portal.database", "ai.salesfox.portal.integration.*.database"})
 @SpringBootApplication(exclude = {BatchAutoConfiguration.class})
 public class PortalApplication {
     public static void main(String[] args) {

@@ -71,6 +71,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
     // Utilities
+    implementation platform('software.amazon.awssdk:bom:2.15.2')
+    implementation 'software.amazon.awssdk:s3'
+
     implementation 'org.freemarker:freemarker:2.3.30'
     implementation 'javax.mail:javax.mail-api:1.6.2'
     runtimeOnly 'com.sun.mail:javax.mail:1.6.2'
@@ -84,6 +87,7 @@ dependencies {
     implementation 'org.liquibase:liquibase-core'
 
     if (getGradle().getStartParameter().taskNames.contains('runServer')) {
+        runtimeClasspath 'org.testcontainers:postgresql:1.15.0-rc2'
         runtimeClasspath 'org.springframework.cloud:spring-cloud-starter:2.2.3.RELEASE'
         runtimeClasspath "com.playtika.testcontainers:embedded-postgresql:1.78"
         runtimeClasspath 'org.springframework.boot:spring-boot-devtools'

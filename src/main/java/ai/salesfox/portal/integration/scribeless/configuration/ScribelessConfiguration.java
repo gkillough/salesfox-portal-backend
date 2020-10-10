@@ -3,6 +3,8 @@ package ai.salesfox.portal.integration.scribeless.configuration;
 import ai.salesfox.integration.common.http.HttpServiceWrapper;
 import ai.salesfox.integration.common.http.HttpServicesFactory;
 import ai.salesfox.integration.scribeless.model.ApiKeyHolder;
+import ai.salesfox.integration.scribeless.service.campaign.CampaignService;
+import ai.salesfox.integration.scribeless.service.on_demand.OnDemandPreviewService;
 import ai.salesfox.integration.scribeless.service.on_demand.OnDemandService;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,13 +27,23 @@ public class ScribelessConfiguration {
     private CharSequence scribelessApiKey;
 
     @Bean
+    public CampaignService scribelessCampaignService() {
+        return new CampaignService(scribelessApiKeyHolder(), scribelessHttpServiceWrapper());
+    }
+
+    @Bean
     public OnDemandService scribelessOnDemandService() {
         return new OnDemandService(scribelessApiKeyHolder(), scribelessHttpServiceWrapper());
     }
 
     @Bean
+    public OnDemandPreviewService scribelessOnDemandPreviewService() {
+        return new OnDemandPreviewService(scribelessApiKeyHolder(), scribelessHttpServiceWrapper());
+    }
+
+    @Bean
     public HttpServiceWrapper scribelessHttpServiceWrapper() {
-        // TODO use portal global proxy config
+        // TODO use portal global proxy config (if necessary)
         return HttpServicesFactory.withProxy(scribelessBaseUrl, Proxy.NO_PROXY);
     }
 

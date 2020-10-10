@@ -1,11 +1,12 @@
 package ai.salesfox.portal.rest.api.license;
 
+import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
+import ai.salesfox.portal.rest.api.common.page.PageMetadata;
 import ai.salesfox.portal.rest.api.license.model.LicenseCreationRequestModel;
+import ai.salesfox.portal.rest.api.license.model.LicenseModel;
 import ai.salesfox.portal.rest.api.license.model.LicenseSeatUpdateModel;
 import ai.salesfox.portal.rest.api.license.model.MultiLicenseModel;
-import ai.salesfox.portal.rest.api.license.model.LicenseModel;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
-import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ import java.util.UUID;
 public class LicenseController {
     public static final String BASE_ENDPOINT = "/licenses";
 
-    private LicenseService licenseService;
+    private final LicenseService licenseService;
 
     @Autowired
     public LicenseController(LicenseService licenseService) {
@@ -26,8 +27,12 @@ public class LicenseController {
     }
 
     @GetMapping
-    public MultiLicenseModel getAllLicenses() {
-        return licenseService.getAllLicenses();
+    public MultiLicenseModel getLicenses(
+            @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset,
+            @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit,
+            @RequestParam(required = false) String query
+    ) {
+        return licenseService.getAllLicenses(offset, limit, query);
     }
 
     @GetMapping("/{licenseId}")

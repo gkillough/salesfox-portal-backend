@@ -1,7 +1,5 @@
 package ai.salesfox.portal.rest.api.inventory;
 
-import ai.salesfox.portal.rest.api.inventory.model.InventoryItemResponseModel;
-import ai.salesfox.portal.rest.api.inventory.model.MultiInventoryItemModel;
 import ai.salesfox.portal.database.catalogue.item.CatalogueItemEntity;
 import ai.salesfox.portal.database.inventory.InventoryEntity;
 import ai.salesfox.portal.database.inventory.InventoryRepository;
@@ -9,6 +7,8 @@ import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
 import ai.salesfox.portal.database.inventory.item.InventoryItemPK;
 import ai.salesfox.portal.database.inventory.item.InventoryItemRepository;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
+import ai.salesfox.portal.rest.api.inventory.model.InventoryItemResponseModel;
+import ai.salesfox.portal.rest.api.inventory.model.MultiInventoryItemModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -75,7 +75,7 @@ public class InventoryItemService {
 
     private InventoryItemResponseModel convertToResponseModel(InventoryItemEntity entity) {
         CatalogueItemEntity catalogueItemEntity = entity.getCatalogueItemEntity();
-        return new InventoryItemResponseModel(entity.getCatalogueItemId(), entity.getInventoryId(), catalogueItemEntity.getName(), catalogueItemEntity.getPrice(), entity.getQuantity(), catalogueItemEntity.getIconId());
+        return new InventoryItemResponseModel(entity.getCatalogueItemId(), entity.getInventoryId(), catalogueItemEntity.getName(), catalogueItemEntity.getPrice(), entity.getQuantity(), catalogueItemEntity.getIconUrl());
     }
 
 }

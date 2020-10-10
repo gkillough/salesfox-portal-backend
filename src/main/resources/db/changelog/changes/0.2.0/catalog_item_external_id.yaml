@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: catalog-item-external-id-1
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: catalogue_item_external_details
+            columns:
+              - column:
+                  name: item_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: distributor
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: external_id
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: catalog-item-external-id-2
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: catalogue_item_external_details_item_id_fk
+            baseTableSchemaName: portal
+            baseTableName: catalogue_item_external_details
+            baseColumnNames: item_id
+            referencedTableSchemaName: portal
+            referencedTableName: catalogue_items
+            referencedColumnNames: item_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true
