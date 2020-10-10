@@ -2,6 +2,8 @@ package ai.salesfox.portal.common.thread;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ApplicationEventMulticaster;
+import org.springframework.context.event.SimpleApplicationEventMulticaster;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,6 +22,13 @@ public class ExecutorConfiguration {
     @Bean(name = SINGLE_THREADED_EXECUTOR_SERVICE_NAME, destroyMethod = "shutdown", autowireCandidate = false)
     public ExecutorService singleThreadPoolExecutorService() {
         return Executors.newSingleThreadExecutor();
+    }
+
+    @Bean
+    public ApplicationEventMulticaster applicationEventMulticaster() {
+        SimpleApplicationEventMulticaster eventMulticaster = new SimpleApplicationEventMulticaster();
+        eventMulticaster.setTaskExecutor(maxThreadPoolExecutorService());
+        return eventMulticaster;
     }
 
 }
