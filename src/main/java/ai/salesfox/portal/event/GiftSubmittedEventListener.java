@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Slf4j
 @Component
 public class GiftSubmittedEventListener implements ApplicationListener<GiftSubmittedEvent> {
@@ -46,13 +48,17 @@ public class GiftSubmittedEventListener implements ApplicationListener<GiftSubmi
         } catch (Exception e) {
             log.debug("There was a problem submitting the gift to Salesfox gifting partner(s)", e);
             giftTrackingService.updateGiftTrackingInfo(gift, submittingUser, GiftTrackingStatus.NOT_FULFILLABLE);
-            sendEmailForException();
+            sendEmailForException(submittingUser, gift);
         }
     }
 
-    private void sendEmailForException() {
+    private void sendEmailForException(UserEntity submittingUser, GiftEntity gift) {
         try {
-            EmailMessageModel errorEmail = new EmailMessageModel();
+            String primaryMessage = String.format("Gift ID: %s <br/>" +
+                    "There was a problem fulfilling the gift request.<br/>" +
+                    "Please login to Salesfox for more information or contact support.", gift.getGiftId()
+            );
+            EmailMessageModel errorEmail = new EmailMessageModel(List.of(submittingUser.getEmail()), "[Salesfox] Distribution Failure", "Distribution Failure", primaryMessage);
             emailMessagingService.sendMessage(errorEmail);
         } catch (Exception e) {
             log.error("Failed to send email for event handling exception", e);
