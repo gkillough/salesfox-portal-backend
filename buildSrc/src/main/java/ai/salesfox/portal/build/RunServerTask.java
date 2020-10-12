@@ -50,6 +50,8 @@ public class RunServerTask extends Exec {
         envVars.put("PORTAL_SMTP_PASSWORD", "yptjlvfodhkuxdly");
         envVars.put("PORTAL_SMTP_FROM", "accounts@getboostr.com");
 
+        envVars.put("PORTAL_SCRIBELESS_API_TESTING", true);
+
         envVars.put("PORTAL_CORS_ALLOWED_ORIGINS", "*");
 
         getEnvironment().putAll(envVars);

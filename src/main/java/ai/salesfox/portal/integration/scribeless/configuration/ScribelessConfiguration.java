@@ -26,19 +26,22 @@ public class ScribelessConfiguration {
     @Value("${ai.salesfox.portal.integration.scribeless.api.key:}")
     private CharSequence scribelessApiKey;
 
+    @Value("${ai.salesfox.portal.integration.scribeless.api.testing:false}")
+    private boolean scribelessApiTesting;
+
     @Bean
     public CampaignService scribelessCampaignService() {
-        return new CampaignService(scribelessApiKeyHolder(), scribelessHttpServiceWrapper());
+        return new CampaignService(scribelessApiTesting, scribelessApiKeyHolder(), scribelessHttpServiceWrapper());
     }
 
     @Bean
     public OnDemandService scribelessOnDemandService() {
-        return new OnDemandService(scribelessApiKeyHolder(), scribelessHttpServiceWrapper());
+        return new OnDemandService(scribelessApiTesting, scribelessApiKeyHolder(), scribelessHttpServiceWrapper());
     }
 
     @Bean
     public OnDemandPreviewService scribelessOnDemandPreviewService() {
-        return new OnDemandPreviewService(scribelessApiKeyHolder(), scribelessHttpServiceWrapper());
+        return new OnDemandPreviewService(scribelessApiTesting, scribelessApiKeyHolder(), scribelessHttpServiceWrapper());
     }
 
     @Bean
