@@ -11,25 +11,27 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class OnDemandService {
+    private final boolean testing;
     private final ApiKeyHolder apiKeyHolder;
     private final HttpServiceWrapper httpServiceWrapper;
 
     public OnDemandResponseModel requestPrint(String campaignId) throws SalesfoxException {
         String requestSpec = String.format("/api/campaign/%s/request_print", campaignId);
-        requestSpec = appendApiKey(requestSpec);
+        requestSpec = appendQueryParams(requestSpec);
         HttpResponse response = httpServiceWrapper.executePut(requestSpec, null);
         return ScribelessApiUtils.parseResponseOrImproveError(httpServiceWrapper, response, OnDemandResponseModel.class);
     }
 
     public OnDemandRecipientResponseModel requestPrintForRecipient(String campaignId, String recipientId) throws SalesfoxException {
         String requestSpec = String.format("/api/campaign/%s/recipient/%s/request_print", campaignId, recipientId);
-        requestSpec = appendApiKey(requestSpec);
+        requestSpec = appendQueryParams(requestSpec);
         HttpResponse response = httpServiceWrapper.executePut(requestSpec, null);
         return ScribelessApiUtils.parseResponseOrImproveError(httpServiceWrapper, response, OnDemandRecipientResponseModel.class);
     }
 
-    private String appendApiKey(String requestSpec) {
-        return String.format("%s?%s=%s", requestSpec, ApiKeyHolder.PARAM_NAME_API_KEY, apiKeyHolder.getApiKey());
+    private String appendQueryParams(String requestSpec) {
+        String queryParams = ScribelessApiUtils.createDefaultQueryParams(apiKeyHolder, testing);
+        return requestSpec + queryParams;
     }
 
 }

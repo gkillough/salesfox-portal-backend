@@ -63,6 +63,8 @@ public class GiftProcessingService {
         GiftEntity foundGift = giftRepository.findById(giftId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        // TODO consider removing the requestingUser field
+
         if (!foundGift.isSubmittable()) {
             GiftTrackingEntity giftTrackingEntity = foundGift.getGiftTrackingEntity();
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Cannot submit a gift with the status '%s'", giftTrackingEntity.getStatus()));

@@ -79,11 +79,8 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private HttpSecurity configureSSL(HttpSecurity security) throws Exception {
-        return security
-                .requiresChannel()
-                .anyRequest()
-                .requiresSecure()
-                .and();
+        // Disabled due to deployment strategy
+        return security;
     }
 
     private HttpSecurity configureCors(HttpSecurity security) throws Exception {

@@ -1,12 +1,17 @@
 package ai.salesfox.portal.integration.scribeless.workflow;
 
 import ai.salesfox.integration.common.exception.SalesfoxException;
+import ai.salesfox.integration.scribeless.enumeration.ScribelessProductType;
 import ai.salesfox.integration.scribeless.model.ScribelessAddressModel;
 import ai.salesfox.integration.scribeless.service.campaign.model.CampaignCreationRequestModel;
 import ai.salesfox.integration.scribeless.service.campaign.model.CampaignUpdateRequestModel;
+import ai.salesfox.portal.database.account.entity.UserAddressEntity;
+import ai.salesfox.portal.database.account.entity.UserEntity;
+import ai.salesfox.portal.database.account.repository.UserAddressRepository;
 import ai.salesfox.portal.database.common.AbstractAddressEntity;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactRepository;
+import ai.salesfox.portal.database.contact.profile.OrganizationAccountContactProfileEntity;
 import ai.salesfox.portal.database.customization.branding_text.CustomBrandingTextEntity;
 import ai.salesfox.portal.database.customization.branding_text.CustomBrandingTextRepository;
 import ai.salesfox.portal.database.customization.icon.CustomIconEntity;
@@ -26,6 +31,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -34,23 +40,24 @@ import java.util.stream.Collectors;
 
 @Component
 public class ScribelessCampaignRequestModelCreator {
-    public static final PageRequest DEFAULT_PAGE_REQUEST = PageRequest.of(0, 100);
-    public static final String DEFAULT_ADDRESS_COUNTRY = "USA";
+    public static final PageRequest DEFAULT_PAGE_REQUEST = PageRequest.of(0, 500);
 
     private final GiftRecipientRepository giftRecipientRepository;
     private final OrganizationAccountContactRepository contactRepository;
     private final NoteRepository noteRepository;
     private final CustomBrandingTextRepository customBrandingTextRepository;
     private final CustomIconRepository customIconRepository;
+    private final UserAddressRepository userAddressRepository;
 
     @Autowired
     public ScribelessCampaignRequestModelCreator(GiftRecipientRepository giftRecipientRepository, OrganizationAccountContactRepository contactRepository, NoteRepository noteRepository,
-                                                 CustomBrandingTextRepository customBrandingTextRepository, CustomIconRepository customIconRepository) {
+                                                 CustomBrandingTextRepository customBrandingTextRepository, CustomIconRepository customIconRepository, UserAddressRepository userAddressRepository) {
         this.giftRecipientRepository = giftRecipientRepository;
         this.contactRepository = contactRepository;
         this.noteRepository = noteRepository;
         this.customBrandingTextRepository = customBrandingTextRepository;
         this.customIconRepository = customIconRepository;
+        this.userAddressRepository = userAddressRepository;
     }
 
     public CampaignCreationRequestHolder createRequestHolder(GiftEntity gift) throws SalesfoxException {
@@ -63,23 +70,26 @@ public class ScribelessCampaignRequestModelCreator {
                 .map(CustomBrandingTextEntity::getCustomBrandingText);
         if (optionalBrandingText.isPresent()) {
             footerText = optionalBrandingText.get();
-            footerFont = "Arial";
+            footerFont = ScribelessCampaignDefaults.DEFAULT_FOOTER_FONT;
         }
 
         String headerImageUrl = null;
         String headerType = null;
-        Optional<CustomIconEntity> optionalIcon = retrieveCustomIcon(gift);
+        Optional<String> optionalIcon = retrieveCustomIconUrl(gift);
         if (optionalIcon.isPresent()) {
-            headerImageUrl = retrieveCustomIconUrl(optionalIcon.get());
-            headerType = "Logo";
+            headerImageUrl = optionalIcon.get();
+            headerType = ScribelessCampaignDefaults.DEFAULT_HEADER_TYPE;
         }
 
-        // TODO determine valid defaults for these
+        ScribelessAddressModel returnAddress = retrieveReturnAddress(gift);
+
         CampaignCreationRequestModel creationRequestModel = new CampaignCreationRequestModel(
-                "A5",
+                ScribelessCampaignDefaults.DEFAULT_PAPER_SIZE_USA,
                 giftNote.getHandwritingStyle(),
+                giftNote.getFontColor(),
+                giftNote.getFontSize(),
                 "Salesfox Gift Id: " + giftId,
-                "Advanced",
+                ScribelessProductType.FULL_SERVICE.getText(),
                 giftNote.getMessage(),
                 null,
                 null,
@@ -90,7 +100,8 @@ public class ScribelessCampaignRequestModelCreator {
                 null,
                 footerText,
                 footerFont,
-                null,
+                ScribelessCampaignDefaults.DEFAULT_DELIVERY_MODEL,
+                returnAddress,
                 List.of()
         );
 
@@ -111,12 +122,17 @@ public class ScribelessCampaignRequestModelCreator {
     }
 
     public ScribelessAddressModel createAddressModel(OrganizationAccountContactEntity contact) {
-        return createAddressModel(contact.getFirstName(), contact.getLastName(), contact.getContactAddressEntity());
+        String title = Optional.ofNullable(contact.getContactProfileEntity()).map(OrganizationAccountContactProfileEntity::getTitle).orElse(null);
+        return createAddressModel(contact.getFirstName(), contact.getLastName(), contact.getContactAddressEntity(), title);
     }
 
     public ScribelessAddressModel createAddressModel(String firstName, String lastName, AbstractAddressEntity address) {
+        return createAddressModel(firstName, lastName, address, null);
+    }
+
+    public ScribelessAddressModel createAddressModel(String firstName, String lastName, AbstractAddressEntity address, @Nullable String title) {
         return new ScribelessAddressModel(
-                null,
+                title,
                 firstName,
                 lastName,
                 null,
@@ -124,10 +140,17 @@ public class ScribelessCampaignRequestModelCreator {
                 address.getAddressLine2(),
                 null,
                 address.getCity(),
-                DEFAULT_ADDRESS_COUNTRY,
+                ScribelessCampaignDefaults.DEFAULT_COUNTRY,
                 address.getState(),
                 address.getZipCode()
         );
+    }
+
+    private ScribelessAddressModel retrieveReturnAddress(GiftEntity gift) throws SalesfoxException {
+        UserEntity requestingUser = gift.getRequestingUserEntity();
+        UserAddressEntity requestingUserAddress = userAddressRepository.findById(requestingUser.getUserId())
+                .orElseThrow(() -> new SalesfoxException("The requesting Salesfox user does not have an address"));
+        return createAddressModel(requestingUser.getFirstName(), requestingUser.getLastName(), requestingUserAddress);
     }
 
     private NoteEntity retrieveNote(GiftEntity gift) throws SalesfoxException {
@@ -148,17 +171,13 @@ public class ScribelessCampaignRequestModelCreator {
         return customBrandingTextRepository.findById(giftCustomTextDetail.getCustomTextId());
     }
 
-    private Optional<CustomIconEntity> retrieveCustomIcon(GiftEntity gift) {
+    private Optional<String> retrieveCustomIconUrl(GiftEntity gift) {
         GiftCustomIconDetailEntity giftCustomIconDetail = gift.getGiftCustomIconDetailEntity();
         if (null == giftCustomIconDetail) {
             return Optional.empty();
         }
-        return customIconRepository.findById(giftCustomIconDetail.getCustomIconId());
-    }
-
-    private String retrieveCustomIconUrl(CustomIconEntity customIcon) {
-        // FIXME update this when it is a url
-        return null;
+        return customIconRepository.findById(giftCustomIconDetail.getCustomIconId())
+                .map(CustomIconEntity::getIconUrl);
     }
 
 }

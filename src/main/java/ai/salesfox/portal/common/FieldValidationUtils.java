@@ -5,6 +5,8 @@ import ai.salesfox.portal.common.model.PortalDateModel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.DateTimeException;
 
 public class FieldValidationUtils {
@@ -45,6 +47,17 @@ public class FieldValidationUtils {
     public static boolean isValidUSZipCode(String zipCode, boolean allowBlank) {
         String zipCodePattern = "^[0-9]{5}(?:-[0-9]{4})?$";
         return isValidBlank(zipCode, allowBlank) || zipCode.matches(zipCodePattern);
+    }
+
+    public static boolean isValidUrl(String url, boolean allowBlank) {
+        if (!isValidBlank(url, allowBlank)) {
+            try {
+                new URL(url);
+            } catch (MalformedURLException e) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static boolean isValidBlank(String str, boolean allowBlank) {
