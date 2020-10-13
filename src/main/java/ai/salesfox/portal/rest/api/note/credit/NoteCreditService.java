@@ -7,6 +7,7 @@ import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
 import ai.salesfox.portal.rest.api.note.credit.model.NoteCreditsRequestModel;
 import ai.salesfox.portal.rest.api.note.credit.model.NoteCreditsResponseModel;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
+import ai.salesfox.portal.integration.stripe.StripeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -22,14 +23,16 @@ public class NoteCreditService {
     private final NoteCreditsUserRestrictionRepository noteCreditsUserRestrictionRepository;
     private final NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final StripeService stripeService;
 
     @Autowired
     public NoteCreditService(NoteCreditsRepository noteCreditsRepository, NoteCreditsUserRestrictionRepository noteCreditsUserRestrictionRepository, NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository,
-                             HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+                             HttpSafeUserMembershipRetrievalService membershipRetrievalService, StripeService stripeService) {
         this.noteCreditsRepository = noteCreditsRepository;
         this.noteCreditsUserRestrictionRepository = noteCreditsUserRestrictionRepository;
         this.noteCreditsOrgAccountRestrictionRepository = noteCreditsOrgAccountRestrictionRepository;
         this.membershipRetrievalService = membershipRetrievalService;
+        this.stripeService = stripeService;
     }
 
     public NoteCreditsResponseModel getCredits() {
