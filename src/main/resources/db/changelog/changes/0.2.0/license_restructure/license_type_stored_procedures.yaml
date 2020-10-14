@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: license-type-function-1
+      author: gavinkillough
+      changes:
+        - createProcedure:
+            dbms: postgresql
+            schemaName: portal
+            procedureBody: |-
+              CREATE OR REPLACE FUNCTION GET_LICENSE_TYPE_ID_BY_NAME(text)
+                          RETURNS UUID AS $result$
+                              DECLARE result UUID;
+                              BEGIN
+                                  select license_type_id
+                                  into result
+                                  from portal.license_types where name = $1;
+                                  RETURN result;
+                              END;
+                          $result$
+                          LANGUAGE plpgsql;

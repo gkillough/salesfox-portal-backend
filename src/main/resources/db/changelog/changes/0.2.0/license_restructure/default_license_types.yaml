@@ -9,6 +9,30 @@ databaseChangeLog:
             columns:
               - column:
                   name: name
+                  value: Salesfox Admins
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 0.00
+              - column:
+                  name: campaigns_per_user_per_month
+                  valueNumeric: 0
+              - column:
+                  name: contacts_per_campaign
+                  valueNumeric: 0
+              - column:
+                  name: users_per_team
+                  valueNumeric: 999999999
+
+  - changeSet:
+      id: default-license-type-2
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: license_types
+            columns:
+              - column:
+                  name: name
                   value: Individual
               - column:
                   name: monthly_cost
@@ -24,7 +48,7 @@ databaseChangeLog:
                   valueNumeric: 1
 
   - changeSet:
-      id: default-license-type-2
+      id: default-license-type-3
       author: gavinkillough
       changes:
         - insert:
@@ -48,7 +72,7 @@ databaseChangeLog:
                   valueNumeric: 5
 
   - changeSet:
-      id: default-license-type-3
+      id: default-license-type-4
       author: gavinkillough
       changes:
         - insert:
@@ -72,7 +96,7 @@ databaseChangeLog:
                   valueNumeric: 50
 
   - changeSet:
-      id: default-license-type-4
+      id: default-license-type-5
       author: gavinkillough
       changes:
         - insert:
