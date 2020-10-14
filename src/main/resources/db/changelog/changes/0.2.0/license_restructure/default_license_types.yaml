@@ -118,5 +118,3 @@ databaseChangeLog:
               - column:
                   name: users_per_team
                   valueNumeric: 999999999
-
-# TODO add stored procedure to get license type by name

@@ -10,3 +10,7 @@ databaseChangeLog:
   - include:
       file: license_type_stored_procedures.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: default_organization_accounts.yaml
+      relativeToChangelogFile: true
