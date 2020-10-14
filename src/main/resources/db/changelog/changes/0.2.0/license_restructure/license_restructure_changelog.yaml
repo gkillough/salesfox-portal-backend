@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: license_type_restructure.yaml
+      relativeToChangelogFile: true

@@ -1,0 +1,104 @@
+databaseChangeLog:
+  - changeSet:
+      id: license-type-1
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: license_types
+            columns:
+              - column:
+                  name: license_type_id
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: monthly_cost
+                  type: DOUBLE PRECISION
+                  constraints:
+                    nullable: false
+              - column:
+                  name: campaigns_per_user_per_month
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: contacts_per_campaign
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: users_per_team
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: license-type-2
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: org_acct_licenses
+            columns:
+              - column:
+                  name: organization_account_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: license_type_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: active_users
+                  type: INTEGER
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: billing_day_of_month
+                  type: INTEGER
+                  defaultValueNumeric: 1
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: license-type-3
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: org_acct_licenses_license_type_id_fk
+            baseTableSchemaName: portal
+            baseTableName: org_acct_licenses
+            baseColumnNames: license_type_id
+            referencedTableSchemaName: portal
+            referencedTableName: license_types
+            referencedColumnNames: license_type_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+            validate: true
+        - addForeignKeyConstraint:
+            constraintName: org_acct_licenses_org_acct_id_fk
+            baseTableSchemaName: portal
+            baseTableName: org_acct_licenses
+            baseColumnNames: organization_account_id
+            referencedTableSchemaName: portal
+            referencedTableName: organization_accounts
+            referencedColumnNames: organization_account_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true
