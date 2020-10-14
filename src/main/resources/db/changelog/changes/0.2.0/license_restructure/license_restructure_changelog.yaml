@@ -2,3 +2,7 @@ databaseChangeLog:
   - include:
       file: license_type_restructure.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: default_license_types.yaml
+      relativeToChangelogFile: true

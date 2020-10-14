@@ -1,0 +1,98 @@
+databaseChangeLog:
+  - changeSet:
+      id: default-license-type-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: license_types
+            columns:
+              - column:
+                  name: name
+                  value: Individual
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 9.00
+              - column:
+                  name: campaigns_per_user_per_month
+                  valueNumeric: 1
+              - column:
+                  name: contacts_per_campaign
+                  valueNumeric: 10
+              - column:
+                  name: users_per_team
+                  valueNumeric: 1
+
+  - changeSet:
+      id: default-license-type-2
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: license_types
+            columns:
+              - column:
+                  name: name
+                  value: Personal
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 19.00
+              - column:
+                  name: campaigns_per_user_per_month
+                  valueNumeric: 3
+              - column:
+                  name: contacts_per_campaign
+                  valueNumeric: 20
+              - column:
+                  name: users_per_team
+                  valueNumeric: 5
+
+  - changeSet:
+      id: default-license-type-3
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: license_types
+            columns:
+              - column:
+                  name: name
+                  value: Small Business
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 39.00
+              - column:
+                  name: campaigns_per_user_per_month
+                  valueNumeric: 5
+              - column:
+                  name: contacts_per_campaign
+                  valueNumeric: 40
+              - column:
+                  name: users_per_team
+                  valueNumeric: 50
+
+  - changeSet:
+      id: default-license-type-4
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: license_types
+            columns:
+              - column:
+                  name: name
+                  value: Enterprise
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 69.00
+              - column:
+                  name: campaigns_per_user_per_month
+                  valueNumeric: 999999999
+              - column:
+                  name: contacts_per_campaign
+                  valueNumeric: 999999999
+              - column:
+                  name: users_per_team
+                  valueNumeric: 999999999
+
+# TODO add stored procedure to get license type by name
