@@ -5,15 +5,18 @@ import ai.salesfox.portal.rest.api.common.page.PagedResponseModel;
 import ai.salesfox.portal.rest.api.license.type.model.LicenseTypeCreationRequestModel;
 import ai.salesfox.portal.rest.api.license.type.model.LicenseTypeResponseModel;
 import ai.salesfox.portal.rest.api.license.type.model.LicenseTypeUpdateRequestModel;
+import ai.salesfox.portal.rest.security.authentication.AnonymouslyAccessible;
+import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping(LicenseTypeController.BASE_URL)
-public class LicenseTypeController {
+public class LicenseTypeController implements AnonymouslyAccessible {
     public static final String BASE_URL = "/license_types";
 
     private final LicenseTypeService licenseTypeService;
@@ -40,20 +43,30 @@ public class LicenseTypeController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
     public LicenseTypeResponseModel createLicenseType(@RequestBody LicenseTypeCreationRequestModel requestModel) {
         return licenseTypeService.createLicenseType(requestModel);
     }
 
     @PutMapping("{licenseTypeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
     public void updateLicenseType(@PathVariable UUID licenseTypeId, @RequestBody LicenseTypeUpdateRequestModel requestModel) {
         licenseTypeService.updateLicenseType(licenseTypeId, requestModel);
     }
 
     @DeleteMapping("{licenseTypeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
     public void deleteLicenseType(@PathVariable UUID licenseTypeId) {
         licenseTypeService.deleteLicenseType(licenseTypeId);
+    }
+
+    @Override
+    public String[] anonymouslyAccessibleApiAntMatchers() {
+        return new String[] {
+                // FIXME this will expose more than just the GET endpoints
+        };
     }
 
 }

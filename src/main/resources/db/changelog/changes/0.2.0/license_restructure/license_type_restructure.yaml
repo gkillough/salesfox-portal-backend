@@ -17,6 +17,7 @@ databaseChangeLog:
                   name: name
                   type: VARCHAR
                   constraints:
+                    unique: true
                     nullable: false
               - column:
                   name: monthly_cost

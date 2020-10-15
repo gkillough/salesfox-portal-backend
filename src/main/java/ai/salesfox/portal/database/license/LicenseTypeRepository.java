@@ -7,4 +7,6 @@ import java.util.UUID;
 
 @Component
 public interface LicenseTypeRepository extends JpaRepository<LicenseTypeEntity, UUID> {
+    boolean existsByName(String name);
+
 }

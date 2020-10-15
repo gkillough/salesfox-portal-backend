@@ -1,19 +1,20 @@
 package ai.salesfox.portal.rest.api.license.type.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class LicenseTypeCreationRequestModel {
-    private String name;
-    private BigDecimal monthlyCost;
-    private Integer campaignsPerUserPerMonth;
-    private Integer contactsPerCampaign;
+@EqualsAndHashCode(callSuper = true)
+public class LicenseTypeCreationRequestModel extends AbstractLicenseTypeRequestModel {
     private Integer usersPerTeam;
+
+    public LicenseTypeCreationRequestModel(String name, BigDecimal monthlyCost, Integer campaignsPerUserPerMonth, Integer contactsPerCampaign, Integer usersPerTeam) {
+        super(name, monthlyCost, campaignsPerUserPerMonth, contactsPerCampaign);
+        this.usersPerTeam = usersPerTeam;
+    }
 
 }
