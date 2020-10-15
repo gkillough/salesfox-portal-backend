@@ -11,11 +11,14 @@ import ai.salesfox.portal.rest.api.license.type.model.LicenseTypeResponseModel;
 import ai.salesfox.portal.rest.api.license.type.model.LicenseTypeUpdateRequestModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Nullable;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Component
@@ -34,7 +37,8 @@ public class LicenseTypeService {
     public PagedResponseModel getLicenseTypes(Integer pageOffset, Integer pageLimit, String query) {
         PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
         // TODO implement
-        return null;
+        return new PagedResponseModel(Page.empty()) {
+        };
     }
 
     public LicenseTypeResponseModel getLicenseType(UUID licenseTypeId) {
@@ -42,24 +46,37 @@ public class LicenseTypeService {
         return LicenseTypeResponseModel.fromEntity(foundLicense);
     }
 
+    @Transactional
     public LicenseTypeResponseModel createLicenseType(LicenseTypeCreationRequestModel requestModel) {
         validateRequestModel(requestModel);
         validateIntField("usersPerTeam", requestModel.getUsersPerTeam());
-        boolean licenseTypeWithNameExists = licenseTypeRepository.existsByName(requestModel.getName());
-        if (licenseTypeWithNameExists) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The license type with the name '%s' already exists", requestModel.getName()));
-        }
 
-        // TODO implement
-        return null;
+        LicenseTypeEntity licenseTypeToSave = new LicenseTypeEntity(
+                null,
+                requestModel.getName(),
+                requestModel.getMonthlyCost(),
+                requestModel.getCampaignsPerUserPerMonth(),
+                requestModel.getContactsPerCampaign(),
+                requestModel.getUsersPerTeam()
+        );
+        LicenseTypeEntity savedLicenseType = licenseTypeRepository.save(licenseTypeToSave);
+        return LicenseTypeResponseModel.fromEntity(savedLicenseType);
     }
 
+    @Transactional
     public void updateLicenseType(UUID licenseTypeId, LicenseTypeUpdateRequestModel requestModel) {
         LicenseTypeEntity foundLicense = findLicenseType(licenseTypeId);
         validateRequestModel(requestModel);
-        // TODO implement
+
+        foundLicense.setName(requestModel.getName());
+        foundLicense.setMonthlyCost(requestModel.getMonthlyCost());
+        foundLicense.setCampaignsPerUserPerMonth(requestModel.getCampaignsPerUserPerMonth());
+        foundLicense.setContactsPerCampaign(requestModel.getContactsPerCampaign());
+
+        licenseTypeRepository.save(foundLicense);
     }
 
+    @Transactional
     public void deleteLicenseType(UUID licenseTypeId) {
         LicenseTypeEntity foundLicense = findLicenseType(licenseTypeId);
         boolean isLicenseInUse = orgAccountLicenseRepository.existsByLicenseTypeId(licenseTypeId);
@@ -78,6 +95,19 @@ public class LicenseTypeService {
         if (StringUtils.isBlank(requestModel.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'name' must not be blank");
         }
+
+        boolean licenseTypeWithNameExists = licenseTypeRepository.existsByName(requestModel.getName());
+        if (licenseTypeWithNameExists) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The license type with the name '%s' already exists", requestModel.getName()));
+        }
+
+        BigDecimal monthlyCost = requestModel.getMonthlyCost();
+        if (null == monthlyCost) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'monthlyCost' is required");
+        } else if (monthlyCost.compareTo(BigDecimal.ZERO) < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'monthlyCost' cannot be less than $0.00");
+        }
+
         validateIntField("campaignsPerUserPerMonth", requestModel.getCampaignsPerUserPerMonth());
         validateIntField("contactsPerCampaign", requestModel.getContactsPerCampaign());
     }
