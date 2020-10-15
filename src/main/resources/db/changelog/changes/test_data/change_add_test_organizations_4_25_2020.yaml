@@ -76,6 +76,30 @@ databaseChangeLog:
                   valueBoolean: true
 
   - changeSet:
+      id: test-org-acct-license-11
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: org_acct_licenses
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Sales')
+              - column:
+                  name: license_type_id
+                  valueComputed: GET_LICENSE_TYPE_ID_BY_NAME('Enterprise')
+              - column:
+                  name: active_users
+                  valueNumeric: 4
+              - column:
+                  name: billing_day_of_month
+                  valueNumeric: 1
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
       id: test-orgs-addresses-11
       author: gavinkillough
       changes:
@@ -199,6 +223,30 @@ databaseChangeLog:
               - column:
                   name: organization_id
                   valueComputed: GET_ORGANIZATION_ID_BY_NAME('Big Apple Corp')
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-org-acct-license-12
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: org_acct_licenses
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Big Apple Corp', 'Marketing')
+              - column:
+                  name: license_type_id
+                  valueComputed: GET_LICENSE_TYPE_ID_BY_NAME('Enterprise')
+              - column:
+                  name: active_users
+                  valueNumeric: 4
+              - column:
+                  name: billing_day_of_month
+                  valueNumeric: 1
               - column:
                   name: is_active
                   valueBoolean: true
@@ -351,6 +399,30 @@ databaseChangeLog:
                   valueBoolean: true
 
   - changeSet:
+      id: test-org-acct-license-21
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: org_acct_licenses
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Support')
+              - column:
+                  name: license_type_id
+                  valueComputed: GET_LICENSE_TYPE_ID_BY_NAME('Small Business')
+              - column:
+                  name: active_users
+                  valueNumeric: 4
+              - column:
+                  name: billing_day_of_month
+                  valueNumeric: 7
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
       id: test-orgs-addresses-21
       author: gavinkillough
       changes:
@@ -474,6 +546,30 @@ databaseChangeLog:
               - column:
                   name: organization_id
                   valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pet Food Online Inc')
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: test-org-acct-license-22
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: org_acct_licenses
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Pet Food Online Inc', 'Distribution')
+              - column:
+                  name: license_type_id
+                  valueComputed: GET_LICENSE_TYPE_ID_BY_NAME('Small Business')
+              - column:
+                  name: active_users
+                  valueNumeric: 4
+              - column:
+                  name: billing_day_of_month
+                  valueNumeric: 24
               - column:
                   name: is_active
                   valueBoolean: true
