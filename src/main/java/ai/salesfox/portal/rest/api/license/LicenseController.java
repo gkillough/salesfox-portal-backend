@@ -16,6 +16,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(LicenseController.BASE_ENDPOINT)
 @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
+@Deprecated
 public class LicenseController {
     public static final String BASE_ENDPOINT = "/licenses";
 

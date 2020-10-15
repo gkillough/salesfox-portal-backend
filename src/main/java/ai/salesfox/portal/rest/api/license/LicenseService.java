@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
+@Deprecated
 public class LicenseService {
     private final LicenseRepository licenseRepository;
     private final LicenseGenerator licenseGenerator;

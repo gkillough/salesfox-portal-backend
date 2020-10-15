@@ -14,6 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(schema = "portal", name = "licenses")
+@Deprecated
 public class LicenseEntity implements Serializable {
     @Id
     @PrimaryKeyJoinColumn

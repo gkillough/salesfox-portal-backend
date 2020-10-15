@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@Deprecated
 public interface LicenseRepository extends JpaRepository<LicenseEntity, UUID> {
     Optional<LicenseEntity> findFirstByLicenseHash(UUID uuid);
 
