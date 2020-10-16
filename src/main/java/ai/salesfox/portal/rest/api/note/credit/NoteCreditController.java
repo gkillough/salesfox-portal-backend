@@ -18,6 +18,7 @@ public class NoteCreditController {
     @Autowired
     public NoteCreditController(NoteCreditService noteCreditService) {
         this.noteCreditService = noteCreditService;
+
     }
 
     @GetMapping
@@ -28,8 +29,8 @@ public class NoteCreditController {
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize(PortalAuthorityConstants.NON_ACCOUNT_REP_AUTH_CHECK)
-    public void orderNoteCredits(@RequestBody NoteCreditsRequestModel requestModel) {
-        noteCreditService.orderCredits(requestModel);
+    public String orderCredits(@RequestBody NoteCreditsRequestModel requestModel) {
+        return noteCreditService.orderCredits(requestModel);
     }
 
 }

@@ -3,11 +3,12 @@ package ai.salesfox.portal.rest.api.note.credit;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.note.credit.*;
+import ai.salesfox.portal.integration.stripe.StripeService;
 import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
 import ai.salesfox.portal.rest.api.note.credit.model.NoteCreditsRequestModel;
 import ai.salesfox.portal.rest.api.note.credit.model.NoteCreditsResponseModel;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
-import ai.salesfox.portal.integration.stripe.StripeService;
+import com.stripe.model.Charge;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -41,19 +42,32 @@ public class NoteCreditService {
     }
 
     @Transactional
-    public void orderCredits(NoteCreditsRequestModel requestModel) {
+    public String orderCredits(NoteCreditsRequestModel requestModel) {
+        final int notePrice = 4;
         NoteCreditsEntity foundNoteCredits = findNoteCredits();
-
+        String token = requestModel.getToken();
+        Charge charge;
+        membershipRetrievalService.getAuthenticatedUserEntity().getMembershipEntity().getOrganizationAccountId();
         Integer requestedQuantity = requestModel.getQuantity();
         if (null == requestedQuantity) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'quantity' is required");
         } else if (requestedQuantity < 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The requested quantity must be greater than zero");
         }
+        try {
+            charge = stripeService.chargeNewCard(token, requestedQuantity * notePrice);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid card or insufficient funds");
+        }
+        if (charge == null) {
+            return "Failure";
+        } else {
+            int newQuantity = foundNoteCredits.getAvailableCredits() + requestedQuantity;
+            foundNoteCredits.setAvailableCredits(newQuantity);
+            noteCreditsRepository.save(foundNoteCredits);
+            return "Success";
+        }
 
-        int newQuantity = foundNoteCredits.getAvailableCredits() + requestedQuantity;
-        foundNoteCredits.setAvailableCredits(newQuantity);
-        noteCreditsRepository.save(foundNoteCredits);
     }
 
     private NoteCreditsEntity findNoteCredits() {
