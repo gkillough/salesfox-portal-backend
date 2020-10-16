@@ -4,14 +4,11 @@ import ai.salesfox.portal.database.license.LicenseTypeEntity;
 import ai.salesfox.portal.database.license.LicenseTypeRepository;
 import ai.salesfox.portal.database.license.OrganizationAccountLicenseRepository;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
-import ai.salesfox.portal.rest.api.common.page.PagedResponseModel;
-import ai.salesfox.portal.rest.api.license.type.model.AbstractLicenseTypeRequestModel;
-import ai.salesfox.portal.rest.api.license.type.model.LicenseTypeCreationRequestModel;
-import ai.salesfox.portal.rest.api.license.type.model.LicenseTypeResponseModel;
-import ai.salesfox.portal.rest.api.license.type.model.LicenseTypeUpdateRequestModel;
+import ai.salesfox.portal.rest.api.license.type.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +16,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 public class LicenseTypeService {
@@ -34,11 +33,31 @@ public class LicenseTypeService {
         this.orgAccountLicenseRepository = orgAccountLicenseRepository;
     }
 
-    public PagedResponseModel getLicenseTypes(Integer pageOffset, Integer pageLimit, String query) {
+    public MultiLicenseTypeModel getPublicLicenseTypes(Integer pageOffset, Integer pageLimit) {
+        // FIXME implement
+        return MultiLicenseTypeModel.empty();
+    }
+
+    public MultiLicenseTypeModel getAllLicenseTypes(Integer pageOffset, Integer pageLimit, String nameQuery) {
         PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
-        // TODO implement
-        return new PagedResponseModel(Page.empty()) {
-        };
+        PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
+
+        Page<LicenseTypeEntity> foundLicenseTypesPage;
+        if (StringUtils.isNotBlank(nameQuery)) {
+            foundLicenseTypesPage = licenseTypeRepository.findByNameContaining(nameQuery, pageRequest);
+        } else {
+            foundLicenseTypesPage = licenseTypeRepository.findAll(pageRequest);
+        }
+
+        if (foundLicenseTypesPage.isEmpty()) {
+            return MultiLicenseTypeModel.empty();
+        }
+
+        List<LicenseTypeResponseModel> responseModels = foundLicenseTypesPage
+                .stream()
+                .map(LicenseTypeResponseModel::fromEntity)
+                .collect(Collectors.toList());
+        return new MultiLicenseTypeModel(responseModels, foundLicenseTypesPage);
     }
 
     public LicenseTypeResponseModel getLicenseType(UUID licenseTypeId) {
@@ -48,7 +67,7 @@ public class LicenseTypeService {
 
     @Transactional
     public LicenseTypeResponseModel createLicenseType(LicenseTypeCreationRequestModel requestModel) {
-        validateRequestModel(requestModel);
+        validateRequestModel(requestModel, null);
         validateIntField("usersPerTeam", requestModel.getUsersPerTeam());
 
         LicenseTypeEntity licenseTypeToSave = new LicenseTypeEntity(
@@ -66,7 +85,7 @@ public class LicenseTypeService {
     @Transactional
     public void updateLicenseType(UUID licenseTypeId, LicenseTypeUpdateRequestModel requestModel) {
         LicenseTypeEntity foundLicense = findLicenseType(licenseTypeId);
-        validateRequestModel(requestModel);
+        validateRequestModel(requestModel, foundLicense);
 
         foundLicense.setName(requestModel.getName());
         foundLicense.setMonthlyCost(requestModel.getMonthlyCost());
@@ -91,14 +110,16 @@ public class LicenseTypeService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    private void validateRequestModel(AbstractLicenseTypeRequestModel requestModel) {
+    private void validateRequestModel(AbstractLicenseTypeRequestModel requestModel, @Nullable LicenseTypeEntity existingEntity) {
         if (StringUtils.isBlank(requestModel.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'name' must not be blank");
         }
 
-        boolean licenseTypeWithNameExists = licenseTypeRepository.existsByName(requestModel.getName());
-        if (licenseTypeWithNameExists) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The license type with the name '%s' already exists", requestModel.getName()));
+        if (null == existingEntity || !existingEntity.getName().equals(requestModel.getName())) {
+            boolean licenseTypeWithNameExists = licenseTypeRepository.existsByName(requestModel.getName());
+            if (licenseTypeWithNameExists) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The license type with the name '%s' already exists", requestModel.getName()));
+            }
         }
 
         BigDecimal monthlyCost = requestModel.getMonthlyCost();
