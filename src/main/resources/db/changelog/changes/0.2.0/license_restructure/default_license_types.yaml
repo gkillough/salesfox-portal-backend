@@ -1,0 +1,150 @@
+databaseChangeLog:
+  - changeSet:
+      id: default-license-type-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: license_types
+            columns:
+              - column:
+                  name: name
+                  value: Salesfox Admins
+              - column:
+                  name: public
+                  valueBoolean: false
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 0.00
+              - column:
+                  name: campaigns_per_user_per_month
+                  valueNumeric: 0
+              - column:
+                  name: contacts_per_campaign
+                  valueNumeric: 0
+              - column:
+                  name: users_included
+                  valueNumeric: 1
+              - column:
+                  name: cost_per_additional_user
+                  valueNumeric: 0.00
+
+  - changeSet:
+      id: default-license-type-2
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: license_types
+            columns:
+              - column:
+                  name: name
+                  value: Individual
+              - column:
+                  name: public
+                  valueBoolean: true
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 9.00
+              - column:
+                  name: campaigns_per_user_per_month
+                  valueNumeric: 1
+              - column:
+                  name: contacts_per_campaign
+                  valueNumeric: 10
+              - column:
+                  name: users_included
+                  valueNumeric: 1
+              - column:
+                  name: cost_per_additional_user
+                  valueNumeric: 9.00
+
+  - changeSet:
+      id: default-license-type-3
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: license_types
+            columns:
+              - column:
+                  name: name
+                  value: Personal
+              - column:
+                  name: public
+                  valueBoolean: true
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 19.00
+              - column:
+                  name: campaigns_per_user_per_month
+                  valueNumeric: 3
+              - column:
+                  name: contacts_per_campaign
+                  valueNumeric: 20
+              - column:
+                  name: users_included
+                  valueNumeric: 5
+              - column:
+                  name: cost_per_additional_user
+                  valueNumeric: 5.99
+
+  - changeSet:
+      id: default-license-type-4
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: license_types
+            columns:
+              - column:
+                  name: name
+                  value: Small Business
+              - column:
+                  name: public
+                  valueBoolean: true
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 39.00
+              - column:
+                  name: campaigns_per_user_per_month
+                  valueNumeric: 5
+              - column:
+                  name: contacts_per_campaign
+                  valueNumeric: 40
+              - column:
+                  name: users_included
+                  valueNumeric: 50
+              - column:
+                  name: cost_per_additional_user
+                  valueNumeric: 3.99
+
+  - changeSet:
+      id: default-license-type-5
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: license_types
+            columns:
+              - column:
+                  name: name
+                  value: Enterprise
+              - column:
+                  name: public
+                  valueBoolean: true
+              - column:
+                  name: monthly_cost
+                  valueNumeric: 69.00
+              - column:
+                  name: campaigns_per_user_per_month
+                  valueNumeric: 100
+              - column:
+                  name: contacts_per_campaign
+                  valueNumeric: 100000
+              - column:
+                  name: users_included
+                  valueNumeric: 1000
+              - column:
+                  name: cost_per_additional_user
+                  valueNumeric: 1.99

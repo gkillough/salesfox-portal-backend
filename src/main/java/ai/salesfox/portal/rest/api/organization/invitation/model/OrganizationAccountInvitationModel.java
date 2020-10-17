@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrganizationAccountInvitationModel {
-    private String organizationAccountName;
     private String inviteEmail;
     private String inviteRole;
 

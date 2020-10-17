@@ -1,10 +1,11 @@
 package ai.salesfox.portal.rest.api.registration.user;
 
 import ai.salesfox.portal.common.FieldValidationUtils;
-import ai.salesfox.portal.common.exception.PortalDatabaseIntegrityViolationException;
 import ai.salesfox.portal.common.service.license.LicenseSeatManager;
-import ai.salesfox.portal.common.service.license.PortalLicenseSeatException;
-import ai.salesfox.portal.database.account.entity.*;
+import ai.salesfox.portal.database.account.entity.LoginEntity;
+import ai.salesfox.portal.database.account.entity.MembershipEntity;
+import ai.salesfox.portal.database.account.entity.RoleEntity;
+import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.LoginRepository;
 import ai.salesfox.portal.database.account.repository.MembershipRepository;
 import ai.salesfox.portal.database.account.repository.RoleRepository;
@@ -13,6 +14,7 @@ import ai.salesfox.portal.database.inventory.InventoryEntity;
 import ai.salesfox.portal.database.inventory.InventoryRepository;
 import ai.salesfox.portal.database.inventory.restriction.InventoryUserRestrictionEntity;
 import ai.salesfox.portal.database.inventory.restriction.InventoryUserRestrictionRepository;
+import ai.salesfox.portal.database.license.OrganizationAccountLicenseEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditUserRestrictionEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
@@ -86,7 +88,6 @@ public class UserRegistrationService {
 
     /**
      * @param registrationModel a model containing the fields required to register a user
-     * @return the id of the registered user
      */
     @Transactional
     public void registerUser(UserRegistrationModel registrationModel) {
@@ -153,15 +154,8 @@ public class UserRegistrationService {
     }
 
     private void reserveLicenseSeatForNewUser(OrganizationAccountEntity orgAccount) {
-        try {
-            LicenseEntity orgLicense = licenseSeatManager.getLicenseForOrganizationAccount(orgAccount);
-            licenseSeatManager.fillSeat(orgLicense);
-        } catch (PortalDatabaseIntegrityViolationException e) {
-            log.error("There was a problem managing the organization license", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (PortalLicenseSeatException e) {
-            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, e.getMessage());
-        }
+        OrganizationAccountLicenseEntity orgLicense = orgAccount.getOrganizationAccountLicenseEntity();
+        licenseSeatManager.fillSeat(orgLicense);
     }
 
     private LoginEntity saveLoginInfo(UUID userId, String password) {

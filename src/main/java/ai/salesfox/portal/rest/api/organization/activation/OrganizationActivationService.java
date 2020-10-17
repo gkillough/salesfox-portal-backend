@@ -5,10 +5,11 @@ import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.MembershipRepository;
 import ai.salesfox.portal.database.account.repository.UserRepository;
 import ai.salesfox.portal.database.common.PageUtils;
+import ai.salesfox.portal.database.license.OrganizationAccountLicenseEntity;
+import ai.salesfox.portal.database.license.OrganizationAccountLicenseRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
-import ai.salesfox.portal.rest.api.license.LicenseService;
 import ai.salesfox.portal.rest.api.user.active.UserActiveService;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,40 +27,41 @@ import java.util.stream.Collectors;
 
 @Component
 public class OrganizationActivationService {
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private MembershipRepository membershipRepository;
-    private UserRepository userRepository;
-    private OrganizationAccountRepository organizationAccountRepository;
-    private LicenseService licenseService;
-    private UserActiveService userActiveService;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final MembershipRepository membershipRepository;
+    private final UserRepository userRepository;
+    private final OrganizationAccountRepository organizationAccountRepository;
+    private final OrganizationAccountLicenseRepository organizationAccountLicenseRepository;
+    private final UserActiveService userActiveService;
 
     @Autowired
     public OrganizationActivationService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, MembershipRepository membershipRepository, UserRepository userRepository,
-                                         OrganizationAccountRepository organizationAccountRepository, LicenseService licenseService, UserActiveService userActiveService) {
+                                         OrganizationAccountRepository organizationAccountRepository, OrganizationAccountLicenseRepository organizationAccountLicenseRepository, UserActiveService userActiveService) {
         this.membershipRetrievalService = membershipRetrievalService;
         this.membershipRepository = membershipRepository;
         this.userRepository = userRepository;
         this.organizationAccountRepository = organizationAccountRepository;
-        this.licenseService = licenseService;
+        this.organizationAccountLicenseRepository = organizationAccountLicenseRepository;
         this.userActiveService = userActiveService;
     }
 
     @Transactional
     public void updateOrganizationAccountActiveStatus(UUID organizationAccountId, ActiveStatusPatchModel activeStatusModel) {
         validateUpdatePermission(organizationAccountId);
-        if (activeStatusModel.getActiveStatus() == null) {
+        Boolean activeStatus = activeStatusModel.getActiveStatus();
+        if (activeStatus == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'activeStatus' cannot be null");
         }
 
         OrganizationAccountEntity orgAccountEntity = organizationAccountRepository.findById(organizationAccountId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        licenseService.setActiveStatus(orgAccountEntity.getLicenseId(), activeStatusModel);
+        setActiveStatusForLicense(orgAccountEntity, activeStatus);
 
         // TODO consider making the rest of this method asynchronous and returning
-        setActiveStatusForOrgUsers(organizationAccountId, activeStatusModel.getActiveStatus());
+        setActiveStatusForOrgUsers(organizationAccountId, activeStatus);
 
-        orgAccountEntity.setIsActive(activeStatusModel.getActiveStatus());
+        orgAccountEntity.setIsActive(activeStatus);
         organizationAccountRepository.save(orgAccountEntity);
     }
 
@@ -85,6 +87,14 @@ public class OrganizationActivationService {
             // TODO figure out how to avoid reactivating "permanently" deactivated users
             userActiveService.updateUserActiveStatusWithoutPermissionCheck(user.getUserId(), activeStatus);
         }
+    }
+
+    // TODO update billing information
+    private void setActiveStatusForLicense(OrganizationAccountEntity organizationAccount, boolean activeStatus) {
+        OrganizationAccountLicenseEntity orgAcctLicense = organizationAccount.getOrganizationAccountLicenseEntity();
+        orgAcctLicense.setIsActive(activeStatus);
+        OrganizationAccountLicenseEntity savedOrgAcctLicense = organizationAccountLicenseRepository.save(orgAcctLicense);
+        organizationAccount.setOrganizationAccountLicenseEntity(savedOrgAcctLicense);
     }
 
 }

@@ -1,5 +1,72 @@
 databaseChangeLog:
   - changeSet:
+      id: insert-test-org-1
+      author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.organizations WHERE organization_name = 'Salesfox for Individuals';
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organizations
+            columns:
+              - column:
+                  name: organization_name
+                  value: Salesfox for Individuals
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: insert-test-org-acc-1
+      author: gavinkillough
+      preConditions:
+        - onFail: MARK_RAN
+        - sqlCheck:
+            expectedResult: 0
+            sql: SELECT count(*) FROM portal.organization_accounts WHERE organization_account_name = 'Salesfox Basic';
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: organization_accounts
+            columns:
+              - column:
+                  name: organization_account_name
+                  value: Salesfox Basic
+              - column:
+                  name: organization_id
+                  valueComputed: GET_ORGANIZATION_ID_BY_NAME('Salesfox for Individuals')
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
+      id: insert-test-org-acct-license-1
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: org_acct_licenses
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Salesfox for Individuals', 'Salesfox Basic')
+              - column:
+                  name: license_type_id
+                  valueComputed: GET_LICENSE_TYPE_ID_BY_NAME('Individual')
+              - column:
+                  name: active_users
+                  valueNumeric: 1
+              - column:
+                  name: billing_day_of_month
+                  valueNumeric: 15
+              - column:
+                  name: is_active
+                  valueBoolean: true
+
+  - changeSet:
       id: test-data-create-user-1
       author: gavinkillough
       preConditions:
@@ -69,7 +136,7 @@ databaseChangeLog:
                   valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Salesfox for Individuals', 'Salesfox Basic')
               - column:
                   name: role_id
-                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PORTAL_BASIC_USER')
+                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('ORGANIZATION_ACCOUNT_OWNER')
 
   - changeSet:
       id: test-data-create-user-address-1
@@ -173,173 +240,6 @@ databaseChangeLog:
         - onFail: MARK_RAN
         - sqlCheck:
             expectedResult: 0
-            sql: SELECT count(*) FROM portal.users WHERE email = 'premium.user@usepipeline.com';
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: users
-            columns:
-              - column:
-                  name: email
-                  value: premium.user@usepipeline.com
-              - column:
-                  name: first_name
-                  value: Premium
-              - column:
-                  name: last_name
-                  value: User
-              - column:
-                  name: is_active
-                  valueBoolean: true
-
-  - changeSet:
-      id: test-data-create-user-login-2
-      author: gavinkillough
-      preConditions:
-        - onFail: MARK_RAN
-        - sqlCheck:
-            expectedResult: 0
-            sql: SELECT count(*) FROM portal.logins WHERE user_id = GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com');
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: logins
-            columns:
-              - column:
-                  name: user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com')
-              - column:
-                  name: password_hash
-                  value: $2a$08$j.QARNAT.eorZjsetIb/Ru/9T0aY2jprfoZgHJE09G9WvA/AACBxS
-              - column:
-                  name: num_failed_logins
-                  valueNumeric: 0
-
-  - changeSet:
-      id: test-data-create-user-membership-2
-      author: gavinkillough
-      preConditions:
-        - onFail: MARK_RAN
-        - sqlCheck:
-            expectedResult: 0
-            sql: SELECT count(*) FROM portal.memberships WHERE user_id = GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com');
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: memberships
-            columns:
-              - column:
-                  name: user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com')
-              - column:
-                  name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Salesfox for Individuals', 'Salesfox Premium')
-              - column:
-                  name: role_id
-                  valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PORTAL_PREMIUM_USER')
-
-  - changeSet:
-      id: test-data-create-user-address-2
-      author: gavinkillough
-      preConditions:
-        - onFail: MARK_RAN
-        - sqlCheck:
-            expectedResult: 0
-            sql: SELECT count(*) FROM portal.user_addresses WHERE user_id = GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com');
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: user_addresses
-            columns:
-              - column:
-                  name: user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com')
-              - column:
-                  name: address_line_1
-                  value: 1024 Main Street
-              - column:
-                  name: address_line_2
-                  value: Unit 5
-              - column:
-                  name: city
-                  value: New York
-              - column:
-                  name: state
-                  value: NY
-              - column:
-                  name: zip_code
-                  value: 10002
-              - column:
-                  name: is_business
-                  valueBoolean: false
-
-  - changeSet:
-      id: test-data-create-user-profile-2
-      author: gavinkillough
-      preConditions:
-        - onFail: MARK_RAN
-        - sqlCheck:
-            expectedResult: 0
-            sql: SELECT count(*) FROM portal.user_profiles WHERE user_id = GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com');
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: user_profiles
-            columns:
-              - column:
-                  name: user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com')
-              - column:
-                  name: mobile_number
-                  valueComputed: 5555550003
-              - column:
-                  name: business_number
-                  valueComputed: 5555550004
-
-  - changeSet:
-      id: test-data-create-user-inventory-2
-      author: gavinkillough
-      preConditions:
-        - onFail: MARK_RAN
-        - sqlCheck:
-            expectedResult: 0
-            sql: SELECT count(*) FROM portal.inventories WHERE inventory_id = '6d57f19b-c14a-4dcd-bc25-6b92ee8b6852';
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: inventories
-            columns:
-              - column:
-                  name: inventory_id
-                  value: 6d57f19b-c14a-4dcd-bc25-6b92ee8b6852
-
-  - changeSet:
-      id: test-data-create-user-inventory-restriction-2
-      author: gavinkillough
-      preConditions:
-        - onFail: MARK_RAN
-        - sqlCheck:
-            expectedResult: 0
-            sql: SELECT count(*) FROM portal.inventory_user_restrictions WHERE user_id = GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com');
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: inventory_user_restrictions
-            columns:
-              - column:
-                  name: inventory_id
-                  value: 6d57f19b-c14a-4dcd-bc25-6b92ee8b6852
-              - column:
-                  name: user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('premium.user@usepipeline.com')
-
-  - changeSet:
-      id: test-data-create-user-3
-      author: gavinkillough
-      preConditions:
-        - onFail: MARK_RAN
-        - sqlCheck:
-            expectedResult: 0
             sql: SELECT count(*) FROM portal.users WHERE email = 'admin@usepipeline.com';
       changes:
         - insert:
@@ -360,7 +260,7 @@ databaseChangeLog:
                   valueBoolean: true
 
   - changeSet:
-      id: test-data-create-user-login-3
+      id: test-data-create-user-login-2
       author: gavinkillough
       preConditions:
         - onFail: MARK_RAN
@@ -383,7 +283,7 @@ databaseChangeLog:
                   valueNumeric: 0
 
   - changeSet:
-      id: test-data-create-user-membership-3
+      id: test-data-create-user-membership-2
       author: gavinkillough
       preConditions:
         - onFail: MARK_RAN
@@ -400,13 +300,13 @@ databaseChangeLog:
                   valueComputed: GET_USER_ID_BY_EMAIL('admin@usepipeline.com')
               - column:
                   name: organization_account_id
-                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Salesfox Organization', 'Salesfox Team')
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Salesfox Organization', 'Salesfox Admins')
               - column:
                   name: role_id
                   valueComputed: GET_ROLE_ID_BY_ROLE_LEVEL('PORTAL_ADMIN')
 
   - changeSet:
-      id: test-data-create-user-address-3
+      id: test-data-create-user-address-2
       author: gavinkillough
       preConditions:
         - onFail: MARK_RAN
@@ -441,7 +341,7 @@ databaseChangeLog:
                   valueBoolean: false
 
   - changeSet:
-      id: test-data-create-user-profile-3
+      id: test-data-create-user-profile-2
       author: gavinkillough
       preConditions:
         - onFail: MARK_RAN

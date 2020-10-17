@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - include:
+      file: license_type_restructure.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: default_license_types.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: license_type_stored_procedures.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: default_organization_accounts.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: remove_old_license_tables.yaml
+      relativeToChangelogFile: true
