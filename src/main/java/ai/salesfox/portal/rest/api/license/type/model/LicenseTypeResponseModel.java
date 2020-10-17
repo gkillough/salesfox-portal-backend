@@ -1,8 +1,8 @@
 package ai.salesfox.portal.rest.api.license.type.model;
 
 import ai.salesfox.portal.database.license.LicenseTypeEntity;
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -10,15 +10,9 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class LicenseTypeResponseModel {
+@EqualsAndHashCode(callSuper = true)
+public class LicenseTypeResponseModel extends AbstractLicenseTypeModel {
     private UUID licenseTypeId;
-    private String name;
-    private Boolean isPublic;
-    private BigDecimal monthlyCost;
-    private Integer campaignsPerUserPerMonth;
-    private Integer contactsPerCampaign;
-    private Integer usersPerTeam;
 
     public static LicenseTypeResponseModel fromEntity(LicenseTypeEntity licenseTypeEntity) {
         return new LicenseTypeResponseModel(
@@ -28,8 +22,14 @@ public class LicenseTypeResponseModel {
                 licenseTypeEntity.getMonthlyCost(),
                 licenseTypeEntity.getCampaignsPerUserPerMonth(),
                 licenseTypeEntity.getContactsPerCampaign(),
-                licenseTypeEntity.getUsersPerTeam()
+                licenseTypeEntity.getUsersIncluded(),
+                licenseTypeEntity.getCostPerAdditionalUser()
         );
+    }
+
+    public LicenseTypeResponseModel(UUID licenseTypeId, String name, Boolean isPublic, BigDecimal monthlyCost, Integer campaignsPerUserPerMonth, Integer contactsPerCampaign, Integer usersIncluded, BigDecimal costPerAdditionalUser) {
+        super(name, isPublic, monthlyCost, campaignsPerUserPerMonth, contactsPerCampaign, usersIncluded, costPerAdditionalUser);
+        this.licenseTypeId = licenseTypeId;
     }
 
 }

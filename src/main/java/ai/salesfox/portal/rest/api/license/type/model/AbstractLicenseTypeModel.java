@@ -9,11 +9,13 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AbstractLicenseTypeRequestModel {
+public class AbstractLicenseTypeModel {
     private String name;
     private Boolean isPublic;
     private BigDecimal monthlyCost;
     private Integer campaignsPerUserPerMonth;
     private Integer contactsPerCampaign;
+    private Integer usersIncluded;
+    private BigDecimal costPerAdditionalUser;
 
 }

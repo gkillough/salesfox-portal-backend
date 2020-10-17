@@ -4,7 +4,10 @@ import ai.salesfox.portal.database.license.LicenseTypeEntity;
 import ai.salesfox.portal.database.license.LicenseTypeRepository;
 import ai.salesfox.portal.database.license.OrganizationAccountLicenseRepository;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
-import ai.salesfox.portal.rest.api.license.type.model.*;
+import ai.salesfox.portal.rest.api.license.type.model.AbstractLicenseTypeModel;
+import ai.salesfox.portal.rest.api.license.type.model.LicenseTypeRequestModel;
+import ai.salesfox.portal.rest.api.license.type.model.LicenseTypeResponseModel;
+import ai.salesfox.portal.rest.api.license.type.model.MultiLicenseTypeModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -60,9 +63,8 @@ public class LicenseTypeService {
     }
 
     @Transactional
-    public LicenseTypeResponseModel createLicenseType(LicenseTypeCreationRequestModel requestModel) {
+    public LicenseTypeResponseModel createLicenseType(LicenseTypeRequestModel requestModel) {
         validateRequestModel(requestModel, null);
-        validateIntField("usersPerTeam", requestModel.getUsersPerTeam());
 
         LicenseTypeEntity licenseTypeToSave = new LicenseTypeEntity(
                 null,
@@ -71,15 +73,15 @@ public class LicenseTypeService {
                 requestModel.getMonthlyCost(),
                 requestModel.getCampaignsPerUserPerMonth(),
                 requestModel.getContactsPerCampaign(),
-                requestModel.getUsersPerTeam()
+                requestModel.getUsersIncluded(),
+                requestModel.getCostPerAdditionalUser()
         );
         LicenseTypeEntity savedLicenseType = licenseTypeRepository.save(licenseTypeToSave);
         return LicenseTypeResponseModel.fromEntity(savedLicenseType);
     }
 
     @Transactional
-    // TODO update billing information if a license cost changes
-    public void updateLicenseType(UUID licenseTypeId, LicenseTypeUpdateRequestModel requestModel) {
+    public void updateLicenseType(UUID licenseTypeId, LicenseTypeRequestModel requestModel) {
         LicenseTypeEntity foundLicense = findLicenseType(licenseTypeId);
         validateRequestModel(requestModel, foundLicense);
 
@@ -87,8 +89,12 @@ public class LicenseTypeService {
         foundLicense.setMonthlyCost(requestModel.getMonthlyCost());
         foundLicense.setCampaignsPerUserPerMonth(requestModel.getCampaignsPerUserPerMonth());
         foundLicense.setContactsPerCampaign(requestModel.getContactsPerCampaign());
+        foundLicense.setUsersIncluded(requestModel.getUsersIncluded());
+        foundLicense.setCostPerAdditionalUser(requestModel.getCostPerAdditionalUser());
 
         licenseTypeRepository.save(foundLicense);
+
+        // TODO update billing information if a license type changes
     }
 
     @Transactional
@@ -106,7 +112,7 @@ public class LicenseTypeService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    private void validateRequestModel(AbstractLicenseTypeRequestModel requestModel, @Nullable LicenseTypeEntity existingEntity) {
+    private void validateRequestModel(AbstractLicenseTypeModel requestModel, @Nullable LicenseTypeEntity existingEntity) {
         if (StringUtils.isBlank(requestModel.getName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'name' cannot be blank");
         }
@@ -122,15 +128,11 @@ public class LicenseTypeService {
             }
         }
 
-        BigDecimal monthlyCost = requestModel.getMonthlyCost();
-        if (null == monthlyCost) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'monthlyCost' is required");
-        } else if (monthlyCost.compareTo(BigDecimal.ZERO) < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'monthlyCost' cannot be less than $0.00");
-        }
-
+        validateBigDecimalField("monthlyCost", requestModel.getMonthlyCost());
         validateIntField("campaignsPerUserPerMonth", requestModel.getCampaignsPerUserPerMonth());
         validateIntField("contactsPerCampaign", requestModel.getContactsPerCampaign());
+        validateIntField("usersIncluded", requestModel.getUsersIncluded());
+        validateBigDecimalField("costPerAdditionalUser", requestModel.getCostPerAdditionalUser());
     }
 
     private void validateIntField(String fieldName, @Nullable Integer fieldValue) {
@@ -138,6 +140,14 @@ public class LicenseTypeService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The field '%s' is required", fieldName));
         } else if (fieldValue < 1 || fieldValue > MAX_INT_LICENSE_FIELD_SIZE) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The field '%s' must be greater than 0, and less than %d", fieldName, MAX_INT_LICENSE_FIELD_SIZE + 1));
+        }
+    }
+
+    private void validateBigDecimalField(String fieldName, @Nullable BigDecimal fieldValue) {
+        if (null == fieldValue) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The field '%s' is required", fieldName));
+        } else if (fieldValue.compareTo(BigDecimal.ZERO) < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The field '%s' cannot be less than 0.00", fieldName));
         }
     }
 

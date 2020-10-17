@@ -23,8 +23,11 @@ databaseChangeLog:
                   name: contacts_per_campaign
                   valueNumeric: 0
               - column:
-                  name: users_per_team
-                  valueNumeric: 999999999
+                  name: users_included
+                  valueNumeric: 1
+              - column:
+                  name: cost_per_additional_user
+                  valueNumeric: 0.00
 
   - changeSet:
       id: default-license-type-2
@@ -50,8 +53,11 @@ databaseChangeLog:
                   name: contacts_per_campaign
                   valueNumeric: 10
               - column:
-                  name: users_per_team
+                  name: users_included
                   valueNumeric: 1
+              - column:
+                  name: cost_per_additional_user
+                  valueNumeric: 9.00
 
   - changeSet:
       id: default-license-type-3
@@ -77,8 +83,11 @@ databaseChangeLog:
                   name: contacts_per_campaign
                   valueNumeric: 20
               - column:
-                  name: users_per_team
+                  name: users_included
                   valueNumeric: 5
+              - column:
+                  name: cost_per_additional_user
+                  valueNumeric: 5.99
 
   - changeSet:
       id: default-license-type-4
@@ -104,8 +113,11 @@ databaseChangeLog:
                   name: contacts_per_campaign
                   valueNumeric: 40
               - column:
-                  name: users_per_team
+                  name: users_included
                   valueNumeric: 50
+              - column:
+                  name: cost_per_additional_user
+                  valueNumeric: 3.99
 
   - changeSet:
       id: default-license-type-5
@@ -126,10 +138,13 @@ databaseChangeLog:
                   valueNumeric: 69.00
               - column:
                   name: campaigns_per_user_per_month
-                  valueNumeric: 999999999
+                  valueNumeric: 100
               - column:
                   name: contacts_per_campaign
-                  valueNumeric: 999999999
+                  valueNumeric: 100000
               - column:
-                  name: users_per_team
-                  valueNumeric: 999999999
+                  name: users_included
+                  valueNumeric: 1000
+              - column:
+                  name: cost_per_additional_user
+                  valueNumeric: 1.99

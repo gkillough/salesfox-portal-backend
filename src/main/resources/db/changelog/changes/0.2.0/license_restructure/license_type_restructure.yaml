@@ -41,8 +41,13 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: users_per_team
+                  name: users_included
                   type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cost_per_additional_user
+                  type: DOUBLE PRECISION
                   constraints:
                     nullable: false
 

@@ -35,7 +35,10 @@ public class LicenseTypeEntity {
     @Column(name = "contacts_per_campaign")
     private Integer contactsPerCampaign;
 
-    @Column(name = "users_per_team")
-    private Integer usersPerTeam;
+    @Column(name = "users_included")
+    private Integer usersIncluded;
+
+    @Column(name = "cost_per_additional_user")
+    private BigDecimal costPerAdditionalUser;
 
 }

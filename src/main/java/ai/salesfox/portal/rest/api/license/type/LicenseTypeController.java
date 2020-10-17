@@ -1,9 +1,8 @@
 package ai.salesfox.portal.rest.api.license.type;
 
 import ai.salesfox.portal.rest.api.common.page.PageMetadata;
-import ai.salesfox.portal.rest.api.license.type.model.LicenseTypeCreationRequestModel;
+import ai.salesfox.portal.rest.api.license.type.model.LicenseTypeRequestModel;
 import ai.salesfox.portal.rest.api.license.type.model.LicenseTypeResponseModel;
-import ai.salesfox.portal.rest.api.license.type.model.LicenseTypeUpdateRequestModel;
 import ai.salesfox.portal.rest.api.license.type.model.MultiLicenseTypeModel;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,14 +43,14 @@ public class LicenseTypeController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
-    public LicenseTypeResponseModel createLicenseType(@RequestBody LicenseTypeCreationRequestModel requestModel) {
+    public LicenseTypeResponseModel createLicenseType(@RequestBody LicenseTypeRequestModel requestModel) {
         return licenseTypeService.createLicenseType(requestModel);
     }
 
     @PutMapping("/{licenseTypeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
-    public void updateLicenseType(@PathVariable UUID licenseTypeId, @RequestBody LicenseTypeUpdateRequestModel requestModel) {
+    public void updateLicenseType(@PathVariable UUID licenseTypeId, @RequestBody LicenseTypeRequestModel requestModel) {
         licenseTypeService.updateLicenseType(licenseTypeId, requestModel);
     }
 
