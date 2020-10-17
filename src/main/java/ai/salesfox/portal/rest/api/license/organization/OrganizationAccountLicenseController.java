@@ -31,7 +31,7 @@ public class OrganizationAccountLicenseController {
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK)
-    public void updateLicense(@PathVariable UUID accountId, OrganizationAccountLicenseTypeUpdateRequestModel requestModel) {
+    public void updateLicense(@PathVariable UUID accountId, @RequestBody OrganizationAccountLicenseTypeUpdateRequestModel requestModel) {
         organizationAccountLicenseService.updateLicense(accountId, requestModel);
     }
 
