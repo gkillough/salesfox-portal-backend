@@ -23,10 +23,6 @@ public class OrganizationAccountEntity implements Serializable {
     private String organizationAccountName;
 
     @PrimaryKeyJoinColumn
-    @Column(name = "license_id")
-    private UUID licenseId;
-
-    @PrimaryKeyJoinColumn
     @Column(name = "organization_id")
     private UUID organizationId;
 

@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: remove-old-license-tables-1
+      author: gavinkillough
+      changes:
+        - dropColumn:
+            schemaName: portal
+            tableName: organization_accounts
+            columns:
+              - column:
+                  name: license_id
+
+  - changeSet:
+      id: remove-old-license-tables-2
+      author: gavinkillough
+      changes:
+        - dropTable:
+            schemaName: portal
+            tableName: licenses
+            columns:
+              - column:
+                  name: license_id
+
+  - changeSet:
+      id: remove-old-license-tables-3
+      author: gavinkillough
+      changes:
+        - sql:
+            schemaName: portal
+            sql: DROP FUNCTION IF EXISTS GET_LICENSE_ID_BY_HASH;
+
+  - changeSet:
+      id: remove-old-license-tables-4
+      author: gavinkillough
+      changes:
+        - delete:
+            schemaName: portal
+            tableName: roles
+            where: role_level = 'PORTAL_BASIC_USER'
+        - delete:
+            schemaName: portal
+            tableName: roles
+            where: role_level = 'PORTAL_PREMIUM_USER'
