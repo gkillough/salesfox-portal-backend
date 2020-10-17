@@ -13,4 +13,6 @@ public interface LicenseTypeRepository extends JpaRepository<LicenseTypeEntity, 
 
     Page<LicenseTypeEntity> findByNameContaining(String name, Pageable pageable);
 
+    Page<LicenseTypeEntity> findByIsPublic(boolean isPublic, Pageable pageable);
+
 }

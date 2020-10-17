@@ -34,8 +34,11 @@ public class LicenseTypeService {
     }
 
     public MultiLicenseTypeModel getPublicLicenseTypes(Integer pageOffset, Integer pageLimit) {
-        // FIXME implement
-        return MultiLicenseTypeModel.empty();
+        PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
+        PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
+
+        Page<LicenseTypeEntity> publicLicenseTypes = licenseTypeRepository.findByIsPublic(true, pageRequest);
+        return convertToMultiResponseModel(publicLicenseTypes);
     }
 
     public MultiLicenseTypeModel getAllLicenseTypes(Integer pageOffset, Integer pageLimit, String nameQuery) {
@@ -48,16 +51,7 @@ public class LicenseTypeService {
         } else {
             foundLicenseTypesPage = licenseTypeRepository.findAll(pageRequest);
         }
-
-        if (foundLicenseTypesPage.isEmpty()) {
-            return MultiLicenseTypeModel.empty();
-        }
-
-        List<LicenseTypeResponseModel> responseModels = foundLicenseTypesPage
-                .stream()
-                .map(LicenseTypeResponseModel::fromEntity)
-                .collect(Collectors.toList());
-        return new MultiLicenseTypeModel(responseModels, foundLicenseTypesPage);
+        return convertToMultiResponseModel(foundLicenseTypesPage);
     }
 
     public LicenseTypeResponseModel getLicenseType(UUID licenseTypeId) {
@@ -145,6 +139,19 @@ public class LicenseTypeService {
         } else if (fieldValue < 1 || fieldValue > MAX_INT_LICENSE_FIELD_SIZE) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The field '%s' must be greater than 0, and less than %d", fieldName, MAX_INT_LICENSE_FIELD_SIZE + 1));
         }
+    }
+
+    // TODO this can likely be abstracted further
+    private MultiLicenseTypeModel convertToMultiResponseModel(Page<LicenseTypeEntity> foundLicenseTypesPage) {
+        if (foundLicenseTypesPage.isEmpty()) {
+            return MultiLicenseTypeModel.empty();
+        }
+
+        List<LicenseTypeResponseModel> responseModels = foundLicenseTypesPage
+                .stream()
+                .map(LicenseTypeResponseModel::fromEntity)
+                .collect(Collectors.toList());
+        return new MultiLicenseTypeModel(responseModels, foundLicenseTypesPage);
     }
 
 }
