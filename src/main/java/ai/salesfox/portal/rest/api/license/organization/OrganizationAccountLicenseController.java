@@ -1,16 +1,20 @@
 package ai.salesfox.portal.rest.api.license.organization;
 
+import ai.salesfox.portal.rest.api.license.organization.model.OrganizationAccountLicenseResponseModel;
+import ai.salesfox.portal.rest.api.license.organization.model.OrganizationAccountLicenseTypeUpdateRequestModel;
 import ai.salesfox.portal.rest.api.organization.common.OrganizationEndpointConstants;
+import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping(OrganizationEndpointConstants.ACCOUNT_ENDPOINT)
+@RequestMapping(OrganizationAccountLicenseController.BASE_ENDPOINT)
 public class OrganizationAccountLicenseController {
-    public static final String BASE_ENDPOINT = OrganizationEndpointConstants.ACCOUNT_ENDPOINT + "{accountId}/license";
+    public static final String BASE_ENDPOINT = OrganizationEndpointConstants.ACCOUNT_ENDPOINT + "/{accountId}/license";
 
     private final OrganizationAccountLicenseService organizationAccountLicenseService;
 
@@ -20,13 +24,14 @@ public class OrganizationAccountLicenseController {
     }
 
     @GetMapping
-    public Object getLicense(@PathVariable UUID accountId) {
+    public OrganizationAccountLicenseResponseModel getLicense(@PathVariable UUID accountId) {
         return organizationAccountLicenseService.getLicense(accountId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateLicense(@PathVariable UUID accountId, Object requestModel) {
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK)
+    public void updateLicense(@PathVariable UUID accountId, OrganizationAccountLicenseTypeUpdateRequestModel requestModel) {
         organizationAccountLicenseService.updateLicense(accountId, requestModel);
     }
 
