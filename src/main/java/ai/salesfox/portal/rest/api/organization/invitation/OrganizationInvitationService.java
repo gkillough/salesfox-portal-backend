@@ -92,10 +92,6 @@ public class OrganizationInvitationService {
         MembershipEntity membership = authenticatedUser.getMembershipEntity();
         OrganizationAccountEntity orgAccountEntity = membership.getOrganizationAccountEntity();
 
-        if (!orgAccountEntity.getOrganizationAccountName().equals(requestModel.getOrganizationAccountName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You do not have access to that Organization Account");
-        }
-
         String invitationToken = UUID.randomUUID().toString();
         OrganizationAccountInviteTokenEntity inviteEntity = new OrganizationAccountInviteTokenEntity(requestModel.getInviteEmail(), invitationToken, orgAccountEntity.getOrganizationAccountId(), requestModel.getInviteRole(), PortalDateTimeUtils.getCurrentDateTime());
         organizationAccountInviteTokenRepository.save(inviteEntity);
@@ -163,15 +159,11 @@ public class OrganizationInvitationService {
 
     private void validateInviteRequestModel(OrganizationAccountInvitationModel requestModel) {
         Set<String> errors = new LinkedHashSet<>();
-        if (StringUtils.isBlank(requestModel.getOrganizationAccountName())) {
-            errors.add("Organization Account Name");
-        }
-
         if (StringUtils.isBlank(requestModel.getInviteEmail())) {
             errors.add("Invite Email");
         }
 
-        if (StringUtils.isBlank(requestModel.getOrganizationAccountName())) {
+        if (StringUtils.isBlank(requestModel.getInviteRole())) {
             errors.add("Invite Role");
         }
 

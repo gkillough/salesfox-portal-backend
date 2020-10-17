@@ -161,7 +161,7 @@ public class OrganizationAccountRegistrationService {
         int currentDayOfMonth = PortalDateTimeUtils.getCurrentDate().getDayOfMonth();
         // TODO extract this into a common interface
         //  7-day free trial period before first bill adjusted for valid billing days (days 1-28 of any month)
-        int billingDayOfMonth = ((currentDayOfMonth + 7) % 27) + 1;
+        int billingDayOfMonth = ((currentDayOfMonth + 6) % 27) + 1;
 
         OrganizationAccountLicenseEntity orgAcctLicenseToSave = new OrganizationAccountLicenseEntity(
                 organizationAccount.getOrganizationAccountId(), licenseType.getLicenseTypeId(), 0, billingDayOfMonth, true);
