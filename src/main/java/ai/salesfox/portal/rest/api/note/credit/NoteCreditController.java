@@ -29,8 +29,8 @@ public class NoteCreditController {
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize(PortalAuthorityConstants.NON_ACCOUNT_REP_AUTH_CHECK)
-    public String orderCredits(@RequestBody NoteCreditsRequestModel requestModel) {
-        return noteCreditService.orderCredits(requestModel);
+    public void orderCredits(@RequestBody NoteCreditsRequestModel requestModel) {
+        noteCreditService.orderCredits(requestModel);
     }
 
 }
