@@ -2,13 +2,16 @@ package ai.salesfox.portal.rest.api.registration.organization;
 
 import ai.salesfox.portal.common.FieldValidationUtils;
 import ai.salesfox.portal.common.model.PortalAddressModel;
-import ai.salesfox.portal.database.account.entity.LicenseEntity;
+import ai.salesfox.portal.common.time.PortalDateTimeUtils;
 import ai.salesfox.portal.database.account.entity.UserEntity;
-import ai.salesfox.portal.database.account.repository.LicenseRepository;
 import ai.salesfox.portal.database.inventory.InventoryEntity;
 import ai.salesfox.portal.database.inventory.InventoryRepository;
 import ai.salesfox.portal.database.inventory.restriction.InventoryOrganizationAccountRestrictionEntity;
 import ai.salesfox.portal.database.inventory.restriction.InventoryOrganizationAccountRestrictionRepository;
+import ai.salesfox.portal.database.license.LicenseTypeEntity;
+import ai.salesfox.portal.database.license.LicenseTypeRepository;
+import ai.salesfox.portal.database.license.OrganizationAccountLicenseEntity;
+import ai.salesfox.portal.database.license.OrganizationAccountLicenseRepository;
 import ai.salesfox.portal.database.note.credit.NoteCreditOrgAccountRestrictionEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsOrgAccountRestrictionRepository;
@@ -43,7 +46,8 @@ import java.util.*;
 
 @Component
 public class OrganizationAccountRegistrationService {
-    private final LicenseRepository licenseRepository;
+    private final LicenseTypeRepository licenseTypeRepository;
+    private final OrganizationAccountLicenseRepository organizationAccountLicenseRepository;
     private final OrganizationRepository organizationRepository;
     private final OrganizationAccountRepository organizationAccountRepository;
     private final OrganizationAccountAddressRepository organizationAccountAddressRepository;
@@ -57,7 +61,8 @@ public class OrganizationAccountRegistrationService {
     private final UserProfileService userProfileService;
 
     @Autowired
-    public OrganizationAccountRegistrationService(LicenseRepository licenseRepository,
+    public OrganizationAccountRegistrationService(LicenseTypeRepository licenseTypeRepository,
+                                                  OrganizationAccountLicenseRepository organizationAccountLicenseRepository,
                                                   OrganizationRepository organizationRepository,
                                                   OrganizationAccountRepository organizationAccountRepository,
                                                   OrganizationAccountAddressRepository organizationAccountAddressRepository,
@@ -70,7 +75,8 @@ public class OrganizationAccountRegistrationService {
                                                   UserRegistrationService userRegistrationService,
                                                   UserProfileService userProfileService
     ) {
-        this.licenseRepository = licenseRepository;
+        this.licenseTypeRepository = licenseTypeRepository;
+        this.organizationAccountLicenseRepository = organizationAccountLicenseRepository;
         this.organizationRepository = organizationRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.organizationAccountAddressRepository = organizationAccountAddressRepository;
@@ -112,28 +118,27 @@ public class OrganizationAccountRegistrationService {
 
     @Transactional
     public void registerOrganizationAccount(OrganizationAccountRegistrationModel registrationModel) {
-        LicenseEntity orgAccountLicense = getAndValidateLicenseByHash(registrationModel.getLicenseHash());
+        LicenseTypeEntity licenseType = getAndValidateLicenseByHash(registrationModel.getLicenseTypeId());
         validateRegistrationFields(registrationModel);
 
         OrganizationEntity orgEntity = getOrCreateOrganizationWithName(registrationModel.getOrganizationName());
-        OrganizationAccountEntity orgAccountEntity = createOrganizationAccount(registrationModel, orgAccountLicense, orgEntity);
+        OrganizationAccountEntity orgAccountEntity = createOrganizationAccount(registrationModel, orgEntity);
+        createOrganizationAccountLicense(orgAccountEntity, licenseType);
         createOrganizationAccountAddress(registrationModel.getOrganizationAddress(), orgAccountEntity);
 
-        activateLicense(orgAccountLicense);
         registerOrganizationAccountOwner(registrationModel.getAccountOwner(), orgAccountEntity);
         createOrganizationAccountProfile(orgAccountEntity, registrationModel.getBusinessPhoneNumber());
         createInventory(orgAccountEntity);
         createNoteCredits(orgAccountEntity);
     }
 
-    private LicenseEntity getAndValidateLicenseByHash(UUID licenseHash) {
-        if (licenseHash != null) {
-            Optional<LicenseEntity> existingLicense = licenseRepository.findFirstByLicenseHash(licenseHash);
+    private LicenseTypeEntity getAndValidateLicenseByHash(UUID licenseTypeId) {
+        if (licenseTypeId != null) {
+            Optional<LicenseTypeEntity> existingLicense = licenseTypeRepository.findById(licenseTypeId);
             if (existingLicense.isPresent()) {
-                LicenseEntity licenseEntity = existingLicense.get();
-                boolean licenseInUse = organizationAccountRepository.findFirstByLicenseId(licenseEntity.getLicenseId()).isPresent();
-                if (!licenseInUse) {
-                    return licenseEntity;
+                LicenseTypeEntity licenseTypeEntity = existingLicense.get();
+                if (licenseTypeEntity.getIsPublic()) {
+                    return licenseTypeEntity;
                 }
             }
         }
@@ -149,10 +154,21 @@ public class OrganizationAccountRegistrationService {
         return organizationRepository.save(newOrganizationEntity);
     }
 
-    private OrganizationAccountEntity createOrganizationAccount(OrganizationAccountRegistrationModel registrationModel, LicenseEntity license, OrganizationEntity organization) {
+    private OrganizationAccountEntity createOrganizationAccount(OrganizationAccountRegistrationModel registrationModel, OrganizationEntity organization) {
         OrganizationAccountEntity orgAccountToSave = new OrganizationAccountEntity(
-                null, registrationModel.getOrganizationAccountName(), license.getLicenseId(), organization.getOrganizationId(), true);
+                null, registrationModel.getOrganizationAccountName(), organization.getOrganizationId(), true);
         return organizationAccountRepository.save(orgAccountToSave);
+    }
+
+    private void createOrganizationAccountLicense(OrganizationAccountEntity organizationAccount, LicenseTypeEntity licenseType) {
+        int currentDayOfMonth = PortalDateTimeUtils.getCurrentDate().getDayOfMonth();
+        // TODO extract this into a common interface
+        //  7-day free trial period before first bill adjusted for valid billing days (days 1-28 of any month)
+        int billingDayOfMonth = ((currentDayOfMonth + 7) % 27) + 1;
+
+        OrganizationAccountLicenseEntity orgAcctLicenseToSave = new OrganizationAccountLicenseEntity(
+                organizationAccount.getOrganizationAccountId(), licenseType.getLicenseTypeId(), 0, billingDayOfMonth, true);
+        organizationAccountLicenseRepository.save(orgAcctLicenseToSave);
     }
 
     private void createOrganizationAccountAddress(PortalAddressModel addressModel, OrganizationAccountEntity organizationAccount) {
@@ -189,11 +205,6 @@ public class OrganizationAccountRegistrationService {
         NoteCreditsEntity savedNoteCredits = noteCreditsRepository.save(noteCreditsToSave);
         NoteCreditOrgAccountRestrictionEntity restrictionToSave = new NoteCreditOrgAccountRestrictionEntity(savedNoteCredits.getNoteCreditId(), orgAccountEntity.getOrganizationAccountId());
         noteCreditsOrgAccountRestrictionRepository.save(restrictionToSave);
-    }
-
-    private void activateLicense(LicenseEntity license) {
-        license.setIsActive(true);
-        licenseRepository.save(license);
     }
 
     private void validateRegistrationFields(OrganizationAccountRegistrationModel registrationModel) {

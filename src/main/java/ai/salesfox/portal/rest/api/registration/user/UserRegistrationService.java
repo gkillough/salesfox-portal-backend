@@ -86,7 +86,6 @@ public class UserRegistrationService {
 
     /**
      * @param registrationModel a model containing the fields required to register a user
-     * @return the id of the registered user
      */
     @Transactional
     public void registerUser(UserRegistrationModel registrationModel) {

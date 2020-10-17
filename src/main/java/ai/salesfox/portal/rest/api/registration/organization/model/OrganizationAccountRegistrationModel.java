@@ -13,7 +13,7 @@ import java.util.UUID;
 public class OrganizationAccountRegistrationModel {
     private String organizationName;
     private String organizationAccountName;
-    private UUID licenseHash;
+    private UUID licenseTypeId;
     private String businessPhoneNumber;
     private PortalAddressModel organizationAddress;
     private OrganizationAccountUserRegistrationModel accountOwner;

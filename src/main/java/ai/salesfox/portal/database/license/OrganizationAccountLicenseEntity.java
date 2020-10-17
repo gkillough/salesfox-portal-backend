@@ -33,4 +33,12 @@ public class OrganizationAccountLicenseEntity {
     @JoinColumn(name = "license_type_id", referencedColumnName = "license_type_id", updatable = false, insertable = false)
     private LicenseTypeEntity licenseTypeEntity;
 
+    public OrganizationAccountLicenseEntity(UUID organizationAccountId, UUID licenseTypeId, Integer activeUsers, Integer billingDayOfMonth, Boolean isActive) {
+        this.organizationAccountId = organizationAccountId;
+        this.licenseTypeId = licenseTypeId;
+        this.activeUsers = activeUsers;
+        this.billingDayOfMonth = billingDayOfMonth;
+        this.isActive = isActive;
+    }
+
 }

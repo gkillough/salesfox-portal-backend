@@ -10,6 +10,4 @@ import java.util.UUID;
 public interface OrganizationAccountRepository extends JpaRepository<OrganizationAccountEntity, UUID> {
     Optional<OrganizationAccountEntity> findFirstByOrganizationIdAndOrganizationAccountName(UUID organizationId, String organizationAccountName);
 
-    Optional<OrganizationAccountEntity> findFirstByLicenseId(UUID licenseId);
-
 }

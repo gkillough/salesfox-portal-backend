@@ -1,6 +1,5 @@
 package ai.salesfox.portal.database.account.entity;
 
-import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -42,19 +41,5 @@ public class LicenseEntity implements Serializable {
 
     @Column(name = "is_active")
     private Boolean isActive;
-
-    @OneToOne(mappedBy = "licenseEntity")
-    private OrganizationAccountEntity organizationAccountEntity;
-
-    public LicenseEntity(UUID licenseId, UUID licenseHash, LocalDate expirationDate, String type, Long availableLicenseSeats, Long maxLicenseSeats, BigDecimal monthlyCost, Boolean isActive) {
-        this.licenseId = licenseId;
-        this.licenseHash = licenseHash;
-        this.expirationDate = expirationDate;
-        this.type = type;
-        this.availableLicenseSeats = availableLicenseSeats;
-        this.maxLicenseSeats = maxLicenseSeats;
-        this.monthlyCost = monthlyCost;
-        this.isActive = isActive;
-    }
 
 }
