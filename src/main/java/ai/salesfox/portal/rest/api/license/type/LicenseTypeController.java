@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(LicenseTypeController.BASE_URL)
+@RequestMapping(LicenseTypeController.BASE_ENDPOINT)
 public class LicenseTypeController {
-    public static final String BASE_URL = "/license_types";
+    public static final String BASE_ENDPOINT = "/license_types";
 
     private final LicenseTypeService licenseTypeService;
 

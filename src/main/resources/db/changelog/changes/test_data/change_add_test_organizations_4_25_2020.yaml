@@ -24,37 +24,6 @@ databaseChangeLog:
   ########################
 
   - changeSet:
-      id: test-orgs-licenses-11
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: licenses
-            columns:
-              - column:
-                  name: license_hash
-                  value: 354d0583-3e0e-4a39-9a23-80f8e979b058
-              - column:
-                  name: expiration_date
-                  valueDate: 2021-12-31
-              - column:
-                  name: type
-                  value: PORTAL_BUSINESS
-              - column:
-                  # 4 initial users
-                  name: available_license_seats
-                  valueNumeric: 6
-              - column:
-                  name: max_license_seats
-                  valueNumeric: 10
-              - column:
-                  name: monthly_cost
-                  valueNumeric: 250.0
-              - column:
-                  name: is_active
-                  valueBoolean: true
-
-  - changeSet:
       id: test-orgs-accounts-11
       author: gavinkillough
       changes:
@@ -65,9 +34,6 @@ databaseChangeLog:
               - column:
                   name: organization_account_name
                   value: Sales
-              - column:
-                  name: license_id
-                  valueComputed: GET_LICENSE_ID_BY_HASH('354d0583-3e0e-4a39-9a23-80f8e979b058')
               - column:
                   name: organization_id
                   valueComputed: GET_ORGANIZATION_ID_BY_NAME('Big Apple Corp')
@@ -176,37 +142,6 @@ databaseChangeLog:
   ########################
 
   - changeSet:
-      id: test-orgs-licenses-12
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: licenses
-            columns:
-              - column:
-                  name: license_hash
-                  value: 88570497-1a02-4353-9afc-fd90f3b62ebc
-              - column:
-                  name: expiration_date
-                  valueDate: 2021-12-31
-              - column:
-                  name: type
-                  value: PORTAL_BUSINESS
-              - column:
-                  # 4 initial users
-                  name: available_license_seats
-                  valueNumeric: 16
-              - column:
-                  name: max_license_seats
-                  valueNumeric: 20
-              - column:
-                  name: monthly_cost
-                  valueNumeric: 499.99
-              - column:
-                  name: is_active
-                  valueBoolean: true
-
-  - changeSet:
       id: test-orgs-accounts-12
       author: gavinkillough
       changes:
@@ -217,9 +152,6 @@ databaseChangeLog:
               - column:
                   name: organization_account_name
                   value: Marketing
-              - column:
-                  name: license_id
-                  valueComputed: GET_LICENSE_ID_BY_HASH('88570497-1a02-4353-9afc-fd90f3b62ebc')
               - column:
                   name: organization_id
                   valueComputed: GET_ORGANIZATION_ID_BY_NAME('Big Apple Corp')
@@ -347,37 +279,6 @@ databaseChangeLog:
   ########################
 
   - changeSet:
-      id: test-orgs-licenses-21
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: licenses
-            columns:
-              - column:
-                  name: license_hash
-                  value: 651390af-7758-484e-ba36-a845d1796b57
-              - column:
-                  name: expiration_date
-                  valueDate: 2021-12-31
-              - column:
-                  name: type
-                  value: PORTAL_BUSINESS
-              - column:
-                  # 4 initial users
-                  name: available_license_seats
-                  valueNumeric: 11
-              - column:
-                  name: max_license_seats
-                  valueNumeric: 15
-              - column:
-                  name: monthly_cost
-                  valueNumeric: 325.0
-              - column:
-                  name: is_active
-                  valueBoolean: true
-
-  - changeSet:
       id: test-orgs-accounts-21
       author: gavinkillough
       changes:
@@ -388,9 +289,6 @@ databaseChangeLog:
               - column:
                   name: organization_account_name
                   value: Support
-              - column:
-                  name: license_id
-                  valueComputed: GET_LICENSE_ID_BY_HASH('651390af-7758-484e-ba36-a845d1796b57')
               - column:
                   name: organization_id
                   valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pet Food Online Inc')
@@ -499,37 +397,6 @@ databaseChangeLog:
   ########################
 
   - changeSet:
-      id: test-orgs-licenses-22
-      author: gavinkillough
-      changes:
-        - insert:
-            schemaName: portal
-            tableName: licenses
-            columns:
-              - column:
-                  name: license_hash
-                  value: 4a430ab7-223f-4560-9110-e1e07e53dd62
-              - column:
-                  name: expiration_date
-                  valueDate: 2021-12-31
-              - column:
-                  name: type
-                  value: PORTAL_BUSINESS
-              - column:
-                  # 4 initial users
-                  name: available_license_seats
-                  valueNumeric: 46
-              - column:
-                  name: max_license_seats
-                  valueNumeric: 50
-              - column:
-                  name: monthly_cost
-                  valueNumeric: 325.0
-              - column:
-                  name: is_active
-                  valueBoolean: true
-
-  - changeSet:
       id: test-orgs-accounts-22
       author: gavinkillough
       changes:
@@ -540,9 +407,6 @@ databaseChangeLog:
               - column:
                   name: organization_account_name
                   value: Distribution
-              - column:
-                  name: license_id
-                  valueComputed: GET_LICENSE_ID_BY_HASH('4a430ab7-223f-4560-9110-e1e07e53dd62')
               - column:
                   name: organization_id
                   valueComputed: GET_ORGANIZATION_ID_BY_NAME('Pet Food Online Inc')

@@ -14,3 +14,7 @@ databaseChangeLog:
   - include:
       file: default_organization_accounts.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: remove_old_license_tables.yaml
+      relativeToChangelogFile: true
