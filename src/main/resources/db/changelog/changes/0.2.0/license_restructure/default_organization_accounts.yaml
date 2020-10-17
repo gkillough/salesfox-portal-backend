@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: default-organization-accounts-1
+      author: gavinkillough
+      changes:
+        - delete:
+            schemaName: portal
+            tableName: organization_accounts
+            where: organization_account_id = GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Salesfox for Individuals', 'Salesfox Basic')
+        - delete:
+            schemaName: portal
+            tableName: organization_accounts
+            where: organization_account_id = GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Salesfox for Individuals', 'Salesfox Premium')
+        - update:
+            schemaName: portal
+            tableName: organization_accounts
+            where: organization_account_id = GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Salesfox Organization', 'Salesfox Team')
+            columns:
+              - column:
+                  name: organization_account_name
+                  value: Salesfox Admins
+
+  - changeSet:
+      id: default-organization-accounts-2
+      author: gavinkillough
+      changes:
+        - delete:
+            schemaName: portal
+            tableName: organizations
+            where: organization_id = GET_ORGANIZATION_ID_BY_NAME('Salesfox for Individuals')
+
+  - changeSet:
+      id: default-organization-accounts-3
+      author: gavinkillough
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: org_acct_licenses
+            columns:
+              - column:
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Salesfox Organization', 'Salesfox Admins')
+              - column:
+                  name: license_type_id
+                  valueComputed: GET_LICENSE_TYPE_ID_BY_NAME('Salesfox Admins')
+              - column:
+                  name: active_users
+                  valueNumeric: 1
+              - column:
+                  name: billing_day_of_month
+                  valueNumeric: 0
+              - column:
+                  name: is_active
+                  valueBoolean: true

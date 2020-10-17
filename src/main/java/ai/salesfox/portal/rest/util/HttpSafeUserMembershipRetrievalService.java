@@ -2,11 +2,8 @@ package ai.salesfox.portal.rest.util;
 
 import ai.salesfox.portal.common.service.auth.AbstractMembershipRetrievalService;
 import ai.salesfox.portal.database.account.entity.UserEntity;
-import ai.salesfox.portal.database.account.repository.MembershipRepository;
-import ai.salesfox.portal.database.account.repository.RoleRepository;
 import ai.salesfox.portal.database.account.repository.UserRepository;
 import ai.salesfox.portal.database.organization.OrganizationRepository;
-import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
 import ai.salesfox.portal.rest.security.authentication.SecurityContextUtils;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +21,7 @@ import java.util.Optional;
 @Component
 public class HttpSafeUserMembershipRetrievalService extends AbstractMembershipRetrievalService<ResponseStatusException> {
     @Autowired
-    public HttpSafeUserMembershipRetrievalService(UserRepository userRepository, MembershipRepository membershipRepository,
-                                                  RoleRepository roleRepository, OrganizationRepository organizationRepository, OrganizationAccountRepository organizationAccountRepository) {
+    public HttpSafeUserMembershipRetrievalService(UserRepository userRepository, OrganizationRepository organizationRepository) {
         super(userRepository, organizationRepository);
     }
 
@@ -45,6 +41,7 @@ public class HttpSafeUserMembershipRetrievalService extends AbstractMembershipRe
                 .anyMatch(PortalAuthorityConstants.PORTAL_ADMIN::equals);
     }
 
+    @Deprecated
     public boolean isAuthenticateUserBasicOrPremiumMember() {
         return getAuthenticatedUserDetails()
                 .getAuthorities()

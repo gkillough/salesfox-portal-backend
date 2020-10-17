@@ -54,3 +54,7 @@ databaseChangeLog:
   - include:
       file: scribeless_note_updates.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: license_restructure/license_restructure_changelog.yaml
+      relativeToChangelogFile: true

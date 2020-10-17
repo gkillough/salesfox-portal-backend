@@ -98,7 +98,7 @@ public class RunServerTask extends Exec {
                 "--embedded.postgresql.enabled=true",
                 "--embedded.postgresql.dockerImage=postgres:" + postgresVersion,
                 "--embedded.postgresql.reuseContainer=" + reuseContainer,
-                "--embedded.postgresql.waitTimeoutInSeconds=20",
+                "--embedded.postgresql.waitTimeoutInSeconds=30",
                 "--embedded.containers.forceShutdown=true",
 
                 "--embedded.postgresql.schema=portal",
@@ -113,8 +113,7 @@ public class RunServerTask extends Exec {
                 "--hibernate.default_schema=portal",
                 "--spring.datasource.username=portaluser",
                 "--spring.datasource.password=Port@l!23",
-                "--spring.datasource.url=jdbc:postgresql://${embedded.postgresql.host}:${embedded.postgresql.port}/salesfox",
-                "--spring.datasource.hikari.jdbc-url=jdbc:postgresql://${embedded.postgresql.host}:${embedded.postgresql.port}/salesfox"
+                "--spring.datasource.url=jdbc:postgresql://${embedded.postgresql.host}:${embedded.postgresql.port}/salesfox"
         );
     }
 

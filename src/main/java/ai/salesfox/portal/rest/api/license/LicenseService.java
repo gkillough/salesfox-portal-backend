@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
+@Deprecated
 public class LicenseService {
     private final LicenseRepository licenseRepository;
     private final LicenseGenerator licenseGenerator;
@@ -166,14 +167,12 @@ public class LicenseService {
 
         if (requestModel.getExpirationDate() == null) {
             errorFields.add("Expiration Date is required");
-        }
-
-        if (!FieldValidationUtils.isValidDate(requestModel.getExpirationDate())) {
-            errorFields.add("Expiration Date is invalid");
-        }
-
-        if (!LocalDate.now().isBefore(requestModel.getExpirationDate().toLocalDate())) {
-            errorFields.add("Expiration Date must be in the future");
+        } else {
+            if (!FieldValidationUtils.isValidDate(requestModel.getExpirationDate())) {
+                errorFields.add("Expiration Date is invalid");
+            } else if (!LocalDate.now().isBefore(requestModel.getExpirationDate().toLocalDate())) {
+                errorFields.add("Expiration Date must be in the future");
+            }
         }
 
         if (!errorFields.isEmpty()) {
