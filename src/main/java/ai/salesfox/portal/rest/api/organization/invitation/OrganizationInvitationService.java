@@ -1,15 +1,12 @@
 package ai.salesfox.portal.rest.api.organization.invitation;
 
-import ai.salesfox.integration.common.exception.SalesfoxException;
 import ai.salesfox.portal.PortalConfiguration;
 import ai.salesfox.portal.common.FieldValidationUtils;
 import ai.salesfox.portal.common.service.email.EmailMessagingService;
 import ai.salesfox.portal.common.service.email.PortalEmailException;
 import ai.salesfox.portal.common.service.email.model.ButtonEmailMessageModel;
 import ai.salesfox.portal.common.service.email.model.EmailMessageModel;
-import ai.salesfox.portal.common.service.license.LicenseSeatManager;
 import ai.salesfox.portal.common.time.PortalDateTimeUtils;
-import ai.salesfox.portal.database.account.entity.LicenseEntity;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.RoleRepository;
@@ -41,7 +38,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -61,28 +57,24 @@ public class OrganizationInvitationService {
     private final OrganizationAccountRepository organizationAccountRepository;
     private final OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository;
     private final UserRegistrationService userRegistrationService;
-    private final UserDetailsService userDetailsService;
     private final UserProfileService userProfileService;
     private final PasswordService passwordService;
     private final UserRoleService userRoleService;
-    private final LicenseSeatManager licenseSeatManager;
     private final HttpSafeUserMembershipRetrievalService userMembershipRetrievalService;
     private final EmailMessagingService emailMessagingService;
 
     @Autowired
     public OrganizationInvitationService(PortalConfiguration portalConfiguration, RoleRepository roleRepository, OrganizationAccountRepository organizationAccountRepository, OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository,
-                                         UserRegistrationService userRegistrationService, UserDetailsService userDetailsService, UserProfileService userProfileService, PasswordService passwordService, UserRoleService userRoleService,
-                                         LicenseSeatManager licenseSeatManager, HttpSafeUserMembershipRetrievalService userMembershipRetrievalService, EmailMessagingService emailMessagingService) {
+                                         UserRegistrationService userRegistrationService, UserProfileService userProfileService, PasswordService passwordService, UserRoleService userRoleService,
+                                         HttpSafeUserMembershipRetrievalService userMembershipRetrievalService, EmailMessagingService emailMessagingService) {
         this.portalConfiguration = portalConfiguration;
         this.roleRepository = roleRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.organizationAccountInviteTokenRepository = organizationAccountInviteTokenRepository;
         this.userRegistrationService = userRegistrationService;
-        this.userDetailsService = userDetailsService;
         this.userProfileService = userProfileService;
         this.passwordService = passwordService;
         this.userRoleService = userRoleService;
-        this.licenseSeatManager = licenseSeatManager;
         this.userMembershipRetrievalService = userMembershipRetrievalService;
         this.emailMessagingService = emailMessagingService;
     }
@@ -102,16 +94,6 @@ public class OrganizationInvitationService {
 
         if (!orgAccountEntity.getOrganizationAccountName().equals(requestModel.getOrganizationAccountName())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You do not have access to that Organization Account");
-        }
-
-        try {
-            LicenseEntity orgLicense = licenseSeatManager.getLicenseForOrganizationAccount(orgAccountEntity);
-            if (!licenseSeatManager.hasAvailableSeats(orgLicense)) {
-                throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "No available license seats");
-            }
-        } catch (SalesfoxException e) {
-            log.error("There was a problem managing the organization license", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         String invitationToken = UUID.randomUUID().toString();
@@ -134,16 +116,6 @@ public class OrganizationInvitationService {
         OrganizationAccountInviteTokenPK invitePK = new OrganizationAccountInviteTokenPK(email, token);
         OrganizationAccountInviteTokenEntity inviteTokenEntity = organizationAccountInviteTokenRepository.findById(invitePK)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN));
-
-        try {
-            LicenseEntity orgLicense = licenseSeatManager.getLicenseForOrganizationAccountId(inviteTokenEntity.getOrganizationAccountId());
-            if (!licenseSeatManager.hasAvailableSeats(orgLicense)) {
-                throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "No available license seats");
-            }
-        } catch (SalesfoxException e) {
-            log.error("There was a problem managing the organization license", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
 
         Duration timeSinceTokenGenerated = Duration.between(inviteTokenEntity.getDateGenerated(), PortalDateTimeUtils.getCurrentDateTime());
         if (timeSinceTokenGenerated.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {

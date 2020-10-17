@@ -136,10 +136,7 @@ public class OrganizationAccountRegistrationService {
         if (licenseTypeId != null) {
             Optional<LicenseTypeEntity> existingLicense = licenseTypeRepository.findById(licenseTypeId);
             if (existingLicense.isPresent()) {
-                LicenseTypeEntity licenseTypeEntity = existingLicense.get();
-                if (licenseTypeEntity.getIsPublic()) {
-                    return licenseTypeEntity;
-                }
+                return existingLicense.get();
             }
         }
         throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Invalid license");

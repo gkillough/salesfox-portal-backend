@@ -2,11 +2,10 @@ package ai.salesfox.portal.rest.api.user.active;
 
 import ai.salesfox.portal.common.exception.PortalDatabaseIntegrityViolationException;
 import ai.salesfox.portal.common.service.license.LicenseSeatManager;
-import ai.salesfox.portal.common.service.license.PortalLicenseSeatException;
-import ai.salesfox.portal.database.account.entity.LicenseEntity;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserRepository;
+import ai.salesfox.portal.database.license.OrganizationAccountLicenseEntity;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import ai.salesfox.portal.rest.api.user.common.UserAccessService;
@@ -70,7 +69,7 @@ public class UserActiveService {
 
     private void toggleLicenseSeatForUser(OrganizationAccountEntity orgAccount, boolean isActive) {
         try {
-            LicenseEntity orgLicense = licenseSeatManager.getLicenseForOrganizationAccount(orgAccount);
+            OrganizationAccountLicenseEntity orgLicense = licenseSeatManager.getLicenseForOrganizationAccount(orgAccount);
             if (isActive) {
                 licenseSeatManager.fillSeat(orgLicense);
             } else {
@@ -78,8 +77,6 @@ public class UserActiveService {
             }
         } catch (PortalDatabaseIntegrityViolationException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (PortalLicenseSeatException e) {
-            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, e.getMessage());
         }
     }
 
