@@ -1,6 +1,5 @@
 package ai.salesfox.portal.rest.api.user.active;
 
-import ai.salesfox.portal.common.exception.PortalDatabaseIntegrityViolationException;
 import ai.salesfox.portal.common.service.license.LicenseSeatManager;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
@@ -68,15 +67,11 @@ public class UserActiveService {
     }
 
     private void toggleLicenseSeatForUser(OrganizationAccountEntity orgAccount, boolean isActive) {
-        try {
-            OrganizationAccountLicenseEntity orgLicense = licenseSeatManager.getLicenseForOrganizationAccount(orgAccount);
-            if (isActive) {
-                licenseSeatManager.fillSeat(orgLicense);
-            } else {
-                licenseSeatManager.vacateSeat(orgLicense);
-            }
-        } catch (PortalDatabaseIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
+        OrganizationAccountLicenseEntity orgLicense = orgAccount.getOrganizationAccountLicenseEntity();
+        if (isActive) {
+            licenseSeatManager.fillSeat(orgLicense);
+        } else {
+            licenseSeatManager.vacateSeat(orgLicense);
         }
     }
 

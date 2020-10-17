@@ -1,7 +1,6 @@
 package ai.salesfox.portal.rest.api.registration.user;
 
 import ai.salesfox.portal.common.FieldValidationUtils;
-import ai.salesfox.portal.common.exception.PortalDatabaseIntegrityViolationException;
 import ai.salesfox.portal.common.service.license.LicenseSeatManager;
 import ai.salesfox.portal.database.account.entity.LoginEntity;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
@@ -155,13 +154,8 @@ public class UserRegistrationService {
     }
 
     private void reserveLicenseSeatForNewUser(OrganizationAccountEntity orgAccount) {
-        try {
-            OrganizationAccountLicenseEntity orgLicense = licenseSeatManager.getLicenseForOrganizationAccount(orgAccount);
-            licenseSeatManager.fillSeat(orgLicense);
-        } catch (PortalDatabaseIntegrityViolationException e) {
-            log.error("There was a problem managing the organization license", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        OrganizationAccountLicenseEntity orgLicense = orgAccount.getOrganizationAccountLicenseEntity();
+        licenseSeatManager.fillSeat(orgLicense);
     }
 
     private LoginEntity saveLoginInfo(UUID userId, String password) {
