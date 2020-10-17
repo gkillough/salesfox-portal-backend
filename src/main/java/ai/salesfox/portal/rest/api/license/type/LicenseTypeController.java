@@ -26,6 +26,7 @@ public class LicenseTypeController {
     }
 
     @GetMapping
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
     public MultiLicenseTypeModel getLicenseTypes(
             @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset,
             @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit,
@@ -35,6 +36,7 @@ public class LicenseTypeController {
     }
 
     @GetMapping("/{licenseTypeId}")
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
     public LicenseTypeResponseModel getLicenseType(@PathVariable UUID licenseTypeId) {
         return licenseTypeService.getLicenseType(licenseTypeId);
     }

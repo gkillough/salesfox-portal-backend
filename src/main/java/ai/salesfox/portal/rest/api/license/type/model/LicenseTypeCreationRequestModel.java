@@ -12,8 +12,8 @@ import java.math.BigDecimal;
 public class LicenseTypeCreationRequestModel extends AbstractLicenseTypeRequestModel {
     private Integer usersPerTeam;
 
-    public LicenseTypeCreationRequestModel(String name, BigDecimal monthlyCost, Integer campaignsPerUserPerMonth, Integer contactsPerCampaign, Integer usersPerTeam) {
-        super(name, monthlyCost, campaignsPerUserPerMonth, contactsPerCampaign);
+    public LicenseTypeCreationRequestModel(String name, Boolean isPublic, BigDecimal monthlyCost, Integer campaignsPerUserPerMonth, Integer contactsPerCampaign, Integer usersPerTeam) {
+        super(name, isPublic, monthlyCost, campaignsPerUserPerMonth, contactsPerCampaign);
         this.usersPerTeam = usersPerTeam;
     }
 

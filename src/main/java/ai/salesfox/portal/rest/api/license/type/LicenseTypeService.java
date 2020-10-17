@@ -73,6 +73,7 @@ public class LicenseTypeService {
         LicenseTypeEntity licenseTypeToSave = new LicenseTypeEntity(
                 null,
                 requestModel.getName(),
+                requestModel.getIsPublic(),
                 requestModel.getMonthlyCost(),
                 requestModel.getCampaignsPerUserPerMonth(),
                 requestModel.getContactsPerCampaign(),
@@ -83,6 +84,7 @@ public class LicenseTypeService {
     }
 
     @Transactional
+    // TODO update billing information if a license cost changes
     public void updateLicenseType(UUID licenseTypeId, LicenseTypeUpdateRequestModel requestModel) {
         LicenseTypeEntity foundLicense = findLicenseType(licenseTypeId);
         validateRequestModel(requestModel, foundLicense);
@@ -112,7 +114,11 @@ public class LicenseTypeService {
 
     private void validateRequestModel(AbstractLicenseTypeRequestModel requestModel, @Nullable LicenseTypeEntity existingEntity) {
         if (StringUtils.isBlank(requestModel.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'name' must not be blank");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'name' cannot be blank");
+        }
+
+        if (null == requestModel.getIsPublic()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'isPublic' is required");
         }
 
         if (null == existingEntity || !existingEntity.getName().equals(requestModel.getName())) {

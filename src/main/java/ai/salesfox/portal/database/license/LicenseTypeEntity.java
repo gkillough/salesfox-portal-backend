@@ -23,6 +23,9 @@ public class LicenseTypeEntity {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "public")
+    private Boolean isPublic;
+
     @Column(name = "monthly_cost")
     private BigDecimal monthlyCost;
 
@@ -34,8 +37,5 @@ public class LicenseTypeEntity {
 
     @Column(name = "users_per_team")
     private Integer usersPerTeam;
-
-    // TODO consider adding a field representing whether this License Type is publicly visible
-    //  i.e. that the license type can be displayed as a sign-up option
 
 }

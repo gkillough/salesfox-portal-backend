@@ -20,6 +20,12 @@ databaseChangeLog:
                     unique: true
                     nullable: false
               - column:
+                  name: public
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
                   name: monthly_cost
                   type: DOUBLE PRECISION
                   constraints:

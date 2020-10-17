@@ -11,6 +11,9 @@ databaseChangeLog:
                   name: name
                   value: Salesfox Admins
               - column:
+                  name: public
+                  valueBoolean: false
+              - column:
                   name: monthly_cost
                   valueNumeric: 0.00
               - column:
@@ -34,6 +37,9 @@ databaseChangeLog:
               - column:
                   name: name
                   value: Individual
+              - column:
+                  name: public
+                  valueBoolean: true
               - column:
                   name: monthly_cost
                   valueNumeric: 9.00
@@ -59,6 +65,9 @@ databaseChangeLog:
                   name: name
                   value: Personal
               - column:
+                  name: public
+                  valueBoolean: true
+              - column:
                   name: monthly_cost
                   valueNumeric: 19.00
               - column:
@@ -83,6 +92,9 @@ databaseChangeLog:
                   name: name
                   value: Small Business
               - column:
+                  name: public
+                  valueBoolean: true
+              - column:
                   name: monthly_cost
                   valueNumeric: 39.00
               - column:
@@ -106,6 +118,9 @@ databaseChangeLog:
               - column:
                   name: name
                   value: Enterprise
+              - column:
+                  name: public
+                  valueBoolean: true
               - column:
                   name: monthly_cost
                   valueNumeric: 69.00

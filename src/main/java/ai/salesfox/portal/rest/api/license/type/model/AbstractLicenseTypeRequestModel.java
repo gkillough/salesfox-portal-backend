@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class AbstractLicenseTypeRequestModel {
     private String name;
+    private Boolean isPublic;
     private BigDecimal monthlyCost;
     private Integer campaignsPerUserPerMonth;
     private Integer contactsPerCampaign;

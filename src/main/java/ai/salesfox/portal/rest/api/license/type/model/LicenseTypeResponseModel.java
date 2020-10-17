@@ -14,6 +14,7 @@ import java.util.UUID;
 public class LicenseTypeResponseModel {
     private UUID licenseTypeId;
     private String name;
+    private Boolean isPublic;
     private BigDecimal monthlyCost;
     private Integer campaignsPerUserPerMonth;
     private Integer contactsPerCampaign;
@@ -23,6 +24,7 @@ public class LicenseTypeResponseModel {
         return new LicenseTypeResponseModel(
                 licenseTypeEntity.getLicenseTypeId(),
                 licenseTypeEntity.getName(),
+                licenseTypeEntity.getIsPublic(),
                 licenseTypeEntity.getMonthlyCost(),
                 licenseTypeEntity.getCampaignsPerUserPerMonth(),
                 licenseTypeEntity.getContactsPerCampaign(),
