@@ -1,8 +1,4 @@
 databaseChangeLog:
-  - preConditions:
-      - runningAs:
-          username: portaladmin
-
   - include:
       file: changes/0.1.0/0.1.0_changelog.yaml
       relativeToChangelogFile: true
