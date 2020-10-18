@@ -30,7 +30,7 @@ public class UserLicenseLimitManager {
         int campaignLimit = licenseType.getCampaignsPerUserPerMonth();
 
         LocalDate billingPeriodStartDate = PortalDateTimeUtils.computeMostRecentDateWithDayOfMonth(orgAcctLicense.getBillingDayOfMonth());
-        List<UserCampaignSendDateEntity> userCampaignsForBillingPeriod = userCampaignSendDateRepository.findByUserIdAfter(user.getUserId(), billingPeriodStartDate);
+        List<UserCampaignSendDateEntity> userCampaignsForBillingPeriod = userCampaignSendDateRepository.findByUserIdOnOrAfter(user.getUserId(), billingPeriodStartDate);
 
         return userCampaignsForBillingPeriod.size() >= campaignLimit;
     }

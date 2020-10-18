@@ -17,6 +17,6 @@ public interface UserCampaignSendDateRepository extends JpaRepository<UserCampai
             " WHERE userCampaign.userId = :userId" +
             " AND userCampaign.date >= :startDate"
     )
-    List<UserCampaignSendDateEntity> findByUserIdAfter(@Param("userId") UUID userId, @Param("startDate") LocalDate startDate);
+    List<UserCampaignSendDateEntity> findByUserIdOnOrAfter(@Param("userId") UUID userId, @Param("startDate") LocalDate startDate);
 
 }
