@@ -1,14 +1,13 @@
 package ai.salesfox.portal.rest.api.inventory;
 
-import ai.salesfox.portal.rest.api.inventory.model.InventoryResponseModel;
-import ai.salesfox.portal.rest.api.inventory.model.MultiInventoryModel;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.inventory.InventoryEntity;
 import ai.salesfox.portal.database.inventory.InventoryRepository;
 import ai.salesfox.portal.database.inventory.restriction.InventoryOrganizationAccountRestrictionEntity;
-import ai.salesfox.portal.database.inventory.restriction.InventoryUserRestrictionEntity;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
+import ai.salesfox.portal.rest.api.inventory.model.InventoryResponseModel;
+import ai.salesfox.portal.rest.api.inventory.model.MultiInventoryModel;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -64,18 +63,15 @@ public class InventoryService {
         }
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = membershipRetrievalService.getMembershipEntity(loggedInUser);
-        return inventoryRepository.findAccessibleInventories(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), pageRequest);
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
+        return inventoryRepository.findAccessibleInventories(userMembership.getOrganizationAccountId(), pageRequest);
     }
 
     private InventoryResponseModel convertToResponseModel(InventoryEntity entity) {
         UUID restrictionOrgAcctId = Optional.ofNullable(entity.getInventoryOrganizationAccountRestrictionEntity())
                 .map(InventoryOrganizationAccountRestrictionEntity::getOrganizationAccountId)
                 .orElse(null);
-        UUID restrictionUserId = Optional.ofNullable(entity.getInventoryUserRestrictionEntity())
-                .map(InventoryUserRestrictionEntity::getUserId)
-                .orElse(null);
-        return new InventoryResponseModel(entity.getInventoryId(), restrictionOrgAcctId, restrictionUserId);
+        return new InventoryResponseModel(entity.getInventoryId(), restrictionOrgAcctId);
     }
 
 }

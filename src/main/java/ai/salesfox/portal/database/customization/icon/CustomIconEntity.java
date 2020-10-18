@@ -2,7 +2,6 @@ package ai.salesfox.portal.database.customization.icon;
 
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.customization.icon.restriction.CustomIconOrganizationAccountRestrictionEntity;
-import ai.salesfox.portal.database.customization.icon.restriction.CustomIconUserRestrictionEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -37,10 +36,6 @@ public class CustomIconEntity implements Serializable {
     @OneToOne
     @JoinColumn(name = "custom_icon_id", referencedColumnName = "custom_icon_id", insertable = false, updatable = false)
     private CustomIconOrganizationAccountRestrictionEntity customIconOrganizationAccountRestrictionEntity;
-
-    @OneToOne
-    @JoinColumn(name = "custom_icon_id", referencedColumnName = "custom_icon_id", insertable = false, updatable = false)
-    private CustomIconUserRestrictionEntity customIconUserRestrictionEntity;
 
     @OneToOne
     @JoinColumn(name = "uploader_id", referencedColumnName = "user_id", insertable = false, updatable = false)

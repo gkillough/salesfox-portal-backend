@@ -14,13 +14,11 @@ public interface CustomBrandingTextRepository extends JpaRepository<CustomBrandi
     @Query("SELECT text" +
             " FROM CustomBrandingTextEntity text" +
             " LEFT JOIN text.customBrandingTextOrgAccountRestrictionEntity orgAcctRestriction" +
-            " LEFT JOIN text.customBrandingTextUserRestrictionEntity userRestriction" +
             " WHERE (" +
-            "   (orgAcctRestriction != NULL AND orgAcctRestriction.orgAccountId = :orgAcctId)" +
-            "   OR" +
-            "   (userRestriction != NULL AND userRestriction.userId = :userId)" +
+            "   orgAcctRestriction != NULL " +
+            "   AND orgAcctRestriction.orgAccountId = :orgAcctId" +
             " )"
     )
-    Page<CustomBrandingTextEntity> findAccessibleCustomBrandingTexts(@Param("orgAcctId") UUID orgAcctId, @Param("userId") UUID userId, Pageable pageable);
+    Page<CustomBrandingTextEntity> findAccessibleCustomBrandingTexts(@Param("orgAcctId") UUID orgAcctId, Pageable pageable);
 
 }

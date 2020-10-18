@@ -1,7 +1,6 @@
 package ai.salesfox.portal.database.inventory;
 
 import ai.salesfox.portal.database.inventory.restriction.InventoryOrganizationAccountRestrictionEntity;
-import ai.salesfox.portal.database.inventory.restriction.InventoryUserRestrictionEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -23,16 +22,12 @@ public class InventoryEntity implements Serializable {
     @JoinColumn(name = "inventory_id", referencedColumnName = "inventory_id", insertable = false, updatable = false)
     private InventoryOrganizationAccountRestrictionEntity inventoryOrganizationAccountRestrictionEntity;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "inventory_id", referencedColumnName = "inventory_id", insertable = false, updatable = false)
-    private InventoryUserRestrictionEntity inventoryUserRestrictionEntity;
-
     public InventoryEntity(UUID inventoryId) {
         this.inventoryId = inventoryId;
     }
 
     public boolean hasRestriction() {
-        return null != inventoryOrganizationAccountRestrictionEntity || null != inventoryUserRestrictionEntity;
+        return null != inventoryOrganizationAccountRestrictionEntity;
     }
 
 }

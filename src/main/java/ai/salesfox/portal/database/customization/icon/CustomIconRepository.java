@@ -14,13 +14,11 @@ public interface CustomIconRepository extends JpaRepository<CustomIconEntity, UU
     @Query("SELECT icon" +
             " FROM CustomIconEntity icon" +
             " LEFT JOIN icon.customIconOrganizationAccountRestrictionEntity orgAcctRestriction" +
-            " LEFT JOIN icon.customIconUserRestrictionEntity userRestriction" +
             " WHERE (" +
-            "   (orgAcctRestriction != NULL AND orgAcctRestriction.organizationAccountId = :orgAcctId)" +
-            "   OR" +
-            "   (userRestriction != NULL AND userRestriction.userId = :userId)" +
+            "   orgAcctRestriction != NULL " +
+            "   AND orgAcctRestriction.organizationAccountId = :orgAcctId" +
             " )"
     )
-    Page<CustomIconEntity> findAccessibleCustomIcons(@Param("orgAcctId") UUID orgAcctId, @Param("userId") UUID userId, Pageable pageable);
+    Page<CustomIconEntity> findAccessibleCustomIcons(@Param("orgAcctId") UUID orgAcctId, Pageable pageable);
 
 }

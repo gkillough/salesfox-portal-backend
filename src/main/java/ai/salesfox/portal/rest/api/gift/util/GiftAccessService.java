@@ -60,7 +60,7 @@ public class GiftAccessService {
 
     public void validateUserInventoryAccess(UserEntity userRequestingAccess, UUID itemId) {
         MembershipEntity userMembership = userRequestingAccess.getMembershipEntity();
-        InventoryEntity userInventory = inventoryRepository.findAccessibleInventories(userMembership.getOrganizationAccountId(), userRequestingAccess.getUserId(), PageRequest.of(0, 1))
+        InventoryEntity userInventory = inventoryRepository.findAccessibleInventories(userMembership.getOrganizationAccountId(), PageRequest.of(0, 1))
                 .stream()
                 .findAny()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));

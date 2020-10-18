@@ -14,13 +14,11 @@ public interface InventoryRepository extends JpaRepository<InventoryEntity, UUID
     @Query("SELECT inventory" +
             " FROM InventoryEntity inventory" +
             " LEFT JOIN inventory.inventoryOrganizationAccountRestrictionEntity orgAcctRestriction" +
-            " LEFT JOIN inventory.inventoryUserRestrictionEntity userRestriction" +
             " WHERE (" +
-            "   (orgAcctRestriction != NULL AND orgAcctRestriction.organizationAccountId = :orgAcctId)" +
-            "   OR" +
-            "   (userRestriction != NULL AND userRestriction.userId = :userId)" +
+            "   orgAcctRestriction != NULL " +
+            "   AND orgAcctRestriction.organizationAccountId = :orgAcctId" +
             " )"
     )
-    Page<InventoryEntity> findAccessibleInventories(@Param("orgAcctId") UUID orgAcctId, @Param("userId") UUID userId, Pageable pageable);
+    Page<InventoryEntity> findAccessibleInventories(@Param("orgAcctId") UUID orgAcctId, Pageable pageable);
 
 }

@@ -110,9 +110,8 @@ public class InventoryOrderService {
             return;
         }
 
-        boolean hasIndividualMembership = isPortalIndividualAccount(loggedInUserRoleLevel);
         boolean hasOrganizationManagementMembership = PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER.equals(loggedInUserRoleLevel) || PortalAuthorityConstants.ORGANIZATION_ACCOUNT_MANAGER.equals(loggedInUserRoleLevel);
-        if (!hasIndividualMembership && !hasOrganizationManagementMembership) {
+        if (!hasOrganizationManagementMembership) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
     }
@@ -123,10 +122,6 @@ public class InventoryOrderService {
         if (!CatalogueItemAccessUtils.doesUserHaveItemAccess(userRequestingAccess, targetItem)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-    }
-
-    private boolean isPortalIndividualAccount(String roleLevel) {
-        return PortalAuthorityConstants.PORTAL_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(roleLevel);
     }
 
     private void validateOrderRequest(InventoryOrderRequestModel requestModel) {

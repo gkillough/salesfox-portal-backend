@@ -11,6 +11,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class RestrictionModel {
     private UUID organizationAccountId;
+    // TODO remove
+    @Deprecated
     private UUID userId;
 
 }

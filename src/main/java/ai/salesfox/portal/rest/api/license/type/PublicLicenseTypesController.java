@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(PublicLicenseTypesController.BASE_URL)
+@RequestMapping(PublicLicenseTypesController.BASE_ENDPOINT)
 public class PublicLicenseTypesController implements AnonymouslyAccessible {
-    public static final String BASE_URL = "/public_license_types";
+    public static final String BASE_ENDPOINT = "/public_license_types";
 
     private final LicenseTypeService licenseTypeService;
 
@@ -30,7 +30,7 @@ public class PublicLicenseTypesController implements AnonymouslyAccessible {
     @Override
     public String[] anonymouslyAccessibleApiAntMatchers() {
         return new String[] {
-                PublicLicenseTypesController.BASE_URL
+                PublicLicenseTypesController.BASE_ENDPOINT
         };
     }
 

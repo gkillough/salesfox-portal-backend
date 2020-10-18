@@ -1,9 +1,9 @@
 package ai.salesfox.portal.rest.api.organization.common;
 
-import ai.salesfox.portal.rest.api.registration.organization.OrganizationConstants;
 import ai.salesfox.portal.database.organization.OrganizationEntity;
 import ai.salesfox.portal.database.organization.OrganizationRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
+import ai.salesfox.portal.rest.api.registration.organization.OrganizationConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +22,7 @@ public class OrganizationValidationService {
     }
 
     public boolean isOrganizationRestricted(String organizationName) {
-        return OrganizationConstants.ADMIN_AND_SUPPORT_ORG_NAME.equals(organizationName) || OrganizationConstants.PLAN_INDIVIDUAL_ORG_NAME.equals(organizationName);
+        return OrganizationConstants.ADMIN_AND_SUPPORT_ORG_NAME.equals(organizationName);
     }
 
     public boolean isOrganizationAccountNameInUse(String organizationName, String organizationAccountName) {

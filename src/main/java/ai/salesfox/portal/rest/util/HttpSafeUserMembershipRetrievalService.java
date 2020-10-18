@@ -41,18 +41,6 @@ public class HttpSafeUserMembershipRetrievalService extends AbstractMembershipRe
                 .anyMatch(PortalAuthorityConstants.PORTAL_ADMIN::equals);
     }
 
-    @Deprecated
-    public boolean isAuthenticateUserBasicOrPremiumMember() {
-        return getAuthenticatedUserDetails()
-                .getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .anyMatch(authority ->
-                        PortalAuthorityConstants.PORTAL_BASIC_USER.equals(authority)
-                                || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(authority)
-                );
-    }
-
     public UserEntity getAuthenticatedUserEntity() {
         UserDetails userDetails = getAuthenticatedUserDetails();
         return getExistingUserByEmail(userDetails.getUsername());

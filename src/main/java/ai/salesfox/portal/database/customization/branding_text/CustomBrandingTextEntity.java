@@ -1,8 +1,7 @@
 package ai.salesfox.portal.database.customization.branding_text;
 
-import ai.salesfox.portal.database.customization.branding_text.restriction.CustomBrandingTextOrgAccountRestrictionEntity;
-import ai.salesfox.portal.database.customization.branding_text.restriction.CustomBrandingTextUserRestrictionEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
+import ai.salesfox.portal.database.customization.branding_text.restriction.CustomBrandingTextOrgAccountRestrictionEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -34,10 +33,6 @@ public class CustomBrandingTextEntity implements Serializable {
     @OneToOne
     @JoinColumn(name = "custom_branding_text_id", referencedColumnName = "custom_branding_text_id", insertable = false, updatable = false)
     private CustomBrandingTextOrgAccountRestrictionEntity customBrandingTextOrgAccountRestrictionEntity;
-
-    @OneToOne
-    @JoinColumn(name = "custom_branding_text_id", referencedColumnName = "custom_branding_text_id", insertable = false, updatable = false)
-    private CustomBrandingTextUserRestrictionEntity customBrandingTextUserRestrictionEntity;
 
     @OneToOne
     @JoinColumn(name = "uploader_id", referencedColumnName = "user_id", insertable = false, updatable = false)

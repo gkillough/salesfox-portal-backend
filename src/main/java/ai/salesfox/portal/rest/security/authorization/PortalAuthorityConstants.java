@@ -15,11 +15,6 @@ public final class PortalAuthorityConstants {
     public static final String PORTAL_ADMIN = PORTAL_ROLE_PREFIX + "ADMIN";
     public static final String PORTAL_ADMIN_AUTH_CHECK = "hasAuthority('" + PORTAL_ADMIN + "')";
 
-    @Deprecated
-    public static final String PORTAL_BASIC_USER = PORTAL_ROLE_PREFIX + "BASIC_USER";
-    @Deprecated
-    public static final String PORTAL_PREMIUM_USER = PORTAL_ROLE_PREFIX + "PREMIUM_USER";
-
     public static final String ORGANIZATION_ACCOUNT_OWNER = ORGANIZATION_ROLE_PREFIX + "ACCOUNT_OWNER";
     public static final String ORGANIZATION_ACCOUNT_OWNER_AUTH_CHECK = "hasAuthority('" + ORGANIZATION_ACCOUNT_OWNER + "')";
 
@@ -40,6 +35,5 @@ public final class PortalAuthorityConstants {
     public static final String PORTAL_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK = "hasAnyAuthority('" + PORTAL_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "')";
     public static final String PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK = "hasAnyAuthority('" + PORTAL_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "','" + ORGANIZATION_ACCOUNT_MANAGER + "')";
     public static final String PORTAL_ADMIN_OR_ORG_ACCT_MEMBER_AUTH_CHECK = "hasAnyAuthority('" + PORTAL_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "','" + ORGANIZATION_ACCOUNT_MANAGER + "','" + ORGANIZATION_ACCOUNT_REP + "')";
-    public static final String NON_ACCOUNT_REP_AUTH_CHECK = "hasAnyAuthority('" + PORTAL_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "','" + ORGANIZATION_ACCOUNT_MANAGER + "','" + PORTAL_BASIC_USER + "','" + PORTAL_PREMIUM_USER + "')";
 
 }

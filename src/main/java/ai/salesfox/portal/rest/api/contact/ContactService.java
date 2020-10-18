@@ -16,8 +16,6 @@ import ai.salesfox.portal.database.contact.profile.OrganizationAccountContactPro
 import ai.salesfox.portal.database.contact.profile.OrganizationAccountContactProfileRepository;
 import ai.salesfox.portal.database.contact.restriction.ContactOrganizationAccountRestrictionEntity;
 import ai.salesfox.portal.database.contact.restriction.ContactOrganizationAccountRestrictionRepository;
-import ai.salesfox.portal.database.contact.restriction.ContactUserRestrictionEntity;
-import ai.salesfox.portal.database.contact.restriction.ContactUserRestrictionRepository;
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
 import ai.salesfox.portal.rest.api.contact.model.*;
@@ -41,7 +39,6 @@ public class ContactService {
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private final UserRepository userRepository;
     private final OrganizationAccountContactRepository contactRepository;
-    private final ContactUserRestrictionRepository contactUserRestrictionRepository;
     private final ContactOrganizationAccountRestrictionRepository contactOrgAcctRestrictionRepository;
     private final OrganizationAccountContactAddressRepository contactAddressRepository;
     private final OrganizationAccountContactProfileRepository contactProfileRepository;
@@ -49,12 +46,11 @@ public class ContactService {
 
     @Autowired
     public ContactService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, UserRepository userRepository, OrganizationAccountContactRepository contactRepository,
-                          ContactUserRestrictionRepository contactUserRestrictionRepository, ContactOrganizationAccountRestrictionRepository contactOrgAcctRestrictionRepository,
+                          ContactOrganizationAccountRestrictionRepository contactOrgAcctRestrictionRepository,
                           OrganizationAccountContactAddressRepository contactAddressRepository, OrganizationAccountContactProfileRepository contactProfileRepository) {
         this.membershipRetrievalService = membershipRetrievalService;
         this.userRepository = userRepository;
         this.contactRepository = contactRepository;
-        this.contactUserRestrictionRepository = contactUserRestrictionRepository;
         this.contactOrgAcctRestrictionRepository = contactOrgAcctRestrictionRepository;
         this.contactAddressRepository = contactAddressRepository;
         this.contactProfileRepository = contactProfileRepository;
@@ -129,22 +125,15 @@ public class ContactService {
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
 
         UUID pointOfContactUserId = contactModel.getPointOfContactUserId();
-        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
-            pointOfContactUserId = loggedInUser.getUserId();
-        } else if (pointOfContactUserId != null) {
+        if (pointOfContactUserId != null) {
             validatePointOfContactUser(userMembership.getOrganizationAccountId(), pointOfContactUserId);
         }
 
         OrganizationAccountContactEntity contactToSave = new OrganizationAccountContactEntity(null, contactModel.getFirstName(), contactModel.getLastName(), contactModel.getEmail(), true);
         OrganizationAccountContactEntity savedContact = contactRepository.save(contactToSave);
 
-        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
-            ContactUserRestrictionEntity contactUserRestriction = new ContactUserRestrictionEntity(savedContact.getContactId(), loggedInUser.getUserId());
-            contactUserRestrictionRepository.save(contactUserRestriction);
-        } else {
-            ContactOrganizationAccountRestrictionEntity contactOrgAcctRestriction = new ContactOrganizationAccountRestrictionEntity(savedContact.getContactId(), userMembership.getOrganizationAccountId());
-            contactOrgAcctRestrictionRepository.save(contactOrgAcctRestriction);
-        }
+        ContactOrganizationAccountRestrictionEntity contactOrgAcctRestriction = new ContactOrganizationAccountRestrictionEntity(savedContact.getContactId(), userMembership.getOrganizationAccountId());
+        contactOrgAcctRestrictionRepository.save(contactOrgAcctRestriction);
 
         OrganizationAccountContactAddressEntity contactAddressToSave = new OrganizationAccountContactAddressEntity();
         contactAddressToSave.setContactId(savedContact.getContactId());
@@ -245,7 +234,7 @@ public class ContactService {
             return contactRepository.findAllByIsActive(isActive, pageRequest);
         }
         MembershipEntity userMembership = user.getMembershipEntity();
-        return contactRepository.findByUserIdAndOrganizationAccountIdAndIsActive(user.getUserId(), userMembership.getOrganizationAccountId(), isActive, pageRequest);
+        return contactRepository.findByOrganizationAccountIdAndIsActive(userMembership.getOrganizationAccountId(), isActive, pageRequest);
     }
 
     private <T extends Contactable> Map<UUID, T> createContactableIdMap(Collection<T> contactables) {

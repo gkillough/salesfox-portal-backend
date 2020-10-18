@@ -90,7 +90,9 @@ public class NoteService {
         NoteEntity noteToSave = new NoteEntity(null, loggedInUser.getUserId(), PortalDateTimeUtils.getCurrentDateTime(), requestModel.getMessage(), noteFontSize, noteFontColor, noteHandwritingStyle);
         NoteEntity savedNote = noteRepository.save(noteToSave);
 
-        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
+        // FIXME determine if notes should be restricted to a specific user
+        boolean restrictToUser = false;
+        if (restrictToUser) {
             NoteUserRestrictionEntity noteUserRestrictionToSave = new NoteUserRestrictionEntity(savedNote.getNoteId(), loggedInUser.getUserId());
             NoteUserRestrictionEntity savedNoteUserRestriction = noteUserRestrictionRepository.save(noteUserRestrictionToSave);
             savedNote.setNoteUserRestrictionEntity(savedNoteUserRestriction);
