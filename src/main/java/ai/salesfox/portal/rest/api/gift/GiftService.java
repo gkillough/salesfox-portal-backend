@@ -143,7 +143,6 @@ public class GiftService {
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         validateRequestModel(loggedInUser, userMembership, requestModel);
 
-        // FIXME update request/response models for multiple contacts
         GiftEntity giftToSave = new GiftEntity(null, loggedInUser.getUserId());
         GiftEntity savedGift = giftRepository.save(giftToSave);
         saveDetails(savedGift, requestModel);
@@ -153,7 +152,9 @@ public class GiftService {
         GiftTrackingEntity savedGiftTracking = giftTrackingRepository.save(giftTrackingToSave);
         savedGift.setGiftTrackingEntity(savedGiftTracking);
 
-        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
+        // FIXME determine if gifts should be restricted to a specific user
+        boolean restrictToUser = false;
+        if (restrictToUser) {
             GiftUserRestrictionEntity userRestrictionToSave = new GiftUserRestrictionEntity(savedGift.getGiftId(), loggedInUser.getUserId());
             GiftUserRestrictionEntity savedUserRestriction = giftUserRestrictionRepository.save(userRestrictionToSave);
             savedGift.setGiftUserRestrictionEntity(savedUserRestriction);
