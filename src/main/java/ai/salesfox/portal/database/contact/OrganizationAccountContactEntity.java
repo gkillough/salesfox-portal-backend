@@ -3,7 +3,6 @@ package ai.salesfox.portal.database.contact;
 import ai.salesfox.portal.database.contact.address.OrganizationAccountContactAddressEntity;
 import ai.salesfox.portal.database.contact.profile.OrganizationAccountContactProfileEntity;
 import ai.salesfox.portal.database.contact.restriction.ContactOrganizationAccountRestrictionEntity;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +13,6 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "organization_account_contacts")
 public class OrganizationAccountContactEntity implements Serializable, Contactable {

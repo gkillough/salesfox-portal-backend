@@ -4,6 +4,7 @@ import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
 import ai.salesfox.portal.common.enumeration.InteractionClassification;
 import ai.salesfox.portal.common.enumeration.InteractionMedium;
 import ai.salesfox.portal.common.service.contact.ContactInteractionsService;
+import ai.salesfox.portal.common.service.license.UserLicenseLimitManager;
 import ai.salesfox.portal.common.service.note.NoteCreditAvailabilityService;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
@@ -28,16 +29,26 @@ import java.util.stream.Collectors;
 public abstract class GiftSubmissionUtility<E extends Throwable> {
     private final GiftTrackingService giftTrackingService;
     private final GiftItemService giftItemService;
+    private final UserLicenseLimitManager userLicenseLimitManager;
     private final GiftRecipientRepository giftRecipientRepository;
     private final NoteCreditsRepository noteCreditsRepository;
     private final NoteCreditAvailabilityService noteCreditAvailabilityService;
     private final ContactInteractionsService contactInteractionsService;
     private final GiftSubmittedEventPublisher giftSubmittedEventPublisher;
 
-    public GiftSubmissionUtility(GiftTrackingService giftTrackingService, GiftItemService giftItemService,
-                                 GiftRecipientRepository giftRecipientRepository, NoteCreditsRepository noteCreditsRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
-                                 ContactInteractionsService contactInteractionsService, GiftSubmittedEventPublisher giftSubmittedEventPublisher) {
+    public GiftSubmissionUtility(
+            GiftTrackingService giftTrackingService,
+            GiftItemService giftItemService,
+            UserLicenseLimitManager userLicenseLimitManager,
+            GiftRecipientRepository giftRecipientRepository,
+            NoteCreditsRepository noteCreditsRepository,
+            NoteCreditAvailabilityService noteCreditAvailabilityService,
+            ContactInteractionsService
+                    contactInteractionsService,
+            GiftSubmittedEventPublisher giftSubmittedEventPublisher
+    ) {
         this.giftItemService = giftItemService;
+        this.userLicenseLimitManager = userLicenseLimitManager;
         this.giftRecipientRepository = giftRecipientRepository;
         this.noteCreditsRepository = noteCreditsRepository;
         this.noteCreditAvailabilityService = noteCreditAvailabilityService;
@@ -63,6 +74,21 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
         }
 
         Integer recipientCount = giftRecipientIds.size();
+        int recipientsAllowedForSubmittingUser = userLicenseLimitManager.retrieveContactPerCampaignLimit(submittingUser);
+        if (recipientCount > recipientsAllowedForSubmittingUser) {
+            handleRecipientLimitExceeded(gift, submittingUser);
+            return Optional.empty();
+        }
+
+        if (recipientCount > 1) {
+            // A gift with more than one recipient is a campaign
+            if (userLicenseLimitManager.isCampaignLimitReachedForUser(submittingUser)) {
+                handleCampaignLimitReached(gift, submittingUser);
+                return Optional.empty();
+            } else {
+                userLicenseLimitManager.trackCampaignSentByUser(submittingUser, recipientCount);
+            }
+        }
 
         MembershipEntity userMembership = submittingUser.getMembershipEntity();
         GiftItemDetailEntity giftItemDetail = gift.getGiftItemDetailEntity();
@@ -102,9 +128,13 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
         return Optional.of(gift);
     }
 
+    protected abstract void handleGiftNotSubmittable(GiftEntity foundGift, UserEntity submittingUser) throws E;
+
     protected abstract void handleNoRecipients(GiftEntity foundGift, UserEntity submittingUser) throws E;
 
-    protected abstract void handleGiftNotSubmittable(GiftEntity foundGift, UserEntity submittingUser) throws E;
+    protected abstract void handleRecipientLimitExceeded(GiftEntity foundGift, UserEntity submittingUser) throws E;
+
+    protected abstract void handleCampaignLimitReached(GiftEntity foundGift, UserEntity submittingUser) throws E;
 
     protected abstract void handleItemMissingFromInventory(GiftEntity foundGift, GiftItemDetailEntity giftItemDetail, UserEntity submittingUser) throws E;
 

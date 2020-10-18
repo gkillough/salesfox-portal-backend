@@ -8,6 +8,7 @@ import ai.salesfox.portal.common.service.email.model.EmailMessageModel;
 import ai.salesfox.portal.common.service.gift.GiftItemService;
 import ai.salesfox.portal.common.service.gift.GiftSubmissionUtility;
 import ai.salesfox.portal.common.service.gift.GiftTrackingService;
+import ai.salesfox.portal.common.service.license.UserLicenseLimitManager;
 import ai.salesfox.portal.common.service.note.NoteCreditAvailabilityService;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
@@ -28,15 +29,24 @@ import java.util.UUID;
 @Component
 public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<SalesfoxException> {
     public static final String FAILURE_MESSAGE_SUBJECT_LINE = "Salesfox - Scheduled Gift Submission Failure";
+    public static final String FAILURE_MESSAGE_LICENSE_LIMIT_FORMAT_STRING = "A gift was scheduled to be submitted, but it would have exceeded the allowed number of %s for this organization account's license.";
 
     private final GiftTrackingService giftTrackingService;
     private final EmailMessagingService emailMessagingService;
 
     @Autowired
-    public ScheduledGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService, GiftRecipientRepository giftRecipientRepository,
-                                          NoteCreditsRepository noteCreditsRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
-                                          ContactInteractionsService contactInteractionsService, EmailMessagingService emailMessagingService, GiftSubmittedEventPublisher giftSubmittedEventPublisher) {
-        super(giftTrackingService, giftItemService, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService, giftSubmittedEventPublisher);
+    public ScheduledGiftSubmissionService(
+            GiftTrackingService giftTrackingService,
+            GiftItemService giftItemService,
+            UserLicenseLimitManager userLicenseLimitManager,
+            GiftRecipientRepository giftRecipientRepository,
+            NoteCreditsRepository noteCreditsRepository,
+            NoteCreditAvailabilityService noteCreditAvailabilityService,
+            ContactInteractionsService contactInteractionsService,
+            EmailMessagingService emailMessagingService,
+            GiftSubmittedEventPublisher giftSubmittedEventPublisher
+    ) {
+        super(giftTrackingService, giftItemService, userLicenseLimitManager, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService, giftSubmittedEventPublisher);
         this.giftTrackingService = giftTrackingService;
         this.emailMessagingService = emailMessagingService;
     }
@@ -51,6 +61,18 @@ public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<Salesf
     protected void handleGiftNotSubmittable(GiftEntity foundGift, UserEntity submittingUser) throws SalesfoxException {
         unscheduleGift(foundGift, submittingUser);
         notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), String.format("A gift was scheduled to be submitted, but its status [%s] prevented this action.", foundGift.getGiftTrackingEntity().getStatus()));
+    }
+
+    @Override
+    protected void handleRecipientLimitExceeded(GiftEntity foundGift, UserEntity submittingUser) throws SalesfoxException {
+        unscheduleGift(foundGift, submittingUser);
+        notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), String.format(FAILURE_MESSAGE_LICENSE_LIMIT_FORMAT_STRING, "recipients-per-campaign"));
+    }
+
+    @Override
+    protected void handleCampaignLimitReached(GiftEntity foundGift, UserEntity submittingUser) throws SalesfoxException {
+        unscheduleGift(foundGift, submittingUser);
+        notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), String.format(FAILURE_MESSAGE_LICENSE_LIMIT_FORMAT_STRING, "campaigns-per-user"));
     }
 
     @Override
