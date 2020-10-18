@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: remove-user-restriction-tables-1
+      author: gavinkillough
+      changes:
+        - dropTable:
+            schemaName: portal
+            tableName: contact_user_restrictions

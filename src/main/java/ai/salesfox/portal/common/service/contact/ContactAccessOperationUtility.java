@@ -33,12 +33,12 @@ public class ContactAccessOperationUtility {
         int accessibleContactCount;
         if (!isOrgAcctOwnerOrManager(userRoleLevel)) {
             if (AccessOperation.UPDATE.equals(requestedAccessOperation) || AccessOperation.INTERACT.equals(requestedAccessOperation)) {
-                accessibleContactCount = contactRepository.countInteractableContactsInContactIdCollection(userRequestingAccess.getUserId(), userMembership.getOrganizationAccountId(), contactIds);
+                accessibleContactCount = contactRepository.countInteractableContactsInContactIdCollection(userMembership.getOrganizationAccountId(), contactIds);
             } else {
                 return false;
             }
         } else {
-            accessibleContactCount = contactRepository.countVisibleContactsInContactIdCollection(userRequestingAccess.getUserId(), userMembership.getOrganizationAccountId(), contactIds);
+            accessibleContactCount = contactRepository.countVisibleContactsInContactIdCollection(userMembership.getOrganizationAccountId(), contactIds);
         }
         return accessibleContactCount == contactIds.size();
     }

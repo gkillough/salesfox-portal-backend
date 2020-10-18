@@ -1,16 +1,14 @@
 package ai.salesfox.portal.rest.api.registration;
 
+import ai.salesfox.portal.rest.api.common.model.request.EmailToValidateModel;
+import ai.salesfox.portal.rest.api.common.model.response.ValidationResponseModel;
+import ai.salesfox.portal.rest.api.organization.invitation.OrganizationInvitationService;
 import ai.salesfox.portal.rest.api.registration.organization.OrganizationAccountRegistrationService;
 import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountNameToValidateModel;
 import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountRegistrationModel;
 import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountUserRegistrationModel;
-import ai.salesfox.portal.rest.api.registration.plan.MultiPlanModel;
-import ai.salesfox.portal.rest.api.registration.plan.RegistrationPlanService;
 import ai.salesfox.portal.rest.api.registration.user.UserRegistrationModel;
 import ai.salesfox.portal.rest.api.registration.user.UserRegistrationService;
-import ai.salesfox.portal.rest.api.common.model.request.EmailToValidateModel;
-import ai.salesfox.portal.rest.api.common.model.response.ValidationResponseModel;
-import ai.salesfox.portal.rest.api.organization.invitation.OrganizationInvitationService;
 import ai.salesfox.portal.rest.security.authentication.AnonymouslyAccessible;
 import ai.salesfox.portal.rest.security.authorization.CsrfIgnorable;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
@@ -19,7 +17,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,15 +33,12 @@ public class RegistrationController implements CsrfIgnorable, AnonymouslyAccessi
     public static final String ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX = ORGANIZATION_ENDPOINT_SUFFIX + USER_ENDPOINT_SUFFIX;
 
     private final UserRegistrationService userRegistrationService;
-    private final RegistrationPlanService registrationPlanService;
     private final OrganizationAccountRegistrationService organizationAccountRegistrationService;
     private final OrganizationInvitationService organizationInvitationService;
 
     @Autowired
-    public RegistrationController(UserRegistrationService userRegistrationService, RegistrationPlanService registrationPlanService,
-                                  OrganizationAccountRegistrationService organizationAccountRegistrationService, OrganizationInvitationService organizationInvitationService) {
+    public RegistrationController(UserRegistrationService userRegistrationService, OrganizationAccountRegistrationService organizationAccountRegistrationService, OrganizationInvitationService organizationInvitationService) {
         this.userRegistrationService = userRegistrationService;
-        this.registrationPlanService = registrationPlanService;
         this.organizationAccountRegistrationService = organizationAccountRegistrationService;
         this.organizationInvitationService = organizationInvitationService;
     }
@@ -50,11 +48,6 @@ public class RegistrationController implements CsrfIgnorable, AnonymouslyAccessi
     public boolean registerUser(@ApiParam @RequestBody UserRegistrationModel registrationRequest) {
         userRegistrationService.registerUser(registrationRequest);
         return true;
-    }
-
-    @GetMapping("/plans")
-    public MultiPlanModel getUserRegistrationPlans() {
-        return registrationPlanService.getPlans();
     }
 
     @ApiOperation(value = "Register an organization with an initial account owner user", response = Boolean.class)
