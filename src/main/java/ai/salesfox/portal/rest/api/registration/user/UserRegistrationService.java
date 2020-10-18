@@ -10,13 +10,9 @@ import ai.salesfox.portal.database.account.repository.LoginRepository;
 import ai.salesfox.portal.database.account.repository.MembershipRepository;
 import ai.salesfox.portal.database.account.repository.RoleRepository;
 import ai.salesfox.portal.database.account.repository.UserRepository;
-import ai.salesfox.portal.database.inventory.InventoryEntity;
 import ai.salesfox.portal.database.inventory.InventoryRepository;
-import ai.salesfox.portal.database.inventory.restriction.InventoryUserRestrictionEntity;
 import ai.salesfox.portal.database.inventory.restriction.InventoryUserRestrictionRepository;
 import ai.salesfox.portal.database.license.OrganizationAccountLicenseEntity;
-import ai.salesfox.portal.database.note.credit.NoteCreditUserRestrictionEntity;
-import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
 import ai.salesfox.portal.database.note.credit.NoteCreditsUserRestrictionRepository;
 import ai.salesfox.portal.database.organization.OrganizationEntity;
@@ -129,10 +125,7 @@ public class UserRegistrationService {
         LoginEntity loginInfo = saveLoginInfo(userEntity.getUserId(), registrationModel.getPassword());
         MembershipEntity membershipInfo = saveMembershipInfo(userEntity.getUserId(), orgAccount.getOrganizationAccountId(), roleEntity.getRoleId());
 
-        createInventoryIfNecessary(userEntity.getUserId(), roleEntity);
-        createNoteCreditsIfNecessary(userEntity.getUserId(), roleEntity);
         userProfileService.initializeProfile(userEntity.getUserId());
-
         userEntity.setLoginEntity(loginInfo);
         userEntity.setMembershipEntity(membershipInfo);
         return userEntity;
@@ -167,26 +160,6 @@ public class UserRegistrationService {
     private MembershipEntity saveMembershipInfo(UUID userId, UUID organizationAccountId, UUID roleId) {
         MembershipEntity newMembershipToSave = new MembershipEntity(userId, organizationAccountId, roleId);
         return membershipRepository.save(newMembershipToSave);
-    }
-
-    private void createInventoryIfNecessary(UUID userId, RoleEntity roleEntity) {
-        String roleLevel = roleEntity.getRoleLevel();
-        if (PortalAuthorityConstants.PORTAL_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(roleLevel)) {
-            InventoryEntity individualUserInventoryToSave = new InventoryEntity();
-            InventoryEntity savedInventory = inventoryRepository.save(individualUserInventoryToSave);
-            InventoryUserRestrictionEntity restrictionToSave = new InventoryUserRestrictionEntity(savedInventory.getInventoryId(), userId);
-            inventoryUserRestrictionRepository.save(restrictionToSave);
-        }
-    }
-
-    private void createNoteCreditsIfNecessary(UUID userId, RoleEntity roleEntity) {
-        String roleLevel = roleEntity.getRoleLevel();
-        if (PortalAuthorityConstants.PORTAL_BASIC_USER.equals(roleLevel) || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(roleLevel)) {
-            NoteCreditsEntity noteCreditsToSave = new NoteCreditsEntity(null, 0);
-            NoteCreditsEntity savedNoteCredits = noteCreditsRepository.save(noteCreditsToSave);
-            NoteCreditUserRestrictionEntity restrictionToSave = new NoteCreditUserRestrictionEntity(savedNoteCredits.getNoteCreditId(), userId);
-            noteCreditsUserRestrictionRepository.save(restrictionToSave);
-        }
     }
 
     private void validateRegistrationModel(UserRegistrationModel registrationModel) {

@@ -18,7 +18,7 @@ import java.util.UUID;
 public class CustomBrandingTextController {
     public static final String BASE_ENDPOINT = CustomizationEndpointConstants.BASE_ENDPOINT + "/branding_texts";
 
-    private CustomBrandingTextService customBrandingTextService;
+    private final CustomBrandingTextService customBrandingTextService;
 
     @Autowired
     public CustomBrandingTextController(CustomBrandingTextService customBrandingTextService) {
@@ -36,19 +36,19 @@ public class CustomBrandingTextController {
     }
 
     @PostMapping
-    @PreAuthorize(PortalAuthorityConstants.NON_ACCOUNT_REP_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     public CustomBrandingTextResponseModel createCustomBrandingText(@RequestBody CustomBrandingTextRequestModel requestModel) {
         return customBrandingTextService.createCustomBrandingText(requestModel);
     }
 
     @PutMapping("/{customBrandingTextId}")
-    @PreAuthorize(PortalAuthorityConstants.NON_ACCOUNT_REP_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     public void updateCustomBrandingText(@PathVariable UUID customBrandingTextId, @RequestBody CustomBrandingTextRequestModel requestModel) {
         customBrandingTextService.updateCustomBrandingText(customBrandingTextId, requestModel);
     }
 
     @PatchMapping("/{customBrandingTextId}")
-    @PreAuthorize(PortalAuthorityConstants.NON_ACCOUNT_REP_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     public void setCustomBrandingTextActiveStatus(@PathVariable UUID customBrandingTextId, @RequestBody ActiveStatusPatchModel requestModel) {
         customBrandingTextService.setActiveStatus(customBrandingTextId, requestModel);
     }

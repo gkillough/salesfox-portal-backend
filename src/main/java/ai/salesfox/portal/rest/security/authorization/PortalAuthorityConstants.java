@@ -40,6 +40,5 @@ public final class PortalAuthorityConstants {
     public static final String PORTAL_ADMIN_OR_ORG_ACCOUNT_OWNER_AUTH_CHECK = "hasAnyAuthority('" + PORTAL_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "')";
     public static final String PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK = "hasAnyAuthority('" + PORTAL_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "','" + ORGANIZATION_ACCOUNT_MANAGER + "')";
     public static final String PORTAL_ADMIN_OR_ORG_ACCT_MEMBER_AUTH_CHECK = "hasAnyAuthority('" + PORTAL_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "','" + ORGANIZATION_ACCOUNT_MANAGER + "','" + ORGANIZATION_ACCOUNT_REP + "')";
-    public static final String NON_ACCOUNT_REP_AUTH_CHECK = "hasAnyAuthority('" + PORTAL_ADMIN + "','" + ORGANIZATION_ACCOUNT_OWNER + "','" + ORGANIZATION_ACCOUNT_MANAGER + "','" + PORTAL_BASIC_USER + "','" + PORTAL_PREMIUM_USER + "')";
 
 }
