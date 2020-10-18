@@ -14,3 +14,11 @@ databaseChangeLog:
         - dropTable:
             schemaName: portal
             tableName: custom_branding_text_user_restrictions
+
+  - changeSet:
+      id: remove-user-restriction-tables-3
+      author: gavinkillough
+      changes:
+        - dropTable:
+            schemaName: portal
+            tableName: custom_icon_user_restrictions
