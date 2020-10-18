@@ -15,9 +15,6 @@ public final class PortalAuthorityConstants {
     public static final String PORTAL_ADMIN = PORTAL_ROLE_PREFIX + "ADMIN";
     public static final String PORTAL_ADMIN_AUTH_CHECK = "hasAuthority('" + PORTAL_ADMIN + "')";
 
-    @Deprecated
-    public static final String PORTAL_PREMIUM_USER = PORTAL_ROLE_PREFIX + "PREMIUM_USER";
-
     public static final String ORGANIZATION_ACCOUNT_OWNER = ORGANIZATION_ROLE_PREFIX + "ACCOUNT_OWNER";
     public static final String ORGANIZATION_ACCOUNT_OWNER_AUTH_CHECK = "hasAuthority('" + ORGANIZATION_ACCOUNT_OWNER + "')";
 

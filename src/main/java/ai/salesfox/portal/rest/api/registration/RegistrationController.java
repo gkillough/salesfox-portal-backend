@@ -7,14 +7,11 @@ import ai.salesfox.portal.rest.api.registration.organization.OrganizationAccount
 import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountNameToValidateModel;
 import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountRegistrationModel;
 import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountUserRegistrationModel;
-import ai.salesfox.portal.rest.api.registration.user.UserRegistrationModel;
-import ai.salesfox.portal.rest.api.registration.user.UserRegistrationService;
 import ai.salesfox.portal.rest.security.authentication.AnonymouslyAccessible;
 import ai.salesfox.portal.rest.security.authorization.CsrfIgnorable;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import ai.salesfox.portal.rest.security.common.SecurityInterface;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,22 +29,13 @@ public class RegistrationController implements CsrfIgnorable, AnonymouslyAccessi
     public static final String ORGANIZATION_ENDPOINT_SUFFIX = "/organization";
     public static final String ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX = ORGANIZATION_ENDPOINT_SUFFIX + USER_ENDPOINT_SUFFIX;
 
-    private final UserRegistrationService userRegistrationService;
     private final OrganizationAccountRegistrationService organizationAccountRegistrationService;
     private final OrganizationInvitationService organizationInvitationService;
 
     @Autowired
-    public RegistrationController(UserRegistrationService userRegistrationService, OrganizationAccountRegistrationService organizationAccountRegistrationService, OrganizationInvitationService organizationInvitationService) {
-        this.userRegistrationService = userRegistrationService;
+    public RegistrationController(OrganizationAccountRegistrationService organizationAccountRegistrationService, OrganizationInvitationService organizationInvitationService) {
         this.organizationAccountRegistrationService = organizationAccountRegistrationService;
         this.organizationInvitationService = organizationInvitationService;
-    }
-
-    @ApiOperation(value = "Register an individual (non-organization) user", response = Boolean.class)
-    @PostMapping(USER_ENDPOINT_SUFFIX)
-    public boolean registerUser(@ApiParam @RequestBody UserRegistrationModel registrationRequest) {
-        userRegistrationService.registerUser(registrationRequest);
-        return true;
     }
 
     @ApiOperation(value = "Register an organization with an initial account owner user", response = Boolean.class)

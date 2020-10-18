@@ -12,9 +12,9 @@ public class InventoryResponseModel {
     private UUID inventoryId;
     private RestrictionModel restriction;
 
-    public InventoryResponseModel(UUID inventoryId, UUID organizationAccountId, UUID userId) {
+    public InventoryResponseModel(UUID inventoryId, UUID organizationAccountId) {
         this.inventoryId = inventoryId;
-        this.restriction = new RestrictionModel(organizationAccountId, userId);
+        this.restriction = new RestrictionModel(organizationAccountId, null);
     }
 
 }

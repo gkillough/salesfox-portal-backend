@@ -10,18 +10,9 @@ import ai.salesfox.portal.database.account.repository.LoginRepository;
 import ai.salesfox.portal.database.account.repository.MembershipRepository;
 import ai.salesfox.portal.database.account.repository.RoleRepository;
 import ai.salesfox.portal.database.account.repository.UserRepository;
-import ai.salesfox.portal.database.inventory.InventoryRepository;
-import ai.salesfox.portal.database.inventory.restriction.InventoryUserRestrictionRepository;
 import ai.salesfox.portal.database.license.OrganizationAccountLicenseEntity;
-import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
-import ai.salesfox.portal.database.note.credit.NoteCreditsUserRestrictionRepository;
-import ai.salesfox.portal.database.organization.OrganizationEntity;
-import ai.salesfox.portal.database.organization.OrganizationRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
-import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
-import ai.salesfox.portal.rest.api.registration.organization.OrganizationConstants;
 import ai.salesfox.portal.rest.api.user.profile.UserProfileService;
-import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,13 +33,7 @@ public class UserRegistrationService {
     private final UserRepository userRepository;
     private final LoginRepository loginRepository;
     private final RoleRepository roleRepository;
-    private final OrganizationRepository organizationRepository;
-    private final OrganizationAccountRepository organizationAccountRepository;
     private final MembershipRepository membershipRepository;
-    private final InventoryRepository inventoryRepository;
-    private final InventoryUserRestrictionRepository inventoryUserRestrictionRepository;
-    private final NoteCreditsRepository noteCreditsRepository;
-    private final NoteCreditsUserRestrictionRepository noteCreditsUserRestrictionRepository;
     private final UserProfileService userProfileService;
     private final LicenseSeatManager licenseSeatManager;
     private final PasswordEncoder passwordEncoder;
@@ -57,53 +42,17 @@ public class UserRegistrationService {
     public UserRegistrationService(UserRepository userRepository,
                                    LoginRepository loginRepository,
                                    RoleRepository roleRepository,
-                                   OrganizationRepository organizationRepository,
-                                   OrganizationAccountRepository organizationAccountRepository,
                                    MembershipRepository membershipRepository,
-                                   InventoryRepository inventoryRepository,
-                                   InventoryUserRestrictionRepository inventoryUserRestrictionRepository,
-                                   NoteCreditsRepository noteCreditsRepository,
-                                   NoteCreditsUserRestrictionRepository noteCreditsUserRestrictionRepository,
                                    UserProfileService userProfileService,
                                    LicenseSeatManager licenseSeatManager,
                                    PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.loginRepository = loginRepository;
         this.roleRepository = roleRepository;
-        this.organizationRepository = organizationRepository;
-        this.organizationAccountRepository = organizationAccountRepository;
         this.membershipRepository = membershipRepository;
-        this.inventoryRepository = inventoryRepository;
-        this.inventoryUserRestrictionRepository = inventoryUserRestrictionRepository;
-        this.noteCreditsRepository = noteCreditsRepository;
-        this.noteCreditsUserRestrictionRepository = noteCreditsUserRestrictionRepository;
         this.userProfileService = userProfileService;
         this.licenseSeatManager = licenseSeatManager;
         this.passwordEncoder = passwordEncoder;
-    }
-
-    /**
-     * @param registrationModel a model containing the fields required to register a user
-     */
-    @Transactional
-    public void registerUser(UserRegistrationModel registrationModel) {
-        UUID defaultOrganizationId = organizationRepository.findFirstByOrganizationName(OrganizationConstants.PLAN_INDIVIDUAL_ORG_NAME)
-                .map(OrganizationEntity::getOrganizationId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
-
-        String roleLevel = registrationModel.getRoleLevel();
-        String planName;
-        if (null == roleLevel) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid plan selected");
-        } else if (roleLevel.equals(PortalAuthorityConstants.PORTAL_PREMIUM_USER)) {
-            planName = OrganizationConstants.PLAN_INDIVIDUAL_PREMIUM_DISPLAY_NAME;
-        } else {
-            planName = OrganizationConstants.PLAN_INDIVIDUAL_BASIC_DISPLAY_NAME;
-        }
-
-        OrganizationAccountEntity individualOrgAccount = organizationAccountRepository.findFirstByOrganizationIdAndOrganizationAccountName(defaultOrganizationId, planName)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No plan with the name '[" + planName + "]' exists"));
-        registerOrganizationUser(registrationModel, individualOrgAccount);
     }
 
     /**
@@ -168,7 +117,7 @@ public class UserRegistrationService {
         isBlankAddError(errorFields, "Last Name", registrationModel.getLastName());
         isBlankAddError(errorFields, "Email", registrationModel.getEmail());
         isBlankAddError(errorFields, "Password", registrationModel.getPassword());
-        isBlankAddError(errorFields, "Plan", registrationModel.getRoleLevel());
+        isBlankAddError(errorFields, "Role", registrationModel.getRoleLevel());
 
         if (!errorFields.isEmpty()) {
             String commaSeparatedErrors = String.join(", ", errorFields);

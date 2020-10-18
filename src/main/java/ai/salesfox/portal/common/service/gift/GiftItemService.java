@@ -26,7 +26,7 @@ public class GiftItemService {
     }
 
     public Optional<InventoryItemEntity> findInventoryItemForGift(UserEntity loggedInUser, MembershipEntity userMembership, GiftItemDetailEntity giftItemDetail) {
-        return inventoryRepository.findAccessibleInventories(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), PageRequest.of(0, 1))
+        return inventoryRepository.findAccessibleInventories(userMembership.getOrganizationAccountId(), PageRequest.of(0, 1))
                 .stream()
                 .findAny()
                 .map(inventory -> new InventoryItemPK(giftItemDetail.getItemId(), inventory.getInventoryId()))

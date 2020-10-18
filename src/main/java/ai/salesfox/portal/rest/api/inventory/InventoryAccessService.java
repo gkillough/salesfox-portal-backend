@@ -4,7 +4,6 @@ import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.inventory.InventoryEntity;
 import ai.salesfox.portal.database.inventory.restriction.InventoryOrganizationAccountRestrictionEntity;
-import ai.salesfox.portal.database.inventory.restriction.InventoryUserRestrictionEntity;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,10 +32,7 @@ public class InventoryAccessService {
         if (inventoryEntity.hasRestriction()) {
             MembershipEntity userMembership = requestingUser.getMembershipEntity();
             InventoryOrganizationAccountRestrictionEntity orgAcctRestriction = inventoryEntity.getInventoryOrganizationAccountRestrictionEntity();
-            InventoryUserRestrictionEntity userRestriction = inventoryEntity.getInventoryUserRestrictionEntity();
             if (orgAcctRestriction != null && orgAcctRestriction.getOrganizationAccountId().equals(userMembership.getOrganizationAccountId())) {
-                return;
-            } else if (userRestriction != null && userRestriction.getUserId().equals(requestingUser.getUserId())) {
                 return;
             }
         }
