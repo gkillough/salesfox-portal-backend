@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: user-campaign-tracking-1
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: user_campaign_send_dates
+            columns:
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: recipient_count
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: user-campaign-tracking-2
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: user_campaign_send_dates_user_id_fk
+            baseTableSchemaName: portal
+            baseTableName: user_campaign_send_dates
+            baseColumnNames: user_id
+            referencedTableSchemaName: portal
+            referencedTableName: users
+            referencedColumnNames: user_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true
