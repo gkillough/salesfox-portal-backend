@@ -16,6 +16,10 @@ public class UserCampaignSendDateEntity {
     @Id
     @PrimaryKeyJoinColumn
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "user_campaign_id")
+    private UUID userCampaignId;
+
+    @PrimaryKeyJoinColumn
     @Column(name = "user_id")
     private UUID userId;
 
@@ -29,7 +33,8 @@ public class UserCampaignSendDateEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", updatable = false, insertable = false)
     private UserEntity userEntity;
 
-    public UserCampaignSendDateEntity(UUID userId, LocalDate date, Integer recipientCount) {
+    public UserCampaignSendDateEntity(UUID userCampaignId, UUID userId, LocalDate date, Integer recipientCount) {
+        this.userCampaignId = userCampaignId;
         this.userId = userId;
         this.date = date;
         this.recipientCount = recipientCount;

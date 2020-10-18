@@ -8,10 +8,16 @@ databaseChangeLog:
             tableName: user_campaign_send_dates
             columns:
               - column:
+                  name: user_campaign_id
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
+                  constraints:
+                    primaryKey: true
+              - column:
                   name: user_id
                   type: UUID
                   constraints:
-                    primaryKey: true
+                    nullable: false
               - column:
                   name: date
                   type: DATE

@@ -63,6 +63,9 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
         }
 
         Integer recipientCount = giftRecipientIds.size();
+        if (recipientCount > 1) {
+            // TODO track "campaign used"
+        }
 
         MembershipEntity userMembership = submittingUser.getMembershipEntity();
         GiftItemDetailEntity giftItemDetail = gift.getGiftItemDetailEntity();

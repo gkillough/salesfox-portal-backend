@@ -12,4 +12,20 @@ public class PortalDateTimeUtils {
         return LocalDate.now();
     }
 
+    public static LocalDate computeMostRecentDateWithDayOfMonth(int dayOfMonth) {
+        LocalDate currentDate = getCurrentDate();
+
+        int currentDayOfMonth = currentDate.getDayOfMonth();
+        if (currentDayOfMonth == dayOfMonth) {
+            return currentDate;
+        }
+
+        LocalDate targetDayThisMonth = LocalDate.of(currentDate.getYear(), currentDate.getMonth(), dayOfMonth);
+        if (currentDayOfMonth > dayOfMonth) {
+            return targetDayThisMonth;
+        } else {
+            return targetDayThisMonth.minusMonths(1L);
+        }
+    }
+
 }
