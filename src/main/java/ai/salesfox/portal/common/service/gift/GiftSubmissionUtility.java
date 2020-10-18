@@ -74,7 +74,14 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
         }
 
         Integer recipientCount = giftRecipientIds.size();
+        int recipientsAllowedForSubmittingUser = userLicenseLimitManager.retrieveContactPerCampaignLimit(submittingUser);
+        if (recipientCount > recipientsAllowedForSubmittingUser) {
+            handleRecipientLimitExceeded(gift, submittingUser);
+            return Optional.empty();
+        }
+
         if (recipientCount > 1) {
+            // A gift with more than one recipient is a campaign
             if (userLicenseLimitManager.isCampaignLimitReachedForUser(submittingUser)) {
                 handleCampaignLimitReached(gift, submittingUser);
                 return Optional.empty();
@@ -124,6 +131,8 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
     protected abstract void handleGiftNotSubmittable(GiftEntity foundGift, UserEntity submittingUser) throws E;
 
     protected abstract void handleNoRecipients(GiftEntity foundGift, UserEntity submittingUser) throws E;
+
+    protected abstract void handleRecipientLimitExceeded(GiftEntity foundGift, UserEntity submittingUser) throws E;
 
     protected abstract void handleCampaignLimitReached(GiftEntity foundGift, UserEntity submittingUser) throws E;
 

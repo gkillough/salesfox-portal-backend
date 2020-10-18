@@ -29,6 +29,7 @@ import java.util.UUID;
 @Component
 public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<SalesfoxException> {
     public static final String FAILURE_MESSAGE_SUBJECT_LINE = "Salesfox - Scheduled Gift Submission Failure";
+    public static final String FAILURE_MESSAGE_LICENSE_LIMIT_FORMAT_STRING = "A gift was scheduled to be submitted, but it would have exceeded the allowed number of %s for this organization account's license.";
 
     private final GiftTrackingService giftTrackingService;
     private final EmailMessagingService emailMessagingService;
@@ -63,9 +64,15 @@ public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<Salesf
     }
 
     @Override
+    protected void handleRecipientLimitExceeded(GiftEntity foundGift, UserEntity submittingUser) throws SalesfoxException {
+        unscheduleGift(foundGift, submittingUser);
+        notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), String.format(FAILURE_MESSAGE_LICENSE_LIMIT_FORMAT_STRING, "recipients-per-campaign"));
+    }
+
+    @Override
     protected void handleCampaignLimitReached(GiftEntity foundGift, UserEntity submittingUser) throws SalesfoxException {
         unscheduleGift(foundGift, submittingUser);
-        notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), "A gift was scheduled to be submitted, but it would have exceeded the allowed number of campaigns for this organization account's license.");
+        notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), String.format(FAILURE_MESSAGE_LICENSE_LIMIT_FORMAT_STRING, "campaigns-per-user"));
     }
 
     @Override

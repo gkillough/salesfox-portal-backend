@@ -21,6 +21,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class EndpointGiftSubmissionService extends GiftSubmissionUtility<ResponseStatusException> {
+    public static final String FAILURE_MESSAGE_LICENSE_LIMIT_FORMAT_STRING = "Submitting this gift would cause you to exceed the allowed number of %s for this organization account's license.";
+
     @Autowired
     public EndpointGiftSubmissionService(
             GiftTrackingService giftTrackingService,
@@ -46,8 +48,13 @@ public class EndpointGiftSubmissionService extends GiftSubmissionUtility<Respons
     }
 
     @Override
+    protected void handleRecipientLimitExceeded(GiftEntity foundGift, UserEntity submittingUser) throws ResponseStatusException {
+        throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, String.format(FAILURE_MESSAGE_LICENSE_LIMIT_FORMAT_STRING, "recipients-per-campaign"));
+    }
+
+    @Override
     protected void handleCampaignLimitReached(GiftEntity foundGift, UserEntity submittingUser) throws ResponseStatusException {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Submitting this gift would cause you to exceed the allowed number of campaigns for this organization account's license.");
+        throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, String.format(FAILURE_MESSAGE_LICENSE_LIMIT_FORMAT_STRING, "campaigns-per-user"));
     }
 
     @Override

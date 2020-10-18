@@ -9,7 +9,6 @@ import ai.salesfox.portal.database.license.LicenseTypeEntity;
 import ai.salesfox.portal.database.license.OrganizationAccountLicenseEntity;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -40,11 +39,6 @@ public class UserLicenseLimitManager {
         LocalDate campaignDate = PortalDateTimeUtils.getCurrentDate();
         UserCampaignSendDateEntity campaignTrackingEntry = new UserCampaignSendDateEntity(null, user.getUserId(), campaignDate, recipientCount);
         userCampaignSendDateRepository.save(campaignTrackingEntry);
-    }
-
-    public Page<Object> getCampaignsByUser() {
-        // FIXME implement
-        return Page.empty();
     }
 
     public int retrieveContactPerCampaignLimit(UserEntity user) {
