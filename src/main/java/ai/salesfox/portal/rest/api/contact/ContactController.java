@@ -31,7 +31,11 @@ public class ContactController {
     }
 
     @GetMapping
-    public MultiContactModel getContacts(@RequestParam Boolean active, @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset, @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit) {
+    public MultiContactModel getContacts(
+            @RequestParam Boolean active,
+            @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset,
+            @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit
+    ) {
         return contactService.getContacts(active, offset, limit);
     }
 
