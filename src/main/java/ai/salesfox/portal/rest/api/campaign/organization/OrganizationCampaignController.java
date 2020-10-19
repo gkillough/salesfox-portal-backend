@@ -1,6 +1,7 @@
-package ai.salesfox.portal.rest.api.campaign;
+package ai.salesfox.portal.rest.api.campaign.organization;
 
-import ai.salesfox.portal.rest.api.common.page.PageMetadata;
+import ai.salesfox.portal.rest.api.campaign.CampaignSummaryEndpointService;
+import ai.salesfox.portal.rest.api.campaign.organization.model.MultiOrganizationAccountCampaignSummaryResponseModel;
 import ai.salesfox.portal.rest.api.organization.common.OrganizationEndpointConstants;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,13 +25,11 @@ public class OrganizationCampaignController {
     @GetMapping
     @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     // TODO eventually support startDate/endDate searching
-    public Object getOrganizationCampaigns(
+    public MultiOrganizationAccountCampaignSummaryResponseModel getOrganizationCampaigns(
             @PathVariable UUID accountId,
-            @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset,
-            @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit,
-            @RequestParam(defaultValue = "30") Integer inNumberOfDays
+            @RequestParam(defaultValue = "30") Integer lookbackDays
     ) {
-        return campaignSummaryEndpointService.getOrganizationAccountCampaigns(accountId, offset, limit, inNumberOfDays);
+        return campaignSummaryEndpointService.getOrganizationAccountCampaigns(accountId, lookbackDays);
     }
 
 }

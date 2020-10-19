@@ -1,6 +1,7 @@
-package ai.salesfox.portal.rest.api.campaign;
+package ai.salesfox.portal.rest.api.campaign.user;
 
-import ai.salesfox.portal.rest.api.campaign.model.MultiCampaignSummaryResponseModel;
+import ai.salesfox.portal.rest.api.campaign.CampaignSummaryEndpointService;
+import ai.salesfox.portal.rest.api.campaign.user.model.MultiUserCampaignSummaryResponseModel;
 import ai.salesfox.portal.rest.api.common.page.PageMetadata;
 import ai.salesfox.portal.rest.api.user.UserEndpointConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +23,13 @@ public class UserCampaignSummaryController {
 
     @GetMapping
     // TODO eventually support startDate/endDate searching
-    public MultiCampaignSummaryResponseModel getUserCampaignSummaries(
+    public MultiUserCampaignSummaryResponseModel getUserCampaignSummaries(
             @PathVariable UUID userId,
             @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset,
             @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit,
-            @RequestParam(defaultValue = "30") Integer inNumberOfDays
+            @RequestParam(defaultValue = "30") Integer lookbackDays
     ) {
-        return campaignSummaryEndpointService.getUserCampaignSummaries(userId, offset, limit, inNumberOfDays);
+        return campaignSummaryEndpointService.getUserCampaignSummaries(userId, offset, limit, lookbackDays);
     }
 
 }

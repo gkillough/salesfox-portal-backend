@@ -5,8 +5,9 @@ import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserRepository;
 import ai.salesfox.portal.database.campaign.UserCampaignSendDateEntity;
 import ai.salesfox.portal.database.campaign.UserCampaignSendDateRepository;
-import ai.salesfox.portal.rest.api.campaign.model.CampaignSummaryResponseModel;
-import ai.salesfox.portal.rest.api.campaign.model.MultiCampaignSummaryResponseModel;
+import ai.salesfox.portal.rest.api.campaign.organization.model.MultiOrganizationAccountCampaignSummaryResponseModel;
+import ai.salesfox.portal.rest.api.campaign.user.model.MultiUserCampaignSummaryResponseModel;
+import ai.salesfox.portal.rest.api.campaign.user.model.UserCampaignSummaryResponseModel;
 import ai.salesfox.portal.rest.api.user.common.UserAccessService;
 import ai.salesfox.portal.rest.api.user.common.model.UserSummaryModel;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
@@ -42,24 +43,25 @@ public class CampaignSummaryEndpointService {
         this.membershipRetrievalService = membershipRetrievalService;
     }
 
-    public MultiCampaignSummaryResponseModel getUserCampaignSummaries(UUID userId, Integer pageOffset, Integer pageLimit, Integer inNumberOfDays) {
+    public MultiUserCampaignSummaryResponseModel getUserCampaignSummaries(UUID userId, Integer pageOffset, Integer pageLimit, Integer lookbackDays) {
         UserEntity foundUser = findAndValidateUser(userId);
-        Page<UserCampaignSendDateEntity> pageOfCampaignsForUser = getPageOfCampaignsForUser(userId, pageOffset, pageLimit, inNumberOfDays);
+        Page<UserCampaignSendDateEntity> pageOfCampaignsForUser = getPageOfCampaignsForUser(userId, pageOffset, pageLimit, lookbackDays);
 
         UserSummaryModel foundUserSummary = UserSummaryModel.fromEntity(foundUser);
         if (pageOfCampaignsForUser.isEmpty()) {
-            return MultiCampaignSummaryResponseModel.empty(foundUserSummary);
+            return MultiUserCampaignSummaryResponseModel.empty(foundUserSummary);
         }
 
-        List<CampaignSummaryResponseModel> campaignSummaries = pageOfCampaignsForUser
+        List<UserCampaignSummaryResponseModel> campaignSummaries = pageOfCampaignsForUser
                 .stream()
                 .map(this::convertToUserCampaignResponseModel)
                 .collect(Collectors.toList());
-        return new MultiCampaignSummaryResponseModel(foundUserSummary, campaignSummaries, pageOfCampaignsForUser);
+        return new MultiUserCampaignSummaryResponseModel(foundUserSummary, campaignSummaries, pageOfCampaignsForUser);
     }
 
-    public Object getOrganizationAccountCampaigns(UUID orgAcctId, Integer pageOffset, Integer pageLimit, Integer inNumberOfDays) {
+    public MultiOrganizationAccountCampaignSummaryResponseModel getOrganizationAccountCampaigns(UUID orgAcctId, Integer lookbackDays) {
         // FIXME implement
+        //  query by joining the organization account and matching the id for users
         return null;
     }
 
@@ -73,17 +75,17 @@ public class CampaignSummaryEndpointService {
         return foundUser;
     }
 
-    private Page<UserCampaignSendDateEntity> getPageOfCampaignsForUser(UUID userId, Integer pageOffset, Integer pageLimit, Integer inNumberOfDays) {
+    private Page<UserCampaignSendDateEntity> getPageOfCampaignsForUser(UUID userId, Integer pageOffset, Integer pageLimit, Integer lookbackDays) {
         LocalDate today = PortalDateTimeUtils.getCurrentDate();
-        LocalDate queryStartDate = today.minusDays(inNumberOfDays);
+        LocalDate queryStartDate = today.minusDays(lookbackDays);
 
         // TODO consider sorting
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
         return userCampaignSendDateRepository.findByUserIdOnOrAfter(userId, queryStartDate, pageRequest);
     }
 
-    private CampaignSummaryResponseModel convertToUserCampaignResponseModel(UserCampaignSendDateEntity userCampaign) {
-        return new CampaignSummaryResponseModel(userCampaign.getDate(), userCampaign.getRecipientCount());
+    private UserCampaignSummaryResponseModel convertToUserCampaignResponseModel(UserCampaignSendDateEntity userCampaign) {
+        return new UserCampaignSummaryResponseModel(userCampaign.getDate(), userCampaign.getRecipientCount());
     }
 
 }
