@@ -165,7 +165,8 @@ public class OrganizationAccountRegistrationService {
 
         OrganizationAccountLicenseEntity orgAcctLicenseToSave = new OrganizationAccountLicenseEntity(
                 organizationAccount.getOrganizationAccountId(), licenseType.getLicenseTypeId(), 0, billingDayOfMonth, true);
-        organizationAccountLicenseRepository.save(orgAcctLicenseToSave);
+        OrganizationAccountLicenseEntity savedOrgAcctLicense = organizationAccountLicenseRepository.save(orgAcctLicenseToSave);
+        organizationAccount.setOrganizationAccountLicenseEntity(savedOrgAcctLicense);
     }
 
     private void createOrganizationAccountAddress(PortalAddressModel addressModel, OrganizationAccountEntity organizationAccount) {
