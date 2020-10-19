@@ -1,60 +1,60 @@
 package ai.salesfox.portal.rest.api.user.common;
 
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
+import ai.salesfox.portal.database.account.entity.RoleEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.MembershipRepository;
-import ai.salesfox.portal.database.account.repository.RoleRepository;
 import ai.salesfox.portal.database.account.repository.UserRepository;
+import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
 import ai.salesfox.portal.rest.api.user.role.model.UserRoleModel;
-import ai.salesfox.portal.rest.security.authentication.SecurityContextUtils;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
+import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Component
 public class UserAccessService {
     private final UserRepository userRepository;
     private final MembershipRepository membershipRepository;
-    private final RoleRepository roleRepository;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
-    public UserAccessService(UserRepository userRepository, MembershipRepository membershipRepository, RoleRepository roleRepository) {
+    public UserAccessService(UserRepository userRepository, MembershipRepository membershipRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.userRepository = userRepository;
         this.membershipRepository = membershipRepository;
-        this.roleRepository = roleRepository;
+        this.membershipRetrievalService = membershipRetrievalService;
     }
 
+    @Deprecated
     public boolean canCurrentUserAccessDataForUser(UUID userId) {
-        Optional<UsernamePasswordAuthenticationToken> optionalAuthToken = SecurityContextUtils.retrieveUserAuthToken();
-        if (optionalAuthToken.isPresent()) {
-            UserDetails userDetails = SecurityContextUtils.extractUserDetails(optionalAuthToken.get());
-            String email = userDetails.getUsername();
-            Optional<UserEntity> optionalUser = userRepository.findFirstByEmail(email);
-            if (optionalUser.isPresent()) {
-                UserEntity userEntity = optionalUser.get();
-                UUID entityUserId = userEntity.getUserId();
-                // TODO in the future, we may want to also check if the logged in user manages the user with this userId
-                if (entityUserId.equals(userId)) {
-                    // If the logged in user is the requested user, grant access.
-                    return true;
-                } else {
-                    // If the logged in user is a portal admin, grant access.
-                    return userDetails.getAuthorities()
-                            .stream()
-                            .map(GrantedAuthority::getAuthority)
-                            .anyMatch(PortalAuthorityConstants.PORTAL_ADMIN::equals);
-                }
-            }
-        }
-        return false;
+        UserEntity authenticatedUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        UserEntity targetUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return canUserAccessDataForUser(authenticatedUser, targetUser);
     }
 
+    public boolean canUserAccessDataForUser(UserEntity requestingUser, UserEntity targetUser) {
+        MembershipEntity requestingUserMembership = requestingUser.getMembershipEntity();
+        RoleEntity requestingUserRole = requestingUserMembership.getRoleEntity();
+        String requestingUserRoleLevel = requestingUserRole.getRoleLevel();
+        if (PortalAuthorityConstants.PORTAL_ADMIN.equals(requestingUserRoleLevel)) {
+            return true;
+        }
+
+        MembershipEntity targetUserMembership = targetUser.getMembershipEntity();
+        OrganizationAccountEntity targetUserOrgAcct = targetUserMembership.getOrganizationAccountEntity();
+
+        OrganizationAccountEntity requestingUserOrgAcct = requestingUserMembership.getOrganizationAccountEntity();
+        return requestingUserOrgAcct.getOrganizationAccountId().equals(targetUserOrgAcct.getOrganizationAccountId())
+                && (PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER.equals(requestingUserRoleLevel)
+                || PortalAuthorityConstants.ORGANIZATION_ACCOUNT_MANAGER.equals(requestingUserRoleLevel));
+    }
+
+    @Deprecated
     public UserRoleModel findRoleByUserId(UUID userId) {
         return membershipRepository.findById(userId)
                 .map(MembershipEntity::getRoleEntity)

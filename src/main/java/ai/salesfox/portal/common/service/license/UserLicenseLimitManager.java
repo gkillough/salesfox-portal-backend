@@ -8,11 +8,13 @@ import ai.salesfox.portal.database.campaign.UserCampaignSendDateRepository;
 import ai.salesfox.portal.database.license.LicenseTypeEntity;
 import ai.salesfox.portal.database.license.OrganizationAccountLicenseEntity;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
+import ai.salesfox.portal.rest.api.license.type.LicenseTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Component
 public class UserLicenseLimitManager {
@@ -30,9 +32,10 @@ public class UserLicenseLimitManager {
         int campaignLimit = licenseType.getCampaignsPerUserPerMonth();
 
         LocalDate billingPeriodStartDate = PortalDateTimeUtils.computeMostRecentDateWithDayOfMonth(orgAcctLicense.getBillingDayOfMonth());
-        List<UserCampaignSendDateEntity> userCampaignsForBillingPeriod = userCampaignSendDateRepository.findByUserIdOnOrAfter(user.getUserId(), billingPeriodStartDate);
+        PageRequest maximumSizePageRequest = PageRequest.of(0, LicenseTypeService.MAX_INT_LICENSE_FIELD_SIZE);
+        Page<UserCampaignSendDateEntity> userCampaignsForBillingPeriod = userCampaignSendDateRepository.findByUserIdOnOrAfter(user.getUserId(), billingPeriodStartDate, maximumSizePageRequest);
 
-        return userCampaignsForBillingPeriod.size() >= campaignLimit;
+        return userCampaignsForBillingPeriod.getNumberOfElements() >= campaignLimit;
     }
 
     public void trackCampaignSentByUser(UserEntity user, int recipientCount) {
