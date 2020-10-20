@@ -16,7 +16,7 @@ import ai.salesfox.portal.database.gift.recipient.GiftRecipientRepository;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsEntity;
 import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
-import ai.salesfox.portal.event.GiftSubmittedEventPublisher;
+import ai.salesfox.portal.event.gift.GiftSubmittedEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 

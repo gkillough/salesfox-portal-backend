@@ -1,4 +1,4 @@
-package ai.salesfox.portal.event;
+package ai.salesfox.portal.event.gift;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;

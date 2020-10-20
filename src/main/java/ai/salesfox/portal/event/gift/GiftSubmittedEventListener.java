@@ -1,4 +1,4 @@
-package ai.salesfox.portal.event;
+package ai.salesfox.portal.event.gift;
 
 import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
 import ai.salesfox.portal.common.exception.PortalRuntimeException;
