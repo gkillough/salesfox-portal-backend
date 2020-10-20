@@ -6,7 +6,6 @@ import ai.salesfox.portal.common.time.PortalDateTimeUtils;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.catalogue.item.CatalogueItemRepository;
-import ai.salesfox.portal.database.contact.OrganizationAccountContactRepository;
 import ai.salesfox.portal.database.customization.branding_text.CustomBrandingTextEntity;
 import ai.salesfox.portal.database.customization.branding_text.CustomBrandingTextRepository;
 import ai.salesfox.portal.database.customization.branding_text.restriction.CustomBrandingTextOrgAccountRestrictionEntity;
@@ -23,7 +22,6 @@ import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailRepository;
 import ai.salesfox.portal.database.gift.note.GiftNoteDetailEntity;
 import ai.salesfox.portal.database.gift.note.GiftNoteDetailRepository;
-import ai.salesfox.portal.database.gift.recipient.GiftRecipientRepository;
 import ai.salesfox.portal.database.gift.restriction.GiftOrgAccountRestrictionEntity;
 import ai.salesfox.portal.database.gift.restriction.GiftOrgAccountRestrictionRepository;
 import ai.salesfox.portal.database.gift.restriction.GiftUserRestrictionEntity;
@@ -58,7 +56,6 @@ import java.util.stream.Collectors;
 @Component
 public class GiftService {
     private final GiftRepository giftRepository;
-    private final GiftRecipientRepository giftRecipientRepository;
     private final GiftNoteDetailRepository noteDetailRepository;
     private final GiftItemDetailRepository itemDetailRepository;
     private final GiftCustomIconDetailRepository customIconDetailRepository;
@@ -66,7 +63,6 @@ public class GiftService {
     private final GiftTrackingRepository giftTrackingRepository;
     private final GiftOrgAccountRestrictionRepository giftOrgAcctRestrictionRepository;
     private final GiftUserRestrictionRepository giftUserRestrictionRepository;
-    private final OrganizationAccountContactRepository contactRepository;
     private final NoteRepository noteRepository;
     private final CatalogueItemRepository catalogueItemRepository;
     private final CustomIconRepository customIconRepository;
@@ -77,14 +73,13 @@ public class GiftService {
     @Autowired
     public GiftService(
             GiftRepository giftRepository,
-            GiftRecipientRepository giftRecipientRepository, GiftNoteDetailRepository noteDetailRepository,
+            GiftNoteDetailRepository noteDetailRepository,
             GiftItemDetailRepository itemDetailRepository,
             GiftCustomIconDetailRepository customIconDetailRepository,
             GiftCustomTextDetailRepository giftCustomTextDetailRepository,
             GiftTrackingRepository giftTrackingRepository,
             GiftOrgAccountRestrictionRepository giftOrgAcctRestrictionRepository,
             GiftUserRestrictionRepository giftUserRestrictionRepository,
-            OrganizationAccountContactRepository contactRepository,
             NoteRepository noteRepository,
             CatalogueItemRepository catalogueItemRepository,
             CustomIconRepository customIconRepository,
@@ -93,7 +88,6 @@ public class GiftService {
             HttpSafeUserMembershipRetrievalService membershipRetrievalService
     ) {
         this.giftRepository = giftRepository;
-        this.giftRecipientRepository = giftRecipientRepository;
         this.noteDetailRepository = noteDetailRepository;
         this.itemDetailRepository = itemDetailRepository;
         this.customIconDetailRepository = customIconDetailRepository;
@@ -101,7 +95,6 @@ public class GiftService {
         this.giftTrackingRepository = giftTrackingRepository;
         this.giftOrgAcctRestrictionRepository = giftOrgAcctRestrictionRepository;
         this.giftUserRestrictionRepository = giftUserRestrictionRepository;
-        this.contactRepository = contactRepository;
         this.noteRepository = noteRepository;
         this.catalogueItemRepository = catalogueItemRepository;
         this.customIconRepository = customIconRepository;

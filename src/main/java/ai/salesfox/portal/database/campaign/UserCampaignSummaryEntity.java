@@ -11,8 +11,8 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(schema = "portal", name = "user_campaign_send_dates")
-public class UserCampaignSendDateEntity {
+@Table(schema = "portal", name = "user_campaign_summaries")
+public class UserCampaignSummaryEntity {
     @Id
     @PrimaryKeyJoinColumn
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,7 +33,7 @@ public class UserCampaignSendDateEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", updatable = false, insertable = false)
     private UserEntity userEntity;
 
-    public UserCampaignSendDateEntity(UUID userCampaignId, UUID userId, LocalDate date, Integer recipientCount) {
+    public UserCampaignSummaryEntity(UUID userCampaignId, UUID userId, LocalDate date, Integer recipientCount) {
         this.userCampaignId = userCampaignId;
         this.userId = userId;
         this.date = date;

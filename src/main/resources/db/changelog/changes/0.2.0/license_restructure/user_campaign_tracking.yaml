@@ -5,7 +5,7 @@ databaseChangeLog:
       changes:
         - createTable:
             schemaName: portal
-            tableName: user_campaign_send_dates
+            tableName: user_campaign_summaries
             columns:
               - column:
                   name: user_campaign_id
@@ -34,9 +34,9 @@ databaseChangeLog:
       author: gavinkillough
       changes:
         - addForeignKeyConstraint:
-            constraintName: user_campaign_send_dates_user_id_fk
+            constraintName: user_campaign_summaries_user_id_fk
             baseTableSchemaName: portal
-            baseTableName: user_campaign_send_dates
+            baseTableName: user_campaign_summaries
             baseColumnNames: user_id
             referencedTableSchemaName: portal
             referencedTableName: users
