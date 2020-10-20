@@ -2,15 +2,19 @@ package ai.salesfox.portal.rest.api.campaign;
 
 import ai.salesfox.portal.common.enumeration.AccessOperation;
 import ai.salesfox.portal.common.time.PortalDateTimeUtils;
+import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserRepository;
 import ai.salesfox.portal.database.campaign.UserCampaignSummaryEntity;
 import ai.salesfox.portal.database.campaign.UserCampaignSummaryRepository;
+import ai.salesfox.portal.database.license.LicenseTypeEntity;
+import ai.salesfox.portal.database.license.OrganizationAccountLicenseEntity;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
 import ai.salesfox.portal.rest.api.campaign.organization.model.MultiOrganizationAccountCampaignSummaryResponseModel;
 import ai.salesfox.portal.rest.api.campaign.organization.model.OrganizationAccountCampaignSummaryResponseModel;
 import ai.salesfox.portal.rest.api.campaign.user.model.MultiUserCampaignSummaryResponseModel;
+import ai.salesfox.portal.rest.api.campaign.user.model.UserCampaignBillingPeriodSummaryModel;
 import ai.salesfox.portal.rest.api.campaign.user.model.UserCampaignSummaryResponseModel;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
 import ai.salesfox.portal.rest.api.organization.common.OrganizationAccessService;
@@ -73,6 +77,20 @@ public class CampaignSummaryEndpointService {
                 .map(this::convertToUserCampaignResponseModel)
                 .collect(Collectors.toList());
         return new MultiUserCampaignSummaryResponseModel(foundUserSummary, campaignSummaries, pageOfCampaignsForUser);
+    }
+
+    public UserCampaignBillingPeriodSummaryModel getUserCampaignSummariesForBillingPeriod(UUID userId) {
+        UserEntity foundUser = findAndValidateUser(userId);
+        MembershipEntity userMembership = foundUser.getMembershipEntity();
+        OrganizationAccountEntity userOrgAcct = userMembership.getOrganizationAccountEntity();
+        OrganizationAccountLicenseEntity userOrgAcctLicense = userOrgAcct.getOrganizationAccountLicenseEntity();
+        LicenseTypeEntity userOrgAcctLicenseType = userOrgAcctLicense.getLicenseTypeEntity();
+
+        LocalDate dayBeforeBillingStartDate = PortalDateTimeUtils.computeMostRecentDateWithDayOfMonth(userOrgAcctLicense.getBillingDayOfMonth()).minusDays(1L);
+
+        Long campaignsForBillingPeriod = userCampaignSummaryRepository.countByUserIdAndDateAfter(userId, dayBeforeBillingStartDate);
+        Integer campaignsAllowedPerBillingPeriod = userOrgAcctLicenseType.getCampaignsPerUserPerMonth();
+        return new UserCampaignBillingPeriodSummaryModel(campaignsForBillingPeriod.intValue(), campaignsAllowedPerBillingPeriod);
     }
 
     public MultiOrganizationAccountCampaignSummaryResponseModel getOrganizationAccountCampaigns(UUID orgAcctId, Integer lookbackDays) {

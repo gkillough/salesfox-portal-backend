@@ -21,6 +21,8 @@ public interface UserCampaignSummaryRepository extends JpaRepository<UserCampaig
     )
     Page<UserCampaignSummaryEntity> findByUserIdOnOrAfter(@Param("userId") UUID userId, @Param("startDate") LocalDate startDate, Pageable pageable);
 
+    Long countByUserIdAndDateAfter(UUID userId, LocalDate date);
+
     @Query("SELECT new ai.salesfox.portal.database.campaign.view.CampaignDateSummaryView(userCampaign.date, COUNT(userCampaign.userId), SUM(userCampaign.recipientCount))" +
             " FROM UserCampaignSummaryEntity userCampaign" +
             " INNER JOIN userCampaign.userEntity user" +

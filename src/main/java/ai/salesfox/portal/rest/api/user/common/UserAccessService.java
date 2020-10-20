@@ -38,6 +38,10 @@ public class UserAccessService {
     }
 
     public boolean canUserAccessDataForUser(UserEntity requestingUser, UserEntity targetUser) {
+        if (requestingUser.getUserId().equals(targetUser.getUserId())) {
+            return true;
+        }
+
         MembershipEntity requestingUserMembership = requestingUser.getMembershipEntity();
         RoleEntity requestingUserRole = requestingUserMembership.getRoleEntity();
         String requestingUserRoleLevel = requestingUserRole.getRoleLevel();
