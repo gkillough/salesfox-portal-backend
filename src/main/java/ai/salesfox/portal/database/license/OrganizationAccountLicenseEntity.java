@@ -1,5 +1,7 @@
 package ai.salesfox.portal.database.license;
 
+import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
+import ai.salesfox.portal.event.license.OrganizationAccountLicenseDatabaseListener;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +11,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @Entity
+@EntityListeners(OrganizationAccountLicenseDatabaseListener.class)
 @Table(schema = "portal", name = "org_acct_licenses")
 public class OrganizationAccountLicenseEntity {
     @Id
@@ -28,6 +31,9 @@ public class OrganizationAccountLicenseEntity {
 
     @Column(name = "is_active")
     private Boolean isActive;
+
+    @OneToOne(mappedBy = "organizationAccountLicenseEntity")
+    private OrganizationAccountEntity organizationAccountEntity;
 
     @OneToOne
     @JoinColumn(name = "license_type_id", referencedColumnName = "license_type_id", updatable = false, insertable = false)

@@ -1,5 +1,6 @@
 package ai.salesfox.portal.database.license;
 
+import ai.salesfox.portal.event.license.LicenseTypeDatabaseListener;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners(LicenseTypeDatabaseListener.class)
 @Table(schema = "portal", name = "license_types")
 public class LicenseTypeEntity {
     @Id
