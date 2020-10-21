@@ -1,7 +1,6 @@
 package ai.salesfox.portal.database.license;
 
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
-import ai.salesfox.portal.event.license.organization.OrganizationAccountLicenseDatabaseListener;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +10,6 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @Entity
-@EntityListeners(OrganizationAccountLicenseDatabaseListener.class)
 @Table(schema = "portal", name = "org_acct_licenses")
 public class OrganizationAccountLicenseEntity {
     @Id
