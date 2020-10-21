@@ -16,6 +16,7 @@ public class OrganizationAccountLicenseDatabaseListener {
         // TODO compare billing information with what's on Stripe for this org account and update it (if necessary)
 
         // Number of active users has changed and billing update is required
+        // TODO notify Salesfox Admin
 
         // Active status changed
     }

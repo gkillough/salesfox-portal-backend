@@ -1,10 +1,12 @@
 package ai.salesfox.portal.event.license.type;
 
-import ai.salesfox.portal.database.license.LicenseTypeEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -16,9 +18,9 @@ public class LicenseTypeChangedEventPublisher {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
-    public void fireLicenseTypeChangedEvent(LicenseTypeEntity previousLicenseTypeEntity) {
-        log.debug("Submitting license type changed event with licenseTypeId=[{}]", previousLicenseTypeEntity.getLicenseTypeId());
-        applicationEventPublisher.publishEvent(new LicenseTypeChangedEvent(this, previousLicenseTypeEntity));
+    public void fireLicenseTypeChangedEvent(UUID licenseTypeId, BigDecimal monthlyCost, Integer usersIncluded, BigDecimal costPerAdditionalUser) {
+        log.debug("Submitting license type changed event with licenseTypeId=[{}]", licenseTypeId);
+        applicationEventPublisher.publishEvent(new LicenseTypeChangedEvent(this, licenseTypeId, monthlyCost, usersIncluded, costPerAdditionalUser));
     }
 
 }

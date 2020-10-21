@@ -99,8 +99,12 @@ public class LicenseTypeService {
                 requestModel.getCostPerAdditionalUser()
         );
 
+        BigDecimal previousMonthlyCost = new BigDecimal(foundLicense.getMonthlyCost().toString());
+        int previousUsersIncluded = foundLicense.getUsersIncluded();
+        BigDecimal previousCostPerAdditionalUser = new BigDecimal(foundLicense.getCostPerAdditionalUser().toString());
+
         licenseTypeRepository.save(updatedLicenseType);
-        licenseTypeChangedEventPublisher.fireLicenseTypeChangedEvent(foundLicense);
+        licenseTypeChangedEventPublisher.fireLicenseTypeChangedEvent(foundLicense.getLicenseTypeId(), previousMonthlyCost, previousUsersIncluded, previousCostPerAdditionalUser);
     }
 
     @Transactional
