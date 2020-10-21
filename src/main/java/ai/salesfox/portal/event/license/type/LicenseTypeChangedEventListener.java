@@ -45,7 +45,7 @@ public class LicenseTypeChangedEventListener {
         // Users included on the license decreased or cost per additional user changed
         if (!updatedLicenseType.getUsersIncluded().equals(event.getPreviousUsersIncluded())
                 || !updatedLicenseType.getCostPerAdditionalUser().equals(event.getPreviousCostPerAdditionalUser())) {
-            licenseBillingService.updateLicenseUsersIncluded(licenseTypeId, updatedLicenseType.getUsersIncluded(), event.getPreviousUsersIncluded(), updatedLicenseType.getCostPerAdditionalUser());
+            licenseBillingService.updateLicenseUsersIncluded(licenseTypeId, updatedLicenseType.getUsersIncluded(), event.getPreviousUsersIncluded(), updatedLicenseType.getCostPerAdditionalUser(), event.getPreviousCostPerAdditionalUser());
         }
     }
 
