@@ -1,6 +1,6 @@
 package ai.salesfox.portal.database.license;
 
-import ai.salesfox.portal.event.license.LicenseTypeDatabaseListener;
+import ai.salesfox.portal.event.license.type.LicenseTypeDatabaseListener;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

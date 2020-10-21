@@ -1,7 +1,7 @@
 package ai.salesfox.portal.database.license;
 
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
-import ai.salesfox.portal.event.license.OrganizationAccountLicenseDatabaseListener;
+import ai.salesfox.portal.event.license.organization.OrganizationAccountLicenseDatabaseListener;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
