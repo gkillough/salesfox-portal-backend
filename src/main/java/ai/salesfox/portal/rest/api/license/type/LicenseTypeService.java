@@ -3,6 +3,7 @@ package ai.salesfox.portal.rest.api.license.type;
 import ai.salesfox.portal.database.license.LicenseTypeEntity;
 import ai.salesfox.portal.database.license.LicenseTypeRepository;
 import ai.salesfox.portal.database.license.OrganizationAccountLicenseRepository;
+import ai.salesfox.portal.event.license.type.LicenseTypeChangedEventPublisher;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
 import ai.salesfox.portal.rest.api.license.type.model.AbstractLicenseTypeModel;
 import ai.salesfox.portal.rest.api.license.type.model.LicenseTypeRequestModel;
@@ -29,11 +30,13 @@ public class LicenseTypeService {
 
     private final LicenseTypeRepository licenseTypeRepository;
     private final OrganizationAccountLicenseRepository orgAccountLicenseRepository;
+    private final LicenseTypeChangedEventPublisher licenseTypeChangedEventPublisher;
 
     @Autowired
-    public LicenseTypeService(LicenseTypeRepository licenseTypeRepository, OrganizationAccountLicenseRepository orgAccountLicenseRepository) {
+    public LicenseTypeService(LicenseTypeRepository licenseTypeRepository, OrganizationAccountLicenseRepository orgAccountLicenseRepository, LicenseTypeChangedEventPublisher licenseTypeChangedEventPublisher) {
         this.licenseTypeRepository = licenseTypeRepository;
         this.orgAccountLicenseRepository = orgAccountLicenseRepository;
+        this.licenseTypeChangedEventPublisher = licenseTypeChangedEventPublisher;
     }
 
     public MultiLicenseTypeModel getPublicLicenseTypes(Integer pageOffset, Integer pageLimit) {
@@ -85,16 +88,19 @@ public class LicenseTypeService {
         LicenseTypeEntity foundLicense = findLicenseType(licenseTypeId);
         validateRequestModel(requestModel, foundLicense);
 
-        foundLicense.setName(requestModel.getName());
-        foundLicense.setMonthlyCost(requestModel.getMonthlyCost());
-        foundLicense.setCampaignsPerUserPerMonth(requestModel.getCampaignsPerUserPerMonth());
-        foundLicense.setContactsPerCampaign(requestModel.getContactsPerCampaign());
-        foundLicense.setUsersIncluded(requestModel.getUsersIncluded());
-        foundLicense.setCostPerAdditionalUser(requestModel.getCostPerAdditionalUser());
+        LicenseTypeEntity updatedLicenseType = new LicenseTypeEntity(
+                foundLicense.getLicenseTypeId(),
+                requestModel.getName(),
+                requestModel.getIsPublic(),
+                requestModel.getMonthlyCost(),
+                requestModel.getCampaignsPerUserPerMonth(),
+                requestModel.getContactsPerCampaign(),
+                requestModel.getUsersIncluded(),
+                requestModel.getCostPerAdditionalUser()
+        );
 
-        licenseTypeRepository.save(foundLicense);
-
-        // TODO update billing information if a license type changes
+        licenseTypeRepository.save(updatedLicenseType);
+        licenseTypeChangedEventPublisher.fireLicenseTypeChangedEvent(foundLicense);
     }
 
     @Transactional
