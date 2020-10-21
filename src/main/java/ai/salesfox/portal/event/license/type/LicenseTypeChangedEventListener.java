@@ -1,5 +1,6 @@
 package ai.salesfox.portal.event.license.type;
 
+import ai.salesfox.portal.common.service.billing.LicenseBillingService;
 import ai.salesfox.portal.database.license.LicenseTypeEntity;
 import ai.salesfox.portal.database.license.LicenseTypeRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -16,10 +17,12 @@ import java.util.UUID;
 @Component
 public class LicenseTypeChangedEventListener {
     private final LicenseTypeRepository licenseTypeRepository;
+    private final LicenseBillingService licenseBillingService;
 
     @Autowired
-    public LicenseTypeChangedEventListener(LicenseTypeRepository licenseTypeRepository) {
+    public LicenseTypeChangedEventListener(LicenseTypeRepository licenseTypeRepository, LicenseBillingService licenseBillingService) {
         this.licenseTypeRepository = licenseTypeRepository;
+        this.licenseBillingService = licenseBillingService;
     }
 
     @Async
@@ -36,17 +39,13 @@ public class LicenseTypeChangedEventListener {
 
         // Monthly cost changed
         if (!updatedLicenseType.getMonthlyCost().equals(event.getPreviousMonthlyCost())) {
-            // TODO update billing
+            licenseBillingService.updateLicenseMonthlyCost(licenseTypeId, updatedLicenseType.getMonthlyCost());
         }
 
-        // Users included on the license decreased
-        if (updatedLicenseType.getUsersIncluded() < event.getPreviousUsersIncluded()) {
-            // TODO update billing
-        }
-
-        // Cost per additional user changed
-        if (!updatedLicenseType.getCostPerAdditionalUser().equals(event.getPreviousCostPerAdditionalUser())) {
-            // TODO update billing
+        // Users included on the license decreased or cost per additional user changed
+        if (!updatedLicenseType.getUsersIncluded().equals(event.getPreviousUsersIncluded())
+                || !updatedLicenseType.getCostPerAdditionalUser().equals(event.getPreviousCostPerAdditionalUser())) {
+            licenseBillingService.updateLicenseUsersIncluded(licenseTypeId, updatedLicenseType.getUsersIncluded(), event.getPreviousUsersIncluded(), updatedLicenseType.getCostPerAdditionalUser());
         }
     }
 
