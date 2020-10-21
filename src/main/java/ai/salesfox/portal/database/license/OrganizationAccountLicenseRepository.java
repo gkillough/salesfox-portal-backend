@@ -13,4 +13,6 @@ public interface OrganizationAccountLicenseRepository extends JpaRepository<Orga
 
     boolean existsByLicenseTypeId(UUID licenseTypeId);
 
+    Slice<OrganizationAccountLicenseEntity> findByLicenseTypeIdAndActiveUsersGreaterThan(UUID licenseTypeId, Integer activeUsers, Pageable pageable);
+
 }

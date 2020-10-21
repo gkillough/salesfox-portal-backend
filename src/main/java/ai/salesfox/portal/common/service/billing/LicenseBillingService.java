@@ -16,7 +16,8 @@ import java.util.function.Function;
 
 @Component
 public class LicenseBillingService {
-    public static final PageRequest DEFAULT_LICENSE_PAGE_REQUEST = PageRequest.of(0, 100);
+    public static final PageRequest DEFAULT_ORG_ACCT_LICENSE_PAGE_REQUEST = PageRequest.of(0, 100);
+
     private final OrganizationAccountLicenseRepository organizationAccountRepository;
 
     @Autowired
@@ -34,12 +35,14 @@ public class LicenseBillingService {
     public void updateLicenseUsersIncluded(UUID licenseTypeId, Integer newUsersIncluded, Integer previousUsersIncluded, BigDecimal newCostPerAdditionalUser, BigDecimal previousCostPerAdditionalUser) {
         Function<Pageable, Slice<OrganizationAccountLicenseEntity>> getPage = null;
         if (newUsersIncluded < previousUsersIncluded) {
-            // user count decrease
-
+            // The number of users included is decreasing, so only get org acct licenses with more users than the new value.
+            getPage = pageable -> organizationAccountRepository.findByLicenseTypeIdAndActiveUsersGreaterThan(licenseTypeId, newUsersIncluded, pageable);
         } else if (newUsersIncluded > previousUsersIncluded) {
-            // user count increase 
-            
+            // The number of users included is increasing, so get org acct licenses with more users than the old value.
+            getPage = pageable -> organizationAccountRepository.findByLicenseTypeIdAndActiveUsersGreaterThan(licenseTypeId, previousUsersIncluded, pageable);
         } else if (!newCostPerAdditionalUser.equals(previousCostPerAdditionalUser)) {
+            // TODO we might not need to update org acct licenses individually and instead, update a single "item" price in Stripe
+            // The number of users included didn't change, but the price per additional user did, so all org accounts for that license type need to be updated.
             getPage = pageable -> organizationAccountRepository.findByLicenseTypeId(licenseTypeId, pageable);
         }
 
@@ -51,7 +54,7 @@ public class LicenseBillingService {
         }
     }
 
-    // TODO we might not need to update org acct licenses individually and instead, update the "subscription item" in Stripe
+    // TODO we might not need to update org acct licenses individually and instead, update a single subscription "item" price in Stripe
     private void updateLicenseMonthlyCost(Streamable<OrganizationAccountLicenseEntity> batchOfOrgAcctLicenses, BigDecimal newMonthlyCost) {
         // TODO implement
     }
@@ -67,7 +70,7 @@ public class LicenseBillingService {
     }
 
     private void doLicenseUpdate(Function<Pageable, Slice<OrganizationAccountLicenseEntity>> getPage, Consumer<Streamable<OrganizationAccountLicenseEntity>> updateBatchOfOrgAcctLicenses) {
-        Pageable pageRequest = DEFAULT_LICENSE_PAGE_REQUEST;
+        Pageable pageRequest = DEFAULT_ORG_ACCT_LICENSE_PAGE_REQUEST;
 
         Slice<OrganizationAccountLicenseEntity> pageOfOrgAccountLicenses;
         do {
