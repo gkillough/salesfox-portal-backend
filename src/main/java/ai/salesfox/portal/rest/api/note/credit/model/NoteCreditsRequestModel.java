@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class NoteCreditsRequestModel {
     private Integer quantity;
-    private String token;
+    private String stripeChargeToken;
 
 }

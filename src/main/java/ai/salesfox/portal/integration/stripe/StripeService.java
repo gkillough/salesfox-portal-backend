@@ -3,6 +3,7 @@ package ai.salesfox.portal.integration.stripe;
 import com.stripe.Stripe;
 import com.stripe.model.Charge;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -11,7 +12,8 @@ import java.util.Map;
 @Component
 public class StripeService {
 
-    private String API_SECRET_KEY = "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";
+    @Value("${stripe.key.secret}")
+    private String API_SECRET_KEY;
 
     @Autowired
     public StripeService() {
@@ -20,7 +22,7 @@ public class StripeService {
 
     public Charge chargeNewCard(String token, double amount) throws Exception {
         try {
-            Map<String, Object> chargeParams = new HashMap<String, Object>();
+            Map<String, Object> chargeParams = new HashMap<>();
             chargeParams.put("amount", (int) (amount * 100));
             chargeParams.put("currency", "USD");
             chargeParams.put("source", token);

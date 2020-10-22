@@ -25,6 +25,7 @@ public class NoteCreditService {
     private final NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private final StripeService stripeService;
+    public static final double NOTE_CREDIT_PRICE = 4.00;
 
     @Autowired
     public NoteCreditService(NoteCreditsRepository noteCreditsRepository, NoteCreditsUserRestrictionRepository noteCreditsUserRestrictionRepository, NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository,
@@ -42,12 +43,10 @@ public class NoteCreditService {
     }
 
     @Transactional
-    public String orderCredits(NoteCreditsRequestModel requestModel) {
-        final int notePrice = 4;
+    public void orderCredits(NoteCreditsRequestModel requestModel) {
         NoteCreditsEntity foundNoteCredits = findNoteCredits();
-        String token = requestModel.getToken();
+        String token = requestModel.getStripeChargeToken();
         Charge charge;
-        membershipRetrievalService.getAuthenticatedUserEntity().getMembershipEntity().getOrganizationAccountId();
         Integer requestedQuantity = requestModel.getQuantity();
         if (null == requestedQuantity) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'quantity' is required");
@@ -55,17 +54,16 @@ public class NoteCreditService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The requested quantity must be greater than zero");
         }
         try {
-            charge = stripeService.chargeNewCard(token, requestedQuantity * notePrice);
+            charge = stripeService.chargeNewCard(token, requestedQuantity * NOTE_CREDIT_PRICE);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid card or insufficient funds");
         }
         if (charge == null) {
-            return "Failure";
+            new ResponseStatusException(HttpStatus.BAD_REQUEST, "There was a problem processing the payment");
         } else {
             int newQuantity = foundNoteCredits.getAvailableCredits() + requestedQuantity;
             foundNoteCredits.setAvailableCredits(newQuantity);
             noteCreditsRepository.save(foundNoteCredits);
-            return "Success";
         }
 
     }
