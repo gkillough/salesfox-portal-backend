@@ -13,7 +13,6 @@ import java.util.Map;
 @Component
 public class StripeService {
 
-    @Autowired
     private final StripeConfiguration stripeConfiguration;
 
     @Autowired
