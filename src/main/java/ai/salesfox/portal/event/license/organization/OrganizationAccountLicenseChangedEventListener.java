@@ -1,5 +1,6 @@
 package ai.salesfox.portal.event.license.organization;
 
+import ai.salesfox.portal.common.service.billing.LicenseBillingService;
 import ai.salesfox.portal.common.service.email.EmailMessagingService;
 import ai.salesfox.portal.common.service.email.PortalEmailException;
 import ai.salesfox.portal.common.service.email.model.EmailMessageModel;
@@ -11,6 +12,7 @@ import ai.salesfox.portal.database.organization.account.OrganizationAccountEntit
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -18,13 +20,10 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * This class listens to events on the organization account license entity.
- * Note: Only database events through the Salesfox Portal application will be captured.
- */
 @Slf4j
+@Component
 // TODO consider splitting this event handling up
-public class OrganizationAccountLicenseChangedListener {
+public class OrganizationAccountLicenseChangedEventListener {
     // FIXME add an endpoint and service for this
     private static final String[] ADMIN_NOTIFICATION_EMAIL_ADDRESSES = {
             "sales@salesfox.ai",
@@ -32,17 +31,19 @@ public class OrganizationAccountLicenseChangedListener {
     };
 
     private final OrganizationAccountLicenseRepository organizationAccountLicenseRepository;
+    private final LicenseBillingService licenseBillingService;
     private final EmailMessagingService emailMessagingService;
 
     @Autowired
-    public OrganizationAccountLicenseChangedListener(OrganizationAccountLicenseRepository organizationAccountLicenseRepository, EmailMessagingService emailMessagingService) {
+    public OrganizationAccountLicenseChangedEventListener(OrganizationAccountLicenseRepository organizationAccountLicenseRepository, LicenseBillingService licenseBillingService, EmailMessagingService emailMessagingService) {
         this.organizationAccountLicenseRepository = organizationAccountLicenseRepository;
+        this.licenseBillingService = licenseBillingService;
         this.emailMessagingService = emailMessagingService;
     }
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMPLETION, fallbackExecution = true)
-    private void onOrgAccountLicenseChanged(OrganizationAccountLicenseChangedEvent event) {
+    public void onOrgAccountLicenseChanged(OrganizationAccountLicenseChangedEvent event) {
         UUID orgAccountLicenseId = event.getOrgAccountId();
         Optional<OrganizationAccountLicenseEntity> optionalOrgAccountLicense = organizationAccountLicenseRepository.findById(orgAccountLicenseId);
         if (optionalOrgAccountLicense.isEmpty()) {
@@ -53,15 +54,32 @@ public class OrganizationAccountLicenseChangedListener {
         OrganizationAccountLicenseEntity updatedOrgAccountLicense = optionalOrgAccountLicense.get();
         LicenseTypeEntity licenseType = updatedOrgAccountLicense.getLicenseTypeEntity();
 
-        // Notify Salesfox Admin
-        notifyAdminOfLicenseSeatUsed(updatedOrgAccountLicense, licenseType);
+        int previousActiveUsers = event.getPreviousActiveUsers();
+        int newActiveUsers = updatedOrgAccountLicense.getActiveUsers();
 
-        // TODO compare billing information with what's on Stripe for this org account and update it (if necessary)
+        // License Type changed
+        if (!event.getPreviousLicenseTypeId().equals(licenseType.getLicenseTypeId())) {
+            licenseBillingService.updateOrgAccountLicenseType(updatedOrgAccountLicense, licenseType);
+        }
 
         // Number of active users has changed and billing update is required
+        if (previousActiveUsers != newActiveUsers) {
+            licenseBillingService.updateOrgAccountLicenseActiveUsers(updatedOrgAccountLicense, newActiveUsers);
+
+            // Notify Salesfox Admin
+            if (previousActiveUsers < newActiveUsers) {
+                notifyAdminOfLicenseSeatUsed(updatedOrgAccountLicense, licenseType);
+            }
+        }
 
         // Active status changed
-        // TODO add the event publisher to the place where this field can be changed
+        if (!event.getPreviousActiveStatus().equals(updatedOrgAccountLicense.getIsActive())) {
+            if (updatedOrgAccountLicense.getIsActive()) {
+                licenseBillingService.activateOrgAccountLicense(updatedOrgAccountLicense);
+            } else {
+                licenseBillingService.deactivateOrgAccountLicense(updatedOrgAccountLicense);
+            }
+        }
     }
 
     private void notifyAdminOfLicenseSeatUsed(OrganizationAccountLicenseEntity updatedOrgAcctLicense, LicenseTypeEntity licenseType) {

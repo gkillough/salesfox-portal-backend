@@ -17,26 +17,16 @@ public class LicenseSeatManager {
         this.orgAccountLicenseChangedEventPublisher = orgAccountLicenseChangedEventPublisher;
     }
 
-    // TODO abstract these methods
-
-    /**
-     *
-     */
     public void fillSeat(OrganizationAccountLicenseEntity licenseEntity) {
-        int previousActiveUsers = licenseEntity.getActiveUsers();
-
-        licenseEntity.setActiveUsers(licenseEntity.getActiveUsers() + 1);
-        organizationAccountLicenseRepository.save(licenseEntity);
-        orgAccountLicenseChangedEventPublisher.fireOrgAccountLicenseChangedEvent(licenseEntity.getOrganizationAccountId(), licenseEntity.getLicenseTypeId(), previousActiveUsers, licenseEntity.getIsActive());
+        updateSeat(licenseEntity, licenseEntity.getActiveUsers(), licenseEntity.getActiveUsers() + 1);
     }
 
-    /**
-     *
-     */
     public void vacateSeat(OrganizationAccountLicenseEntity licenseEntity) {
-        int previousActiveUsers = licenseEntity.getActiveUsers();
+        updateSeat(licenseEntity, licenseEntity.getActiveUsers(), licenseEntity.getActiveUsers() - 1);
+    }
 
-        licenseEntity.setActiveUsers(licenseEntity.getActiveUsers() - 1);
+    private void updateSeat(OrganizationAccountLicenseEntity licenseEntity, int previousActiveUsers, int newActiveUsers) {
+        licenseEntity.setActiveUsers(newActiveUsers);
         organizationAccountLicenseRepository.save(licenseEntity);
         orgAccountLicenseChangedEventPublisher.fireOrgAccountLicenseChangedEvent(licenseEntity.getOrganizationAccountId(), licenseEntity.getLicenseTypeId(), previousActiveUsers, licenseEntity.getIsActive());
     }

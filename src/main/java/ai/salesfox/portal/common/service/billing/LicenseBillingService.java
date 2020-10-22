@@ -1,5 +1,6 @@
 package ai.salesfox.portal.common.service.billing;
 
+import ai.salesfox.portal.database.license.LicenseTypeEntity;
 import ai.salesfox.portal.database.license.OrganizationAccountLicenseEntity;
 import ai.salesfox.portal.database.license.OrganizationAccountLicenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,24 @@ public class LicenseBillingService {
         this.organizationAccountRepository = organizationAccountRepository;
     }
 
+    public void activateOrgAccountLicense(OrganizationAccountLicenseEntity orgAccountLicense) {
+        // TODO implement
+    }
+
+    public void deactivateOrgAccountLicense(OrganizationAccountLicenseEntity orgAccountLicense) {
+        // TODO implement
+    }
+
+    public void updateOrgAccountLicenseType(OrganizationAccountLicenseEntity orgAccountLicense, LicenseTypeEntity newLicenseType) {
+        // TODO implement
+    }
+
+    public void updateOrgAccountLicenseActiveUsers(OrganizationAccountLicenseEntity orgAccountLicense, Integer newActiveUsers) {
+        // TODO implement
+    }
+
     public void updateLicenseMonthlyCost(UUID licenseTypeId, BigDecimal newMonthlyCost) {
-        doLicenseUpdate(
+        performLicenseUpdate(
                 pageable -> organizationAccountRepository.findByLicenseTypeId(licenseTypeId, pageable),
                 batchOfOrgAcctLicenses -> updateLicenseMonthlyCost(batchOfOrgAcctLicenses, newMonthlyCost)
         );
@@ -47,7 +64,7 @@ public class LicenseBillingService {
         }
 
         if (null != getPage) {
-            doLicenseUpdate(
+            performLicenseUpdate(
                     getPage,
                     (batchOfOrgAcctLicenses) -> updateBillingForAdditionalUsers(batchOfOrgAcctLicenses, newUsersIncluded, previousUsersIncluded, newCostPerAdditionalUser, previousCostPerAdditionalUser)
             );
@@ -69,7 +86,7 @@ public class LicenseBillingService {
         // TODO implement
     }
 
-    private void doLicenseUpdate(Function<Pageable, Slice<OrganizationAccountLicenseEntity>> getPage, Consumer<Streamable<OrganizationAccountLicenseEntity>> updateBatchOfOrgAcctLicenses) {
+    private void performLicenseUpdate(Function<Pageable, Slice<OrganizationAccountLicenseEntity>> getPage, Consumer<Streamable<OrganizationAccountLicenseEntity>> updateBatchOfOrgAcctLicenses) {
         Pageable pageRequest = DEFAULT_ORG_ACCT_LICENSE_PAGE_REQUEST;
 
         Slice<OrganizationAccountLicenseEntity> pageOfOrgAccountLicenses;

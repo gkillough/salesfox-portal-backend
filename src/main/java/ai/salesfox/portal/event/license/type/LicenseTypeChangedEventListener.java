@@ -27,7 +27,7 @@ public class LicenseTypeChangedEventListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMPLETION, fallbackExecution = true)
-    public void onLicenseChanged(LicenseTypeChangedEvent event) {
+    public void onLicenseTypeChanged(LicenseTypeChangedEvent event) {
         UUID licenseTypeId = event.getLicenseTypeId();
         Optional<LicenseTypeEntity> optionalLicenseType = licenseTypeRepository.findById(licenseTypeId);
         if (optionalLicenseType.isEmpty()) {
