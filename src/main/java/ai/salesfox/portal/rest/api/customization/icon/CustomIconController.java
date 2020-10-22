@@ -42,25 +42,25 @@ public class CustomIconController {
     }
 
     @PostMapping("/{customIconId}/image")
-    @PreAuthorize(PortalAuthorityConstants.NON_ACCOUNT_REP_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     public void uploadCustomIconImage(@PathVariable UUID customIconId, @RequestParam MultipartFile customIconFile) {
         customIconImageService.setCustomIconImage(customIconId, customIconFile);
     }
 
     @PostMapping
-    @PreAuthorize(PortalAuthorityConstants.NON_ACCOUNT_REP_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     public CustomIconResponseModel createCustomIcon(@RequestBody CustomIconRequestModel requestModel) {
         return customIconService.createCustomIcon(requestModel);
     }
 
     @PutMapping("/{customIconId}")
-    @PreAuthorize(PortalAuthorityConstants.NON_ACCOUNT_REP_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     public void updateCustomIcon(@PathVariable UUID customIconId, @RequestBody CustomIconRequestModel requestModel) {
         customIconService.updateCustomIcon(customIconId, requestModel);
     }
 
     @PatchMapping("/{customIconId}")
-    @PreAuthorize(PortalAuthorityConstants.NON_ACCOUNT_REP_AUTH_CHECK)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     public void setCustomIconActiveStatus(@PathVariable UUID customIconId, @RequestBody ActiveStatusPatchModel requestModel) {
         customIconService.setActiveStatus(customIconId, requestModel);
     }

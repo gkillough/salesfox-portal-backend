@@ -7,8 +7,6 @@ import ai.salesfox.portal.database.customization.icon.CustomIconEntity;
 import ai.salesfox.portal.database.customization.icon.CustomIconRepository;
 import ai.salesfox.portal.database.customization.icon.restriction.CustomIconOrganizationAccountRepository;
 import ai.salesfox.portal.database.customization.icon.restriction.CustomIconOrganizationAccountRestrictionEntity;
-import ai.salesfox.portal.database.customization.icon.restriction.CustomIconUserRestrictionEntity;
-import ai.salesfox.portal.database.customization.icon.restriction.CustomIconUserRestrictionRepository;
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
@@ -35,17 +33,15 @@ import java.util.stream.Collectors;
 public class CustomIconService {
     private final CustomIconRepository customIconRepository;
     private final CustomIconOrganizationAccountRepository customIconOrgAcctRepository;
-    private final CustomIconUserRestrictionRepository customIconUserRestrictionRepository;
     private final CustomIconGiftStatusValidator customIconGiftStatusValidator;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private final CustomIconAccessService customIconAccessService;
 
     @Autowired
-    public CustomIconService(CustomIconRepository customIconRepository, CustomIconOrganizationAccountRepository customIconOrgAcctRepository, CustomIconUserRestrictionRepository customIconUserRestrictionRepository,
+    public CustomIconService(CustomIconRepository customIconRepository, CustomIconOrganizationAccountRepository customIconOrgAcctRepository,
                              CustomIconGiftStatusValidator customIconGiftStatusValidator, HttpSafeUserMembershipRetrievalService membershipRetrievalService, CustomIconAccessService customIconAccessService) {
         this.customIconRepository = customIconRepository;
         this.customIconOrgAcctRepository = customIconOrgAcctRepository;
-        this.customIconUserRestrictionRepository = customIconUserRestrictionRepository;
         this.customIconGiftStatusValidator = customIconGiftStatusValidator;
         this.membershipRetrievalService = membershipRetrievalService;
         this.customIconAccessService = customIconAccessService;
@@ -81,16 +77,10 @@ public class CustomIconService {
         CustomIconEntity customIconToSave = new CustomIconEntity(null, requestModel.getLabel(), requestModel.getIconUrl(), loggedInUser.getUserId(), true);
         CustomIconEntity savedCustomIcon = customIconRepository.save(customIconToSave);
 
-        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
-            CustomIconUserRestrictionEntity userRestrictionToSave = new CustomIconUserRestrictionEntity(savedCustomIcon.getCustomIconId(), loggedInUser.getUserId());
-            CustomIconUserRestrictionEntity savedUserRestriction = customIconUserRestrictionRepository.save(userRestrictionToSave);
-            savedCustomIcon.setCustomIconUserRestrictionEntity(savedUserRestriction);
-        } else {
-            MembershipEntity userMembership = loggedInUser.getMembershipEntity();
-            CustomIconOrganizationAccountRestrictionEntity orgAcctRestrictionToSave = new CustomIconOrganizationAccountRestrictionEntity(savedCustomIcon.getCustomIconId(), userMembership.getOrganizationAccountId());
-            CustomIconOrganizationAccountRestrictionEntity savedOrgAcctRestriction = customIconOrgAcctRepository.save(orgAcctRestrictionToSave);
-            savedCustomIcon.setCustomIconOrganizationAccountRestrictionEntity(savedOrgAcctRestriction);
-        }
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
+        CustomIconOrganizationAccountRestrictionEntity orgAcctRestrictionToSave = new CustomIconOrganizationAccountRestrictionEntity(savedCustomIcon.getCustomIconId(), userMembership.getOrganizationAccountId());
+        CustomIconOrganizationAccountRestrictionEntity savedOrgAcctRestriction = customIconOrgAcctRepository.save(orgAcctRestrictionToSave);
+        savedCustomIcon.setCustomIconOrganizationAccountRestrictionEntity(savedOrgAcctRestriction);
 
         savedCustomIcon.setUploaderEntity(loggedInUser);
         return convertToResponseModel(savedCustomIcon);
@@ -133,7 +123,7 @@ public class CustomIconService {
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
-        return customIconRepository.findAccessibleCustomIcons(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), pageRequest);
+        return customIconRepository.findAccessibleCustomIcons(userMembership.getOrganizationAccountId(), pageRequest);
     }
 
     private void validateRequestModel(CustomIconRequestModel requestModel) {
@@ -155,9 +145,6 @@ public class CustomIconService {
         Optional.ofNullable(entity.getCustomIconOrganizationAccountRestrictionEntity())
                 .map(CustomIconOrganizationAccountRestrictionEntity::getOrganizationAccountId)
                 .ifPresent(restrictionModel::setOrganizationAccountId);
-        Optional.ofNullable(entity.getCustomIconUserRestrictionEntity())
-                .map(CustomIconUserRestrictionEntity::getUserId)
-                .ifPresent(restrictionModel::setUserId);
         return new CustomIconResponseModel(entity.getCustomIconId(), entity.getLabel(), entity.getIconUrl(), uploaderModel, entity.getIsActive(), restrictionModel);
     }
 

@@ -18,3 +18,11 @@ databaseChangeLog:
   - include:
       file: remove_old_license_tables.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: remove_user_restriction_tables.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: user_campaign_tracking.yaml
+      relativeToChangelogFile: true

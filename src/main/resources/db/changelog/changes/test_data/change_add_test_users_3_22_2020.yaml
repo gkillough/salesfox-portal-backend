@@ -220,18 +220,18 @@ databaseChangeLog:
         - onFail: MARK_RAN
         - sqlCheck:
             expectedResult: 0
-            sql: SELECT count(*) FROM portal.inventory_user_restrictions WHERE user_id = GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com');
+            sql: SELECT count(*) FROM portal.inventory_organization_account_restrictions WHERE organization_account_id = GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Salesfox for Individuals', 'Salesfox Basic');
       changes:
         - insert:
             schemaName: portal
-            tableName: inventory_user_restrictions
+            tableName: inventory_organization_account_restrictions
             columns:
               - column:
                   name: inventory_id
                   value: 1a0c6260-712e-4753-9cf4-4eb80faf8b50
               - column:
-                  name: user_id
-                  valueComputed: GET_USER_ID_BY_EMAIL('basic.user@usepipeline.com')
+                  name: organization_account_id
+                  valueComputed: GET_ORGANIZATION_ACCOUNT_ID_BY_ORG_NAME_AND_ACCT_NAME('Salesfox for Individuals', 'Salesfox Basic')
 
   - changeSet:
       id: test-data-create-user-2

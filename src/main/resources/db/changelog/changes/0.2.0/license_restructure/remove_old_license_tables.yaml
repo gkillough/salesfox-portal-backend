@@ -17,9 +17,6 @@ databaseChangeLog:
         - dropTable:
             schemaName: portal
             tableName: licenses
-            columns:
-              - column:
-                  name: license_id
 
   - changeSet:
       id: remove-old-license-tables-3

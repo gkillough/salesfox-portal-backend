@@ -4,6 +4,7 @@ import ai.salesfox.portal.common.service.contact.ContactInteractionsService;
 import ai.salesfox.portal.common.service.gift.GiftItemService;
 import ai.salesfox.portal.common.service.gift.GiftSubmissionUtility;
 import ai.salesfox.portal.common.service.gift.GiftTrackingService;
+import ai.salesfox.portal.common.service.license.UserLicenseLimitManager;
 import ai.salesfox.portal.common.service.note.NoteCreditAvailabilityService;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
@@ -20,11 +21,20 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Component
 public class EndpointGiftSubmissionService extends GiftSubmissionUtility<ResponseStatusException> {
+    public static final String FAILURE_MESSAGE_LICENSE_LIMIT_FORMAT_STRING = "Submitting this gift would cause you to exceed the allowed number of %s for this organization account's license.";
+
     @Autowired
-    public EndpointGiftSubmissionService(GiftTrackingService giftTrackingService, GiftItemService giftItemService, GiftRecipientRepository giftRecipientRepository,
-                                         NoteCreditsRepository noteCreditsRepository, NoteCreditAvailabilityService noteCreditAvailabilityService,
-                                         ContactInteractionsService contactInteractionsService, GiftSubmittedEventPublisher giftSubmittedEventPublisher) {
-        super(giftTrackingService, giftItemService, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService, giftSubmittedEventPublisher);
+    public EndpointGiftSubmissionService(
+            GiftTrackingService giftTrackingService,
+            GiftItemService giftItemService,
+            UserLicenseLimitManager userLicenseLimitManager,
+            GiftRecipientRepository giftRecipientRepository,
+            NoteCreditsRepository noteCreditsRepository,
+            NoteCreditAvailabilityService noteCreditAvailabilityService,
+            ContactInteractionsService contactInteractionsService,
+            GiftSubmittedEventPublisher giftSubmittedEventPublisher
+    ) {
+        super(giftTrackingService, giftItemService, userLicenseLimitManager, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService, giftSubmittedEventPublisher);
     }
 
     @Override
@@ -35,6 +45,16 @@ public class EndpointGiftSubmissionService extends GiftSubmissionUtility<Respons
     @Override
     protected void handleGiftNotSubmittable(GiftEntity foundGift, UserEntity submittingUser) throws ResponseStatusException {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "This gift has already been submitted");
+    }
+
+    @Override
+    protected void handleRecipientLimitExceeded(GiftEntity foundGift, UserEntity submittingUser) throws ResponseStatusException {
+        throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, String.format(FAILURE_MESSAGE_LICENSE_LIMIT_FORMAT_STRING, "recipients-per-campaign"));
+    }
+
+    @Override
+    protected void handleCampaignLimitReached(GiftEntity foundGift, UserEntity submittingUser) throws ResponseStatusException {
+        throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, String.format(FAILURE_MESSAGE_LICENSE_LIMIT_FORMAT_STRING, "campaigns-per-user"));
     }
 
     @Override

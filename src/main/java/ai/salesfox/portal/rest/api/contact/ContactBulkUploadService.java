@@ -1,14 +1,9 @@
 package ai.salesfox.portal.rest.api.contact;
 
-import ai.salesfox.portal.rest.api.contact.model.ContactBulkUploadFieldStatus;
-import ai.salesfox.portal.rest.api.contact.model.ContactBulkUploadModel;
-import ai.salesfox.portal.rest.api.contact.model.ContactBulkUploadResponse;
-import ai.salesfox.portal.rest.api.contact.model.ContactUploadModel;
 import ai.salesfox.portal.common.service.contact.ContactCSVFileUtils;
 import ai.salesfox.portal.common.service.contact.ContactFieldValidationUtils;
 import ai.salesfox.portal.common.service.contact.model.ContactCSVWrapper;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
-import ai.salesfox.portal.database.account.entity.RoleEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactRepository;
@@ -18,9 +13,10 @@ import ai.salesfox.portal.database.contact.profile.OrganizationAccountContactPro
 import ai.salesfox.portal.database.contact.profile.OrganizationAccountContactProfileRepository;
 import ai.salesfox.portal.database.contact.restriction.ContactOrganizationAccountRestrictionEntity;
 import ai.salesfox.portal.database.contact.restriction.ContactOrganizationAccountRestrictionRepository;
-import ai.salesfox.portal.database.contact.restriction.ContactUserRestrictionEntity;
-import ai.salesfox.portal.database.contact.restriction.ContactUserRestrictionRepository;
-import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
+import ai.salesfox.portal.rest.api.contact.model.ContactBulkUploadFieldStatus;
+import ai.salesfox.portal.rest.api.contact.model.ContactBulkUploadModel;
+import ai.salesfox.portal.rest.api.contact.model.ContactBulkUploadResponse;
+import ai.salesfox.portal.rest.api.contact.model.ContactUploadModel;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -46,18 +42,16 @@ public class ContactBulkUploadService {
 
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private final OrganizationAccountContactRepository contactRepository;
-    private final ContactUserRestrictionRepository contactUserRestrictionRepository;
     private final ContactOrganizationAccountRestrictionRepository contactOrgAcctRestrictionRepository;
     private final OrganizationAccountContactAddressRepository contactAddressRepository;
     private final OrganizationAccountContactProfileRepository contactProfileRepository;
 
     @Autowired
     public ContactBulkUploadService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, OrganizationAccountContactRepository contactRepository,
-                                    ContactUserRestrictionRepository contactUserRestrictionRepository, ContactOrganizationAccountRestrictionRepository contactOrgAcctRestrictionRepository,
+                                    ContactOrganizationAccountRestrictionRepository contactOrgAcctRestrictionRepository,
                                     OrganizationAccountContactAddressRepository contactAddressRepository, OrganizationAccountContactProfileRepository contactProfileRepository) {
         this.membershipRetrievalService = membershipRetrievalService;
         this.contactRepository = contactRepository;
-        this.contactUserRestrictionRepository = contactUserRestrictionRepository;
         this.contactOrgAcctRestrictionRepository = contactOrgAcctRestrictionRepository;
         this.contactAddressRepository = contactAddressRepository;
         this.contactProfileRepository = contactProfileRepository;
@@ -92,19 +86,11 @@ public class ContactBulkUploadService {
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
-        RoleEntity userRole = userMembership.getRoleEntity();
-
-        UUID restrictedUserId = null;
-        String userRoleLevel = userRole.getRoleLevel();
-        if (PortalAuthorityConstants.PORTAL_BASIC_USER.equals(userRoleLevel) || PortalAuthorityConstants.PORTAL_PREMIUM_USER.equals(userRoleLevel)) {
-            restrictedUserId = loggedInUser.getUserId();
-        }
 
         List<ContactBulkUploadFieldStatus> contactUploadStatuses = new ArrayList<>(contactsUploadCandidates.size());
 
         List<OrganizationAccountContactEntity> contactsToSave = new ArrayList<>(contactsUploadCandidates.size());
         List<ContactOrganizationAccountRestrictionEntity> contactOrgAcctRestrictionsToSave = new ArrayList<>(contactsUploadCandidates.size());
-        List<ContactUserRestrictionEntity> contactUserRestrictionsToSave = new ArrayList<>(contactsUploadCandidates.size());
         List<OrganizationAccountContactAddressEntity> contactAddressesToSave = new ArrayList<>(contactsUploadCandidates.size());
         List<OrganizationAccountContactProfileEntity> contactProfilesToSave = new ArrayList<>(contactsUploadCandidates.size());
 
@@ -118,13 +104,8 @@ public class ContactBulkUploadService {
                 OrganizationAccountContactEntity contactToSave = new OrganizationAccountContactEntity(contactToSaveId, contactUploadCandidate.getFirstName(), contactUploadCandidate.getLastName(), contactUploadCandidate.getEmail(), true);
                 contactsToSave.add(contactToSave);
 
-                if (restrictedUserId != null) {
-                    ContactUserRestrictionEntity contactUserRestrictionToSave = new ContactUserRestrictionEntity(contactToSaveId, restrictedUserId);
-                    contactUserRestrictionsToSave.add(contactUserRestrictionToSave);
-                } else {
-                    ContactOrganizationAccountRestrictionEntity contactOrgAcctRestrictionToSave = new ContactOrganizationAccountRestrictionEntity(contactToSaveId, userMembership.getOrganizationAccountId());
-                    contactOrgAcctRestrictionsToSave.add(contactOrgAcctRestrictionToSave);
-                }
+                ContactOrganizationAccountRestrictionEntity contactOrgAcctRestrictionToSave = new ContactOrganizationAccountRestrictionEntity(contactToSaveId, userMembership.getOrganizationAccountId());
+                contactOrgAcctRestrictionsToSave.add(contactOrgAcctRestrictionToSave);
 
                 OrganizationAccountContactAddressEntity contactAddressToSave = new OrganizationAccountContactAddressEntity();
                 contactAddressToSave.setContactId(contactToSaveId);
@@ -132,14 +113,13 @@ public class ContactBulkUploadService {
                 contactAddressesToSave.add(contactAddressToSave);
 
                 OrganizationAccountContactProfileEntity contactProfileToSave = new OrganizationAccountContactProfileEntity(
-                        contactToSaveId, restrictedUserId, contactUploadCandidate.getContactOrganizationName(), contactUploadCandidate.getTitle(), contactUploadCandidate.getMobileNumber(), contactUploadCandidate.getBusinessNumber());
+                        contactToSaveId, null, contactUploadCandidate.getContactOrganizationName(), contactUploadCandidate.getTitle(), contactUploadCandidate.getMobileNumber(), contactUploadCandidate.getBusinessNumber());
                 contactProfilesToSave.add(contactProfileToSave);
             }
         }
 
         log.info("Saving {} valid contacts out of {} to the database", contactsToSave.size(), contactsUploadCandidates.size());
         contactRepository.saveAll(contactsToSave);
-        contactUserRestrictionRepository.saveAll(contactUserRestrictionsToSave);
         contactOrgAcctRestrictionRepository.saveAll(contactOrgAcctRestrictionsToSave);
         contactAddressRepository.saveAll(contactAddressesToSave);
         contactProfileRepository.saveAll(contactProfilesToSave);

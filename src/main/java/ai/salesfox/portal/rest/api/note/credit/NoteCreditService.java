@@ -21,7 +21,6 @@ import java.util.UUID;
 @Component
 public class NoteCreditService {
     private final NoteCreditsRepository noteCreditsRepository;
-    private final NoteCreditsUserRestrictionRepository noteCreditsUserRestrictionRepository;
     private final NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private final StripeService stripeService;
@@ -31,7 +30,6 @@ public class NoteCreditService {
     public NoteCreditService(NoteCreditsRepository noteCreditsRepository, NoteCreditsUserRestrictionRepository noteCreditsUserRestrictionRepository, NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository,
                              HttpSafeUserMembershipRetrievalService membershipRetrievalService, StripeService stripeService) {
         this.noteCreditsRepository = noteCreditsRepository;
-        this.noteCreditsUserRestrictionRepository = noteCreditsUserRestrictionRepository;
         this.noteCreditsOrgAccountRestrictionRepository = noteCreditsOrgAccountRestrictionRepository;
         this.membershipRetrievalService = membershipRetrievalService;
         this.stripeService = stripeService;
@@ -78,15 +76,11 @@ public class NoteCreditService {
     private NoteCreditsEntity initializeNoteCredits(UserEntity loggedInUser, MembershipEntity userMembership) {
         NoteCreditsEntity noteCreditsToSave = new NoteCreditsEntity(null, 0);
         NoteCreditsEntity savedNoteCredits = noteCreditsRepository.save(noteCreditsToSave);
-        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
-            NoteCreditUserRestrictionEntity userRestrictionToSave = new NoteCreditUserRestrictionEntity(savedNoteCredits.getNoteCreditId(), loggedInUser.getUserId());
-            NoteCreditUserRestrictionEntity savedUserRestriction = noteCreditsUserRestrictionRepository.save(userRestrictionToSave);
-            savedNoteCredits.setNoteCreditUserRestrictionEntity(savedUserRestriction);
-        } else {
-            NoteCreditOrgAccountRestrictionEntity orgAcctRestrictionToSave = new NoteCreditOrgAccountRestrictionEntity(savedNoteCredits.getNoteCreditId(), userMembership.getOrganizationAccountId());
-            NoteCreditOrgAccountRestrictionEntity savedOrgAcctRestriction = noteCreditsOrgAccountRestrictionRepository.save(orgAcctRestrictionToSave);
-            savedNoteCredits.setNoteCreditOrgAccountRestrictionEntity(savedOrgAcctRestriction);
-        }
+
+        NoteCreditOrgAccountRestrictionEntity orgAcctRestrictionToSave = new NoteCreditOrgAccountRestrictionEntity(savedNoteCredits.getNoteCreditId(), userMembership.getOrganizationAccountId());
+        NoteCreditOrgAccountRestrictionEntity savedOrgAcctRestriction = noteCreditsOrgAccountRestrictionRepository.save(orgAcctRestrictionToSave);
+        savedNoteCredits.setNoteCreditOrgAccountRestrictionEntity(savedOrgAcctRestriction);
+
         return savedNoteCredits;
     }
 

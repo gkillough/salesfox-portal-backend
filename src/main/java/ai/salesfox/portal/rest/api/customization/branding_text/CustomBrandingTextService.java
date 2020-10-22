@@ -6,8 +6,6 @@ import ai.salesfox.portal.database.customization.branding_text.CustomBrandingTex
 import ai.salesfox.portal.database.customization.branding_text.CustomBrandingTextRepository;
 import ai.salesfox.portal.database.customization.branding_text.restriction.CustomBrandingTextOrgAccountRestrictionEntity;
 import ai.salesfox.portal.database.customization.branding_text.restriction.CustomBrandingTextOrgAccountRestrictionRepository;
-import ai.salesfox.portal.database.customization.branding_text.restriction.CustomBrandingTextUserRestrictionEntity;
-import ai.salesfox.portal.database.customization.branding_text.restriction.CustomBrandingTextUserRestrictionRepository;
 import ai.salesfox.portal.database.gift.customization.GiftCustomTextDetailEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomTextDetailRepository;
 import ai.salesfox.portal.database.gift.tracking.GiftTrackingEntity;
@@ -39,18 +37,15 @@ public class CustomBrandingTextService {
 
     private final CustomBrandingTextRepository customBrandingTextRepository;
     private final CustomBrandingTextOrgAccountRestrictionRepository customBrandingTextOrgAcctRestrictionRepository;
-    private final CustomBrandingTextUserRestrictionRepository customBrandingTextUserRestrictionRepository;
     private final GiftTrackingRepository giftTrackingRepository;
     private final GiftCustomTextDetailRepository giftCustomTextDetailRepository;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
-    public CustomBrandingTextService(CustomBrandingTextRepository customBrandingTextRepository,
-                                     CustomBrandingTextOrgAccountRestrictionRepository customBrandingTextOrgAcctRestrictionRepository, CustomBrandingTextUserRestrictionRepository customBrandingTextUserRestrictionRepository,
+    public CustomBrandingTextService(CustomBrandingTextRepository customBrandingTextRepository, CustomBrandingTextOrgAccountRestrictionRepository customBrandingTextOrgAcctRestrictionRepository,
                                      GiftTrackingRepository giftTrackingRepository, GiftCustomTextDetailRepository giftCustomTextDetailRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
         this.customBrandingTextRepository = customBrandingTextRepository;
         this.customBrandingTextOrgAcctRestrictionRepository = customBrandingTextOrgAcctRestrictionRepository;
-        this.customBrandingTextUserRestrictionRepository = customBrandingTextUserRestrictionRepository;
         this.giftTrackingRepository = giftTrackingRepository;
         this.giftCustomTextDetailRepository = giftCustomTextDetailRepository;
         this.membershipRetrievalService = membershipRetrievalService;
@@ -86,16 +81,10 @@ public class CustomBrandingTextService {
         CustomBrandingTextEntity entityToSave = new CustomBrandingTextEntity(null, requestModel.getCustomBrandingText(), loggedInUser.getUserId(), true);
         CustomBrandingTextEntity savedEntity = customBrandingTextRepository.save(entityToSave);
 
-        if (membershipRetrievalService.isAuthenticateUserBasicOrPremiumMember()) {
-            CustomBrandingTextUserRestrictionEntity userRestrictionToSave = new CustomBrandingTextUserRestrictionEntity(savedEntity.getCustomBrandingTextId(), loggedInUser.getUserId());
-            CustomBrandingTextUserRestrictionEntity savedUserRestriction = customBrandingTextUserRestrictionRepository.save(userRestrictionToSave);
-            savedEntity.setCustomBrandingTextUserRestrictionEntity(savedUserRestriction);
-        } else {
-            MembershipEntity userMembership = loggedInUser.getMembershipEntity();
-            CustomBrandingTextOrgAccountRestrictionEntity orgAcctRestrictionToSave = new CustomBrandingTextOrgAccountRestrictionEntity(savedEntity.getCustomBrandingTextId(), userMembership.getOrganizationAccountId());
-            CustomBrandingTextOrgAccountRestrictionEntity savedOrgAcctRestriction = customBrandingTextOrgAcctRestrictionRepository.save(orgAcctRestrictionToSave);
-            savedEntity.setCustomBrandingTextOrgAccountRestrictionEntity(savedOrgAcctRestriction);
-        }
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
+        CustomBrandingTextOrgAccountRestrictionEntity orgAcctRestrictionToSave = new CustomBrandingTextOrgAccountRestrictionEntity(savedEntity.getCustomBrandingTextId(), userMembership.getOrganizationAccountId());
+        CustomBrandingTextOrgAccountRestrictionEntity savedOrgAcctRestriction = customBrandingTextOrgAcctRestrictionRepository.save(orgAcctRestrictionToSave);
+        savedEntity.setCustomBrandingTextOrgAccountRestrictionEntity(savedOrgAcctRestriction);
 
         savedEntity.setUploaderEntity(loggedInUser);
         return createResponseModel(savedEntity);
@@ -137,7 +126,7 @@ public class CustomBrandingTextService {
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
-        return customBrandingTextRepository.findAccessibleCustomBrandingTexts(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), pageRequest);
+        return customBrandingTextRepository.findAccessibleCustomBrandingTexts(userMembership.getOrganizationAccountId(), pageRequest);
     }
 
     private void validateAccess(CustomBrandingTextEntity customBrandingTextEntity) {
@@ -148,11 +137,8 @@ public class CustomBrandingTextService {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
 
-        CustomBrandingTextUserRestrictionEntity userRestriction = customBrandingTextEntity.getCustomBrandingTextUserRestrictionEntity();
         CustomBrandingTextOrgAccountRestrictionEntity orgAcctRestriction = customBrandingTextEntity.getCustomBrandingTextOrgAccountRestrictionEntity();
-        if (null != userRestriction && userRestriction.getUserId().equals(loggedInUser.getUserId())) {
-            return;
-        } else if (null != orgAcctRestriction && orgAcctRestriction.getOrgAccountId().equals(userMembership.getOrganizationAccountId())) {
+        if (null != orgAcctRestriction && orgAcctRestriction.getOrgAccountId().equals(userMembership.getOrganizationAccountId())) {
             return;
         }
         throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -192,9 +178,6 @@ public class CustomBrandingTextService {
         Optional.ofNullable(entity.getCustomBrandingTextOrgAccountRestrictionEntity())
                 .map(CustomBrandingTextOrgAccountRestrictionEntity::getOrgAccountId)
                 .ifPresent(restrictionModel::setOrganizationAccountId);
-        Optional.ofNullable(entity.getCustomBrandingTextUserRestrictionEntity())
-                .map(CustomBrandingTextUserRestrictionEntity::getUserId)
-                .ifPresent(restrictionModel::setUserId);
         return new CustomBrandingTextResponseModel(entity.getCustomBrandingTextId(), entity.getCustomBrandingText(), uploaderModel, entity.getIsActive(), restrictionModel);
     }
 

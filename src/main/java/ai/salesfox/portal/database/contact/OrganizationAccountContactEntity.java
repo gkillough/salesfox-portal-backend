@@ -3,8 +3,6 @@ package ai.salesfox.portal.database.contact;
 import ai.salesfox.portal.database.contact.address.OrganizationAccountContactAddressEntity;
 import ai.salesfox.portal.database.contact.profile.OrganizationAccountContactProfileEntity;
 import ai.salesfox.portal.database.contact.restriction.ContactOrganizationAccountRestrictionEntity;
-import ai.salesfox.portal.database.contact.restriction.ContactUserRestrictionEntity;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +13,6 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "organization_account_contacts")
 public class OrganizationAccountContactEntity implements Serializable, Contactable {
@@ -38,10 +35,6 @@ public class OrganizationAccountContactEntity implements Serializable, Contactab
     @OneToOne
     @JoinColumn(name = "contact_id", referencedColumnName = "contact_id", insertable = false, updatable = false)
     private ContactOrganizationAccountRestrictionEntity contactOrganizationAccountRestrictionEntity;
-
-    @OneToOne
-    @JoinColumn(name = "contact_id", referencedColumnName = "contact_id", insertable = false, updatable = false)
-    private ContactUserRestrictionEntity contactUserRestrictionEntity;
 
     @OneToOne
     @JoinColumn(name = "contact_id", referencedColumnName = "contact_id", insertable = false, updatable = false)
