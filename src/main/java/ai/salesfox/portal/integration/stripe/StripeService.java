@@ -1,9 +1,9 @@
 package ai.salesfox.portal.integration.stripe;
 
+import ai.salesfox.portal.integration.stripe.configuration.StripeConfiguration;
 import com.stripe.Stripe;
 import com.stripe.model.Charge;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -11,9 +11,8 @@ import java.util.Map;
 
 @Component
 public class StripeService {
-
-    @Value("${stripe.key.secret}")
-    private String API_SECRET_KEY;
+    StripeConfiguration stripeConfiguration;
+    private String API_SECRET_KEY = stripeConfiguration.getStripeSecretKey();
 
     @Autowired
     public StripeService() {
