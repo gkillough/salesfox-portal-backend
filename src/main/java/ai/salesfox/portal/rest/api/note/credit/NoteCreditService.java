@@ -3,10 +3,13 @@ package ai.salesfox.portal.rest.api.note.credit;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.note.credit.*;
+import ai.salesfox.portal.integration.stripe.StripeService;
 import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
 import ai.salesfox.portal.rest.api.note.credit.model.NoteCreditsRequestModel;
 import ai.salesfox.portal.rest.api.note.credit.model.NoteCreditsResponseModel;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
+import com.stripe.model.Charge;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -18,16 +21,25 @@ import java.util.UUID;
 
 @Component
 public class NoteCreditService {
+    // FIXME determine how to set this programmatically at runtime
+    public static final double NOTE_CREDIT_PRICE = 4.00;
+
     private final NoteCreditsRepository noteCreditsRepository;
     private final NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final StripeService stripeService;
 
     @Autowired
-    public NoteCreditService(NoteCreditsRepository noteCreditsRepository, NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository,
-                             HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+    public NoteCreditService(
+            NoteCreditsRepository noteCreditsRepository,
+            NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository,
+            HttpSafeUserMembershipRetrievalService membershipRetrievalService,
+            StripeService stripeService
+    ) {
         this.noteCreditsRepository = noteCreditsRepository;
         this.noteCreditsOrgAccountRestrictionRepository = noteCreditsOrgAccountRestrictionRepository;
         this.membershipRetrievalService = membershipRetrievalService;
+        this.stripeService = stripeService;
     }
 
     public NoteCreditsResponseModel getCredits() {
@@ -38,7 +50,6 @@ public class NoteCreditService {
     @Transactional
     public void orderCredits(NoteCreditsRequestModel requestModel) {
         NoteCreditsEntity foundNoteCredits = findNoteCredits();
-
         Integer requestedQuantity = requestModel.getQuantity();
         if (null == requestedQuantity) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'quantity' is required");
@@ -46,9 +57,25 @@ public class NoteCreditService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The requested quantity must be greater than zero");
         }
 
-        int newQuantity = foundNoteCredits.getAvailableCredits() + requestedQuantity;
-        foundNoteCredits.setAvailableCredits(newQuantity);
-        noteCreditsRepository.save(foundNoteCredits);
+        String stripeChargeToken = requestModel.getStripeChargeToken();
+        if (StringUtils.isBlank(stripeChargeToken)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'stripeChargeToken' is required");
+        }
+
+        Charge charge;
+        try {
+            charge = stripeService.chargeNewCard(stripeChargeToken, requestedQuantity * NOTE_CREDIT_PRICE);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid card or insufficient funds");
+        }
+
+        if (charge == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There was a problem processing the payment");
+        } else {
+            int newQuantity = foundNoteCredits.getAvailableCredits() + requestedQuantity;
+            foundNoteCredits.setAvailableCredits(newQuantity);
+            noteCreditsRepository.save(foundNoteCredits);
+        }
     }
 
     private NoteCreditsEntity findNoteCredits() {

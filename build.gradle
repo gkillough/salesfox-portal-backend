@@ -70,9 +70,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
-    // Utilities
+    // Utilities & Integrations
     implementation platform('software.amazon.awssdk:bom:2.15.2')
     implementation 'software.amazon.awssdk:s3'
+
+    implementation "com.stripe:stripe-java:20.14.0"
 
     implementation 'org.freemarker:freemarker:2.3.30'
     implementation 'javax.mail:javax.mail-api:1.6.2'
