@@ -8,6 +8,7 @@ import ai.salesfox.portal.database.license.OrganizationAccountLicenseEntity;
 import ai.salesfox.portal.database.license.OrganizationAccountLicenseRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
+import ai.salesfox.portal.event.license.organization.OrganizationAccountLicenseChangedEventPublisher;
 import ai.salesfox.portal.rest.api.license.organization.model.OrganizationAccountLicenseResponseModel;
 import ai.salesfox.portal.rest.api.license.organization.model.OrganizationAccountLicenseTypeUpdateRequestModel;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
@@ -27,14 +28,21 @@ public class OrganizationAccountLicenseService {
     private final OrganizationAccountLicenseRepository orgAcctLicenseRepository;
     private final LicenseTypeRepository licenseTypeRepository;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final OrganizationAccountLicenseChangedEventPublisher orgAccountLicenseChangedEventPublisher;
 
     @Autowired
-    public OrganizationAccountLicenseService(OrganizationAccountRepository organizationAccountRepository, OrganizationAccountLicenseRepository orgAcctLicenseRepository, LicenseTypeRepository licenseTypeRepository,
-                                             HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+    public OrganizationAccountLicenseService(
+            OrganizationAccountRepository organizationAccountRepository,
+            OrganizationAccountLicenseRepository orgAcctLicenseRepository,
+            LicenseTypeRepository licenseTypeRepository,
+            HttpSafeUserMembershipRetrievalService membershipRetrievalService,
+            OrganizationAccountLicenseChangedEventPublisher orgAccountLicenseChangedEventPublisher
+    ) {
         this.organizationAccountRepository = organizationAccountRepository;
         this.orgAcctLicenseRepository = orgAcctLicenseRepository;
         this.licenseTypeRepository = licenseTypeRepository;
         this.membershipRetrievalService = membershipRetrievalService;
+        this.orgAccountLicenseChangedEventPublisher = orgAccountLicenseChangedEventPublisher;
     }
 
     public OrganizationAccountLicenseResponseModel getLicense(UUID orgAcctId) {
@@ -56,8 +64,12 @@ public class OrganizationAccountLicenseService {
         }
 
         OrganizationAccountLicenseEntity orgAcctLicense = findOrgAcctLicense(foundOrgAcct);
+        UUID previousLicenseTypeId = UUID.fromString(orgAcctLicense.getLicenseTypeId().toString());
+
         orgAcctLicense.setLicenseTypeId(requestModel.getLicenseTypeId());
         orgAcctLicenseRepository.save(orgAcctLicense);
+
+        orgAccountLicenseChangedEventPublisher.fireOrgAccountLicenseChangedEvent(orgAcctLicense.getOrganizationAccountId(), previousLicenseTypeId, orgAcctLicense.getActiveUsers(), orgAcctLicense.getIsActive());
     }
 
     private OrganizationAccountEntity findOrgAcct(UUID orgAcctId) {

@@ -1,4 +1,4 @@
-package ai.salesfox.portal.event;
+package ai.salesfox.portal.event.gift;
 
 import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
 import ai.salesfox.portal.common.exception.PortalRuntimeException;
@@ -12,14 +12,16 @@ import ai.salesfox.portal.database.gift.GiftRepository;
 import ai.salesfox.portal.integration.GiftPartnerSubmissionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.List;
 
 @Slf4j
 @Component
-public class GiftSubmittedEventListener implements ApplicationListener<GiftSubmittedEvent> {
+public class GiftSubmittedEventListener {
     private final UserRepository userRepository;
     private final GiftRepository giftRepository;
     private final GiftPartnerSubmissionService giftPartnerSubmissionService;
@@ -36,8 +38,9 @@ public class GiftSubmittedEventListener implements ApplicationListener<GiftSubmi
         this.emailMessagingService = emailMessagingService;
     }
 
-    @Override
-    public void onApplicationEvent(GiftSubmittedEvent event) {
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMPLETION, fallbackExecution = true)
+    public void onGiftSubmitted(GiftSubmittedEvent event) {
         UserEntity submittingUser = userRepository.findById(event.getSubmittingUserId())
                 .orElseThrow(() -> new PortalRuntimeException("Unable to find a submittingUser for the gift event. This is a bug."));
         GiftEntity gift = giftRepository.findById(event.getGiftId())

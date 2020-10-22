@@ -9,6 +9,7 @@ import ai.salesfox.portal.database.license.OrganizationAccountLicenseEntity;
 import ai.salesfox.portal.database.license.OrganizationAccountLicenseRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
+import ai.salesfox.portal.event.license.organization.OrganizationAccountLicenseChangedEventPublisher;
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import ai.salesfox.portal.rest.api.user.active.UserActiveService;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
@@ -33,16 +34,25 @@ public class OrganizationActivationService {
     private final OrganizationAccountRepository organizationAccountRepository;
     private final OrganizationAccountLicenseRepository organizationAccountLicenseRepository;
     private final UserActiveService userActiveService;
+    private final OrganizationAccountLicenseChangedEventPublisher orgAccountLicenseChangedEventPublisher;
 
     @Autowired
-    public OrganizationActivationService(HttpSafeUserMembershipRetrievalService membershipRetrievalService, MembershipRepository membershipRepository, UserRepository userRepository,
-                                         OrganizationAccountRepository organizationAccountRepository, OrganizationAccountLicenseRepository organizationAccountLicenseRepository, UserActiveService userActiveService) {
+    public OrganizationActivationService(
+            HttpSafeUserMembershipRetrievalService membershipRetrievalService,
+            MembershipRepository membershipRepository,
+            UserRepository userRepository,
+            OrganizationAccountRepository organizationAccountRepository,
+            OrganizationAccountLicenseRepository organizationAccountLicenseRepository,
+            UserActiveService userActiveService,
+            OrganizationAccountLicenseChangedEventPublisher orgAccountLicenseChangedEventPublisher
+    ) {
         this.membershipRetrievalService = membershipRetrievalService;
         this.membershipRepository = membershipRepository;
         this.userRepository = userRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.organizationAccountLicenseRepository = organizationAccountLicenseRepository;
         this.userActiveService = userActiveService;
+        this.orgAccountLicenseChangedEventPublisher = orgAccountLicenseChangedEventPublisher;
     }
 
     @Transactional
@@ -89,12 +99,13 @@ public class OrganizationActivationService {
         }
     }
 
-    // TODO update billing information
     private void setActiveStatusForLicense(OrganizationAccountEntity organizationAccount, boolean activeStatus) {
         OrganizationAccountLicenseEntity orgAcctLicense = organizationAccount.getOrganizationAccountLicenseEntity();
         orgAcctLicense.setIsActive(activeStatus);
         OrganizationAccountLicenseEntity savedOrgAcctLicense = organizationAccountLicenseRepository.save(orgAcctLicense);
         organizationAccount.setOrganizationAccountLicenseEntity(savedOrgAcctLicense);
+
+        orgAccountLicenseChangedEventPublisher.fireOrgAccountLicenseChangedEvent(organizationAccount.getOrganizationAccountId(), orgAcctLicense.getLicenseTypeId(), orgAcctLicense.getActiveUsers(), !activeStatus);
     }
 
 }

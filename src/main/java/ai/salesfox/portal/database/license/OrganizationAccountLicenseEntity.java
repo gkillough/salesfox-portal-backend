@@ -1,5 +1,6 @@
 package ai.salesfox.portal.database.license;
 
+import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,6 +29,9 @@ public class OrganizationAccountLicenseEntity {
 
     @Column(name = "is_active")
     private Boolean isActive;
+
+    @OneToOne(mappedBy = "organizationAccountLicenseEntity")
+    private OrganizationAccountEntity organizationAccountEntity;
 
     @OneToOne
     @JoinColumn(name = "license_type_id", referencedColumnName = "license_type_id", updatable = false, insertable = false)
