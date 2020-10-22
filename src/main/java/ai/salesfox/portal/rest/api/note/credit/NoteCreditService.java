@@ -59,7 +59,7 @@ public class NoteCreditService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid card or insufficient funds");
         }
         if (charge == null) {
-            new ResponseStatusException(HttpStatus.BAD_REQUEST, "There was a problem processing the payment");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There was a problem processing the payment");
         } else {
             int newQuantity = foundNoteCredits.getAvailableCredits() + requestedQuantity;
             foundNoteCredits.setAvailableCredits(newQuantity);

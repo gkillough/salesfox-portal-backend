@@ -11,7 +11,7 @@ import org.springframework.context.annotation.PropertySource;
 public class StripeConfiguration {
     public static final String STRIPE_CONFIGURATION_FILE_NAME = "stripe.properties";
 
-    @Value("${stripe.key.secret}")
+    @Value("${ai.salesfox.portal.integration.stripe.key.secret:}")
     private String stripeSecretKey;
 
 }
