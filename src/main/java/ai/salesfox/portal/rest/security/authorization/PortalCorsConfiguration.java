@@ -22,6 +22,7 @@ public class PortalCorsConfiguration {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
         corsConfiguration.setAllowedOrigins(getAllowedOrigins());
+        corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setAllowedHeaders(List.of(CorsConfiguration.ALL));
         corsConfiguration.setAllowedMethods(
                 List.of(
