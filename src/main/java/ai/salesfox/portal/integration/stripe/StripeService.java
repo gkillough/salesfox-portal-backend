@@ -12,7 +12,6 @@ import java.util.Map;
 
 @Component
 public class StripeService {
-
     private final StripeConfiguration stripeConfiguration;
 
     @Autowired
@@ -27,8 +26,7 @@ public class StripeService {
             chargeParams.put("amount", (int) (amount * 100));
             chargeParams.put("currency", "USD");
             chargeParams.put("source", token);
-            Charge charge = Charge.create(chargeParams);
-            return charge;
+            return Charge.create(chargeParams);
         } catch (Exception e) {
             throw new PortalException("Stripe was unable to charge this payment method");
         }

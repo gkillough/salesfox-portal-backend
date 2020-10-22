@@ -9,6 +9,7 @@ import ai.salesfox.portal.rest.api.note.credit.model.NoteCreditsRequestModel;
 import ai.salesfox.portal.rest.api.note.credit.model.NoteCreditsResponseModel;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import com.stripe.model.Charge;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -20,15 +21,21 @@ import java.util.UUID;
 
 @Component
 public class NoteCreditService {
+    // FIXME determine how to set this programmatically at runtime
+    public static final double NOTE_CREDIT_PRICE = 4.00;
+
     private final NoteCreditsRepository noteCreditsRepository;
     private final NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
     private final StripeService stripeService;
-    public static final double NOTE_CREDIT_PRICE = 4.00;
 
     @Autowired
-    public NoteCreditService(NoteCreditsRepository noteCreditsRepository, NoteCreditsUserRestrictionRepository noteCreditsUserRestrictionRepository, NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository,
-                             HttpSafeUserMembershipRetrievalService membershipRetrievalService, StripeService stripeService) {
+    public NoteCreditService(
+            NoteCreditsRepository noteCreditsRepository,
+            NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository,
+            HttpSafeUserMembershipRetrievalService membershipRetrievalService,
+            StripeService stripeService
+    ) {
         this.noteCreditsRepository = noteCreditsRepository;
         this.noteCreditsOrgAccountRestrictionRepository = noteCreditsOrgAccountRestrictionRepository;
         this.membershipRetrievalService = membershipRetrievalService;
@@ -43,19 +50,25 @@ public class NoteCreditService {
     @Transactional
     public void orderCredits(NoteCreditsRequestModel requestModel) {
         NoteCreditsEntity foundNoteCredits = findNoteCredits();
-        String token = requestModel.getStripeChargeToken();
-        Charge charge;
         Integer requestedQuantity = requestModel.getQuantity();
         if (null == requestedQuantity) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'quantity' is required");
         } else if (requestedQuantity < 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The requested quantity must be greater than zero");
         }
+
+        String stripeChargeToken = requestModel.getStripeChargeToken();
+        if (StringUtils.isBlank(stripeChargeToken)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'stripeChargeToken' is required");
+        }
+
+        Charge charge;
         try {
-            charge = stripeService.chargeNewCard(token, requestedQuantity * NOTE_CREDIT_PRICE);
+            charge = stripeService.chargeNewCard(stripeChargeToken, requestedQuantity * NOTE_CREDIT_PRICE);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid card or insufficient funds");
         }
+
         if (charge == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There was a problem processing the payment");
         } else {
@@ -63,7 +76,6 @@ public class NoteCreditService {
             foundNoteCredits.setAvailableCredits(newQuantity);
             noteCreditsRepository.save(foundNoteCredits);
         }
-
     }
 
     private NoteCreditsEntity findNoteCredits() {
