@@ -153,7 +153,7 @@ public class ScribelessCampaignRequestModelCreator {
         UserEntity requestingUser = gift.getRequestingUserEntity();
         UserAddressEntity requestingUserAddress = userAddressRepository.findById(requestingUser.getUserId())
                 .filter(this::isValidAddress)
-                .orElseThrow(() -> new SalesfoxException("The requesting Salesfox user does not have an address"));
+                .orElseThrow(() -> new SalesfoxException("The requesting Salesfox user does not have a valid address"));
         return createAddressModel(requestingUser.getFirstName(), requestingUser.getLastName(), requestingUserAddress);
     }
 
