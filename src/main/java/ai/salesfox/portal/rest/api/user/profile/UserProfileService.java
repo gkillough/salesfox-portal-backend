@@ -172,7 +172,7 @@ public class UserProfileService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid mobile number");
         } else if (!FieldValidationUtils.isValidUSPhoneNumber(updateModel.getBusinessNumber(), true)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid business number");
-        } else if (!FieldValidationUtils.isValidUSAddress(updateModel.getAddress(), true)) {
+        } else if (!FieldValidationUtils.isValidUSAddress(updateModel.getAddress(), false)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid address");
         }
     }
