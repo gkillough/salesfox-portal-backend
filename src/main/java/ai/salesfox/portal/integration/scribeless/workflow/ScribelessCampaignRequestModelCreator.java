@@ -5,6 +5,8 @@ import ai.salesfox.integration.scribeless.enumeration.ScribelessProductType;
 import ai.salesfox.integration.scribeless.model.ScribelessAddressModel;
 import ai.salesfox.integration.scribeless.service.campaign.model.CampaignCreationRequestModel;
 import ai.salesfox.integration.scribeless.service.campaign.model.CampaignUpdateRequestModel;
+import ai.salesfox.portal.common.FieldValidationUtils;
+import ai.salesfox.portal.common.model.PortalAddressModel;
 import ai.salesfox.portal.database.account.entity.UserAddressEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserAddressRepository;
@@ -109,6 +111,7 @@ public class ScribelessCampaignRequestModelCreator {
         return new CampaignCreationRequestHolder(creationRequestModel, firstPageOfRecipients, pageRequest -> giftRecipientRepository.findByGiftId(giftId, pageRequest));
     }
 
+    // TODO consider validating addresses before creating an update request model and emailing the gift creator
     public CampaignUpdateRequestModel createUpdateRequestModel(Streamable<GiftRecipientEntity> giftRecipients) {
         Set<UUID> contactIds = giftRecipients
                 .stream()
@@ -149,6 +152,7 @@ public class ScribelessCampaignRequestModelCreator {
     private ScribelessAddressModel retrieveReturnAddress(GiftEntity gift) throws SalesfoxException {
         UserEntity requestingUser = gift.getRequestingUserEntity();
         UserAddressEntity requestingUserAddress = userAddressRepository.findById(requestingUser.getUserId())
+                .filter(this::isValidAddress)
                 .orElseThrow(() -> new SalesfoxException("The requesting Salesfox user does not have an address"));
         return createAddressModel(requestingUser.getFirstName(), requestingUser.getLastName(), requestingUserAddress);
     }
@@ -178,6 +182,11 @@ public class ScribelessCampaignRequestModelCreator {
         }
         return customIconRepository.findById(giftCustomIconDetail.getCustomIconId())
                 .map(CustomIconEntity::getIconUrl);
+    }
+
+    private boolean isValidAddress(AbstractAddressEntity addressEntity) {
+        PortalAddressModel portalAddressModel = PortalAddressModel.fromEntity(addressEntity);
+        return FieldValidationUtils.isValidUSAddress(portalAddressModel, false);
     }
 
 }

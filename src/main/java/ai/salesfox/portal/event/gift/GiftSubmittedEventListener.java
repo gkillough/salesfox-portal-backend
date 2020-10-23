@@ -1,5 +1,6 @@
 package ai.salesfox.portal.event.gift;
 
+import ai.salesfox.integration.common.exception.SalesfoxException;
 import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
 import ai.salesfox.portal.common.exception.PortalRuntimeException;
 import ai.salesfox.portal.common.service.email.EmailMessagingService;
@@ -48,18 +49,19 @@ public class GiftSubmittedEventListener {
 
         try {
             giftPartnerSubmissionService.submitGiftToPartners(gift, submittingUser);
-        } catch (Exception e) {
-            log.debug("There was a problem submitting the gift to Salesfox gifting partner(s)", e);
+        } catch (SalesfoxException salesfoxException) {
+            log.debug("There was a problem submitting the gift to Salesfox gifting partner(s)", salesfoxException);
             giftTrackingService.updateGiftTrackingInfo(gift, submittingUser, GiftTrackingStatus.NOT_FULFILLABLE);
-            sendEmailForException(submittingUser, gift);
+            sendEmailForException(submittingUser, gift, salesfoxException.getMessage());
         }
     }
 
-    private void sendEmailForException(UserEntity submittingUser, GiftEntity gift) {
+    private void sendEmailForException(UserEntity submittingUser, GiftEntity gift, String exceptionMessage) {
         try {
             String primaryMessage = String.format("Gift ID: %s <br/>" +
                     "There was a problem fulfilling the gift request.<br/>" +
-                    "Please login to Salesfox for more information or contact support.", gift.getGiftId()
+                    "Please login to Salesfox for more information or contact support.<br/>" +
+                    "Error message: %s", gift.getGiftId(), exceptionMessage
             );
             EmailMessageModel errorEmail = new EmailMessageModel(List.of(submittingUser.getEmail()), "[Salesfox] Distribution Failure", "Distribution Failure", primaryMessage);
             emailMessagingService.sendMessage(errorEmail);
