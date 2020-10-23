@@ -1,7 +1,7 @@
 package ai.salesfox.portal.common.service.contact;
 
-import ai.salesfox.portal.rest.api.contact.model.ContactUploadModel;
 import ai.salesfox.portal.common.FieldValidationUtils;
+import ai.salesfox.portal.rest.api.contact.model.ContactUploadModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -33,7 +33,7 @@ public class ContactFieldValidationUtils {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The email is in an invalid format");
         }
 
-        if (!FieldValidationUtils.isValidUSAddress(contactUpdateModel.getAddress(), true)) {
+        if (!FieldValidationUtils.isValidUSAddress(contactUpdateModel.getAddress(), false)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The address is invalid");
         }
 

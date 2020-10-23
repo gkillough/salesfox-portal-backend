@@ -36,7 +36,10 @@ public class FieldValidationUtils {
     }
 
     public static boolean isValidUSAddress(PortalAddressModel addressModel, boolean allowBlank) {
-        return isValidUSState(addressModel.getState(), allowBlank) && isValidUSZipCode(addressModel.getZipCode(), allowBlank);
+        return isNotBlank(addressModel.getAddressLine1(), allowBlank)
+                && isNotBlank(addressModel.getCity(), allowBlank)
+                && isValidUSState(addressModel.getState(), allowBlank)
+                && isValidUSZipCode(addressModel.getZipCode(), allowBlank);
     }
 
     public static boolean isValidUSState(String state, boolean allowBlank) {
@@ -62,6 +65,10 @@ public class FieldValidationUtils {
 
     private static boolean isValidBlank(String str, boolean allowBlank) {
         return allowBlank && StringUtils.isBlank(str);
+    }
+
+    private static boolean isNotBlank(String str, boolean allowBlank) {
+        return allowBlank || StringUtils.isNotBlank(str);
     }
 
 }
