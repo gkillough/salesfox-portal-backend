@@ -1,8 +1,15 @@
 databaseChangeLog:
+  # Released Changelogs
   - include:
-      file: db/changelog/changelog-master.yaml
+      file: all_previously_deployed_version/all_previously_deployed_versions_changelog.yaml
+      relativeToChangelogFile: true
+
+  # Latest (master) Changelog
+  - include:
+      file: db/changelog/changelog_latest.yaml
       relativeToChangelogFile: false
 
+  # Test Data
   - include:
       file: change_add_test_users_3_22_2020.yaml
       relativeToChangelogFile: true
