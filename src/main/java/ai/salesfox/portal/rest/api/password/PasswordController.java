@@ -24,13 +24,13 @@ public class PasswordController implements CsrfIgnorable, AnonymouslyAccessible 
     }
 
     @PostMapping(RESET_ENDPOINT)
-    public boolean resetPassword(@RequestBody ResetPasswordModel resetPasswordRequest) {
-        return passwordService.sendPasswordResetEmail(resetPasswordRequest);
+    public void resetPassword(@RequestBody ResetPasswordModel resetPasswordRequest) {
+        passwordService.sendPasswordResetEmail(resetPasswordRequest);
     }
 
     @GetMapping(GRANT_UPDATE_PERMISSION_ENDPOINT)
-    public boolean grantUpdatePasswordPermission(HttpServletResponse response, @RequestParam("email") String emailRequestParam, @RequestParam("token") String tokenRequestParam) {
-        return passwordService.validateToken(response, emailRequestParam, tokenRequestParam);
+    public void grantUpdatePasswordPermission(HttpServletResponse response, @RequestParam("email") String emailRequestParam, @RequestParam("token") String tokenRequestParam) {
+        passwordService.validateToken(response, emailRequestParam, tokenRequestParam);
     }
 
     @PostMapping(UPDATE_ENDPOINT)
@@ -50,8 +50,7 @@ public class PasswordController implements CsrfIgnorable, AnonymouslyAccessible 
     @Override
     public String[] csrfIgnorableApiAntMatchers() {
         return new String[] {
-                PasswordController.RESET_ENDPOINT,
-                PasswordController.UPDATE_ENDPOINT
+                PasswordController.RESET_ENDPOINT
         };
     }
 

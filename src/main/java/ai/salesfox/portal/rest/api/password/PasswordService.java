@@ -19,6 +19,7 @@ import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -49,10 +51,15 @@ public class PasswordService {
     private final EmailMessagingService emailMessagingService;
 
     @Autowired
-    public PasswordService(PortalConfiguration portalConfiguration, PasswordResetTokenRepository passwordResetTokenRepository,
-                           UserRepository userRepository, LoginRepository loginRepository,
-                           PortalUserDetailsService userDetailsService, PasswordEncoder passwordEncoder,
-                           EmailMessagingService emailMessagingService) {
+    public PasswordService(
+            PortalConfiguration portalConfiguration,
+            PasswordResetTokenRepository passwordResetTokenRepository,
+            UserRepository userRepository,
+            LoginRepository loginRepository,
+            PortalUserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder,
+            EmailMessagingService emailMessagingService
+    ) {
         this.portalConfiguration = portalConfiguration;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.userRepository = userRepository;
@@ -62,35 +69,31 @@ public class PasswordService {
         this.emailMessagingService = emailMessagingService;
     }
 
-    public boolean sendPasswordResetEmail(ResetPasswordModel resetPasswordModel) {
+    public void sendPasswordResetEmail(ResetPasswordModel resetPasswordModel) {
         String email = resetPasswordModel.getEmail();
         if (StringUtils.isBlank(email)) {
-            log.error("The field 'email' cannot be blank");
-            return false;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'email' cannot be blank");
         }
 
         Optional<UserEntity> optionalUser = userRepository.findFirstByEmail(email);
         if (!optionalUser.isPresent()) {
-            log.error("No user with that email exists");
-            return false;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No user with that email exists");
         }
 
         String passwordResetToken = UUID.randomUUID().toString();
         PasswordResetTokenEntity passwordResetTokenToSave = new PasswordResetTokenEntity(email, passwordResetToken, PortalDateTimeUtils.getCurrentDateTime());
         passwordResetTokenRepository.save(passwordResetTokenToSave);
 
-        return sendPasswordResetEmail(email, passwordResetToken);
+        sendPasswordResetEmail(email, passwordResetToken);
     }
 
-    public boolean validateToken(HttpServletResponse response, String email, String token) {
+    public void validateToken(HttpServletResponse response, String email, String token) {
         if (StringUtils.isBlank(email)) {
-            log.error("The parameter 'email' cannot be blank");
-            return false;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The parameter 'email' cannot be blank");
         }
 
         if (StringUtils.isBlank(token)) {
-            log.error("The parameter 'token' cannot be blank");
-            return false;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The parameter 'token' cannot be blank");
         }
         PasswordResetTokenPK passwordResetTokenPK = new PasswordResetTokenPK(email, token);
         Optional<OffsetDateTime> optionalTimeGenerated = passwordResetTokenRepository.findById(passwordResetTokenPK)
@@ -100,15 +103,15 @@ public class PasswordService {
             Duration timeSinceTokenGenerated = Duration.between(optionalTimeGenerated.get(), PortalDateTimeUtils.getCurrentDateTime());
             if (timeSinceTokenGenerated.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
                 grantResetPasswordAuthorityToUser(email);
-                response.setHeader("Location", PasswordController.UPDATE_ENDPOINT);
-                return true;
+
+                String frontEndLocation = String.format("%s%s", portalConfiguration.getPortalFrontEndUrl(), portalConfiguration.getFrontEndResetPasswordRoute());
+                response.setHeader("Location", frontEndLocation);
             } else {
-                log.error("The password reset token has expired");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The password reset token has expired");
             }
         } else {
-            log.error("No password reset entry for that email/token combination");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No password reset entry for that email/token combination");
         }
-        return false;
     }
 
     @Transactional
@@ -173,20 +176,17 @@ public class PasswordService {
         SecurityContextHolder.clearContext();
     }
 
-    private boolean sendPasswordResetEmail(String email, String passwordResetToken) {
+    private void sendPasswordResetEmail(String email, String passwordResetToken) {
         String passwordResetUrl = createResetPasswordLink(email, passwordResetToken);
 
-        log.info("*** REMOVE ME *** Password Reset Token: " + passwordResetToken);
-        log.info("*** REMOVE ME *** Password Reset URL: " + passwordResetUrl);
-
+        log.info("*** REMOVE ME *** Password Reset URL: {}", passwordResetUrl);
         EmailMessageModel emailMessage = createPasswordResetMessageModel(email, passwordResetUrl);
         try {
             emailMessagingService.sendMessage(emailMessage);
-            return true;
         } catch (PortalEmailException e) {
             log.error("Problem sending password reset email", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "There was a problem sending the email");
         }
-        return false;
     }
 
     private ButtonEmailMessageModel createPasswordResetMessageModel(String recipientEmail, String passwordResetUrl) {
@@ -201,8 +201,8 @@ public class PasswordService {
     }
 
     private String createResetPasswordLink(String email, String passwordResetToken) {
-        StringBuilder linkBuilder = new StringBuilder(portalConfiguration.getPortalBaseUrl());
-        linkBuilder.append(portalConfiguration.getResetPasswordLinkSpec());
+        StringBuilder linkBuilder = new StringBuilder(portalConfiguration.getPortalBackEndUrl());
+        linkBuilder.append(PasswordController.GRANT_UPDATE_PERMISSION_ENDPOINT);
         linkBuilder.append("?token=");
         linkBuilder.append(passwordResetToken);
         linkBuilder.append("&email=");

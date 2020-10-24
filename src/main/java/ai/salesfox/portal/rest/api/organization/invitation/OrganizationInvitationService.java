@@ -18,7 +18,6 @@ import ai.salesfox.portal.database.organization.account.invite.OrganizationAccou
 import ai.salesfox.portal.rest.api.organization.invitation.model.OrganizationAccountInvitationModel;
 import ai.salesfox.portal.rest.api.organization.invitation.model.OrganizationAssignableRolesModel;
 import ai.salesfox.portal.rest.api.password.PasswordService;
-import ai.salesfox.portal.rest.api.registration.RegistrationController;
 import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountUserRegistrationModel;
 import ai.salesfox.portal.rest.api.registration.user.UserRegistrationModel;
 import ai.salesfox.portal.rest.api.registration.user.UserRegistrationService;
@@ -117,7 +116,9 @@ public class OrganizationInvitationService {
         if (timeSinceTokenGenerated.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
             UserEntity tempUser = createUserAccountWithOrgAccountCreationRole(inviteTokenEntity);
             createUserSessionWithOrgAccountCreationPermission(tempUser);
-            response.setHeader("Location", RegistrationController.BASE_ENDPOINT + RegistrationController.ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX);
+
+            String frontEndLocation = String.format("%s%s", portalConfiguration.getPortalFrontEndUrl(), portalConfiguration.getFrontEndOrgAcctInviteRoute());
+            response.setHeader("Location", frontEndLocation);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your invitation has expired. Please contact your organization's account owner.");
         }
@@ -222,7 +223,6 @@ public class OrganizationInvitationService {
         String invitationUrl = createInvitationLink(email, invitationToken);
 
         log.info("*** REMOVE ME *** Invitation Link: {}", invitationUrl);
-
         EmailMessageModel emailMessage = createInvitationMessageModel(email, organizationAccountName, invitationUrl);
         try {
             emailMessagingService.sendMessage(emailMessage);
@@ -243,8 +243,8 @@ public class OrganizationInvitationService {
     }
 
     private String createInvitationLink(String email, String invitationToken) {
-        StringBuilder linkBuilder = new StringBuilder(portalConfiguration.getPortalBaseUrl());
-        linkBuilder.append(portalConfiguration.getInviteOrganizationAccountUserLinkSpec());
+        StringBuilder linkBuilder = new StringBuilder(portalConfiguration.getPortalBackEndUrl());
+        linkBuilder.append(OrganizationInvitationController.VALIDATE_INVITE_ENDPOINT);
         linkBuilder.append("?token=");
         linkBuilder.append(invitationToken);
         linkBuilder.append("&email=");
