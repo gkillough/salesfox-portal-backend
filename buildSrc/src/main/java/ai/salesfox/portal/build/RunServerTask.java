@@ -39,22 +39,22 @@ public class RunServerTask extends Exec {
         String projectPath = project.getProjectDir().getAbsolutePath();
         String buildDirectory = project.getBuildDir().getAbsolutePath();
 
+        Map runEnvironment = getEnvironment();
         Map<String, Object> envVars = new HashMap<>();
-        envVars.put("PORTAL_RESOURCE_BASE_DIR", String.format("%s/tmp", buildDirectory));
-        envVars.put("PORTAL_RESOURCE_ICON_DIR", String.format("%s/tmp", buildDirectory));
+        envVars.putIfAbsent("PORTAL_RESOURCE_BASE_DIR", String.format("%s/tmp", buildDirectory));
+        envVars.putIfAbsent("PORTAL_RESOURCE_ICON_DIR", String.format("%s/tmp", buildDirectory));
         envVars.put("PORTAL_RESOURCE_LOGO_PNG", String.format("%s/src/main/resources/images/salesfox_logo.png", projectPath));
 
-        envVars.put("PORTAL_SMTP_HOST", "smtp.gmail.com");
-        envVars.put("PORTAL_SMTP_PORT", 465);
-        envVars.put("PORTAL_SMTP_USER", "accounts@getboostr.com");
-        envVars.put("PORTAL_SMTP_PASSWORD", "yptjlvfodhkuxdly");
-        envVars.put("PORTAL_SMTP_FROM", "accounts@getboostr.com");
+        envVars.putIfAbsent("PORTAL_SMTP_HOST", "smtp.sendgrid.net");
+        envVars.putIfAbsent("PORTAL_SMTP_PORT", 465);
+        envVars.putIfAbsent("PORTAL_SMTP_USER", "apikey");
+        envVars.putIfAbsent("PORTAL_SMTP_FROM", "noreply@salesfox.ai");
 
-        envVars.put("PORTAL_SCRIBELESS_API_TESTING", true);
+        envVars.putIfAbsent("PORTAL_SCRIBELESS_API_TESTING", true);
 
-        envVars.put("PORTAL_CORS_ALLOWED_ORIGINS", "*");
+        envVars.putIfAbsent("PORTAL_CORS_ALLOWED_ORIGINS", "*");
 
-        getEnvironment().putAll(envVars);
+        runEnvironment.putAll(envVars);
 
         String version = (String) project.getVersion();
         File jarFile = new File(String.format("%s/libs/portal-%s.jar", buildDirectory, version));

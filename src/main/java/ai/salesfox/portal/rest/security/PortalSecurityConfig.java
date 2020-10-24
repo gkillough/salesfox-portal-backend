@@ -45,9 +45,15 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public PortalSecurityConfig(CsrfTokenRepository csrfTokenRepository, RoleRepository roleRepository,
-                                List<CsrfIgnorable> csrfIgnorables, List<AnonymouslyAccessible> anonymouslyAccessibles, List<AdminOnlyAccessible> adminOnlyAccessibles,
-                                PortalUserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public PortalSecurityConfig(
+            CsrfTokenRepository csrfTokenRepository,
+            RoleRepository roleRepository,
+            List<CsrfIgnorable> csrfIgnorables,
+            List<AnonymouslyAccessible> anonymouslyAccessibles,
+            List<AdminOnlyAccessible> adminOnlyAccessibles,
+            PortalUserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder
+    ) {
         this.csrfTokenRepository = csrfTokenRepository;
         this.roleRepository = roleRepository;
         this.csrfIgnorables = csrfIgnorables;

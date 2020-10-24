@@ -5,11 +5,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DefaultAllowedEndpoints implements AnonymouslyAccessible {
-    public static final String ROOT_ENDPOINT = "/";
     public static final String ERROR_ENDPOINT = "/error";
 
-    public static final String LOGIN_ENDPOINT = "/api/login";
-    public static final String LOGOUT_ENDPOINT = "/api/logout";
+    public static final String LOGIN_ENDPOINT = "/login";
+    public static final String LOGOUT_ENDPOINT = "/logout";
 
     public static final String STATIC_RESOURCES_DIR = "/static";
     public static final String STATIC_RESOURCES_CONTENTS = "/static/**";
@@ -31,10 +30,11 @@ public class DefaultAllowedEndpoints implements AnonymouslyAccessible {
     public static final String JPG_CONTENT = "/*.jpg";
     public static final String JPG_SUB_CONTENT = "/**/*.jpg";
 
+    // TODO consider removing most of this if the UI is hosted separately
+
     @Override
     public String[] anonymouslyAccessibleStaticResourceAntMatchers() {
         return new String[] {
-                ROOT_ENDPOINT,
                 ERROR_ENDPOINT,
 
                 STATIC_RESOURCES_DIR,
@@ -62,7 +62,6 @@ public class DefaultAllowedEndpoints implements AnonymouslyAccessible {
     public String[] anonymouslyAccessibleApiAntMatchers() {
         // TODO determine if these should be duplicated above
         return new String[] {
-                ROOT_ENDPOINT,
                 ERROR_ENDPOINT,
 
                 LOGIN_ENDPOINT,
