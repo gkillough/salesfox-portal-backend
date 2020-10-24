@@ -106,7 +106,7 @@ public class RunServerTask extends Exec {
                 "--embedded.postgresql.password=root",
                 "--embedded.postgresql.initScriptPath=file:buildSrc/src/main/resources/init_test_db.sql",
 
-                "--spring.liquibase.change-log=classpath:db/changelog/changes/test_data/development-master.yaml",
+                "--spring.liquibase.change-log=classpath:db/changelog/changes/test_data/test_data_master.yaml",
                 "--spring.liquibase.user=portaladmin",
                 "--spring.liquibase.password=Port@l!23",
 
