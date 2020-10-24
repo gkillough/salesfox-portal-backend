@@ -41,6 +41,9 @@ public class RunServerTask extends Exec {
 
         Map runEnvironment = getEnvironment();
         Map<String, Object> envVars = new HashMap<>();
+        envVars.putIfAbsent("PORTAL_BACK_END_URL", "http://localhost:8080");
+        envVars.putIfAbsent("PORTAL_FRONT_END_URL", "http://localhost:3000");
+
         envVars.putIfAbsent("PORTAL_RESOURCE_BASE_DIR", String.format("%s/tmp", buildDirectory));
         envVars.putIfAbsent("PORTAL_RESOURCE_ICON_DIR", String.format("%s/tmp", buildDirectory));
         envVars.put("PORTAL_RESOURCE_LOGO_PNG", String.format("%s/src/main/resources/images/salesfox_logo.png", projectPath));

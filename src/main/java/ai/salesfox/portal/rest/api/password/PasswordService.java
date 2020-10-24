@@ -106,6 +106,7 @@ public class PasswordService {
 
                 String frontEndLocation = String.format("%s%s", portalConfiguration.getPortalFrontEndUrl(), portalConfiguration.getFrontEndResetPasswordRoute());
                 response.setHeader("Location", frontEndLocation);
+                response.setStatus(HttpStatus.FOUND.value());
             } else {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The password reset token has expired");
             }
