@@ -2,7 +2,6 @@ package ai.salesfox.portal.rest.security;
 
 import ai.salesfox.portal.database.account.entity.RoleEntity;
 import ai.salesfox.portal.database.account.repository.RoleRepository;
-import ai.salesfox.portal.rest.RestApiPathConfig;
 import ai.salesfox.portal.rest.api.password.PasswordController;
 import ai.salesfox.portal.rest.api.registration.RegistrationController;
 import ai.salesfox.portal.rest.security.authentication.AnonymouslyAccessible;
@@ -14,6 +13,7 @@ import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import ai.salesfox.portal.rest.security.common.DefaultAllowedEndpoints;
 import ai.salesfox.portal.rest.security.common.SecurityInterface;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -45,9 +45,15 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public PortalSecurityConfig(CsrfTokenRepository csrfTokenRepository, RoleRepository roleRepository,
-                                List<CsrfIgnorable> csrfIgnorables, List<AnonymouslyAccessible> anonymouslyAccessibles, List<AdminOnlyAccessible> adminOnlyAccessibles,
-                                PortalUserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public PortalSecurityConfig(
+            CsrfTokenRepository csrfTokenRepository,
+            RoleRepository roleRepository,
+            List<CsrfIgnorable> csrfIgnorables,
+            List<AnonymouslyAccessible> anonymouslyAccessibles,
+            List<AdminOnlyAccessible> adminOnlyAccessibles,
+            PortalUserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder
+    ) {
         this.csrfTokenRepository = csrfTokenRepository;
         this.roleRepository = roleRepository;
         this.csrfIgnorables = csrfIgnorables;
@@ -158,23 +164,19 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private String[] collectCsrfIgnorableResources() {
-        return collectFlattenedApiStrings(csrfIgnorables, CsrfIgnorable::csrfIgnorableApiAntMatchers);
+        return collectFlattenedStrings(csrfIgnorables, CsrfIgnorable::csrfIgnorableApiAntMatchers);
     }
 
     private String[] collectAnonymouslyAccessibleResources() {
         String[] staticResourceEndpoints = collectFlattenedStrings(anonymouslyAccessibles, AnonymouslyAccessible::anonymouslyAccessibleStaticResourceAntMatchers);
-        String[] apiEndpoints = collectFlattenedApiStrings(anonymouslyAccessibles, AnonymouslyAccessible::anonymouslyAccessibleApiAntMatchers);
+        String[] apiEndpoints = collectFlattenedStrings(anonymouslyAccessibles, AnonymouslyAccessible::anonymouslyAccessibleApiAntMatchers);
         return ArrayUtils.addAll(staticResourceEndpoints, apiEndpoints);
     }
 
     private String[] collectAdminOnlyResources() {
         String[] staticResourceEndpoints = collectFlattenedStrings(adminOnlyAccessibles, AdminOnlyAccessible::adminOnlyStaticResourceAntMatchers);
-        String[] apiEndpoints = collectFlattenedApiStrings(adminOnlyAccessibles, AdminOnlyAccessible::adminOnlyApiAntMatchers);
+        String[] apiEndpoints = collectFlattenedStrings(adminOnlyAccessibles, AdminOnlyAccessible::adminOnlyApiAntMatchers);
         return ArrayUtils.addAll(staticResourceEndpoints, apiEndpoints);
-    }
-
-    private <T extends SecurityInterface> String[] collectFlattenedApiStrings(Collection<T> securityInterfaces, Function<T, String[]> stringExtractor) {
-        return collectFlattenedStrings(securityInterfaces, stringExtractor, RestApiPathConfig::addApiPrefix);
     }
 
     private <T extends SecurityInterface> String[] collectFlattenedStrings(Collection<T> securityInterfaces, Function<T, String[]> stringExtractor) {
@@ -186,6 +188,7 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
                 .stream()
                 .map(stringExtractor)
                 .flatMap(Arrays::stream)
+                .filter(StringUtils::isNotBlank)
                 .map(postProcessor)
                 .distinct()
                 .toArray(String[]::new);

@@ -1,11 +1,10 @@
 package ai.salesfox.portal.rest.api.organization.invitation;
 
+import ai.salesfox.portal.rest.api.organization.common.OrganizationEndpointConstants;
 import ai.salesfox.portal.rest.api.organization.invitation.model.OrganizationAccountInvitationModel;
 import ai.salesfox.portal.rest.api.organization.invitation.model.OrganizationAssignableRolesModel;
-import ai.salesfox.portal.rest.api.organization.common.OrganizationEndpointConstants;
 import ai.salesfox.portal.rest.security.authentication.AnonymouslyAccessible;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
-import ai.salesfox.portal.rest.security.common.SecurityInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
-@RequestMapping(OrganizationEndpointConstants.BASE_ENDPOINT)
 public class OrganizationInvitationController implements AnonymouslyAccessible {
-    public static final String INVITE_ENDPOINT = "/invite";
+    public static final String ASSIGNABLE_ROLES_ENDPOINT = OrganizationEndpointConstants.BASE_ENDPOINT + "/assignable_roles";
+    public static final String INVITE_ENDPOINT = OrganizationEndpointConstants.BASE_ENDPOINT + "/invite";
     public static final String VALIDATE_INVITE_ENDPOINT = INVITE_ENDPOINT + "/validate";
 
     private final OrganizationInvitationService organizationInvitationService;
@@ -25,7 +24,7 @@ public class OrganizationInvitationController implements AnonymouslyAccessible {
         this.organizationInvitationService = organizationInvitationService;
     }
 
-    @GetMapping("/assignable_roles")
+    @GetMapping(ASSIGNABLE_ROLES_ENDPOINT)
     @PreAuthorize(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER_AUTH_CHECK)
     public OrganizationAssignableRolesModel getAssignableRoles() {
         return organizationInvitationService.getAssignableRoles();
@@ -45,8 +44,7 @@ public class OrganizationInvitationController implements AnonymouslyAccessible {
     @Override
     public String[] anonymouslyAccessibleApiAntMatchers() {
         return new String[] {
-                OrganizationEndpointConstants.BASE_ENDPOINT + VALIDATE_INVITE_ENDPOINT,
-                SecurityInterface.createSubDirectoryPattern(OrganizationEndpointConstants.BASE_ENDPOINT + VALIDATE_INVITE_ENDPOINT)
+                VALIDATE_INVITE_ENDPOINT
         };
     }
 

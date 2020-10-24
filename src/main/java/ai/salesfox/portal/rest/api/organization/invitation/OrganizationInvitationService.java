@@ -10,6 +10,7 @@ import ai.salesfox.portal.common.time.PortalDateTimeUtils;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.RoleRepository;
+import ai.salesfox.portal.database.account.repository.UserRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
 import ai.salesfox.portal.database.organization.account.invite.OrganizationAccountInviteTokenEntity;
@@ -18,7 +19,6 @@ import ai.salesfox.portal.database.organization.account.invite.OrganizationAccou
 import ai.salesfox.portal.rest.api.organization.invitation.model.OrganizationAccountInvitationModel;
 import ai.salesfox.portal.rest.api.organization.invitation.model.OrganizationAssignableRolesModel;
 import ai.salesfox.portal.rest.api.password.PasswordService;
-import ai.salesfox.portal.rest.api.registration.RegistrationController;
 import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountUserRegistrationModel;
 import ai.salesfox.portal.rest.api.registration.user.UserRegistrationModel;
 import ai.salesfox.portal.rest.api.registration.user.UserRegistrationService;
@@ -53,6 +53,7 @@ public class OrganizationInvitationService {
     public static final Duration DURATION_OF_TOKEN_VALIDITY = Duration.ofDays(7);
 
     private final PortalConfiguration portalConfiguration;
+    private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final OrganizationAccountRepository organizationAccountRepository;
     private final OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository;
@@ -64,10 +65,21 @@ public class OrganizationInvitationService {
     private final EmailMessagingService emailMessagingService;
 
     @Autowired
-    public OrganizationInvitationService(PortalConfiguration portalConfiguration, RoleRepository roleRepository, OrganizationAccountRepository organizationAccountRepository, OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository,
-                                         UserRegistrationService userRegistrationService, UserProfileService userProfileService, PasswordService passwordService, UserRoleService userRoleService,
-                                         HttpSafeUserMembershipRetrievalService userMembershipRetrievalService, EmailMessagingService emailMessagingService) {
+    public OrganizationInvitationService(
+            PortalConfiguration portalConfiguration,
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            OrganizationAccountRepository organizationAccountRepository,
+            OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository,
+            UserRegistrationService userRegistrationService,
+            UserProfileService userProfileService,
+            PasswordService passwordService,
+            UserRoleService userRoleService,
+            HttpSafeUserMembershipRetrievalService userMembershipRetrievalService,
+            EmailMessagingService emailMessagingService
+    ) {
         this.portalConfiguration = portalConfiguration;
+        this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.organizationAccountInviteTokenRepository = organizationAccountInviteTokenRepository;
@@ -117,7 +129,10 @@ public class OrganizationInvitationService {
         if (timeSinceTokenGenerated.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
             UserEntity tempUser = createUserAccountWithOrgAccountCreationRole(inviteTokenEntity);
             createUserSessionWithOrgAccountCreationPermission(tempUser);
-            response.setHeader("Location", RegistrationController.BASE_ENDPOINT + RegistrationController.ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX);
+
+            String frontEndLocation = String.format("%s%s", portalConfiguration.getPortalFrontEndUrl(), portalConfiguration.getFrontEndOrgAcctInviteRoute());
+            response.setHeader("Location", frontEndLocation);
+            response.setStatus(HttpStatus.FOUND.value());
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your invitation has expired. Please contact your organization's account owner.");
         }
@@ -186,6 +201,7 @@ public class OrganizationInvitationService {
     }
 
     private UserEntity createUserAccountWithOrgAccountCreationRole(OrganizationAccountInviteTokenEntity inviteTokenEntity) {
+        String invitedEmail = inviteTokenEntity.getEmail();
         OrganizationAccountEntity orgAccount = organizationAccountRepository.findById(inviteTokenEntity.getOrganizationAccountId())
                 .orElseThrow(() -> {
                     log.error("Expected organization account with id [{}] to exist in the database", inviteTokenEntity.getOrganizationAccountId());
@@ -193,8 +209,10 @@ public class OrganizationInvitationService {
                 });
 
         String randomTemporaryPassword = UUID.randomUUID().toString();
-        UserRegistrationModel userRegistrationModel = new UserRegistrationModel("First Name", "Last Name", inviteTokenEntity.getEmail(), randomTemporaryPassword, PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION);
-        return userRegistrationService.registerOrganizationUser(userRegistrationModel, orgAccount);
+        UserRegistrationModel userRegistrationModel = new UserRegistrationModel("First Name", "Last Name", invitedEmail, randomTemporaryPassword, PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION);
+
+        return findExistingTempUser(invitedEmail)
+                .orElseGet(() -> userRegistrationService.registerOrganizationUser(userRegistrationModel, orgAccount));
     }
 
     private void createUserSessionWithOrgAccountCreationPermission(UserEntity user) {
@@ -214,6 +232,16 @@ public class OrganizationInvitationService {
                 });
     }
 
+    private Optional<UserEntity> findExistingTempUser(String emailAddress) {
+        return userRepository.findFirstByEmail(emailAddress)
+                .filter(user -> user
+                        .getMembershipEntity()
+                        .getRoleEntity()
+                        .getRoleLevel()
+                        .equals(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION)
+                );
+    }
+
     private void clearCreateOrgAccountAuthorityFromSecurityContext() {
         SecurityContextHolder.clearContext();
     }
@@ -222,7 +250,6 @@ public class OrganizationInvitationService {
         String invitationUrl = createInvitationLink(email, invitationToken);
 
         log.info("*** REMOVE ME *** Invitation Link: {}", invitationUrl);
-
         EmailMessageModel emailMessage = createInvitationMessageModel(email, organizationAccountName, invitationUrl);
         try {
             emailMessagingService.sendMessage(emailMessage);
@@ -243,8 +270,8 @@ public class OrganizationInvitationService {
     }
 
     private String createInvitationLink(String email, String invitationToken) {
-        StringBuilder linkBuilder = new StringBuilder(portalConfiguration.getPortalBaseUrl());
-        linkBuilder.append(portalConfiguration.getInviteOrganizationAccountUserLinkSpec());
+        StringBuilder linkBuilder = new StringBuilder(portalConfiguration.getPortalBackEndUrl());
+        linkBuilder.append(OrganizationInvitationController.VALIDATE_INVITE_ENDPOINT);
         linkBuilder.append("?token=");
         linkBuilder.append(invitationToken);
         linkBuilder.append("&email=");
