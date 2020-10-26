@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.function.Function;
 
+// TODO add test for this
 public class PagedResourceHolder<T> {
     @Getter
     private final Page<T> firstPage;
@@ -16,7 +17,7 @@ public class PagedResourceHolder<T> {
         this.retrieveNextPageFunction = retrieveNextPageFunction;
     }
 
-    public final Page<T> retrieveNextPage(Page<T> currentPage) {
+    public Page<T> retrieveNextPage(Page<T> currentPage) {
         if (currentPage.hasNext()) {
             return retrieveNextPageFunction.apply(currentPage.nextPageable());
         }
