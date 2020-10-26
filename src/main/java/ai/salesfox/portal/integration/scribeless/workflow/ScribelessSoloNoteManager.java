@@ -71,11 +71,11 @@ public class ScribelessSoloNoteManager {
         CampaignResponseModel campaign = createCampaign(gift, submittingUser, requestHolder.getCampaignCreationRequestModel());
         String campaignId = campaign.getId();
 
-        Page<GiftRecipientEntity> recipientsPage = requestHolder.getFirstPageOfRecipients();
+        Page<GiftRecipientEntity> recipientsPage = requestHolder.getFirstPage();
         do {
             CampaignUpdateRequestModel updateRequestModel = campaignRequestModelCreator.createUpdateRequestModel(recipientsPage);
             addRecipientsToCampaign(gift, submittingUser, campaignId, updateRequestModel);
-            recipientsPage = requestHolder.retrieveNextPageOfRecipients(recipientsPage);
+            recipientsPage = requestHolder.retrieveNextPage(recipientsPage);
         } while (!recipientsPage.isEmpty());
 
         requestImmediatePrint(gift, submittingUser, campaignId);
