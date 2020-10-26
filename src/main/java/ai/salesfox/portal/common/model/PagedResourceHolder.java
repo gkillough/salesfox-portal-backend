@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.function.Function;
 
-// TODO add test for this
 public class PagedResourceHolder<T> {
     @Getter
     private final Page<T> firstPage;
