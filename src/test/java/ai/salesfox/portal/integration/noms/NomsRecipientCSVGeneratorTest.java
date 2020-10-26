@@ -40,8 +40,9 @@ public class NomsRecipientCSVGeneratorTest {
     }
 
     private PagedResourceHolder<OrganizationAccountContactEntity> createContactPagedResourceHolder() {
-        OrganizationAccountContactEntity contact1 = createTestContact("Test", "User");
-        Page<OrganizationAccountContactEntity> page = new PageImpl<>(List.of(contact1));
+        OrganizationAccountContactEntity contact1 = createTestContact("Test 1", "User");
+        OrganizationAccountContactEntity contact2 = createTestContact("Test 2", "User");
+        Page<OrganizationAccountContactEntity> page = new PageImpl<>(List.of(contact1, contact2));
         return new PagedResourceHolder<>(page, input -> Page.empty());
     }
 

@@ -98,7 +98,7 @@ public class NomsRecipientCSVGenerator {
 
     private String createCSVFileName(UUID giftId) {
         LocalDate currentDate = PortalDateTimeUtils.getCurrentDate();
-        return BULK_ORDER_FILE_NAME_PREFIX + currentDate.toString() + giftId.toString() + BULK_ORDER_FILE_NAME_SUFFIX;
+        return BULK_ORDER_FILE_NAME_PREFIX + currentDate.toString() + "-" + giftId.toString() + BULK_ORDER_FILE_NAME_SUFFIX;
     }
 
 }
