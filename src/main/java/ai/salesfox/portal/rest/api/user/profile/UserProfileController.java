@@ -11,7 +11,7 @@ import java.util.UUID;
 @RequestMapping(UserProfileController.BASE_ENDPOINT)
 public class UserProfileController {
     public static final String BASE_ENDPOINT = "/user_profile";
-    private UserProfileService userProfileService;
+    private final UserProfileService userProfileService;
 
     @Autowired
     public UserProfileController(UserProfileService userProfileService) {

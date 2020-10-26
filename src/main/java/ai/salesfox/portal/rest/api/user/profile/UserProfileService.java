@@ -2,9 +2,7 @@ package ai.salesfox.portal.rest.api.user.profile;
 
 import ai.salesfox.portal.common.FieldValidationUtils;
 import ai.salesfox.portal.common.model.PortalAddressModel;
-import ai.salesfox.portal.database.account.entity.ProfileEntity;
-import ai.salesfox.portal.database.account.entity.UserAddressEntity;
-import ai.salesfox.portal.database.account.entity.UserEntity;
+import ai.salesfox.portal.database.account.entity.*;
 import ai.salesfox.portal.database.account.repository.ProfileRepository;
 import ai.salesfox.portal.database.account.repository.UserAddressRepository;
 import ai.salesfox.portal.database.account.repository.UserRepository;
@@ -72,8 +70,10 @@ public class UserProfileService {
                 .map(PortalAddressModel::fromEntity)
                 .orElseThrow(internalServerError);
 
-        UserRoleModel role = userAccessService.findRoleByUserId(userId);
+        MembershipEntity userMembership = userEntity.getMembershipEntity();
+        RoleEntity userRole = userMembership.getRoleEntity();
 
+        UserRoleModel roleModel = new UserRoleModel(userRole.getRoleLevel(), userRole.getDescription());
         return new UserProfileModel(
                 userEntity.getFirstName(),
                 userEntity.getLastName(),
@@ -82,7 +82,7 @@ public class UserProfileService {
                 profileEntity.getMobileNumber(),
                 profileEntity.getBusinessNumber(),
                 userEntity.getIsActive(),
-                role
+                roleModel
         );
     }
 
