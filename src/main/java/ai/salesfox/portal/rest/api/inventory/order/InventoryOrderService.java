@@ -70,7 +70,7 @@ public class InventoryOrderService {
             validateOrderRequest(itemOrder);
             for (CatalogueItemEntity item : catalogueItemEntities) {
                 if (!item.getIsActive()) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", itemOrder.getCatalogueItemId()));
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Catalogue item with the id [%s] unavailable", itemOrder.getCatalogueItemId()));
                 } else if (item.getItemId().equals(itemOrder.getCatalogueItemId())) {
                     validateItemAccess(loggedInUser, item);
                     Integer requestedQuantity = itemOrder.getQuantity();
