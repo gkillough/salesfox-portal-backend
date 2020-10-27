@@ -5,7 +5,7 @@ import ai.salesfox.portal.common.model.PagedResourceHolder;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.contact.address.OrganizationAccountContactAddressEntity;
 import ai.salesfox.portal.integration.noms.configuration.NomsConfiguration;
-import ai.salesfox.portal.integration.noms.csv.NomsRecipientCSVGenerator;
+import ai.salesfox.portal.integration.noms.workflow.NomsRecipientCSVGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

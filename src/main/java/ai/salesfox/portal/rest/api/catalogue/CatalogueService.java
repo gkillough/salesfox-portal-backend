@@ -1,7 +1,7 @@
 package ai.salesfox.portal.rest.api.catalogue;
 
 import ai.salesfox.portal.common.FieldValidationUtils;
-import ai.salesfox.portal.common.enumeration.DistributorNames;
+import ai.salesfox.portal.common.enumeration.DistributorName;
 import ai.salesfox.portal.common.enumeration.PortalImageStorageDestination;
 import ai.salesfox.portal.common.exception.PortalException;
 import ai.salesfox.portal.common.service.catalogue.CatalogueItemAccessUtils;
@@ -261,8 +261,8 @@ public class CatalogueService {
             String distributor = externalDetails.getDistributor();
             if (StringUtils.isBlank(distributor)) {
                 errors.add("The Distributor specified for the external details cannot be blank");
-            } else if (!EnumUtils.isValidEnumIgnoreCase(DistributorNames.class, distributor)) {
-                errors.add("The Distributor must be one of the following: " + Arrays.toString(DistributorNames.values()));
+            } else if (!EnumUtils.isValidEnumIgnoreCase(DistributorName.class, distributor)) {
+                errors.add("The Distributor must be one of the following: " + Arrays.toString(DistributorName.values()));
             }
 
             if (StringUtils.isBlank(externalDetails.getExternalId())) {

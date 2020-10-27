@@ -54,7 +54,7 @@ public class ContactController {
         return contactBulkUploadService.createContactsInBulk(contactBulkUploadModel);
     }
 
-    @PostMapping("/csv")
+    @PostMapping("/workflow")
     public ContactBulkUploadResponse createContactsFromCsv(@RequestParam MultipartFile csvFile) {
         return contactBulkUploadService.createContactsFromCsvFile(csvFile);
     }
