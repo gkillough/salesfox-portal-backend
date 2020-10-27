@@ -13,7 +13,6 @@ import ai.salesfox.portal.database.inventory.item.InventoryItemRepository;
 import ai.salesfox.portal.integration.stripe.StripeService;
 import ai.salesfox.portal.rest.api.inventory.InventoryAccessService;
 import ai.salesfox.portal.rest.api.inventory.order.model.InventoryOrderRequestModel;
-import ai.salesfox.portal.rest.api.inventory.order.model.InventoryOrderResponseModel;
 import ai.salesfox.portal.rest.api.inventory.order.model.ItemOrderModel;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
@@ -56,7 +55,7 @@ public class InventoryOrderService {
     @Transactional
     // TODO this class and method were gutted to pave the way for "voucher" based inventories
     //  this is a temporary state until we add a payment processing integration
-    public InventoryOrderResponseModel submitOrder(InventoryOrderRequestModel requestModel) {
+    public void submitOrder(InventoryOrderRequestModel requestModel) {
         BigDecimal totalPrice = new BigDecimal(0);
         String stripeChargeToken = requestModel.getStripeChargeToken();
         List<CatalogueItemEntity> catalogueItemEntities = catalogueItemRepository.findAll();
@@ -70,7 +69,9 @@ public class InventoryOrderService {
             validateSubmitOrderAccess(userRoleLevel);
             validateOrderRequest(itemOrder);
             for (CatalogueItemEntity item : catalogueItemEntities) {
-                if (item.getItemId().equals(itemOrder.getCatalogueItemId())) {
+                if (!item.getIsActive()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", itemOrder.getCatalogueItemId()));
+                } else if (item.getItemId().equals(itemOrder.getCatalogueItemId())) {
                     validateItemAccess(loggedInUser, item);
                     Integer requestedQuantity = itemOrder.getQuantity();
                     InventoryItemEntity itemToSave = findOrCreateInventoryItemEntity(foundInventory, item);
@@ -79,6 +80,8 @@ public class InventoryOrderService {
                     inventoryItemRepository.save(itemToSave);
                     totalPrice.add(item.getPrice());
                     totalPrice.add(item.getShippingCost());
+                } else {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", itemOrder.getCatalogueItemId()));
                 }
             }
 
@@ -98,40 +101,6 @@ public class InventoryOrderService {
         if (charge == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There was a problem processing the payment");
         }
-
-//        CatalogueItemEntity targetItem = catalogueItemRepository.findById(requestModel.getCatalogueItemId())
-//                .filter(CatalogueItemEntity::getIsActive)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", requestModel.getCatalogueItemId())));
-//        validateItemAccess(loggedInUser, targetItem);
-
-        // TODO insert payment processing in the middle of this step
-        /*
-        InventoryOrderRequestEntity orderToSave = new InventoryOrderRequestEntity(
-                null,
-                targetItem.getItemId(),
-                foundInventory.getInventoryId(),
-                userMembership.getOrganizationAccountId(),
-                loggedInUser.getUserId(),
-                loggedInUser.getUserId(),
-                requestedQuantity,
-                targetItem.getPrice()
-        );
-        InventoryOrderRequestEntity savedOrder = orderRequestRepository.save(orderToSave);
-
-        savedOrder.setCatalogueItemEntity(targetItem);
-        savedOrder.setInventoryEntity(foundInventory);
-
-        String processingStatus = InventoryOrderRequestStatus.SUBMITTED.name();
-        OffsetDateTime orderDateTime = PortalDateTimeUtils.getCurrentDateTime();
-        InventoryOrderRequestStatusEntity statusToSave = new InventoryOrderRequestStatusEntity(null, savedOrder.getOrderId(), loggedInUser.getUserId(), processingStatus, orderDateTime, orderDateTime);
-        InventoryOrderRequestStatusEntity savedStatus = orderRequestStatusRepository.save(statusToSave);
-        savedOrder.setInventoryOrderRequestStatusEntity(savedStatus);
-
-        return convertToResponseModel(savedOrder);
-         */
-
-        // TODO fix this when this method is broken up for payment processing
-        return null;
     }
 
     private InventoryEntity findInventoryAndValidateAccess(UUID inventoryId) {
