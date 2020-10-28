@@ -23,4 +23,20 @@ public class PagedResourceHolder<T> {
         return Page.empty();
     }
 
+    public <U> PagedResourceHolder<U> map(Function<T, U> mapper) {
+        return new PagedResourceHolder<>(
+                firstPage.map(mapper),
+                pageable -> retrieveNextPageFunction
+                        .apply(pageable)
+                        .map(mapper)
+        );
+    }
+
+    public <U> PagedResourceHolder<U> mapPage(Function<Page<T>, Page<U>> mapper) {
+        return new PagedResourceHolder<>(
+                mapper.apply(firstPage),
+                pageable -> mapper.apply(retrieveNextPageFunction.apply(pageable))
+        );
+    }
+
 }

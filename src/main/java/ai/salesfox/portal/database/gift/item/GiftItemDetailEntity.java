@@ -21,13 +21,13 @@ public class GiftItemDetailEntity {
     @Column(name = "item_id")
     private UUID itemId;
 
+    @OneToOne
+    @JoinColumn(name = "item_id", referencedColumnName = "item_id", updatable = false, insertable = false)
+    private CatalogueItemEntity catalogueItemEntity;
+
     public GiftItemDetailEntity(UUID giftId, UUID itemId) {
         this.giftId = giftId;
         this.itemId = itemId;
     }
-
-    @OneToOne
-    @JoinColumn(name = "item_id", referencedColumnName = "item_id", updatable = false, insertable = false)
-    private CatalogueItemEntity catalogueItemEntity;
 
 }
