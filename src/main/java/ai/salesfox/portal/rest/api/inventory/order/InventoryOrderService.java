@@ -30,6 +30,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -53,20 +54,21 @@ public class InventoryOrderService {
     }
 
     @Transactional
-    // TODO this class and method were gutted to pave the way for "voucher" based inventories
-    //  this is a temporary state until we add a payment processing integration
-    public void submitOrder(InventoryOrderRequestModel requestModel) {
+    public void submitOrder(UUID inventoryID, InventoryOrderRequestModel requestModel) {
+        InventoryEntity foundInventory = findInventoryAndValidateAccess(inventoryID);
         BigDecimal totalPrice = new BigDecimal(0);
         String stripeChargeToken = requestModel.getStripeChargeToken();
-        List<CatalogueItemEntity> catalogueItemEntities = catalogueItemRepository.findAll();
         List<ItemOrderModel> itemOrders = requestModel.getOrders();
+        List<UUID> catalogueIDs = itemOrders.stream().map(ItemOrderModel::getCatalogueItemId).collect(Collectors.toList());
+        List<CatalogueItemEntity> catalogueItemEntities = catalogueItemRepository.findAllById(catalogueIDs);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         String userRoleLevel = userMembership.getRoleEntity().getRoleLevel();
-        requestModel.getOrders();
+        validateSubmitOrderAccess(userRoleLevel);
+        if (StringUtils.isBlank(stripeChargeToken)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'stripeChargeToken' is required");
+        }
         for (ItemOrderModel itemOrder : itemOrders) {
-            InventoryEntity foundInventory = findInventoryAndValidateAccess(itemOrder.getCatalogueItemId());
-            validateSubmitOrderAccess(userRoleLevel);
             validateOrderRequest(itemOrder);
             for (CatalogueItemEntity item : catalogueItemEntities) {
                 if (!item.getIsActive()) {
@@ -85,10 +87,6 @@ public class InventoryOrderService {
                 }
             }
 
-        }
-
-        if (StringUtils.isBlank(stripeChargeToken)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'stripeChargeToken' is required");
         }
 
         Charge charge;
