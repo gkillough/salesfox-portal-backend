@@ -61,8 +61,7 @@ public class InventoryOrderService {
         BigDecimal totalPrice = new BigDecimal(0);
         List<ItemOrderModel> itemOrders = requestModel.getOrders();
         Map<UUID, ItemOrderModel> itemOrderMap = itemOrders.stream().collect(Collectors.toMap(ItemOrderModel::getCatalogueItemId, Function.identity()));
-        List<UUID> catalogueIDs = new ArrayList<>(itemOrderMap.keySet());
-        List<CatalogueItemEntity> catalogueItemEntities = catalogueItemRepository.findAllById(catalogueIDs);
+        List<CatalogueItemEntity> catalogueItemEntities = catalogueItemRepository.findAllById(itemOrderMap.keySet());
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         String userRoleLevel = userMembership.getRoleEntity().getRoleLevel();
@@ -89,7 +88,7 @@ public class InventoryOrderService {
 
         Charge charge;
         try {
-            charge = stripeService.chargeNewCard(stripeChargeToken, totalPrice.intValue());
+            charge = stripeService.chargeNewCard(stripeChargeToken, totalPrice.doubleValue());
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid card or insufficient funds");
         }
