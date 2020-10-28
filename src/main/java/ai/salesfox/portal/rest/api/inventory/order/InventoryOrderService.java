@@ -26,10 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -55,38 +53,38 @@ public class InventoryOrderService {
 
     @Transactional
     public void submitOrder(UUID inventoryID, InventoryOrderRequestModel requestModel) {
+        String stripeChargeToken = requestModel.getStripeChargeToken();
+        if (StringUtils.isBlank(stripeChargeToken)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'stripeChargeToken' is required");
+        }
         InventoryEntity foundInventory = findInventoryAndValidateAccess(inventoryID);
         BigDecimal totalPrice = new BigDecimal(0);
-        String stripeChargeToken = requestModel.getStripeChargeToken();
         List<ItemOrderModel> itemOrders = requestModel.getOrders();
-        List<UUID> catalogueIDs = itemOrders.stream().map(ItemOrderModel::getCatalogueItemId).collect(Collectors.toList());
+        Map<UUID, ItemOrderModel> itemOrderMap = itemOrders.stream().collect(Collectors.toMap(ItemOrderModel::getCatalogueItemId, Function.identity()));
+        List<UUID> catalogueIDs = new ArrayList<>(itemOrderMap.keySet());
         List<CatalogueItemEntity> catalogueItemEntities = catalogueItemRepository.findAllById(catalogueIDs);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         String userRoleLevel = userMembership.getRoleEntity().getRoleLevel();
         validateSubmitOrderAccess(userRoleLevel);
-        if (StringUtils.isBlank(stripeChargeToken)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'stripeChargeToken' is required");
-        }
-        for (ItemOrderModel itemOrder : itemOrders) {
-            validateOrderRequest(itemOrder);
-            for (CatalogueItemEntity item : catalogueItemEntities) {
-                if (!item.getIsActive()) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Catalogue item with the id [%s] unavailable", itemOrder.getCatalogueItemId()));
-                } else if (item.getItemId().equals(itemOrder.getCatalogueItemId())) {
-                    validateItemAccess(loggedInUser, item);
-                    Integer requestedQuantity = itemOrder.getQuantity();
-                    InventoryItemEntity itemToSave = findOrCreateInventoryItemEntity(foundInventory, item);
-                    Long newInventoryItemQuantity = Math.addExact(itemToSave.getQuantity(), requestedQuantity);
-                    itemToSave.setQuantity(newInventoryItemQuantity);
-                    inventoryItemRepository.save(itemToSave);
-                    totalPrice.add(item.getPrice());
-                    totalPrice.add(item.getShippingCost());
-                } else {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", itemOrder.getCatalogueItemId()));
-                }
-            }
 
+        for (CatalogueItemEntity item : catalogueItemEntities) {
+            ItemOrderModel itemOrder = itemOrderMap.get(item.getItemId());
+            validateOrderRequest(itemOrder);
+            if (!item.getIsActive()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Catalogue item with the id [%s] unavailable", itemOrder.getCatalogueItemId()));
+            } else if (item.getItemId().equals(itemOrder.getCatalogueItemId())) {
+                validateItemAccess(loggedInUser, item);
+                Integer requestedQuantity = itemOrder.getQuantity();
+                InventoryItemEntity itemToSave = findOrCreateInventoryItemEntity(foundInventory, item);
+                Long newInventoryItemQuantity = Math.addExact(itemToSave.getQuantity(), requestedQuantity);
+                itemToSave.setQuantity(newInventoryItemQuantity);
+                inventoryItemRepository.save(itemToSave);
+                totalPrice.add(item.getPrice());
+                totalPrice.add(item.getShippingCost());
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", itemOrder.getCatalogueItemId()));
+            }
         }
 
         Charge charge;
