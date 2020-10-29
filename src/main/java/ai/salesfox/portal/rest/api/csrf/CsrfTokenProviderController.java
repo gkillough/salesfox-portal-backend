@@ -1,4 +1,4 @@
-package ai.salesfox.portal.rest.security.authorization;
+package ai.salesfox.portal.rest.api.csrf;
 
 import ai.salesfox.portal.rest.security.authentication.AnonymouslyAccessible;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +22,10 @@ public class CsrfTokenProviderController implements AnonymouslyAccessible {
     }
 
     @GetMapping(CSRF_TOKEN_REQUEST_ENDPOINT)
-    public void getToken(HttpServletRequest request, HttpServletResponse response) {
+    public CsrfTokenHolderResponseModel getToken(HttpServletRequest request, HttpServletResponse response) {
         CsrfToken csrfToken = csrfTokenRepository.loadToken(request);
         response.setHeader(csrfToken.getHeaderName(), csrfToken.getToken());
+        return new CsrfTokenHolderResponseModel(csrfToken.getHeaderName(), csrfToken.getToken());
     }
 
     @Override

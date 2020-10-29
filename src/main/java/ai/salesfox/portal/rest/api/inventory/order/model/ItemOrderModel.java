@@ -4,13 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class InventoryOrderRequestModel {
-    private List<ItemOrderModel> orders;
-    private String stripeChargeToken;
+public class ItemOrderModel {
+    private UUID catalogueItemId;
+    private Integer quantity;
 
 }
