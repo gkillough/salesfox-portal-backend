@@ -25,7 +25,7 @@ import java.util.UUID;
 public class NomsRecipientCSVGenerator {
     public static CSVFormat DEFAULT_CSV_FORMAT = CSVFormat.EXCEL;
     public static String BULK_ORDER_FILE_NAME_PREFIX = "bulk-order-";
-    public static String BULK_ORDER_FILE_NAME_SUFFIX = ".workflow";
+    public static String BULK_ORDER_FILE_NAME_SUFFIX = ".csv";
 
     public static List<String> NOMS_REQUIRED_CSV_HEADERS = Collections.unmodifiableList(
             List.of(
