@@ -16,6 +16,11 @@ public class PagedResourceHolder<T> {
         this.retrieveNextPageFunction = retrieveNextPageFunction;
     }
 
+    protected PagedResourceHolder(PagedResourceHolder<T> source) {
+        this.firstPage = source.firstPage;
+        this.retrieveNextPageFunction = source.retrieveNextPageFunction;
+    }
+
     public Page<T> retrieveNextPage(Page<T> currentPage) {
         if (currentPage.hasNext()) {
             return retrieveNextPageFunction.apply(currentPage.nextPageable());

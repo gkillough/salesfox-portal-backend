@@ -61,7 +61,7 @@ public class GiftDetailsService {
         UUID giftId = gift.getGiftId();
         PageRequest pageRequest = PageRequest.of(0, pageSize);
         Page<OrganizationAccountContactEntity> recipients = contactRepository.findGiftRecipientContactsByGiftId(giftId, pageRequest);
-        return new PagedResourceHolder<>(recipients, pageable -> contactRepository.findGiftRecipientContactsByGiftId(giftId, pageable));
+        return new PagedResourceHolder<>(recipients, newPageRequest -> contactRepository.findGiftRecipientContactsByGiftId(giftId, newPageRequest));
     }
 
     public Optional<CustomBrandingTextEntity> retrieveCustomText(GiftEntity gift) {
