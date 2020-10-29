@@ -53,4 +53,11 @@ public interface OrganizationAccountContactRepository extends JpaRepository<Orga
     )
     Integer countInteractableContactsInContactIdCollection(@Param("orgAcctId") UUID organizationAccountId, @Param("contactIds") Collection<UUID> contactIds);
 
+    @Query("SELECT contact" +
+            " FROM OrganizationAccountContactEntity contact" +
+            " INNER JOIN GiftRecipientEntity recipient ON recipient.contactId = contact.contactId" +
+            " WHERE recipient.giftId = :giftId"
+    )
+    Page<OrganizationAccountContactEntity> findGiftRecipientContactsByGiftId(@Param("giftId") UUID giftId, Pageable pageable);
+
 }
