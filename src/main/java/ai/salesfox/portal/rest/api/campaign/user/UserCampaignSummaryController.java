@@ -4,7 +4,7 @@ import ai.salesfox.portal.rest.api.campaign.CampaignSummaryEndpointService;
 import ai.salesfox.portal.rest.api.campaign.user.model.MultiUserCampaignSummaryResponseModel;
 import ai.salesfox.portal.rest.api.campaign.user.model.UserCampaignBillingPeriodSummaryModel;
 import ai.salesfox.portal.rest.api.common.page.PageMetadata;
-import ai.salesfox.portal.rest.api.user.UserEndpointConstants;
+import ai.salesfox.portal.rest.api.user.common.UserEndpointConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
