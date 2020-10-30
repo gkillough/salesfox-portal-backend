@@ -1,5 +1,7 @@
 package ai.salesfox.portal.rest.api.user;
 
+import ai.salesfox.portal.database.account.entity.MembershipEntity;
+import ai.salesfox.portal.database.account.entity.RoleEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserRepository;
 import ai.salesfox.portal.rest.api.user.common.UserAccessService;
@@ -13,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -32,27 +33,28 @@ public class UserService {
 
     public CurrentUserModel getCurrentUserFromSession() {
         UserEntity user = userMembershipRetrievalService.getAuthenticatedUserEntity();
-        UserRoleModel role = userAccessService.findRoleByUserId(user.getUserId());
-        return new CurrentUserModel(user.getUserId(), user.getFirstName(), user.getLastName(), role);
+        UserRoleModel userRoleModel = createRoleModel(user);
+        return new CurrentUserModel(user.getUserId(), user.getFirstName(), user.getLastName(), userRoleModel);
     }
 
     public UserAccountModel getUser(UUID userId) {
-        if (userId == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'userId' is required");
-        }
+        UserEntity foundUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        if (!userAccessService.canCurrentUserAccessDataForUser(userId)) {
+        UserEntity loggedInUser = userMembershipRetrievalService.getAuthenticatedUserEntity();
+        if (!userAccessService.canUserAccessDataForUser(loggedInUser, foundUser)) {
             log.warn("There was an attempt to access the user with id [{}], from an unauthorized account", userId);
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        Optional<UserEntity> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isPresent()) {
-            UserEntity user = optionalUser.get();
-            UserRoleModel role = userAccessService.findRoleByUserId(user.getUserId());
-            return new UserAccountModel(user.getFirstName(), user.getLastName(), user.getEmail(), role, user.getIsActive());
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        UserRoleModel role = createRoleModel(foundUser);
+        return new UserAccountModel(foundUser.getFirstName(), foundUser.getLastName(), foundUser.getEmail(), role, foundUser.getIsActive());
+    }
+
+    private UserRoleModel createRoleModel(UserEntity user) {
+        MembershipEntity userMembership = user.getMembershipEntity();
+        RoleEntity role = userMembership.getRoleEntity();
+        return new UserRoleModel(role.getRoleLevel(), role.getDescription());
     }
 
 }

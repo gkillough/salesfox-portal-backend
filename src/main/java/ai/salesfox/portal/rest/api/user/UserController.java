@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
 
 @RestController
@@ -28,7 +27,7 @@ public class UserController {
     }
 
     @GetMapping("/{user_id}")
-    public UserAccountModel getUserById(HttpServletResponse response, @PathVariable(name = "user_id") UUID userId) {
+    public UserAccountModel getUserById(@PathVariable(name = "user_id") UUID userId) {
         return userService.getUser(userId);
     }
 
