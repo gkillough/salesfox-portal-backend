@@ -1,8 +1,8 @@
-package ai.salesfox.portal.rest.api.user.common;
+package ai.salesfox.portal.rest.api.user;
 
+import ai.salesfox.portal.rest.api.user.common.UserEndpointConstants;
 import ai.salesfox.portal.rest.api.user.common.model.CurrentUserModel;
 import ai.salesfox.portal.rest.api.user.common.model.UserAccountModel;
-import ai.salesfox.portal.rest.api.user.UserEndpointConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(UserEndpointConstants.BASE_ENDPOINT)
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     public UserController(UserService userService) {

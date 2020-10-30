@@ -1,4 +1,4 @@
-package ai.salesfox.portal.rest.api.user;
+package ai.salesfox.portal.rest.api.user.common;
 
 public class UserEndpointConstants {
     // FIXME migrate this to "/users"

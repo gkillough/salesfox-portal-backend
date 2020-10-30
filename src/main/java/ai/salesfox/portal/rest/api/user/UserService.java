@@ -1,11 +1,12 @@
-package ai.salesfox.portal.rest.api.user.common;
+package ai.salesfox.portal.rest.api.user;
 
-import ai.salesfox.portal.rest.api.user.common.model.CurrentUserModel;
-import ai.salesfox.portal.rest.api.user.common.model.UserAccountModel;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserRepository;
-import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
+import ai.salesfox.portal.rest.api.user.common.UserAccessService;
+import ai.salesfox.portal.rest.api.user.common.model.CurrentUserModel;
+import ai.salesfox.portal.rest.api.user.common.model.UserAccountModel;
 import ai.salesfox.portal.rest.api.user.role.model.UserRoleModel;
+import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,9 +19,9 @@ import java.util.UUID;
 @Slf4j
 @Component
 public class UserService {
-    private UserRepository userRepository;
-    private UserAccessService userAccessService;
-    private HttpSafeUserMembershipRetrievalService userMembershipRetrievalService;
+    private final UserRepository userRepository;
+    private final UserAccessService userAccessService;
+    private final HttpSafeUserMembershipRetrievalService userMembershipRetrievalService;
 
     @Autowired
     public UserService(UserRepository userRepository, UserAccessService userAccessService, HttpSafeUserMembershipRetrievalService userMembershipRetrievalService) {
