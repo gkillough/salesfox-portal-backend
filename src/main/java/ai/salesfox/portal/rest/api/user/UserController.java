@@ -1,13 +1,14 @@
 package ai.salesfox.portal.rest.api.user;
 
+import ai.salesfox.portal.rest.api.common.page.PageMetadata;
 import ai.salesfox.portal.rest.api.user.common.UserEndpointConstants;
 import ai.salesfox.portal.rest.api.user.common.model.CurrentUserModel;
+import ai.salesfox.portal.rest.api.user.common.model.MultiUserModel;
 import ai.salesfox.portal.rest.api.user.common.model.UserAccountModel;
+import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -30,6 +31,16 @@ public class UserController {
     })
     public CurrentUserModel getCurrentUser() {
         return userService.getCurrentUserFromSession();
+    }
+
+    @GetMapping(UserEndpointConstants.BASE_ENDPOINT)
+    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
+    public MultiUserModel getUsers(
+            @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset,
+            @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit,
+            @RequestParam(required = false) String query
+    ) {
+        return userService.getUsers(offset, limit, query);
     }
 
     // FIXME eventually remove deprecated endpoint
