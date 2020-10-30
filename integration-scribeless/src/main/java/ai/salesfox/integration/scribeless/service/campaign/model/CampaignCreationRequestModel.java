@@ -6,6 +6,9 @@ import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.List;
 
@@ -47,5 +50,12 @@ public class CampaignCreationRequestModel {
     @SerializedName("return_address")
     private ScribelessAddressModel returnAddress;
     private List<ScribelessAddressModel> recipients;
+
+    public String print(String separator) {
+        String stringToPrint = ReflectionToStringBuilder.reflectionToString(this, ToStringStyle.NO_CLASS_NAME_STYLE);
+        stringToPrint = StringUtils.removeStart(stringToPrint, "[");
+        stringToPrint = StringUtils.removeEnd(stringToPrint, "]");
+        return StringUtils.replace(stringToPrint, ",", separator);
+    }
 
 }

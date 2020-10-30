@@ -13,8 +13,8 @@ import ai.salesfox.portal.common.service.email.PortalEmailException;
 import ai.salesfox.portal.common.service.email.model.EmailMessageModel;
 import ai.salesfox.portal.common.time.PortalDateTimeUtils;
 import ai.salesfox.portal.database.account.entity.UserEntity;
+import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
-import ai.salesfox.portal.database.gift.recipient.GiftRecipientEntity;
 import ai.salesfox.portal.integration.scribeless.database.GiftScribelessStatusEntity;
 import ai.salesfox.portal.integration.scribeless.database.GiftScribelessStatusRepository;
 import ai.salesfox.portal.integration.scribeless.workflow.model.CampaignCreationRequestHolder;
@@ -46,8 +46,10 @@ public class ScribelessSoloNoteManager {
     @Autowired
     public ScribelessSoloNoteManager(GiftScribelessStatusRepository scribelessStatusRepository,
                                      ScribelessCampaignRequestModelCreator campaignRequestModelCreator,
-                                     CampaignService campaignService, OnDemandService onDemandService,
-                                     EmailMessagingService emailMessagingService) {
+                                     CampaignService campaignService,
+                                     OnDemandService onDemandService,
+                                     EmailMessagingService emailMessagingService
+    ) {
         this.scribelessStatusRepository = scribelessStatusRepository;
         this.campaignRequestModelCreator = campaignRequestModelCreator;
         this.campaignService = campaignService;
@@ -71,7 +73,7 @@ public class ScribelessSoloNoteManager {
         CampaignResponseModel campaign = createCampaign(gift, submittingUser, requestHolder.getCampaignCreationRequestModel());
         String campaignId = campaign.getId();
 
-        Page<GiftRecipientEntity> recipientsPage = requestHolder.getFirstPage();
+        Page<OrganizationAccountContactEntity> recipientsPage = requestHolder.getFirstPage();
         do {
             CampaignUpdateRequestModel updateRequestModel = campaignRequestModelCreator.createUpdateRequestModel(recipientsPage);
             addRecipientsToCampaign(gift, submittingUser, campaignId, updateRequestModel);

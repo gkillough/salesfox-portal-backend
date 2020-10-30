@@ -1,6 +1,6 @@
 package ai.salesfox.portal.common.enumeration;
 
-public enum DistributorNames {
+public enum DistributorName {
     NOMS,
     ICONIC_IMPRINT
 

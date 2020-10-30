@@ -16,11 +16,32 @@ public class PagedResourceHolder<T> {
         this.retrieveNextPageFunction = retrieveNextPageFunction;
     }
 
+    protected PagedResourceHolder(PagedResourceHolder<T> source) {
+        this.firstPage = source.firstPage;
+        this.retrieveNextPageFunction = source.retrieveNextPageFunction;
+    }
+
     public Page<T> retrieveNextPage(Page<T> currentPage) {
         if (currentPage.hasNext()) {
             return retrieveNextPageFunction.apply(currentPage.nextPageable());
         }
         return Page.empty();
+    }
+
+    public <U> PagedResourceHolder<U> map(Function<T, U> mapper) {
+        return new PagedResourceHolder<>(
+                firstPage.map(mapper),
+                pageable -> retrieveNextPageFunction
+                        .apply(pageable)
+                        .map(mapper)
+        );
+    }
+
+    public <U> PagedResourceHolder<U> mapPage(Function<Page<T>, Page<U>> mapper) {
+        return new PagedResourceHolder<>(
+                mapper.apply(firstPage),
+                pageable -> mapper.apply(retrieveNextPageFunction.apply(pageable))
+        );
     }
 
 }
