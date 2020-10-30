@@ -63,8 +63,9 @@ public class NomsGiftOrderService implements GiftPartner {
 
     @Override
     public void submitGift(GiftEntity gift, UserEntity submittingUser) throws SalesfoxException {
+        UUID giftId = gift.getGiftId();
         PagedResourceHolder<OrganizationAccountContactEntity> contactHolder = giftDetailsService.retrieveRecipientHolder(gift);
-        File recipientCSVFile = nomsRecipientCSVGenerator.createRecipientCSVFile(gift.getGiftId(), contactHolder);
+        File recipientCSVFile = nomsRecipientCSVGenerator.createRecipientCSVFile(giftId, contactHolder);
 
         AbstractAddressEntity returnAddress = giftDetailsService.retrieveReturnAddress(gift);
 
@@ -77,11 +78,12 @@ public class NomsGiftOrderService implements GiftPartner {
             orderMessageBody = constructOrderMessageBody(gift, returnAddress);
         }
 
-        EmailMessageModel orderEmailMessage = createOrderEmailMessage(gift.getGiftId(), orderMessageBody);
+        EmailMessageModel orderEmailMessage = createOrderEmailMessage(giftId, orderMessageBody);
         try {
             emailMessagingService.sendMessage(orderEmailMessage, List.of(recipientCSVFile));
         } catch (PortalEmailException e) {
-            log.error("There was a problem submitting an order to NOMS", e);
+            log.error("There was a problem submitting an order with giftId=[{}] to NOMS: {}.", giftId, e.getMessage());
+            throw e;
         }
     }
 

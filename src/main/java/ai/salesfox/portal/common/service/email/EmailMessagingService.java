@@ -21,6 +21,7 @@ import java.util.Optional;
 @Component
 public class EmailMessagingService {
     public static final String ATTACHMENT_HEADER_CONTENT_ID = "Content-ID";
+
     private final EmailConfiguration emailConfiguration;
     private final EmailHtmlMessageCreator emailHtmlMessageCreator;
 
@@ -132,14 +133,14 @@ public class EmailMessagingService {
     }
 
     private void sendMessage(Session session, MimeMessage mimeMessage) throws MessagingException {
-        log.info("Attempting to send an email...");
+        log.debug("Attempting to send an email...");
         try (Transport transport = session.getTransport("smtp")) {
             if (emailConfiguration.getSmtpAuth()) {
-                log.info("Authenticating with email server...");
+                log.debug("Authenticating with email server...");
                 transport.connect(emailConfiguration.getSmtpHost(), emailConfiguration.getSmtpPort(), emailConfiguration.getSmtpUser(), emailConfiguration.getSmtpPassword());
             }
             transport.sendMessage(mimeMessage, mimeMessage.getAllRecipients());
-            log.info("Successfully sent an email!");
+            log.debug("Successfully sent an email!");
         }
     }
 
