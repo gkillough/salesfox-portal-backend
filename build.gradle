@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.2.3.RELEASE'
+        springBootVersion = '2.2.6.RELEASE'
     }
 
     repositories {
@@ -18,7 +18,7 @@ buildscript {
 plugins {
     id 'java'
     id 'application'
-    id 'org.springframework.boot' version '2.2.3.RELEASE'
+    id 'org.springframework.boot' version '2.2.6.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
     id 'org.liquibase.gradle' version '2.0.1'
 }
@@ -70,6 +70,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
+    // OAuth
+    implementation 'org.springframework.security:spring-security-oauth2-resource-server'
+    implementation 'org.springframework.security:spring-security-oauth2-jose'
+    implementation 'org.springframework.security:spring-security-config'
+
     // Utilities & Integrations
     implementation platform('software.amazon.awssdk:bom:2.15.2')
     implementation 'software.amazon.awssdk:s3'
@@ -90,7 +95,7 @@ dependencies {
 
     if (getGradle().getStartParameter().taskNames.contains('runServer')) {
         runtimeClasspath 'org.testcontainers:postgresql:1.15.0-rc2'
-        runtimeClasspath 'org.springframework.cloud:spring-cloud-starter:2.2.3.RELEASE'
+        runtimeClasspath 'org.springframework.cloud:spring-cloud-starter:2.2.5.RELEASE'
         runtimeClasspath "com.playtika.testcontainers:embedded-postgresql:1.78"
         runtimeClasspath 'org.springframework.boot:spring-boot-devtools'
     }

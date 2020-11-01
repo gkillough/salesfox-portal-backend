@@ -75,7 +75,8 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
         HttpSecurity sslSecured = configureSSL(security);
         HttpSecurity csrfSecured = configureCsrf(sslSecured);
         HttpSecurity corsAllowed = configureCors(csrfSecured);
-        HttpSecurity passwordResetSecured = configurePasswordReset(corsAllowed);
+        HttpSecurity oAuthSecured = configureOAuth(corsAllowed);
+        HttpSecurity passwordResetSecured = configurePasswordReset(oAuthSecured);
         HttpSecurity orgAccountRegistrationSecured = configureOrganizationAccountRegistration(passwordResetSecured);
         HttpSecurity adminPermissionsSecured = configureAdminPermissions(orgAccountRegistrationSecured);
         HttpSecurity defaultPermissionsSecured = configureDefaultPermissions(adminPermissionsSecured);
@@ -98,6 +99,13 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
         return security.csrf()
                 .csrfTokenRepository(csrfTokenRepository)
                 .ignoringAntMatchers(collectCsrfIgnorableResources())
+                .and();
+    }
+
+    private HttpSecurity configureOAuth(HttpSecurity security) throws Exception {
+        return security.oauth2ResourceServer()
+                .jwt()
+                .and()
                 .and();
     }
 
