@@ -1,5 +1,6 @@
 package ai.salesfox.portal.common.time;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
@@ -13,19 +14,34 @@ public class PortalDateTimeUtils {
     }
 
     public static LocalDate computeMostRecentDateWithDayOfMonth(int dayOfMonth) {
-        LocalDate currentDate = getCurrentDate();
+        if (dayOfMonth < 1 || 31 < dayOfMonth) {
+            throw new DateTimeException("Invalid day of month: " + dayOfMonth);
+        }
 
+        LocalDate currentDate = getCurrentDate();
         int currentDayOfMonth = currentDate.getDayOfMonth();
         if (currentDayOfMonth == dayOfMonth) {
             return currentDate;
         }
 
-        LocalDate targetDayThisMonth = LocalDate.of(currentDate.getYear(), currentDate.getMonth(), dayOfMonth);
-        if (currentDayOfMonth > dayOfMonth) {
-            return targetDayThisMonth;
-        } else {
-            return targetDayThisMonth.minusMonths(1L);
+        LocalDate targetDayThisMonth;
+        try {
+            targetDayThisMonth = currentDate.withDayOfMonth(dayOfMonth);
+            if (currentDayOfMonth > dayOfMonth) {
+                return targetDayThisMonth;
+            }
+        } catch (DateTimeException e) {
+            // This month does not have the specified day-of-month.
         }
+
+        for (long i = 1L; i < 12; i++) {
+            try {
+                return currentDate.minusMonths(i).withDayOfMonth(dayOfMonth);
+            } catch (DateTimeException e) {
+                // The i-th month before this one does not have the specified day-of-month.
+            }
+        }
+        throw new DateTimeException("Could not compute most recent date with day-of-month: " + dayOfMonth);
     }
 
 }
