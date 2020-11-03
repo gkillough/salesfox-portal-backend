@@ -53,7 +53,8 @@ public class PasswordController implements CsrfIgnorable, AnonymouslyAccessible 
     @Override
     public String[] csrfIgnorableApiAntMatchers() {
         return new String[] {
-                PasswordController.RESET_ENDPOINT
+                PasswordController.RESET_ENDPOINT,
+                PasswordController.UPDATE_ENDPOINT
         };
     }
 

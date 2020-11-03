@@ -15,8 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
-
 @RestController
 @RequestMapping(RegistrationController.BASE_ENDPOINT)
 public class RegistrationController implements CsrfIgnorable, AnonymouslyAccessible {
@@ -44,7 +42,7 @@ public class RegistrationController implements CsrfIgnorable, AnonymouslyAccessi
     @ApiOperation(value = "Complete the registration of an organization account user")
     @PostMapping(ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void registerOrganizationAccountUser(HttpServletResponse httpServletResponse, @RequestBody OrganizationAccountUserRegistrationModel registrationRequest) {
+    public void registerOrganizationAccountUser(@RequestBody OrganizationAccountUserRegistrationModel registrationRequest) {
         organizationInvitationService.completeOrganizationAccountRegistrationFromInvite(registrationRequest);
     }
 
