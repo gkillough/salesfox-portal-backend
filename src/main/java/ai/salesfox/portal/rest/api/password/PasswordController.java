@@ -1,13 +1,12 @@
 package ai.salesfox.portal.rest.api.password;
 
+import ai.salesfox.portal.rest.api.password.model.PasswordResetValidationResponseModel;
+import ai.salesfox.portal.rest.api.password.model.ResetPasswordModel;
+import ai.salesfox.portal.rest.api.password.model.UpdatePasswordModel;
 import ai.salesfox.portal.rest.security.authentication.AnonymouslyAccessible;
 import ai.salesfox.portal.rest.security.authorization.CsrfIgnorable;
-import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
 
 @RestController
 public class PasswordController implements CsrfIgnorable, AnonymouslyAccessible {
@@ -28,22 +27,23 @@ public class PasswordController implements CsrfIgnorable, AnonymouslyAccessible 
         passwordService.sendPasswordResetEmail(resetPasswordRequest);
     }
 
+    // TODO consider making this a POST endpoint
     @GetMapping(GRANT_UPDATE_PERMISSION_ENDPOINT)
-    public void grantUpdatePasswordPermission(HttpServletResponse response, @RequestParam("email") String emailRequestParam, @RequestParam("token") String tokenRequestParam) {
-        passwordService.validateToken(response, emailRequestParam, tokenRequestParam);
+    public PasswordResetValidationResponseModel grantUpdatePasswordPermission(@RequestParam("email") String emailRequestParam, @RequestParam("token") String tokenRequestParam) {
+        return passwordService.validateToken(emailRequestParam, tokenRequestParam);
     }
 
     @PostMapping(UPDATE_ENDPOINT)
-    @PreAuthorize(PortalAuthorityConstants.UPDATE_PASSWORD_PERMISSION_AUTH_CHECK)
-    public boolean updatePassword(HttpServletResponse response, @RequestBody UpdatePasswordModel updatePasswordModel) {
-        return passwordService.updateAuthenticatedUserPassword(response, updatePasswordModel);
+    public void updatePassword(@RequestBody UpdatePasswordModel updatePasswordModel) {
+        passwordService.updatePasswordWithTokenAndEmail(updatePasswordModel);
     }
 
     @Override
     public String[] anonymouslyAccessibleApiAntMatchers() {
         return new String[] {
                 PasswordController.RESET_ENDPOINT,
-                PasswordController.GRANT_UPDATE_PERMISSION_ENDPOINT
+                PasswordController.GRANT_UPDATE_PERMISSION_ENDPOINT,
+                PasswordController.UPDATE_ENDPOINT
         };
     }
 

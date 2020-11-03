@@ -147,12 +147,7 @@ public class OrganizationInvitationService {
                 registrationModel.getFirstName(), registrationModel.getLastName(), temporarilyAuthenticatedUser.getEmail(), registrationModel.getUserAddress(), registrationModel.getMobilePhoneNumber(), registrationModel.getBusinessPhoneNumber());
         userProfileService.updateProfile(temporarilyAuthenticatedUser.getUserId(), userProfileUpdateModel);
 
-        boolean didUpdatePassword = passwordService.updatePassword(temporarilyAuthenticatedUser.getEmail(), registrationModel.getPassword());
-        if (!didUpdatePassword) {
-            log.error("Could not update password for user [{}] while completing organization account registration", temporarilyAuthenticatedUser.getEmail());
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
+        passwordService.updatePassword(temporarilyAuthenticatedUser.getEmail(), registrationModel.getPassword());
         UserRoleUpdateModel roleUpdateModel = new UserRoleUpdateModel(inviteTokenEntity.getRoleLevel());
         userRoleService.updateRole(temporarilyAuthenticatedUser.getUserId(), roleUpdateModel);
 
