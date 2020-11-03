@@ -63,8 +63,7 @@ public class RegistrationController implements CsrfIgnorable, AnonymouslyAccessi
     @Override
     public String[] anonymouslyAccessibleApiAntMatchers() {
         return new String[] {
-                SecurityInterface.createSubDirectoryPattern(RegistrationController.BASE_ENDPOINT),
-                RegistrationController.BASE_ENDPOINT + RegistrationController.ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX
+                SecurityInterface.createSubDirectoryPattern(RegistrationController.BASE_ENDPOINT)
         };
     }
 
