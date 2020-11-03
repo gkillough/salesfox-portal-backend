@@ -43,7 +43,7 @@ databaseChangeLog:
                   SELECT u2.user_id FROM portal.users u2
                   JOIN portal.logins l1 ON u2.user_id = l1.user_id
                   JOIN portal.memberships m1 ON u2.user_id = m1.user_id
-                  JOIN portal.roles r1 ON m1.role_id = m1.role_id
+                  JOIN portal.roles r1 ON m1.role_id = r1.role_id
                   WHERE r1.role_level = 'TEMPORARY_CREATE_ORGANIZATION_ACCOUNT_PERMISSION'
                 );"
 
