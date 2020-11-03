@@ -10,6 +10,8 @@ import ai.salesfox.portal.common.time.PortalDateTimeUtils;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.RoleRepository;
+import ai.salesfox.portal.database.organization.OrganizationEntity;
+import ai.salesfox.portal.database.organization.OrganizationRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
 import ai.salesfox.portal.database.organization.account.invite.OrganizationAccountInviteTokenEntity;
@@ -48,6 +50,7 @@ public class OrganizationInvitationService {
 
     private final PortalConfiguration portalConfiguration;
     private final RoleRepository roleRepository;
+    private final OrganizationRepository organizationRepository;
     private final OrganizationAccountRepository organizationAccountRepository;
     private final OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository;
     private final UserRegistrationService userRegistrationService;
@@ -59,6 +62,7 @@ public class OrganizationInvitationService {
     public OrganizationInvitationService(
             PortalConfiguration portalConfiguration,
             RoleRepository roleRepository,
+            OrganizationRepository organizationRepository,
             OrganizationAccountRepository organizationAccountRepository,
             OrganizationAccountInviteTokenRepository organizationAccountInviteTokenRepository,
             UserRegistrationService userRegistrationService,
@@ -68,6 +72,7 @@ public class OrganizationInvitationService {
     ) {
         this.portalConfiguration = portalConfiguration;
         this.roleRepository = roleRepository;
+        this.organizationRepository = organizationRepository;
         this.organizationAccountRepository = organizationAccountRepository;
         this.organizationAccountInviteTokenRepository = organizationAccountInviteTokenRepository;
         this.userRegistrationService = userRegistrationService;
@@ -88,12 +93,14 @@ public class OrganizationInvitationService {
         UserEntity authenticatedUser = userMembershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity membership = authenticatedUser.getMembershipEntity();
         OrganizationAccountEntity orgAccountEntity = membership.getOrganizationAccountEntity();
+        OrganizationEntity orgEntity = organizationRepository.findById(orgAccountEntity.getOrganizationId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Organization missing!"));
 
         String invitationToken = UUID.randomUUID().toString();
         OrganizationAccountInviteTokenEntity inviteEntity = new OrganizationAccountInviteTokenEntity(requestModel.getInviteEmail(), invitationToken, orgAccountEntity.getOrganizationAccountId(), requestModel.getInviteRole(), PortalDateTimeUtils.getCurrentDateTime());
         organizationAccountInviteTokenRepository.save(inviteEntity);
 
-        sendInvitationEmail(requestModel.getInviteEmail(), orgAccountEntity.getOrganizationAccountName(), invitationToken);
+        sendInvitationEmail(requestModel.getInviteEmail(), orgEntity.getOrganizationName(), orgAccountEntity.getOrganizationAccountName(), invitationToken);
     }
 
     @Transactional(readOnly = true)
@@ -183,11 +190,11 @@ public class OrganizationInvitationService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "No invitation exists for that email/token combination"));
     }
 
-    private void sendInvitationEmail(String email, String organizationAccountName, String invitationToken) {
+    private void sendInvitationEmail(String email, String organizationName, String organizationAccountName, String invitationToken) {
         String invitationUrl = createInvitationLink(email, invitationToken);
 
         log.info("*** REMOVE ME *** Invitation Link: {}", invitationUrl);
-        EmailMessageModel emailMessage = createInvitationMessageModel(email, organizationAccountName, invitationUrl);
+        EmailMessageModel emailMessage = createInvitationMessageModel(email, organizationName, organizationAccountName, invitationUrl);
         try {
             emailMessagingService.sendMessage(emailMessage);
         } catch (PortalEmailException e) {
@@ -195,12 +202,12 @@ public class OrganizationInvitationService {
         }
     }
 
-    private ButtonEmailMessageModel createInvitationMessageModel(String recipientEmail, String organizationAccountName, String invitationUrl) {
+    private ButtonEmailMessageModel createInvitationMessageModel(String recipientEmail, String organizationName, String organizationAccountName, String invitationUrl) {
         return new ButtonEmailMessageModel(
                 List.of(recipientEmail),
-                String.format("Invitation to join %s on Salesfox", organizationAccountName),
+                String.format("Invitation to join '%s - %s' on Salesfox", organizationName, organizationAccountName),
                 "Invitation",
-                String.format("You have been invited to join the '%s' account on Salesfox. Click the button below to accept.", organizationAccountName),
+                String.format("You have been invited to join the '%s - %s' account on Salesfox. Click the button below to accept.", organizationName, organizationAccountName),
                 "Accept Invitation",
                 invitationUrl
         );
