@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: remove_temp_role.yaml
+      relativeToChangelogFile: true
