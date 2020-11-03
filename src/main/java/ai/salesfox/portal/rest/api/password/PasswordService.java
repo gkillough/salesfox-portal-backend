@@ -83,8 +83,8 @@ public class PasswordService {
     public ValidationResponseModel validateToken(String email, String token) {
         Duration timeSinceTokenGenerated = validateAndRetrieveDurationSinceGenerated(email, token);
         if (timeSinceTokenGenerated.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
-            Long minutesRemaining = DURATION_OF_TOKEN_VALIDITY.toMinutes() - timeSinceTokenGenerated.toMinutes();
-            return new ValidationResponseModel(true, String.format("The token expires in %s minutes", minutesRemaining.toString()));
+            Duration remainingTokenValidity = DURATION_OF_TOKEN_VALIDITY.minus(timeSinceTokenGenerated);
+            return new ValidationResponseModel(true, String.format("The token expires in %d minutes", remainingTokenValidity.toMinutes()));
         } else {
             return new ValidationResponseModel(false, "The password reset token has expired");
         }
