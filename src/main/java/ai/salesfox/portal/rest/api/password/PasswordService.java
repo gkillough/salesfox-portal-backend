@@ -13,7 +13,7 @@ import ai.salesfox.portal.database.account.key.PasswordResetTokenPK;
 import ai.salesfox.portal.database.account.repository.LoginRepository;
 import ai.salesfox.portal.database.account.repository.PasswordResetTokenRepository;
 import ai.salesfox.portal.database.account.repository.UserRepository;
-import ai.salesfox.portal.rest.api.password.model.PasswordResetValidationResponseModel;
+import ai.salesfox.portal.rest.api.common.model.response.ValidationResponseModel;
 import ai.salesfox.portal.rest.api.password.model.ResetPasswordModel;
 import ai.salesfox.portal.rest.api.password.model.UpdatePasswordModel;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -60,6 +60,7 @@ public class PasswordService {
         this.emailMessagingService = emailMessagingService;
     }
 
+    @Transactional
     public void sendPasswordResetEmail(ResetPasswordModel resetPasswordModel) {
         String email = resetPasswordModel.getEmail();
         if (StringUtils.isBlank(email)) {
@@ -78,13 +79,14 @@ public class PasswordService {
         sendPasswordResetEmail(email, passwordResetToken);
     }
 
-    public PasswordResetValidationResponseModel validateToken(String email, String token) {
+    @Transactional(readOnly = true)
+    public ValidationResponseModel validateToken(String email, String token) {
         Duration timeSinceTokenGenerated = validateAndRetrieveDurationSinceGenerated(email, token);
         if (timeSinceTokenGenerated.compareTo(DURATION_OF_TOKEN_VALIDITY) < 0) {
             Long minutesRemaining = DURATION_OF_TOKEN_VALIDITY.toMinutes() - timeSinceTokenGenerated.toMinutes();
-            return new PasswordResetValidationResponseModel(true, String.format("The token expires in %s minutes", minutesRemaining.toString()));
+            return new ValidationResponseModel(true, String.format("The token expires in %s minutes", minutesRemaining.toString()));
         } else {
-            return new PasswordResetValidationResponseModel(false, "The password reset token has expired");
+            return new ValidationResponseModel(false, "The password reset token has expired");
         }
     }
 

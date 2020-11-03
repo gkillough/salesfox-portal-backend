@@ -1,15 +1,15 @@
 package ai.salesfox.portal.rest.api.organization.invitation;
 
+import ai.salesfox.portal.rest.api.common.model.response.ValidationResponseModel;
 import ai.salesfox.portal.rest.api.organization.common.OrganizationEndpointConstants;
 import ai.salesfox.portal.rest.api.organization.invitation.model.OrganizationAccountInvitationModel;
 import ai.salesfox.portal.rest.api.organization.invitation.model.OrganizationAssignableRolesModel;
 import ai.salesfox.portal.rest.security.authentication.AnonymouslyAccessible;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
 
 @RestController
 public class OrganizationInvitationController implements AnonymouslyAccessible {
@@ -31,14 +31,15 @@ public class OrganizationInvitationController implements AnonymouslyAccessible {
     }
 
     @PostMapping(INVITE_ENDPOINT)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize(PortalAuthorityConstants.ORGANIZATION_ACCOUNT_OWNER_AUTH_CHECK)
     public void sendOrganizationAccountInvitation(@RequestBody OrganizationAccountInvitationModel requestModel) {
         organizationInvitationService.sendOrganizationAccountInvitation(requestModel);
     }
 
     @GetMapping(VALIDATE_INVITE_ENDPOINT)
-    public void validateOrganizationAccountInvitation(HttpServletResponse response, @RequestParam("email") String emailRequestParam, @RequestParam("token") String tokenRequestParam) {
-        organizationInvitationService.validateOrganizationAccountInvitation(response, emailRequestParam, tokenRequestParam);
+    public ValidationResponseModel validateOrganizationAccountInvitation(@RequestParam("email") String emailRequestParam, @RequestParam("token") String tokenRequestParam) {
+        return organizationInvitationService.validateOrganizationAccountInvitation(emailRequestParam, tokenRequestParam);
     }
 
     @Override
