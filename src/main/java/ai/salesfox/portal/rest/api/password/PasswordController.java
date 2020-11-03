@@ -1,13 +1,13 @@
 package ai.salesfox.portal.rest.api.password;
 
+import ai.salesfox.portal.rest.api.common.model.response.ValidationResponseModel;
+import ai.salesfox.portal.rest.api.password.model.ResetPasswordModel;
+import ai.salesfox.portal.rest.api.password.model.UpdatePasswordModel;
 import ai.salesfox.portal.rest.security.authentication.AnonymouslyAccessible;
 import ai.salesfox.portal.rest.security.authorization.CsrfIgnorable;
-import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
 
 @RestController
 public class PasswordController implements CsrfIgnorable, AnonymouslyAccessible {
@@ -24,33 +24,37 @@ public class PasswordController implements CsrfIgnorable, AnonymouslyAccessible 
     }
 
     @PostMapping(RESET_ENDPOINT)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void resetPassword(@RequestBody ResetPasswordModel resetPasswordRequest) {
         passwordService.sendPasswordResetEmail(resetPasswordRequest);
     }
 
+    // TODO consider making this a POST endpoint
     @GetMapping(GRANT_UPDATE_PERMISSION_ENDPOINT)
-    public void grantUpdatePasswordPermission(HttpServletResponse response, @RequestParam("email") String emailRequestParam, @RequestParam("token") String tokenRequestParam) {
-        passwordService.validateToken(response, emailRequestParam, tokenRequestParam);
+    public ValidationResponseModel grantUpdatePasswordPermission(@RequestParam("email") String emailRequestParam, @RequestParam("token") String tokenRequestParam) {
+        return passwordService.validateToken(emailRequestParam, tokenRequestParam);
     }
 
     @PostMapping(UPDATE_ENDPOINT)
-    @PreAuthorize(PortalAuthorityConstants.UPDATE_PASSWORD_PERMISSION_AUTH_CHECK)
-    public boolean updatePassword(HttpServletResponse response, @RequestBody UpdatePasswordModel updatePasswordModel) {
-        return passwordService.updateAuthenticatedUserPassword(response, updatePasswordModel);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updatePassword(@RequestBody UpdatePasswordModel updatePasswordModel) {
+        passwordService.updatePasswordWithTokenAndEmail(updatePasswordModel);
     }
 
     @Override
     public String[] anonymouslyAccessibleApiAntMatchers() {
         return new String[] {
                 PasswordController.RESET_ENDPOINT,
-                PasswordController.GRANT_UPDATE_PERMISSION_ENDPOINT
+                PasswordController.GRANT_UPDATE_PERMISSION_ENDPOINT,
+                PasswordController.UPDATE_ENDPOINT
         };
     }
 
     @Override
     public String[] csrfIgnorableApiAntMatchers() {
         return new String[] {
-                PasswordController.RESET_ENDPOINT
+                PasswordController.RESET_ENDPOINT,
+                PasswordController.UPDATE_ENDPOINT
         };
     }
 

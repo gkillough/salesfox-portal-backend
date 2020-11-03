@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrganizationAccountUserRegistrationModel {
+    private String token;
     private String firstName;
     private String lastName;
     private String email;

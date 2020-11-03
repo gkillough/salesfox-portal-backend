@@ -2,8 +2,6 @@ package ai.salesfox.portal.rest.security;
 
 import ai.salesfox.portal.database.account.entity.RoleEntity;
 import ai.salesfox.portal.database.account.repository.RoleRepository;
-import ai.salesfox.portal.rest.api.password.PasswordController;
-import ai.salesfox.portal.rest.api.registration.RegistrationController;
 import ai.salesfox.portal.rest.security.authentication.AnonymouslyAccessible;
 import ai.salesfox.portal.rest.security.authentication.DefaultAuthenticationHandlers;
 import ai.salesfox.portal.rest.security.authentication.user.PortalUserDetailsService;
@@ -75,9 +73,7 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
         HttpSecurity sslSecured = configureSSL(security);
         HttpSecurity csrfSecured = configureCsrf(sslSecured);
         HttpSecurity corsAllowed = configureCors(csrfSecured);
-        HttpSecurity passwordResetSecured = configurePasswordReset(corsAllowed);
-        HttpSecurity orgAccountRegistrationSecured = configureOrganizationAccountRegistration(passwordResetSecured);
-        HttpSecurity adminPermissionsSecured = configureAdminPermissions(orgAccountRegistrationSecured);
+        HttpSecurity adminPermissionsSecured = configureAdminPermissions(corsAllowed);
         HttpSecurity defaultPermissionsSecured = configureDefaultPermissions(adminPermissionsSecured);
         HttpSecurity errorHandlingSecured = configureErrorHandling(defaultPermissionsSecured);
         HttpSecurity loginSecured = configureLogin(errorHandlingSecured);
@@ -98,21 +94,6 @@ public class PortalSecurityConfig extends WebSecurityConfigurerAdapter {
         return security.csrf()
                 .csrfTokenRepository(csrfTokenRepository)
                 .ignoringAntMatchers(collectCsrfIgnorableResources())
-                .and();
-    }
-
-    // TODO consider an interface for password reset and org account registration to implement, then use it here instead of having two similar methods
-    private HttpSecurity configurePasswordReset(HttpSecurity security) throws Exception {
-        return security.authorizeRequests()
-                .antMatchers(PasswordController.UPDATE_ENDPOINT)
-                .hasAuthority(PortalAuthorityConstants.UPDATE_PASSWORD_PERMISSION)
-                .and();
-    }
-
-    private HttpSecurity configureOrganizationAccountRegistration(HttpSecurity security) throws Exception {
-        return security.authorizeRequests()
-                .antMatchers(RegistrationController.BASE_ENDPOINT + RegistrationController.ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX)
-                .hasAuthority(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION)
                 .and();
     }
 

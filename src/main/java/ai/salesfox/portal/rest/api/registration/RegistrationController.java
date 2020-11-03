@@ -9,17 +9,11 @@ import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationA
 import ai.salesfox.portal.rest.api.registration.organization.model.OrganizationAccountUserRegistrationModel;
 import ai.salesfox.portal.rest.security.authentication.AnonymouslyAccessible;
 import ai.salesfox.portal.rest.security.authorization.CsrfIgnorable;
-import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import ai.salesfox.portal.rest.security.common.SecurityInterface;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(RegistrationController.BASE_ENDPOINT)
@@ -40,15 +34,16 @@ public class RegistrationController implements CsrfIgnorable, AnonymouslyAccessi
 
     @ApiOperation(value = "Register an organization with an initial account owner user", response = Boolean.class)
     @PostMapping(ORGANIZATION_ENDPOINT_SUFFIX)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void registerOrganizationAccount(@RequestBody OrganizationAccountRegistrationModel registrationRequest) {
         organizationAccountRegistrationService.registerOrganizationAccount(registrationRequest);
     }
 
     @ApiOperation(value = "Complete the registration of an organization account user")
     @PostMapping(ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX)
-    @PreAuthorize(PortalAuthorityConstants.CREATE_ORGANIZATION_ACCOUNT_PERMISSION_AUTH_CHECK)
-    public void registerOrganizationAccountUser(HttpServletResponse httpServletResponse, @RequestBody OrganizationAccountUserRegistrationModel registrationRequest) {
-        organizationInvitationService.completeOrganizationAccountRegistrationFromInvite(httpServletResponse, registrationRequest);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void registerOrganizationAccountUser(@RequestBody OrganizationAccountUserRegistrationModel registrationRequest) {
+        organizationInvitationService.completeOrganizationAccountRegistrationFromInvite(registrationRequest);
     }
 
     @ApiOperation(value = "Validate that an email address is eligible to own an organization account")
