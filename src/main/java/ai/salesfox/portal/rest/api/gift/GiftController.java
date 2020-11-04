@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -35,9 +36,9 @@ public class GiftController {
     public MultiGiftModel getGifts(
             @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset,
             @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit,
-            @RequestParam(required = false) String status
+            @RequestParam(required = false) List<String> statuses
     ) {
-        return giftService.getGifts(offset, limit, status);
+        return giftService.getGifts(offset, limit, statuses);
     }
 
     @GetMapping("/{giftId}")

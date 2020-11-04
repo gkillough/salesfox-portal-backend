@@ -39,11 +39,11 @@ import ai.salesfox.portal.rest.api.gift.util.GiftAccessService;
 import ai.salesfox.portal.rest.api.gift.util.GiftResponseModelUtils;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -103,13 +103,11 @@ public class GiftService {
         this.membershipRetrievalService = membershipRetrievalService;
     }
 
-    public MultiGiftModel getGifts(Integer pageOffset, Integer pageLimit, String giftStatus) {
+    public MultiGiftModel getGifts(Integer pageOffset, Integer pageLimit, List<String> giftStatuses) {
         PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
-        if (null != giftStatus && !EnumUtils.isValidEnum(GiftTrackingStatus.class, giftStatus)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The status [%s] is invalid. Valid statuses: %s", giftStatus, Arrays.toString(GiftTrackingStatus.values())));
-        }
+        validateGiftStatusesFilter(giftStatuses);
 
-        Page<GiftEntity> accessibleGifts = getAccessibleGifts(pageOffset, pageLimit, giftStatus);
+        Page<GiftEntity> accessibleGifts = getAccessibleGifts(pageOffset, pageLimit, giftStatuses);
         if (accessibleGifts.isEmpty()) {
             return MultiGiftModel.empty();
         }
@@ -224,7 +222,7 @@ public class GiftService {
         }
     }
 
-    private Page<GiftEntity> getAccessibleGifts(Integer pageOffset, Integer pageLimit, @Nullable String giftStatus) {
+    private Page<GiftEntity> getAccessibleGifts(Integer pageOffset, Integer pageLimit, List<String> giftStatuses) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
         if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             return giftRepository.findAll(pageRequest);
@@ -232,7 +230,25 @@ public class GiftService {
 
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
-        return giftRepository.findAccessibleGiftsByStatus(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), giftStatus, pageRequest);
+        return giftRepository.findAccessibleGiftsByStatuses(userMembership.getOrganizationAccountId(), loggedInUser.getUserId(), giftStatuses, pageRequest);
+    }
+
+    private void validateGiftStatusesFilter(Collection<String> giftStatuses) {
+        if (null == giftStatuses) {
+            return;
+        }
+
+        List<String> invalidStatuses = new ArrayList<>(giftStatuses.size());
+        for (String giftStatus : giftStatuses) {
+            if (StringUtils.isBlank(giftStatus) || !EnumUtils.isValidEnum(GiftTrackingStatus.class, giftStatus)) {
+                invalidStatuses.add(giftStatus);
+            }
+        }
+
+        if (!invalidStatuses.isEmpty()) {
+            String invalidStatusesString = String.join(", ", invalidStatuses);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Invalid status(es): [%s]. Valid statuses: [%s]", invalidStatusesString, Arrays.toString(GiftTrackingStatus.values())));
+        }
     }
 
     // TODO clean this method up after a common restriction interface is implemented
