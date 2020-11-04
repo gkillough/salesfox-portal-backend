@@ -10,6 +10,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -25,11 +26,11 @@ public interface GiftRepository extends JpaRepository<GiftEntity, UUID> {
             "   (userRestriction != NULL AND userRestriction.userId = :userId)" +
             " )" +
             " AND (" +
-            "   :status = NULL OR tracking.status = :status" +
+            "   (:statuses) = NULL OR tracking.status IN (:statuses)" +
             " )" +
             " ORDER BY tracking.dateCreated"
     )
-    Page<GiftEntity> findAccessibleGiftsByStatus(@Param("orgAcctId") UUID orgAcctId, @Param("userId") UUID userId, @Nullable @Param("status") String status, Pageable pageable);
+    Page<GiftEntity> findAccessibleGiftsByStatuses(@Param("orgAcctId") UUID orgAcctId, @Param("userId") UUID userId, @Nullable @Param("statuses") List<String> statuses, Pageable pageable);
 
     @Query("SELECT gift" +
             " FROM GiftEntity gift" +
