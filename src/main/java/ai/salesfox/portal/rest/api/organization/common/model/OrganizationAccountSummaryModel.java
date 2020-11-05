@@ -9,7 +9,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrganizationAccountModel {
+public class OrganizationAccountSummaryModel {
     private String organizationName;
     private String organizationAccountName;
     private UUID organizationAccountId;
