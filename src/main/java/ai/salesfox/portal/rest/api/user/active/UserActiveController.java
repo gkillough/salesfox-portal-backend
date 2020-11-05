@@ -3,6 +3,7 @@ package ai.salesfox.portal.rest.api.user.active;
 import ai.salesfox.portal.rest.api.common.model.request.ActiveStatusPatchModel;
 import ai.salesfox.portal.rest.api.user.common.UserEndpointConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -20,8 +21,9 @@ public class UserActiveController {
     // FIXME eventually remove deprecated endpoint
     @PatchMapping({
             "/active/{userId}",
-            UserEndpointConstants.BASE_ENDPOINT + "/{userId}"
+            UserEndpointConstants.BASE_ENDPOINT + "/{userId}/active"
     })
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateActiveStatus(@PathVariable UUID userId, @RequestBody ActiveStatusPatchModel updateModel) {
         userActiveService.updateUserActiveStatus(userId, updateModel);
     }
