@@ -18,8 +18,7 @@ public class ContactCSVFileUtils {
                 .withEscape(DEFAULT_ESCAPE_CHAR)
                 .withQuoteMode(QuoteMode.NONE)
                 .withFirstRecordAsHeader()
-                .withAllowDuplicateHeaderNames(false)
-                .withIgnoreEmptyLines();
+                .withAllowDuplicateHeaderNames(false);
     }
 
     public static ContactCSVWrapper createCSVWrapper(InputStream csvFileInputStream, CSVFormat csvFormat) throws IOException {
