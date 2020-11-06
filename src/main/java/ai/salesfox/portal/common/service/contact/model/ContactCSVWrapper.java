@@ -19,6 +19,7 @@ public class ContactCSVWrapper implements Closeable {
     public static final String HEADER_EMAIL = "Email";
     public static final String HEADER_EMAIL_ADDRESS = "Email Address";
 
+    public static final String HEADER_SINGLE_COLUMN_ADDRESS = "Address";
     public static final String HEADER_ADDRESS_LINE_1 = "Address Line 1";
     public static final String HEADER_ADDRESS_LINE_2 = "Address Line 2";
     public static final String HEADER_ADDRESS_CITY = "City";
@@ -74,14 +75,23 @@ public class ContactCSVWrapper implements Closeable {
     }
 
     private PortalAddressModel extractAddress(CSVRecord csvRecord) {
+        Boolean isBusiness = Optional.ofNullable(extractTrimmedField(csvRecord, HEADER_ADDRESS_IS_BUSINESS))
+                .map(Boolean::parseBoolean)
+                .orElse(true);
+
+        if (headerMap.containsKey(HEADER_SINGLE_COLUMN_ADDRESS) && !headerMap.containsKey(HEADER_ADDRESS_LINE_1)) {
+            // Candidate for single column address parsing
+            String addressString = extractTrimmedField(csvRecord, HEADER_SINGLE_COLUMN_ADDRESS);
+            Optional<PortalAddressModel> extractedAddress = SimpleAddressExtractionUtils.extractSimpleAddress(addressString);
+            extractedAddress.ifPresent(addr -> addr.setIsBusiness(isBusiness));
+            return extractedAddress.orElse(null);
+        }
+
         String addressLine1 = extractTrimmedField(csvRecord, HEADER_ADDRESS_LINE_1);
         String addressLine2 = extractTrimmedField(csvRecord, HEADER_ADDRESS_LINE_2);
         String city = extractTrimmedField(csvRecord, HEADER_ADDRESS_CITY);
         String state = extractTrimmedField(csvRecord, HEADER_ADDRESS_STATE);
         String zip = Optional.ofNullable(extractTrimmedField(csvRecord, HEADER_ADDRESS_ZIP)).orElseGet(() -> extractTrimmedField(csvRecord, HEADER_ADDRESS_ZIP_CODE));
-        Boolean isBusiness = Optional.ofNullable(extractTrimmedField(csvRecord, HEADER_ADDRESS_IS_BUSINESS))
-                .map(Boolean::parseBoolean)
-                .orElse(true);
 
         return new PortalAddressModel(addressLine1, addressLine2, city, state, zip, isBusiness);
     }

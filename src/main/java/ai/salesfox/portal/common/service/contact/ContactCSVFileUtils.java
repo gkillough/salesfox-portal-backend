@@ -10,17 +10,16 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 public class ContactCSVFileUtils {
-    public static final char DEFAULT_DELIMITER = '|';
     public static final char DEFAULT_ESCAPE_CHAR = '\\';
 
     // TODO consider allowing some of these fields to be overridden by the end-user
     public static CSVFormat portalCSVFormat() {
-        return CSVFormat.DEFAULT
-                .withDelimiter(DEFAULT_DELIMITER)
+        return CSVFormat.EXCEL
                 .withEscape(DEFAULT_ESCAPE_CHAR)
                 .withQuoteMode(QuoteMode.NONE)
                 .withFirstRecordAsHeader()
-                .withAllowDuplicateHeaderNames(false);
+                .withAllowDuplicateHeaderNames(false)
+                .withIgnoreEmptyLines();
     }
 
     public static ContactCSVWrapper createCSVWrapper(InputStream csvFileInputStream, CSVFormat csvFormat) throws IOException {

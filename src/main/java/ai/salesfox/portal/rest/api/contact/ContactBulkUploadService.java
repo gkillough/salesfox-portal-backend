@@ -71,7 +71,10 @@ public class ContactBulkUploadService {
         }
 
         Resource csvFileResource = csvFile.getResource();
-        try (InputStream csvFileInputStream = csvFileResource.getInputStream(); ContactCSVWrapper csvWrapper = ContactCSVFileUtils.createCSVWrapper(csvFileInputStream, ContactCSVFileUtils.portalCSVFormat())) {
+        try (
+                InputStream csvFileInputStream = csvFileResource.getInputStream();
+                ContactCSVWrapper csvWrapper = ContactCSVFileUtils.createCSVWrapper(csvFileInputStream, ContactCSVFileUtils.portalCSVFormat())
+        ) {
             List<ContactUploadModel> parsedContactRecords = csvWrapper.parseRecords();
             return createContactsInBulk(parsedContactRecords, UPLOAD_INPUT_TYPE_CSV);
         } catch (IOException e) {
