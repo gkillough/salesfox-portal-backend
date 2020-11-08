@@ -41,8 +41,8 @@ public class RunServerTask extends Exec {
 
         Map runEnvironment = getEnvironment();
         Map<String, Object> envVars = new HashMap<>();
-        envVars.putIfAbsent("PORTAL_BACK_END_URL", "http://localhost:8080");
-        envVars.putIfAbsent("PORTAL_FRONT_END_URL", "http://localhost:3000");
+        envVars.putIfAbsent("PORTAL_BACK_END_URL", "https://://localhost:8443");
+        envVars.putIfAbsent("PORTAL_FRONT_END_URL", "https://localhost:3000");
 
         envVars.putIfAbsent("PORTAL_RESOURCE_BASE_DIR", String.format("%s/tmp", buildDirectory));
         envVars.putIfAbsent("PORTAL_RESOURCE_ICON_DIR", String.format("%s/tmp", buildDirectory));
@@ -57,6 +57,9 @@ public class RunServerTask extends Exec {
 
         envVars.putIfAbsent("PORTAL_CORS_ALLOWED_ORIGINS", "*");
 
+        envVars.putIfAbsent("PORTAL_SSL_ENABLED", true);
+        envVars.putIfAbsent("PORTAL_SERVER_PORT", 8443);
+
         runEnvironment.putAll(envVars);
 
         String version = (String) project.getVersion();
@@ -68,6 +71,7 @@ public class RunServerTask extends Exec {
         commandArray.addAll(getJMXVariables());
         commandArray.add("-jar");
         commandArray.add(jarFile.getAbsolutePath());
+        commandArray.addAll(getSSLVariables());
         commandArray.addAll(getApplicationVariables());
         commandLine(commandArray);
         super.exec();
@@ -81,11 +85,24 @@ public class RunServerTask extends Exec {
     }
 
     public List<String> getJMXVariables() {
-        return List.of("-Dcom.sun.management.jmxremote",
+        return List.of(
+                "-Dcom.sun.management.jmxremote",
                 "-Dcom.sun.management.jmxremote.port=9045",
                 "-Dcom.sun.management.jmxremote.local.only=false",
                 "-Dcom.sun.management.jmxremote.authenticate=false",
                 "-Dcom.sun.management.jmxremote.ssl=false"
+        );
+    }
+
+    public List<String> getSSLVariables() {
+        return List.of(
+                "--server.ssl.key-store=classpath:keystore.p12",
+                "--server.ssl.key-store-password=changeit",
+                "--server.ssl.key-store-type=PKCS12",
+                "--server.ssl.key-alias=portal-cert",
+                "--server.ssl.protocol=TLS",
+                "--server.ssl.enabled-protocols=TLSv1.2,TLSv1.3",
+                "--spring.profiles.active=ssl"
         );
     }
 
