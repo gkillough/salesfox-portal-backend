@@ -23,9 +23,18 @@ public class PortalCorsConfiguration {
         CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
         corsConfiguration.setAllowedOrigins(getAllowedOrigins());
         corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setAllowedHeaders(List.of(CorsConfiguration.ALL));
+        corsConfiguration.setAllowedHeaders(
+                List.of(
+                        "origin",
+                        "content-type",
+                        "accept",
+                        "Cookie",
+                        "X-CSRF-TOKEN"
+                )
+        );
         corsConfiguration.setAllowedMethods(
                 List.of(
+                        HttpMethod.OPTIONS.name(),
                         HttpMethod.GET.name(),
                         HttpMethod.POST.name(),
                         HttpMethod.PUT.name(),
