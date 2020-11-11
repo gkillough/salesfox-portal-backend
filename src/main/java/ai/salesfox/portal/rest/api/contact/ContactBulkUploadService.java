@@ -75,6 +75,14 @@ public class ContactBulkUploadService {
                 InputStream csvFileInputStream = csvFileResource.getInputStream();
                 ContactCSVWrapper csvWrapper = ContactCSVFileUtils.createCSVWrapper(csvFileInputStream, ContactCSVFileUtils.portalCSVFormat())
         ) {
+            List<String> headerNames = csvWrapper.extractHeaderNames();
+            if (headerNames.size() < ContactCSVWrapper.MINIMUM_REQUIRED_HEADERS) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        String.format("The supplied headers were not sufficient to extract contact data. Minimum number of headers required: %d. Headers supplied: %d", ContactCSVWrapper.MINIMUM_REQUIRED_HEADERS, headerNames.size())
+                );
+            }
+
             List<ContactUploadModel> parsedContactRecords = csvWrapper.parseRecords();
             return createContactsInBulk(parsedContactRecords, UPLOAD_INPUT_TYPE_CSV);
         } catch (IOException e) {
