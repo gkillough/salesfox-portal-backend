@@ -4,6 +4,7 @@ import ai.salesfox.portal.common.model.PortalAddressModel;
 import ai.salesfox.portal.rest.api.contact.model.ContactUploadModel;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.util.Pair;
 
@@ -47,7 +48,7 @@ public class ContactCSVWrapper implements Closeable {
 
     public ContactCSVWrapper(CSVParser contactCSVParser) {
         this.contactCSVParser = contactCSVParser;
-        this.headerMap = contactCSVParser.getHeaderMap();
+        this.headerMap = sanitizeHeaders(contactCSVParser.getHeaderMap());
     }
 
     public List<String> extractHeaderNames() {
@@ -103,7 +104,7 @@ public class ContactCSVWrapper implements Closeable {
 
     private String extractTrimmedField(CSVRecord csvRecord, String fieldName) {
         Integer fieldIndex = headerMap.get(fieldName);
-        if (fieldIndex >= 0) {
+        if (null != fieldIndex && csvRecord.isSet(fieldIndex)) {
             String fieldValue = csvRecord.get(fieldIndex);
             return StringUtils.trimToNull(fieldValue);
         }
@@ -174,6 +175,29 @@ public class ContactCSVWrapper implements Closeable {
     @Override
     public void close() throws IOException {
         contactCSVParser.close();
+    }
+
+    private Map<String, Integer> sanitizeHeaders(Map<String, Integer> originalHeaders) {
+        Map<String, Integer> sanitizedHeaders = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> headerEntry : originalHeaders.entrySet()) {
+            String sanitizedKey = sanitizeInput(headerEntry.getKey());
+            if (null != sanitizedKey) {
+                sanitizedHeaders.put(sanitizedKey, headerEntry.getValue());
+            }
+        }
+        return sanitizedHeaders;
+    }
+
+    private String sanitizeInput(String input) {
+        input = StringUtils.trimToEmpty(input);
+
+        StringBuilder sanitizedInput = new StringBuilder();
+        for (char inputChar : input.toCharArray()) {
+            if (CharUtils.isAsciiAlphanumeric(inputChar) || inputChar == ' ') {
+                sanitizedInput.append(inputChar);
+            }
+        }
+        return StringUtils.trimToNull(sanitizedInput.toString());
     }
 
 }

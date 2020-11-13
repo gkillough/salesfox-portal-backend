@@ -73,7 +73,7 @@ public class ContactBulkUploadService {
         Resource csvFileResource = csvFile.getResource();
         try (
                 InputStream csvFileInputStream = csvFileResource.getInputStream();
-                ContactCSVWrapper csvWrapper = ContactCSVFileUtils.createCSVWrapper(csvFileInputStream, ContactCSVFileUtils.portalCSVFormat())
+                ContactCSVWrapper csvWrapper = ContactCSVFileUtils.createCSVWrapper(csvFileInputStream, ContactCSVFileUtils.PORTAL_CSV_FORMAT)
         ) {
             List<String> headerNames = csvWrapper.extractHeaderNames();
             if (headerNames.size() < ContactCSVWrapper.MINIMUM_REQUIRED_HEADERS) {
@@ -142,8 +142,8 @@ public class ContactBulkUploadService {
         try {
             ContactFieldValidationUtils.validateContactUploadModel(contactUploadCandidate);
         } catch (ResponseStatusException e) {
-            log.warn("A contact failed validation during bulk upload: {} ", e.getMessage());
-            errorMessage = e.getMessage();
+            errorMessage = e.getReason();
+            log.warn("A contact failed validation during bulk upload: {} ", errorMessage);
         }
         return new ContactBulkUploadFieldStatus(fieldNumber, errorMessage);
     }

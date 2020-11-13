@@ -19,7 +19,7 @@ public class ContactCSVWrapperTest {
     public void extractHeaderNamesTest() throws IOException {
         File testCSVFile = ContactCSVFileUtilsTest.getTestCSVFile(getClass().getClassLoader());
         try (FileInputStream testCsvFileInputStream = new FileInputStream(testCSVFile)) {
-            try (ContactCSVWrapper csvWrapper = ContactCSVFileUtils.createCSVWrapper(testCsvFileInputStream, ContactCSVFileUtils.portalCSVFormat())) {
+            try (ContactCSVWrapper csvWrapper = ContactCSVFileUtils.createCSVWrapper(testCsvFileInputStream, ContactCSVFileUtils.PORTAL_CSV_FORMAT)) {
                 List<String> headerNames = csvWrapper.extractHeaderNames();
                 assertHeader(headerNames, ContactCSVWrapper.HEADER_FIRST_NAME);
                 assertHeader(headerNames, ContactCSVWrapper.HEADER_LAST_NAME);
@@ -44,7 +44,7 @@ public class ContactCSVWrapperTest {
     public void validateUploadModelTest() throws IOException {
         File testCSVFile = ContactCSVFileUtilsTest.getTestCSVFile(getClass().getClassLoader());
         try (FileInputStream testCsvFileInputStream = new FileInputStream(testCSVFile)) {
-            try (ContactCSVWrapper csvWrapper = ContactCSVFileUtils.createCSVWrapper(testCsvFileInputStream, ContactCSVFileUtils.portalCSVFormat())) {
+            try (ContactCSVWrapper csvWrapper = ContactCSVFileUtils.createCSVWrapper(testCsvFileInputStream, ContactCSVFileUtils.PORTAL_CSV_FORMAT)) {
                 List<ContactUploadModel> contactUploadModels = csvWrapper.parseRecords();
                 assertFalse(contactUploadModels.isEmpty(), "Expected to find at least one model");
 
