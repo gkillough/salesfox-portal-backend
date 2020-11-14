@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class LicenseTypeService {
+    public static final int MAX_FREE_TRIAL_DAYS = 365;
     public static final int MAX_INT_LICENSE_FIELD_SIZE = 999999999;
 
     private final LicenseTypeRepository licenseTypeRepository;
@@ -77,7 +78,8 @@ public class LicenseTypeService {
                 requestModel.getCampaignsPerUserPerMonth(),
                 requestModel.getContactsPerCampaign(),
                 requestModel.getUsersIncluded(),
-                requestModel.getCostPerAdditionalUser()
+                requestModel.getCostPerAdditionalUser(),
+                requestModel.getFreeTrialDays()
         );
         LicenseTypeEntity savedLicenseType = licenseTypeRepository.save(licenseTypeToSave);
         return LicenseTypeResponseModel.fromEntity(savedLicenseType);
@@ -96,7 +98,8 @@ public class LicenseTypeService {
                 requestModel.getCampaignsPerUserPerMonth(),
                 requestModel.getContactsPerCampaign(),
                 requestModel.getUsersIncluded(),
-                requestModel.getCostPerAdditionalUser()
+                requestModel.getCostPerAdditionalUser(),
+                requestModel.getFreeTrialDays()
         );
 
         BigDecimal previousMonthlyCost = new BigDecimal(foundLicense.getMonthlyCost().toString());
@@ -143,6 +146,13 @@ public class LicenseTypeService {
         validateIntField("contactsPerCampaign", requestModel.getContactsPerCampaign());
         validateIntField("usersIncluded", requestModel.getUsersIncluded());
         validateBigDecimalField("costPerAdditionalUser", requestModel.getCostPerAdditionalUser());
+
+        Integer freeTrialDays = requestModel.getFreeTrialDays();
+        if (null == freeTrialDays) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'freeTrialDays' is required");
+        } else if (freeTrialDays < 0 || freeTrialDays > MAX_INT_LICENSE_FIELD_SIZE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("The field 'freeTrialDays' must be greater than or equal to 0, and less than %d", MAX_FREE_TRIAL_DAYS));
+        }
     }
 
     private void validateIntField(String fieldName, @Nullable Integer fieldValue) {

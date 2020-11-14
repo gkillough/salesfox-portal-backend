@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: license-free-trial-1
+      author: gavinkillough
+      changes:
+        - addColumn:
+            schemaName: portal
+            tableName: license_types
+            columns:
+              - column:
+                  name: free_trial_days
+                  type: INTEGER
+                  valueNumeric: 7

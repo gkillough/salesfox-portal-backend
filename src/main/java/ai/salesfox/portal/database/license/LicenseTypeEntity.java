@@ -41,4 +41,7 @@ public class LicenseTypeEntity {
     @Column(name = "cost_per_additional_user")
     private BigDecimal costPerAdditionalUser;
 
+    @Column(name = "free_trial_days")
+    private Integer freeTrialDays;
+
 }
