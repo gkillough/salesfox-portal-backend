@@ -103,16 +103,15 @@ public class RunServerTask extends Exec {
                 "--embedded.rabbitmq.reuseContainer=" + reuseContainer,
                 "--embedded.rabbitmq.password=rabbitmq",
                 "--embedded.rabbitmq.dockerImage=rabbitmq:" + rabbitMQVersion,
-                "--embedded.rabbitmq.waitTimeoutInSeconds=" + CONTAINER_TIMEOUT_SECONDS
+                "--embedded.rabbitmq.waitTimeoutInSeconds=" + CONTAINER_TIMEOUT_SECONDS,
 
-                /* PRODUCES:
-                embedded.rabbitmq.host
-                embedded.rabbitmq.port
-                embedded.rabbitmq.user
-                embedded.rabbitmq.password
-                embedded.rabbitmq.vhost
-                embedded.rabbitmq.httpPort
-                 */
+                "--spring.rabbitmq.host=${embedded.rabbitmq.host}",
+                "--spring.rabbitmq.port=${embedded.rabbitmq.port}",
+                "--spring.rabbitmq.username=${embedded.rabbitmq.user}",
+                "--spring.rabbitmq.password=${embedded.rabbitmq.password}"
+
+                // ${embedded.rabbitmq.vhost}
+                // ${embedded.rabbitmq.httpPort}
         );
     }
 
