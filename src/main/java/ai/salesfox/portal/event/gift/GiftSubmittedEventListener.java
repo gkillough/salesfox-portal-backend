@@ -10,18 +10,18 @@ import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserRepository;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.GiftRepository;
+import ai.salesfox.portal.event.EventQueueConfiguration;
 import ai.salesfox.portal.integration.GiftPartnerSubmissionService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.List;
 
 @Slf4j
 @Component
+@RabbitListener(queues = EventQueueConfiguration.GIFT_SUBMITTED_QUEUE)
 public class GiftSubmittedEventListener {
     private final UserRepository userRepository;
     private final GiftRepository giftRepository;
@@ -29,9 +29,13 @@ public class GiftSubmittedEventListener {
     private final GiftTrackingService giftTrackingService;
     private final EmailMessagingService emailMessagingService;
 
-    @Autowired
-    public GiftSubmittedEventListener(UserRepository userRepository, GiftRepository giftRepository,
-                                      GiftPartnerSubmissionService giftPartnerSubmissionService, GiftTrackingService giftTrackingService, EmailMessagingService emailMessagingService) {
+    public GiftSubmittedEventListener(
+            UserRepository userRepository,
+            GiftRepository giftRepository,
+            GiftPartnerSubmissionService giftPartnerSubmissionService,
+            GiftTrackingService giftTrackingService,
+            EmailMessagingService emailMessagingService
+    ) {
         this.userRepository = userRepository;
         this.giftRepository = giftRepository;
         this.giftPartnerSubmissionService = giftPartnerSubmissionService;
@@ -39,8 +43,7 @@ public class GiftSubmittedEventListener {
         this.emailMessagingService = emailMessagingService;
     }
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMPLETION, fallbackExecution = true)
+    @RabbitHandler
     public void onGiftSubmitted(GiftSubmittedEvent event) {
         UserEntity submittingUser = userRepository.findById(event.getSubmittingUserId())
                 .orElseThrow(() -> new PortalRuntimeException("Unable to find a submittingUser for the gift event. This is a bug."));
