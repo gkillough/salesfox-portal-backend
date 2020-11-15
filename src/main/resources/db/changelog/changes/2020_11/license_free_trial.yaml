@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: license-free-trial-1
+      author: gavinkillough
+      changes:
+        - addColumn:
+            schemaName: portal
+            tableName: license_types
+            columns:
+              - column:
+                  name: free_trial_days
+                  type: INTEGER
+                  valueNumeric: 7
+
+  - changeSet:
+      id: license-free-trial-2
+      author: gavinkillough
+      changes:
+        - addNotNullConstraint:
+            schemaName: portal
+            tableName: license_types
+            columnName: free_trial_days
+
+  - changeSet:
+      id: license-free-trial-3
+      author: gavinkillough
+      changes:
+        - addColumn:
+            schemaName: portal
+            tableName: org_acct_licenses
+            columns:
+              - column:
+                  name: free_trial_start_date
+                  type: DATE
+                  value: '2020-01-01'
+
+  - changeSet:
+      id: license-free-trial-4
+      author: gavinkillough
+      changes:
+        - addNotNullConstraint:
+            schemaName: portal
+            tableName: org_acct_licenses
+            columnName: free_trial_start_date

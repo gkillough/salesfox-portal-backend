@@ -23,12 +23,23 @@ public class LicenseTypeResponseModel extends AbstractLicenseTypeModel {
                 licenseTypeEntity.getCampaignsPerUserPerMonth(),
                 licenseTypeEntity.getContactsPerCampaign(),
                 licenseTypeEntity.getUsersIncluded(),
-                licenseTypeEntity.getCostPerAdditionalUser()
+                licenseTypeEntity.getCostPerAdditionalUser(),
+                licenseTypeEntity.getFreeTrialDays()
         );
     }
 
-    public LicenseTypeResponseModel(UUID licenseTypeId, String name, Boolean isPublic, BigDecimal monthlyCost, Integer campaignsPerUserPerMonth, Integer contactsPerCampaign, Integer usersIncluded, BigDecimal costPerAdditionalUser) {
-        super(name, isPublic, monthlyCost, campaignsPerUserPerMonth, contactsPerCampaign, usersIncluded, costPerAdditionalUser);
+    public LicenseTypeResponseModel(
+            UUID licenseTypeId,
+            String name,
+            Boolean isPublic,
+            BigDecimal monthlyCost,
+            Integer campaignsPerUserPerMonth,
+            Integer contactsPerCampaign,
+            Integer usersIncluded,
+            BigDecimal costPerAdditionalUser,
+            Integer freeTrialDays
+    ) {
+        super(name, isPublic, monthlyCost, campaignsPerUserPerMonth, contactsPerCampaign, usersIncluded, costPerAdditionalUser, freeTrialDays);
         this.licenseTypeId = licenseTypeId;
     }
 

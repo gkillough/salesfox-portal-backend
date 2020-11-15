@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
@@ -27,6 +28,9 @@ public class OrganizationAccountLicenseEntity {
     @Column(name = "billing_day_of_month")
     private Integer billingDayOfMonth;
 
+    @Column(name = "free_trial_start_date")
+    private LocalDate freeTrialStartDate;
+
     @Column(name = "is_active")
     private Boolean isActive;
 
@@ -37,11 +41,12 @@ public class OrganizationAccountLicenseEntity {
     @JoinColumn(name = "license_type_id", referencedColumnName = "license_type_id", updatable = false, insertable = false)
     private LicenseTypeEntity licenseTypeEntity;
 
-    public OrganizationAccountLicenseEntity(UUID organizationAccountId, UUID licenseTypeId, Integer activeUsers, Integer billingDayOfMonth, Boolean isActive) {
+    public OrganizationAccountLicenseEntity(UUID organizationAccountId, UUID licenseTypeId, Integer activeUsers, Integer billingDayOfMonth, LocalDate freeTrialStartDate, Boolean isActive) {
         this.organizationAccountId = organizationAccountId;
         this.licenseTypeId = licenseTypeId;
         this.activeUsers = activeUsers;
         this.billingDayOfMonth = billingDayOfMonth;
+        this.freeTrialStartDate = freeTrialStartDate;
         this.isActive = isActive;
     }
 
