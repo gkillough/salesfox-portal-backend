@@ -1,3 +1,4 @@
 task runServer(type: ai.salesfox.portal.build.RunServerTask, dependsOn: [build]) {
     postgresVersion = project.ext.postgresContainerVersion
+    rabbitMQVersion = project.ext.rabbitMQContainerVersion
 }
