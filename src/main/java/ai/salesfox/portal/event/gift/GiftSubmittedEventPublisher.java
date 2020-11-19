@@ -1,6 +1,5 @@
 package ai.salesfox.portal.event.gift;
 
-import ai.salesfox.portal.event.EventQueueConfiguration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ public class GiftSubmittedEventPublisher {
 
     public void fireGiftSubmittedEvent(UUID giftId, UUID submittingUserId) {
         log.debug("Submitting gift event with giftId=[{}], submittingUserId=[{}]", giftId, submittingUserId);
-        rabbitTemplate.convertAndSend(EventQueueConfiguration.GIFT_SUBMITTED_QUEUE, new GiftSubmittedEvent(giftId, submittingUserId));
+        rabbitTemplate.convertAndSend(GiftSubmittedEventQueueConfiguration.GIFT_SUBMITTED_QUEUE, new GiftSubmittedEvent(giftId, submittingUserId));
     }
 
 }

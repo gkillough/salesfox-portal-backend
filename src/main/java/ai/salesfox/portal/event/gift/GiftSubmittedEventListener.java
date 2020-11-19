@@ -10,10 +10,9 @@ import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserRepository;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.GiftRepository;
-import ai.salesfox.portal.event.EventQueueConfiguration;
 import ai.salesfox.portal.integration.GiftPartnerSubmissionService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +20,6 @@ import java.util.List;
 
 @Slf4j
 @Component
-@RabbitListener(queues = EventQueueConfiguration.GIFT_SUBMITTED_QUEUE)
 public class GiftSubmittedEventListener {
     private final UserRepository userRepository;
     private final GiftRepository giftRepository;
@@ -43,7 +41,7 @@ public class GiftSubmittedEventListener {
         this.emailMessagingService = emailMessagingService;
     }
 
-    @RabbitHandler
+    @RabbitListener(queues = GiftSubmittedEventQueueConfiguration.GIFT_SUBMITTED_QUEUE)
     public void onGiftSubmitted(GiftSubmittedEvent event) {
         UserEntity submittingUser = userRepository.findById(event.getSubmittingUserId())
                 .orElseThrow(() -> new PortalRuntimeException("Unable to find a submittingUser for the gift event. This is a bug."));
@@ -56,6 +54,20 @@ public class GiftSubmittedEventListener {
             log.debug("There was a problem submitting the gift to Salesfox gifting partner(s)", salesfoxException);
             giftTrackingService.updateGiftTrackingInfo(gift, submittingUser, GiftTrackingStatus.NOT_FULFILLABLE);
             sendEmailForException(submittingUser, gift, salesfoxException.getMessage());
+        }
+    }
+
+    @RabbitListener(queues = GiftSubmittedEventQueueConfiguration.GIFT_SUBMITTED_DLQ)
+    public void onGiftSubmittedProcessingFailure(Message message) {
+        try {
+            log.error(String.format("Could not send message: %s", message.toString()));
+            String primaryMessage = String.format("Queued Message Handling Failed: %s <br/>", message.toString());
+
+            // FIXME add real failure email address
+            EmailMessageModel errorEmail = new EmailMessageModel(List.of("noreply@salesfox.ai"), "[Salesfox] Distribution Failure", "Distribution Failure", primaryMessage);
+            emailMessagingService.sendMessage(errorEmail);
+        } catch (Exception e) {
+            log.error("Handler failed for {}: {}", GiftSubmittedEventQueueConfiguration.GIFT_SUBMITTED_DLQ, e.getMessage());
         }
     }
 
