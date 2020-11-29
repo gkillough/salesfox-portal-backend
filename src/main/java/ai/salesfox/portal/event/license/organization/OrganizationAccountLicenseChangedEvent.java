@@ -3,9 +3,10 @@ package ai.salesfox.portal.event.license.organization;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class OrganizationAccountLicenseChangedEvent extends ApplicationEvent {
+public class OrganizationAccountLicenseChangedEvent extends ApplicationEvent implements Serializable {
     @Getter
     private final UUID orgAccountId;
     @Getter

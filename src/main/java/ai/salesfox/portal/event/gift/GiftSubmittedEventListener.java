@@ -4,6 +4,7 @@ import ai.salesfox.integration.common.exception.SalesfoxException;
 import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
 import ai.salesfox.portal.common.exception.PortalRuntimeException;
 import ai.salesfox.portal.common.service.email.EmailMessagingService;
+import ai.salesfox.portal.common.service.email.PortalEmailAddressConfiguration;
 import ai.salesfox.portal.common.service.email.model.EmailMessageModel;
 import ai.salesfox.portal.common.service.gift.GiftTrackingService;
 import ai.salesfox.portal.database.account.entity.UserEntity;
@@ -26,19 +27,22 @@ public class GiftSubmittedEventListener {
     private final GiftPartnerSubmissionService giftPartnerSubmissionService;
     private final GiftTrackingService giftTrackingService;
     private final EmailMessagingService emailMessagingService;
+    private final PortalEmailAddressConfiguration portalEmailAddressConfiguration;
 
     public GiftSubmittedEventListener(
             UserRepository userRepository,
             GiftRepository giftRepository,
             GiftPartnerSubmissionService giftPartnerSubmissionService,
             GiftTrackingService giftTrackingService,
-            EmailMessagingService emailMessagingService
+            EmailMessagingService emailMessagingService,
+            PortalEmailAddressConfiguration portalEmailAddressConfiguration
     ) {
         this.userRepository = userRepository;
         this.giftRepository = giftRepository;
         this.giftPartnerSubmissionService = giftPartnerSubmissionService;
         this.giftTrackingService = giftTrackingService;
         this.emailMessagingService = emailMessagingService;
+        this.portalEmailAddressConfiguration = portalEmailAddressConfiguration;
     }
 
     @RabbitListener(queues = GiftSubmittedEventQueueConfiguration.GIFT_SUBMITTED_QUEUE)
@@ -63,8 +67,8 @@ public class GiftSubmittedEventListener {
             log.error(String.format("Could not send message: %s", message.toString()));
             String primaryMessage = String.format("Queued Message Handling Failed: %s <br/>", message.toString());
 
-            // FIXME add real failure email address
-            EmailMessageModel errorEmail = new EmailMessageModel(List.of("noreply@salesfox.ai"), "[Salesfox] Distribution Failure", "Distribution Failure", primaryMessage);
+            String portalSupportEmail = portalEmailAddressConfiguration.getSupportEmailAddress();
+            EmailMessageModel errorEmail = new EmailMessageModel(List.of(portalSupportEmail), "[Salesfox] Distribution Failure", "Distribution Failure", primaryMessage);
             emailMessagingService.sendMessage(errorEmail);
         } catch (Exception e) {
             log.error("Handler failed for {}: {}", GiftSubmittedEventQueueConfiguration.GIFT_SUBMITTED_DLQ, e.getMessage());
