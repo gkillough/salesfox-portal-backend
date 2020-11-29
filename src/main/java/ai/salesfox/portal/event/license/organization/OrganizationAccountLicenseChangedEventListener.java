@@ -10,6 +10,7 @@ import ai.salesfox.portal.database.license.OrganizationAccountLicenseEntity;
 import ai.salesfox.portal.database.license.OrganizationAccountLicenseRepository;
 import ai.salesfox.portal.database.organization.OrganizationEntity;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
+import ai.salesfox.portal.event.DefaultDLQHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -28,13 +29,15 @@ public class OrganizationAccountLicenseChangedEventListener {
     private final LicenseBillingService licenseBillingService;
     private final EmailMessagingService emailMessagingService;
     private final PortalEmailAddressConfiguration portalEmailAddressConfiguration;
+    private final DefaultDLQHandler defaultDLQHandler;
 
     @Autowired
-    public OrganizationAccountLicenseChangedEventListener(OrganizationAccountLicenseRepository organizationAccountLicenseRepository, LicenseBillingService licenseBillingService, EmailMessagingService emailMessagingService, PortalEmailAddressConfiguration portalEmailAddressConfiguration) {
+    public OrganizationAccountLicenseChangedEventListener(OrganizationAccountLicenseRepository organizationAccountLicenseRepository, LicenseBillingService licenseBillingService, EmailMessagingService emailMessagingService, PortalEmailAddressConfiguration portalEmailAddressConfiguration, DefaultDLQHandler defaultDLQHandler) {
         this.organizationAccountLicenseRepository = organizationAccountLicenseRepository;
         this.licenseBillingService = licenseBillingService;
         this.emailMessagingService = emailMessagingService;
         this.portalEmailAddressConfiguration = portalEmailAddressConfiguration;
+        this.defaultDLQHandler = defaultDLQHandler;
     }
 
     @RabbitListener(queues = OrganizationAccountLicenseChangedEventQueueConfiguration.LICENSE_CHANGED_QUEUE)
@@ -77,19 +80,9 @@ public class OrganizationAccountLicenseChangedEventListener {
         }
     }
 
-    // TODO abstract DLQ handling
     @RabbitListener(queues = OrganizationAccountLicenseChangedEventQueueConfiguration.LICENSE_CHANGED_DLQ)
     public void onLicenseChangedProcessingFailure(Message message) {
-        try {
-            log.error(String.format("Could not send message: %s", message.toString()));
-            String primaryMessage = String.format("Queued Message Handling Failed: %s <br/>", message.toString());
-
-            String portalSupportEmail = portalEmailAddressConfiguration.getSupportEmailAddress();
-            EmailMessageModel errorEmail = new EmailMessageModel(List.of(portalSupportEmail), "[Salesfox] Distribution Failure", "Distribution Failure", primaryMessage);
-            emailMessagingService.sendMessage(errorEmail);
-        } catch (Exception e) {
-            log.error("Handler failed for {}: {}", OrganizationAccountLicenseChangedEventQueueConfiguration.LICENSE_CHANGED_DLQ, e.getMessage());
-        }
+        defaultDLQHandler.handleQueuedMessageFailure(OrganizationAccountLicenseChangedEventQueueConfiguration.LICENSE_CHANGED_QUEUE, message);
     }
 
     private void notifyAdminOfLicenseSeatUsed(OrganizationAccountLicenseEntity updatedOrgAcctLicense, LicenseTypeEntity licenseType) {
