@@ -5,10 +5,9 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.util.UUID;
 
+@Getter
 public class GiftSubmittedEvent implements Serializable {
-    @Getter
     private final UUID giftId;
-    @Getter
     private final UUID submittingUserId;
 
     public GiftSubmittedEvent(UUID giftId, UUID submittingUserId) {

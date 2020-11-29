@@ -11,11 +11,10 @@ import ai.salesfox.portal.database.license.OrganizationAccountLicenseRepository;
 import ai.salesfox.portal.database.organization.OrganizationEntity;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,8 +37,7 @@ public class OrganizationAccountLicenseChangedEventListener {
         this.portalEmailAddressConfiguration = portalEmailAddressConfiguration;
     }
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMPLETION, fallbackExecution = true)
+    @RabbitListener(queues = OrganizationAccountLicenseChangedEventQueueConfiguration.LICENSE_CHANGED_QUEUE)
     public void onOrgAccountLicenseChanged(OrganizationAccountLicenseChangedEvent event) {
         UUID orgAccountLicenseId = event.getOrgAccountId();
         Optional<OrganizationAccountLicenseEntity> optionalOrgAccountLicense = organizationAccountLicenseRepository.findById(orgAccountLicenseId);
@@ -76,6 +74,21 @@ public class OrganizationAccountLicenseChangedEventListener {
             } else {
                 licenseBillingService.deactivateOrgAccountLicense(updatedOrgAccountLicense);
             }
+        }
+    }
+
+    // TODO abstract DLQ handling
+    @RabbitListener(queues = OrganizationAccountLicenseChangedEventQueueConfiguration.LICENSE_CHANGED_DLQ)
+    public void onLicenseChangedProcessingFailure(Message message) {
+        try {
+            log.error(String.format("Could not send message: %s", message.toString()));
+            String primaryMessage = String.format("Queued Message Handling Failed: %s <br/>", message.toString());
+
+            String portalSupportEmail = portalEmailAddressConfiguration.getSupportEmailAddress();
+            EmailMessageModel errorEmail = new EmailMessageModel(List.of(portalSupportEmail), "[Salesfox] Distribution Failure", "Distribution Failure", primaryMessage);
+            emailMessagingService.sendMessage(errorEmail);
+        } catch (Exception e) {
+            log.error("Handler failed for {}: {}", OrganizationAccountLicenseChangedEventQueueConfiguration.LICENSE_CHANGED_DLQ, e.getMessage());
         }
     }
 
