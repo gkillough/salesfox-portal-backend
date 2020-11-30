@@ -1,17 +1,17 @@
 package ai.salesfox.portal.rest.api.user.role;
 
-import ai.salesfox.portal.rest.api.user.role.model.UserRoleUpdateModel;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.RoleEntity;
 import ai.salesfox.portal.database.account.repository.MembershipRepository;
 import ai.salesfox.portal.database.account.repository.RoleRepository;
+import ai.salesfox.portal.rest.api.user.role.model.UserRoleUpdateModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
 import java.util.UUID;
 
 @Component

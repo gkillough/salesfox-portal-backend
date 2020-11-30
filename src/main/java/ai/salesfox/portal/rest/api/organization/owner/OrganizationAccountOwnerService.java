@@ -1,7 +1,5 @@
 package ai.salesfox.portal.rest.api.organization.owner;
 
-import ai.salesfox.portal.rest.api.organization.common.OrganizationAccessService;
-import ai.salesfox.portal.rest.api.organization.users.model.NewAccountOwnerRequestModel;
 import ai.salesfox.portal.common.enumeration.AccessOperation;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.RoleEntity;
@@ -11,9 +9,11 @@ import ai.salesfox.portal.database.account.repository.RoleRepository;
 import ai.salesfox.portal.database.account.repository.UserRepository;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountRepository;
-import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
+import ai.salesfox.portal.rest.api.organization.common.OrganizationAccessService;
+import ai.salesfox.portal.rest.api.organization.users.model.NewAccountOwnerRequestModel;
 import ai.salesfox.portal.rest.api.user.profile.UserProfileService;
 import ai.salesfox.portal.rest.api.user.profile.model.UserProfileModel;
+import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -21,22 +21,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 
 @Slf4j
 @Component
 public class OrganizationAccountOwnerService {
-    private OrganizationAccountRepository organizationAccountRepository;
-    private UserRepository userRepository;
-    private MembershipRepository membershipRepository;
-    private RoleRepository roleRepository;
-    private UserProfileService userProfileService;
-    private OrganizationAccessService organizationAccessService;
-    private HttpSafeUserMembershipRetrievalService membershipRetrievalService;
+    private final OrganizationAccountRepository organizationAccountRepository;
+    private final UserRepository userRepository;
+    private final MembershipRepository membershipRepository;
+    private final RoleRepository roleRepository;
+    private final UserProfileService userProfileService;
+    private final OrganizationAccessService organizationAccessService;
+    private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
     public OrganizationAccountOwnerService(OrganizationAccountRepository organizationAccountRepository, UserRepository userRepository, MembershipRepository membershipRepository, RoleRepository roleRepository,
