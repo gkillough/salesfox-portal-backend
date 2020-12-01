@@ -93,6 +93,7 @@ dependencies {
     implementation 'org.freemarker:freemarker:2.3.30'
     implementation 'javax.mail:javax.mail-api:1.6.2'
     runtimeOnly 'com.sun.mail:javax.mail:1.6.2'
+    runtimeOnly 'org.yaml:snakeyaml:1.25'
 
     // Database
     runtimeOnly 'org.postgresql:postgresql'
