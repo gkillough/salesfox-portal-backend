@@ -74,7 +74,9 @@ public class RunServerTask extends Exec {
         commandArray.addAll(getJMXVariables());
         commandArray.add("-jar");
         commandArray.add(jarFile.getAbsolutePath());
-        commandArray.addAll(getRabbitMQVariables());
+        if (!envVars.containsKey("PORTAL_AMQP_ADDRESSES")) {
+            commandArray.addAll(getRabbitMQVariables());
+        }
         commandArray.addAll(getApplicationVariables());
         commandLine(commandArray);
         super.exec();
@@ -109,9 +111,6 @@ public class RunServerTask extends Exec {
                 "--spring.rabbitmq.port=${embedded.rabbitmq.port}",
                 "--spring.rabbitmq.username=${embedded.rabbitmq.user}",
                 "--spring.rabbitmq.password=${embedded.rabbitmq.password}"
-
-                // ${embedded.rabbitmq.vhost}
-                // ${embedded.rabbitmq.httpPort}
         );
     }
 
