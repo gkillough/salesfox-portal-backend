@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: fix_billing_day_of_month.yaml
+      relativeToChangelogFile: true

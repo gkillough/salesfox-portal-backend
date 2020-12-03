@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: fix-default-org-account-billing-day-of-month
+      author: gavinkillough
+      changes:
+        - update:
+            schemaName: portal
+            tableName: org_acct_licenses
+            columns:
+              - column:
+                  name: billing_day_of_month
+                  valueNumeric: 1
+            where: billing_day_of_month = 0
