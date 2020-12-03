@@ -70,7 +70,6 @@ dependencies {
     implementation 'org.springframework:spring-context'
     implementation 'org.springframework:spring-jms'
     implementation 'org.springframework:spring-webmvc'
-    implementation 'org.springframework:spring-messaging'
     implementation 'org.springframework.amqp:spring-rabbit'
 
     // Spring Boot
