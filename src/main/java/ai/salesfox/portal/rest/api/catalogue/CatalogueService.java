@@ -225,10 +225,10 @@ public class CatalogueService {
         if (StringUtils.isBlank(requestModel.getName())) {
             errors.add("The field 'Item Name' cannot be blank");
         }
-
-        if (StringUtils.isBlank(requestModel.getDescription())) {
-            errors.add("The field 'Description' cannot be blank");
-        }
+        //Desctiption verfication null check
+        //if (StringUtils.isBlank(requestModel.getDescription())) {
+        //    errors.add("The field 'Description' cannot be blank");
+        //}
 
         if (null == requestModel.getPrice()) {
             errors.add("The field 'Price' is required");
