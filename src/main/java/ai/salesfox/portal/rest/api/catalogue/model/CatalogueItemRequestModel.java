@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class CatalogueItemRequestModel {
     private String name;
+    private String description;
     private String iconUrl;
     private BigDecimal price;
     private BigDecimal shippingCost;
