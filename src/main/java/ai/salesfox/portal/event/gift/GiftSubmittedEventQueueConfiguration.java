@@ -19,6 +19,7 @@ public class GiftSubmittedEventQueueConfiguration {
         return QueueBuilder
                 .durable(GIFT_SUBMITTED_QUEUE)
                 .withArgument(EventQueueConstants.KEY_DEAD_LETTER_EXCHANGE, GIFT_SUBMITTED_DLQ_EXCHANGE)
+                .withArgument(EventQueueConstants.KEY_DEAD_LETTER_EXCHANGE_ROUTING_KEY, GIFT_SUBMITTED_DLQ)
                 .build();
     }
 
@@ -43,7 +44,9 @@ public class GiftSubmittedEventQueueConfiguration {
 
     @Bean
     public Queue giftSubmittedDLQ() {
-        return new Queue(GIFT_SUBMITTED_DLQ, true);
+        return QueueBuilder
+                .durable(GIFT_SUBMITTED_DLQ)
+                .build();
     }
 
     @Bean
@@ -59,7 +62,7 @@ public class GiftSubmittedEventQueueConfiguration {
         return BindingBuilder
                 .bind(giftSubmittedDLQ())
                 .to(giftSubmittedDLQExchange())
-                .with(GIFT_SUBMITTED_QUEUE)
+                .with(GIFT_SUBMITTED_DLQ)
                 .noargs();
     }
 

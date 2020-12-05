@@ -25,7 +25,7 @@ public class DefaultDLQHandler {
     public void handleQueuedMessageFailure(String queueName, Message message) {
         try {
             log.error(String.format("Could not send message: %s", message.toString()));
-            String primaryMessage = String.format("Queued Message Handling Failed: %s <br/>", message.toString());
+            String primaryMessage = String.format("Queued Message Handling Failed: <br/>%s ", message.toString());
 
             String portalSupportEmail = portalEmailAddressConfiguration.getSupportEmailAddress();
             EmailMessageModel errorEmail = new EmailMessageModel(List.of(portalSupportEmail), "[Salesfox] Event Handling Failure", "Event Handling Failure", primaryMessage);

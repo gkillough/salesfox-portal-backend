@@ -35,7 +35,8 @@ public class GiftSubmittedEventListener {
             GiftPartnerSubmissionService giftPartnerSubmissionService,
             GiftTrackingService giftTrackingService,
             EmailMessagingService emailMessagingService,
-            DefaultDLQHandler defaultDLQHandler) {
+            DefaultDLQHandler defaultDLQHandler
+    ) {
         this.userRepository = userRepository;
         this.giftRepository = giftRepository;
         this.giftPartnerSubmissionService = giftPartnerSubmissionService;

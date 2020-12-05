@@ -19,6 +19,7 @@ public class OrganizationAccountLicenseChangedEventQueueConfiguration {
         return QueueBuilder
                 .durable(LICENSE_CHANGED_QUEUE)
                 .withArgument(EventQueueConstants.KEY_DEAD_LETTER_EXCHANGE, LICENSE_CHANGED_DLQ_EXCHANGE)
+                .withArgument(EventQueueConstants.KEY_DEAD_LETTER_EXCHANGE_ROUTING_KEY, LICENSE_CHANGED_DLQ)
                 .build();
     }
 
@@ -43,7 +44,9 @@ public class OrganizationAccountLicenseChangedEventQueueConfiguration {
 
     @Bean
     public Queue licenseChangedDLQ() {
-        return new Queue(LICENSE_CHANGED_DLQ, true);
+        return QueueBuilder
+                .durable(LICENSE_CHANGED_DLQ)
+                .build();
     }
 
     @Bean
@@ -59,7 +62,7 @@ public class OrganizationAccountLicenseChangedEventQueueConfiguration {
         return BindingBuilder
                 .bind(licenseChangedDLQ())
                 .to(licenseChangedDLQExchange())
-                .with(LICENSE_CHANGED_QUEUE)
+                .with(LICENSE_CHANGED_DLQ)
                 .noargs();
     }
 
