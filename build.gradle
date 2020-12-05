@@ -91,6 +91,7 @@ dependencies {
     implementation 'org.apache.tomcat.embed:tomcat-embed-core'
     implementation 'org.freemarker:freemarker:2.3.30'
     implementation 'javax.mail:javax.mail-api:1.6.2'
+    runtimeOnly 'org.aspectj:aspectjweaver'
     runtimeOnly 'com.sun.mail:javax.mail:1.6.2'
     runtimeOnly 'org.yaml:snakeyaml:1.25'
 
