@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-description-to-catalogue-item
+      author: bradmoulder
+      changes:
+        - addColumn:
+            schemaName: portal
+            tableName: catalogue_items
+            columns:
+              - column:
+                  name: description
+                  type: VARCHAR

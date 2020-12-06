@@ -12,15 +12,17 @@ import java.util.UUID;
 public class CatalogueItemResponseModel {
     private UUID itemId;
     private String name;
+    private String description;
     private BigDecimal price;
     private BigDecimal shippingCost;
     private String iconUrl;
     private Boolean isActive;
     private RestrictionModel restriction;
 
-    public CatalogueItemResponseModel(UUID itemId, String name, BigDecimal price, BigDecimal shippingCost, String iconUrl, Boolean isActive, UUID organizationAccountId, UUID userId) {
+    public CatalogueItemResponseModel(UUID itemId, String name, String description, BigDecimal price, BigDecimal shippingCost, String iconUrl, Boolean isActive, UUID organizationAccountId, UUID userId) {
         this.itemId = itemId;
         this.name = name;
+        this.description = description;
         this.price = price;
         this.shippingCost = shippingCost;
         this.iconUrl = iconUrl;
