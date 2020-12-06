@@ -24,12 +24,12 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping({CURRENT_USER_ENDPOINT_SUFFIX})
+    @GetMapping(CURRENT_USER_ENDPOINT_SUFFIX)
     public CurrentUserModel getCurrentUser() {
         return userService.getCurrentUserFromSession();
     }
 
-    @GetMapping(UserEndpointConstants.BASE_ENDPOINT)
+    @GetMapping()
     @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
     public MultiUserModel getUsers(
             @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset,
@@ -38,8 +38,8 @@ public class UserController {
     ) {
         return userService.getUsers(offset, limit, query);
     }
-    
-    @GetMapping({USER_ID_ENDPOINT_PATH_VARIABLE_SUFFIX})
+
+    @GetMapping(USER_ID_ENDPOINT_PATH_VARIABLE_SUFFIX)
     public UserAccountModel getUserById(@PathVariable(name = "user_id") UUID userId) {
         return userService.getUser(userId);
     }
