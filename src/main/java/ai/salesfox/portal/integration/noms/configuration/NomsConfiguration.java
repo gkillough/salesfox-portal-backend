@@ -11,7 +11,6 @@ import java.io.File;
 @PropertySource(NomsConfiguration.NOMS_CONFIGURATION_FILE_NAME)
 public class NomsConfiguration {
     public static final String NOMS_CONFIGURATION_FILE_NAME = "noms.properties";
-    public static final String NOMS_ORDER_EMAIL_TEMPLATE = "email_order.ftl";
 
     @Getter
     @Value("{ai.salesfox.portal.integration.noms.temp.directory:}")

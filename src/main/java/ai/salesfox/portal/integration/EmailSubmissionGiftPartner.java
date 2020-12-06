@@ -1,4 +1,4 @@
-package ai.salesfox.portal.integration.noms.workflow;
+package ai.salesfox.portal.integration;
 
 import ai.salesfox.integration.common.exception.SalesfoxException;
 import ai.salesfox.integration.scribeless.service.campaign.model.CampaignCreationRequestModel;
@@ -17,40 +17,33 @@ import ai.salesfox.portal.database.customization.icon.CustomIconEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomIconDetailEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
-import ai.salesfox.portal.integration.EmailSubmissionGiftPartner;
-import ai.salesfox.portal.integration.GiftPartner;
-import ai.salesfox.portal.integration.noms.configuration.NomsConfiguration;
+import ai.salesfox.portal.integration.noms.workflow.NomsRecipientCSVGenerator;
 import ai.salesfox.portal.integration.scribeless.workflow.ScribelessCampaignRequestModelCreator;
 import ai.salesfox.portal.integration.scribeless.workflow.model.CampaignCreationRequestHolder;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
 @Slf4j
-@Component
-public class NomsGiftOrderService implements GiftPartner {
+public abstract class EmailSubmissionGiftPartner implements GiftPartner {
+    public static final String TEMPLATE_EMAIL_ORDER = "email_order.ftl";
+
     private static final String ORDER_MESSAGE_LINE_BREAK = "<br />";
     private static final String ORDER_MESSAGE_SECTION_BREAK = "<hr />";
 
-    private final NomsConfiguration nomsConfiguration;
     private final NomsRecipientCSVGenerator nomsRecipientCSVGenerator;
     private final GiftDetailsService giftDetailsService;
     private final ScribelessCampaignRequestModelCreator scribelessCampaignRequestModelCreator;
     private final EmailMessagingService emailMessagingService;
 
-    @Autowired
-    public NomsGiftOrderService(
-            NomsConfiguration nomsConfiguration,
+    public EmailSubmissionGiftPartner(
             NomsRecipientCSVGenerator nomsRecipientCSVGenerator,
             GiftDetailsService giftDetailsService,
             ScribelessCampaignRequestModelCreator scribelessCampaignRequestModelCreator,
             EmailMessagingService emailMessagingService
     ) {
-        this.nomsConfiguration = nomsConfiguration;
         this.nomsRecipientCSVGenerator = nomsRecipientCSVGenerator;
         this.giftDetailsService = giftDetailsService;
         this.scribelessCampaignRequestModelCreator = scribelessCampaignRequestModelCreator;
@@ -66,7 +59,7 @@ public class NomsGiftOrderService implements GiftPartner {
     public void submitGift(GiftEntity gift, UserEntity submittingUser) throws SalesfoxException {
         UUID giftId = gift.getGiftId();
         PagedResourceHolder<OrganizationAccountContactEntity> contactHolder = giftDetailsService.retrieveRecipientHolder(gift);
-        File recipientCSVFile = nomsRecipientCSVGenerator.createRecipientCSVFile(giftId, contactHolder);
+        File recipientCSVFile = generateRecipientCSVFileToAttach(giftId, contactHolder);
 
         AbstractAddressEntity returnAddress = giftDetailsService.retrieveReturnAddress(gift);
 
@@ -88,18 +81,22 @@ public class NomsGiftOrderService implements GiftPartner {
         }
     }
 
-    private EmailMessageModel createOrderEmailMessage(UUID giftId, String primaryMessage) {
+    protected abstract List<String> retrieveOrderEmailAddresses();
+
+    protected abstract File generateRecipientCSVFileToAttach(UUID giftId, PagedResourceHolder<OrganizationAccountContactEntity> contactPageHolder);
+
+    protected EmailMessageModel createOrderEmailMessage(UUID giftId, String primaryMessage) {
         EmailMessageModel emailMessageModel = new EmailMessageModel(
-                List.of(nomsConfiguration.getNomsOrderEmailAddress()),
+                retrieveOrderEmailAddresses(),
                 "[Salesfox] Gift Order",
                 String.format("Gift Order ID: %s", giftId),
                 primaryMessage
         );
-        emailMessageModel.setTemplateFileName(EmailSubmissionGiftPartner.TEMPLATE_EMAIL_ORDER);
+        emailMessageModel.setTemplateFileName(TEMPLATE_EMAIL_ORDER);
         return emailMessageModel;
     }
 
-    private String constructOrderMessageBody(GiftEntity gift, AbstractAddressEntity returnAddress, CampaignCreationRequestModel scribelessRequestDetails) {
+    protected String constructOrderMessageBody(GiftEntity gift, AbstractAddressEntity returnAddress, CampaignCreationRequestModel scribelessRequestDetails) {
         String baseOrderMessageBody = constructOrderMessageBody(gift, returnAddress);
         StringBuilder scribelessOrderMessageBody = new StringBuilder(baseOrderMessageBody);
 
@@ -116,7 +113,7 @@ public class NomsGiftOrderService implements GiftPartner {
         return scribelessOrderMessageBody.toString();
     }
 
-    private String constructOrderMessageBody(GiftEntity gift, AbstractAddressEntity returnAddress) {
+    protected String constructOrderMessageBody(GiftEntity gift, AbstractAddressEntity returnAddress) {
         StringBuilder orderBodyBuilder = new StringBuilder(ORDER_MESSAGE_LINE_BREAK);
         orderBodyBuilder.append(ORDER_MESSAGE_SECTION_BREAK);
         orderBodyBuilder.append(ORDER_MESSAGE_LINE_BREAK);
@@ -125,7 +122,9 @@ public class NomsGiftOrderService implements GiftPartner {
         CatalogueItemEntity catalogItem = giftItemDetail.getCatalogueItemEntity();
         CatalogueItemExternalDetailsEntity externalDetails = catalogItem.getCatalogueItemExternalDetailsEntity();
 
-        orderBodyBuilder.append(distributorName());
+        orderBodyBuilder.append("Distributor: ");
+        orderBodyBuilder.append(distributorName().name());
+        orderBodyBuilder.append(ORDER_MESSAGE_LINE_BREAK);
         orderBodyBuilder.append(" Order Details:");
         orderBodyBuilder.append(ORDER_MESSAGE_LINE_BREAK);
         orderBodyBuilder.append("Item Name: ");
