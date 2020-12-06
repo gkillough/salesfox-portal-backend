@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping
+@RequestMapping(UserEndpointConstants.BASE_ENDPOINT)
 public class UserController {
     public static final String CURRENT_USER_ENDPOINT_SUFFIX = "/current_user";
     public static final String USER_ID_ENDPOINT_PATH_VARIABLE_SUFFIX = "/{user_id}";
@@ -24,11 +24,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    // FIXME eventually remove deprecated endpoint
-    @GetMapping({
-            "/user" + CURRENT_USER_ENDPOINT_SUFFIX,
-            UserEndpointConstants.BASE_ENDPOINT + CURRENT_USER_ENDPOINT_SUFFIX
-    })
+    @GetMapping({CURRENT_USER_ENDPOINT_SUFFIX})
     public CurrentUserModel getCurrentUser() {
         return userService.getCurrentUserFromSession();
     }
@@ -44,10 +40,7 @@ public class UserController {
     }
 
     // FIXME eventually remove deprecated endpoint
-    @GetMapping({
-            "/user" + USER_ID_ENDPOINT_PATH_VARIABLE_SUFFIX,
-            UserEndpointConstants.BASE_ENDPOINT + USER_ID_ENDPOINT_PATH_VARIABLE_SUFFIX
-    })
+    @GetMapping({USER_ID_ENDPOINT_PATH_VARIABLE_SUFFIX})
     public UserAccountModel getUserById(@PathVariable(name = "user_id") UUID userId) {
         return userService.getUser(userId);
     }

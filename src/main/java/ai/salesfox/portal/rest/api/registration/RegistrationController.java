@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(RegistrationController.BASE_ENDPOINT)
 public class RegistrationController implements CsrfIgnorable, AnonymouslyAccessible {
     public static final String BASE_ENDPOINT = "/register";
-    public static final String USER_ENDPOINT_SUFFIX = "/user";
+    public static final String USER_ENDPOINT_SUFFIX = "/users";
     public static final String ORGANIZATION_ENDPOINT_SUFFIX = "/organization";
     public static final String ORGANIZATION_ACCOUNT_USER_ENDPOINT_SUFFIX = ORGANIZATION_ENDPOINT_SUFFIX + USER_ENDPOINT_SUFFIX;
 
