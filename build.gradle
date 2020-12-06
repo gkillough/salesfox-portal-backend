@@ -28,6 +28,7 @@ ext {
     targetCompatibility = JavaVersion.VERSION_11
 
     postgresContainerVersion = '12.3-alpine'
+    rabbitMQContainerVersion = '3-alpine'
 }
 
 allprojects {
@@ -75,6 +76,7 @@ dependencies {
     implementation 'org.springframework:spring-context'
     implementation 'org.springframework:spring-jms'
     implementation 'org.springframework:spring-webmvc'
+    implementation 'org.springframework.amqp:spring-rabbit'
 
     // Spring Boot
     implementation 'org.springframework.boot:spring-boot-autoconfigure'
@@ -111,10 +113,16 @@ dependencies {
     implementation 'io.springfox:springfox-swagger-ui:2.8.0'
 
     if (getGradle().getStartParameter().taskNames.contains('runServer')) {
-        runtimeClasspath 'org.testcontainers:postgresql:1.15.0-rc2'
         runtimeClasspath 'org.springframework.cloud:spring-cloud-starter:2.2.3.RELEASE'
-        runtimeClasspath "com.playtika.testcontainers:embedded-postgresql:1.78"
         runtimeClasspath 'org.springframework.boot:spring-boot-devtools'
+
+        // Database
+        runtimeClasspath 'org.testcontainers:postgresql:1.15.0-rc2'
+        runtimeClasspath "com.playtika.testcontainers:embedded-postgresql:1.78"
+
+        // Message Queue
+        runtimeClasspath 'org.testcontainers:rabbitmq:1.15.0'
+        runtimeClasspath "com.playtika.testcontainers:embedded-rabbitmq:1.78"
     }
 }
 
