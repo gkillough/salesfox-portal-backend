@@ -58,6 +58,12 @@ group = 'ai.salesfox'
 version = 'latest'
 mainClassName = 'ai.salesfox.portal.PortalApplication'
 
+startScripts.enabled = false
+distZip.enabled = false
+bootDistZip.enabled = false
+distTar.enabled = false
+bootDistTar.enabled = false
+
 apply from: 'buildSrc/tasks.gradle'
 
 dependencies {
