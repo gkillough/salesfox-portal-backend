@@ -38,8 +38,7 @@ public class UserController {
     ) {
         return userService.getUsers(offset, limit, query);
     }
-
-    // FIXME eventually remove deprecated endpoint
+    
     @GetMapping({USER_ID_ENDPOINT_PATH_VARIABLE_SUFFIX})
     public UserAccountModel getUserById(@PathVariable(name = "user_id") UUID userId) {
         return userService.getUser(userId);
