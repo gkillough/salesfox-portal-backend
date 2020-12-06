@@ -7,16 +7,15 @@ import org.springframework.context.annotation.PropertySource;
 
 import java.io.File;
 
+@Getter
 @Configuration
 @PropertySource(NomsConfiguration.NOMS_CONFIGURATION_FILE_NAME)
 public class NomsConfiguration {
     public static final String NOMS_CONFIGURATION_FILE_NAME = "noms.properties";
 
-    @Getter
     @Value("{ai.salesfox.portal.integration.noms.temp.directory:}")
     private File nomsTempDirectory;
 
-    @Getter
     @Value("{ai.salesfox.portal.integration.noms.order.email.address:}")
     private String nomsOrderEmailAddress;
 
