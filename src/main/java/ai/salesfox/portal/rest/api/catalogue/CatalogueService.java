@@ -225,7 +225,7 @@ public class CatalogueService {
         if (StringUtils.isBlank(requestModel.getName())) {
             errors.add("The field 'Item Name' cannot be blank");
         }
-        //Desctiption verfication null check
+        // TODO Description verification null check
         //if (StringUtils.isBlank(requestModel.getDescription())) {
         //    errors.add("The field 'Description' cannot be blank");
         //}
