@@ -2,7 +2,7 @@ package ai.salesfox.portal.integration;
 
 import ai.salesfox.integration.common.exception.SalesfoxException;
 import ai.salesfox.integration.scribeless.service.campaign.model.CampaignCreationRequestModel;
-import ai.salesfox.portal.common.enumeration.DistributorName;
+import ai.salesfox.portal.common.exception.PortalException;
 import ai.salesfox.portal.common.model.PagedResourceHolder;
 import ai.salesfox.portal.common.service.email.EmailMessagingService;
 import ai.salesfox.portal.common.service.email.PortalEmailException;
@@ -17,7 +17,6 @@ import ai.salesfox.portal.database.customization.icon.CustomIconEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomIconDetailEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
-import ai.salesfox.portal.integration.noms.workflow.NomsRecipientCSVGenerator;
 import ai.salesfox.portal.integration.scribeless.workflow.ScribelessCampaignRequestModelCreator;
 import ai.salesfox.portal.integration.scribeless.workflow.model.CampaignCreationRequestHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -33,26 +32,18 @@ public abstract class EmailSubmissionGiftPartner implements GiftPartner {
     private static final String ORDER_MESSAGE_LINE_BREAK = "<br />";
     private static final String ORDER_MESSAGE_SECTION_BREAK = "<hr />";
 
-    private final NomsRecipientCSVGenerator nomsRecipientCSVGenerator;
     private final GiftDetailsService giftDetailsService;
     private final ScribelessCampaignRequestModelCreator scribelessCampaignRequestModelCreator;
     private final EmailMessagingService emailMessagingService;
 
     public EmailSubmissionGiftPartner(
-            NomsRecipientCSVGenerator nomsRecipientCSVGenerator,
             GiftDetailsService giftDetailsService,
             ScribelessCampaignRequestModelCreator scribelessCampaignRequestModelCreator,
             EmailMessagingService emailMessagingService
     ) {
-        this.nomsRecipientCSVGenerator = nomsRecipientCSVGenerator;
         this.giftDetailsService = giftDetailsService;
         this.scribelessCampaignRequestModelCreator = scribelessCampaignRequestModelCreator;
         this.emailMessagingService = emailMessagingService;
-    }
-
-    @Override
-    public DistributorName distributorName() {
-        return DistributorName.NOMS;
     }
 
     @Override
@@ -76,14 +67,14 @@ public abstract class EmailSubmissionGiftPartner implements GiftPartner {
         try {
             emailMessagingService.sendMessage(orderEmailMessage, List.of(recipientCSVFile));
         } catch (PortalEmailException e) {
-            log.error("There was a problem submitting an order with giftId=[{}] to NOMS: {}.", giftId, e.getMessage());
+            log.error("There was a problem submitting an order with giftId=[{}] to {}: {}.", giftId, distributorName().name(), e.getMessage());
             throw e;
         }
     }
 
     protected abstract List<String> retrieveOrderEmailAddresses();
 
-    protected abstract File generateRecipientCSVFileToAttach(UUID giftId, PagedResourceHolder<OrganizationAccountContactEntity> contactPageHolder);
+    protected abstract File generateRecipientCSVFileToAttach(UUID giftId, PagedResourceHolder<OrganizationAccountContactEntity> contactPageHolder) throws PortalException;
 
     protected EmailMessageModel createOrderEmailMessage(UUID giftId, String primaryMessage) {
         EmailMessageModel emailMessageModel = new EmailMessageModel(
