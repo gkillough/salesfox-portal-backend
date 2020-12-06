@@ -2,3 +2,6 @@ databaseChangeLog:
   - include:
       file: fix_billing_day_of_month.yaml
       relativeToChangelogFile: true
+  - include:
+      file: add_description_to_catalogue_item.yaml
+      relativeToChangelogFile: true
