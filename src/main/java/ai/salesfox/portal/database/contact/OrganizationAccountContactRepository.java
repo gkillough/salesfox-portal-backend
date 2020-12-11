@@ -12,11 +12,15 @@ import java.util.UUID;
 
 @Component
 public interface OrganizationAccountContactRepository extends JpaRepository<OrganizationAccountContactEntity, UUID> {
-    Page<OrganizationAccountContactEntity> findAllByIsActive(boolean isActive, Pageable pageable);
+    @Query("SELECT contact" +
+            " FROM OrganizationAccountContactEntity contact" +
+            " WHERE (:isActive = NULL OR contact.isActive = :isActive)"
+    )
+    Page<OrganizationAccountContactEntity> findByIsActive(Boolean isActive, Pageable pageable);
 
     @Query("SELECT contact" +
             " FROM OrganizationAccountContactEntity contact" +
-            " WHERE (contact.isActive = NULL OR contact.isActive = :isActive)" +
+            " WHERE (:isActive = NULL OR contact.isActive = :isActive)" +
             " AND (" +
             "   :query = NULL OR (" +
             "     contact.firstName LIKE %:query%" +
@@ -30,7 +34,7 @@ public interface OrganizationAccountContactRepository extends JpaRepository<Orga
     @Query("SELECT contact" +
             " FROM OrganizationAccountContactEntity contact" +
             " LEFT JOIN contact.contactOrganizationAccountRestrictionEntity orgAcctRestriction" +
-            " WHERE (contact.isActive = NULL OR contact.isActive = :isActive)" +
+            " WHERE (:isActive = NULL OR contact.isActive = :isActive)" +
             " AND (" +
             "   orgAcctRestriction != NULL " +
             "   AND orgAcctRestriction.organizationAccountId = :orgAcctId" +
@@ -41,7 +45,7 @@ public interface OrganizationAccountContactRepository extends JpaRepository<Orga
     @Query("SELECT contact" +
             " FROM OrganizationAccountContactEntity contact" +
             " LEFT JOIN contact.contactOrganizationAccountRestrictionEntity orgAcctRestriction" +
-            " WHERE (contact.isActive = NULL OR contact.isActive = :isActive)" +
+            " WHERE (:isActive = NULL OR contact.isActive = :isActive)" +
             " AND (" +
             "   orgAcctRestriction != NULL " +
             "   AND orgAcctRestriction.organizationAccountId = :orgAcctId" +

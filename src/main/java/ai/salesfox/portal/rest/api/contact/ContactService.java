@@ -236,7 +236,7 @@ public class ContactService {
             if (useQuery) {
                 return contactRepository.findByIsActiveAndQuery(isActive, query, pageRequest);
             } else {
-                return contactRepository.findAllByIsActive(isActive, pageRequest);
+                return contactRepository.findByIsActive(isActive, pageRequest);
             }
         }
 
