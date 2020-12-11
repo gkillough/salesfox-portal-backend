@@ -16,14 +16,45 @@ public interface OrganizationAccountContactRepository extends JpaRepository<Orga
 
     @Query("SELECT contact" +
             " FROM OrganizationAccountContactEntity contact" +
+            " WHERE (contact.isActive = NULL OR contact.isActive = :isActive)" +
+            " AND (" +
+            "   :query = NULL OR (" +
+            "     contact.firstName LIKE %:query%" +
+            "     OR contact.lastName LIKE %:query%" +
+            "     OR contact.email LIKE %:query%" +
+            "   )" +
+            " )"
+    )
+    Page<OrganizationAccountContactEntity> findByIsActiveAndQuery(@Param("isActive") Boolean isActive, @Param("query") String query, Pageable pageable);
+
+    @Query("SELECT contact" +
+            " FROM OrganizationAccountContactEntity contact" +
             " LEFT JOIN contact.contactOrganizationAccountRestrictionEntity orgAcctRestriction" +
-            " WHERE contact.isActive = :isActive" +
+            " WHERE (contact.isActive = NULL OR contact.isActive = :isActive)" +
             " AND (" +
             "   orgAcctRestriction != NULL " +
             "   AND orgAcctRestriction.organizationAccountId = :orgAcctId" +
             " )"
     )
-    Page<OrganizationAccountContactEntity> findByOrganizationAccountIdAndIsActive(@Param("orgAcctId") UUID organizationAccountId, @Param("isActive") boolean isActive, Pageable pageable);
+    Page<OrganizationAccountContactEntity> findByOrganizationAccountIdAndIsActive(@Param("orgAcctId") UUID organizationAccountId, @Param("isActive") Boolean isActive, Pageable pageable);
+
+    @Query("SELECT contact" +
+            " FROM OrganizationAccountContactEntity contact" +
+            " LEFT JOIN contact.contactOrganizationAccountRestrictionEntity orgAcctRestriction" +
+            " WHERE (contact.isActive = NULL OR contact.isActive = :isActive)" +
+            " AND (" +
+            "   orgAcctRestriction != NULL " +
+            "   AND orgAcctRestriction.organizationAccountId = :orgAcctId" +
+            " )" +
+            " AND (" +
+            "   :query = NULL OR (" +
+            "     contact.firstName LIKE %:query%" +
+            "     OR contact.lastName LIKE %:query%" +
+            "     OR contact.email LIKE %:query%" +
+            "   )" +
+            " )"
+    )
+    Page<OrganizationAccountContactEntity> findByOrganizationAccountIdAndIsActiveAndQuery(@Param("orgAcctId") UUID organizationAccountId, @Param("isActive") Boolean isActive, @Param("query") String query, Pageable pageable);
 
     @Query("SELECT COUNT(contact)" +
             " FROM OrganizationAccountContactEntity contact" +

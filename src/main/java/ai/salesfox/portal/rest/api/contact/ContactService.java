@@ -21,6 +21,7 @@ import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
 import ai.salesfox.portal.rest.api.contact.model.*;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -57,11 +58,11 @@ public class ContactService {
         this.contactAccessOperationUtility = new ContactAccessOperationUtility(contactRepository);
     }
 
-    public MultiContactModel getContacts(boolean contactActiveStatus, Integer pageOffset, Integer pageLimit) {
+    public MultiContactModel getContacts(Boolean isActive, String query, Integer pageOffset, Integer pageLimit) {
         PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
 
-        Page<OrganizationAccountContactEntity> accessibleContacts = getAccessibleContacts(loggedInUser, contactActiveStatus, pageOffset, pageLimit);
+        Page<OrganizationAccountContactEntity> accessibleContacts = getAccessibleContacts(loggedInUser, isActive, query, pageOffset, pageLimit);
         if (accessibleContacts.isEmpty()) {
             return MultiContactModel.empty();
         }
@@ -228,13 +229,23 @@ public class ContactService {
         contactRepository.save(contactToUpdate);
     }
 
-    private Page<OrganizationAccountContactEntity> getAccessibleContacts(UserEntity user, boolean isActive, Integer pageOffset, Integer pageLimit) {
+    private Page<OrganizationAccountContactEntity> getAccessibleContacts(UserEntity user, Boolean isActive, String query, Integer pageOffset, Integer pageLimit) {
+        boolean useQuery = StringUtils.isNotBlank(query);
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
         if (membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
-            return contactRepository.findAllByIsActive(isActive, pageRequest);
+            if (useQuery) {
+                return contactRepository.findByIsActiveAndQuery(isActive, query, pageRequest);
+            } else {
+                return contactRepository.findAllByIsActive(isActive, pageRequest);
+            }
         }
+
         MembershipEntity userMembership = user.getMembershipEntity();
-        return contactRepository.findByOrganizationAccountIdAndIsActive(userMembership.getOrganizationAccountId(), isActive, pageRequest);
+        UUID orgAcctId = userMembership.getOrganizationAccountId();
+        if (useQuery) {
+            return contactRepository.findByOrganizationAccountIdAndIsActiveAndQuery(orgAcctId, isActive, query, pageRequest);
+        }
+        return contactRepository.findByOrganizationAccountIdAndIsActive(orgAcctId, isActive, pageRequest);
     }
 
     private <T extends Contactable> Map<UUID, T> createContactableIdMap(Collection<T> contactables) {
