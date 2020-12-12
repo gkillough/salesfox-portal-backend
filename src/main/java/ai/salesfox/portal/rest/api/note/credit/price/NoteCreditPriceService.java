@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
+
 @Component
 public class NoteCreditPriceService {
     private final NoteCreditPriceRepository noteCreditPriceRepository;
@@ -27,12 +29,12 @@ public class NoteCreditPriceService {
     @Transactional
     public void updateNoteCreditPrice(NoteCreditPriceRequestModel requestModel) {
         NoteCreditPriceEntity foundNoteCreditPrice = findNoteCreditPrice();
-        Double requestedPrice = requestModel.getNoteCreditPrice();
-        if (null == requestedPrice) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Note Credit Price must not be NULL");
+        BigDecimal requestedPrice = requestModel.getNoteCreditPrice();
+        if (null == foundNoteCreditPrice) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to find Note Credit Price to update");
         } else {
-            if (null == foundNoteCreditPrice) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to find Note Credit Price to update");
+            if (null == requestedPrice) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Note Credit Price must not be NULL");
             } else {
                 foundNoteCreditPrice.setNoteCreditPrice(requestedPrice);
                 noteCreditPriceRepository.save(foundNoteCreditPrice);
@@ -48,15 +50,8 @@ public class NoteCreditPriceService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "The Note Credit Price could not be retrieved"));
     }
 
-    private NoteCreditPriceEntity initializeNoteCreditPrice() {
-        NoteCreditPriceEntity noteCreditPriceToSave = new NoteCreditPriceEntity(null, null);
-        NoteCreditPriceEntity savedNoteCreditPrice = noteCreditPriceRepository.save(noteCreditPriceToSave);
-
-        return savedNoteCreditPrice;
-    }
-
     private NoteCreditPriceResponseModel createResponseModel(NoteCreditPriceEntity currentNoteCreditPrice) {
-        return new NoteCreditPriceResponseModel(currentNoteCreditPrice.getNoteCreditPriceId(), currentNoteCreditPrice.getNoteCreditPrice());
+        return new NoteCreditPriceResponseModel(currentNoteCreditPrice.getNoteCreditPrice());
     }
 
 }

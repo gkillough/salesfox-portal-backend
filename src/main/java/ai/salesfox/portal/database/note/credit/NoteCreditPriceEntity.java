@@ -8,6 +8,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -16,12 +18,12 @@ import java.io.Serializable;
 public class NoteCreditPriceEntity implements Serializable {
     @Id
     @Column(name = "price_id")
-    private Integer noteCreditPriceId;
-    
-    @Column(name = "price")
-    private Double noteCreditPrice;
+    private UUID noteCreditPriceId;
 
-    public NoteCreditPriceEntity(Integer noteCreditPriceId, Double noteCreditPrice) {
+    @Column(name = "price")
+    private BigDecimal noteCreditPrice;
+
+    public NoteCreditPriceEntity(UUID noteCreditPriceId, BigDecimal noteCreditPrice) {
         this.noteCreditPriceId = noteCreditPriceId;
         this.noteCreditPrice = noteCreditPrice;
     }

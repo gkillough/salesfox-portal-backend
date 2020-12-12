@@ -4,11 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class NoteCreditPriceRequestModel {
-    private Integer noteCreditPriceId;
-    private Double noteCreditPrice;
+    // TODO When we incorporate different note credit price. this will be needed. 
+    //private UUID noteCreditPriceId;
+    private BigDecimal noteCreditPrice;
 
 }

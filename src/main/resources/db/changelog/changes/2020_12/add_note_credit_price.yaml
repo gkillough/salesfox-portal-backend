@@ -9,7 +9,8 @@ databaseChangeLog:
             columns:
               - column:
                   name: price_id
-                  type: INTEGER
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
                   constraints:
                     primaryKey: true
               - column:
@@ -23,9 +24,6 @@ databaseChangeLog:
             schemaName: portal
             tableName: note_credit_price
             columns:
-              - column:
-                  name: price_id
-                  valueNumeric: 1
               - column:
                   name: price
                   valueNumeric: 4.00
