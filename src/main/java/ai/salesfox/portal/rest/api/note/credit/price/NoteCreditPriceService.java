@@ -26,10 +26,13 @@ public class NoteCreditPriceService {
 
     @Transactional
     public void updateNoteCreditPrice(NoteCreditPriceRequestModel requestModel) {
-        NoteCreditPriceEntity currentNoteCreditPrice = findNoteCreditPrice();
+        NoteCreditPriceEntity foundNoteCreditPrice = findNoteCreditPrice();
         Double requestedPrice = requestModel.getNoteCreditPrice();
         if (null == requestedPrice) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Note Credit Price must not be NULL");
+        } else {
+            foundNoteCreditPrice.setNoteCreditPrice(requestedPrice);
+            noteCreditPriceRepository.save(foundNoteCreditPrice);
         }
     }
 
@@ -41,12 +44,10 @@ public class NoteCreditPriceService {
     }
 
     private NoteCreditPriceEntity initializeNoteCreditPrice() {
-        // TODO: parameterize this call to get note Credit Price
-        NoteCreditPriceEntity noteCreditPriceToSave = new NoteCreditPriceEntity(1, 4.00);
+        NoteCreditPriceEntity noteCreditPriceToSave = new NoteCreditPriceEntity(null, null);
         NoteCreditPriceEntity savedNoteCreditPrice = noteCreditPriceRepository.save(noteCreditPriceToSave);
 
         return savedNoteCreditPrice;
-
     }
 
     private NoteCreditPriceResponseModel createResponseModel(NoteCreditPriceEntity currentNoteCreditPrice) {
