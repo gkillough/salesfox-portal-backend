@@ -33,7 +33,7 @@ public class NoteCreditPriceService {
         if (null == foundNoteCreditPrice) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to find Note Credit Price to update");
         } else {
-            if (null == requestedPrice) {
+            if (null == requestedPrice || requestedPrice.compareTo(BigDecimal.ZERO) == -1 || requestedPrice.compareTo(BigDecimal.ZERO) == 0) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Note Credit Price must not be NULL");
             } else {
                 foundNoteCreditPrice.setNoteCreditPrice(requestedPrice);

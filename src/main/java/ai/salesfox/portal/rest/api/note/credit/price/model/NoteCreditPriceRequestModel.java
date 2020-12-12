@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NoteCreditPriceRequestModel {
-    // TODO When we incorporate different note credit price. this will be needed. 
+    // TODO When we incorporate different note credit price. this will be needed.
     //private UUID noteCreditPriceId;
     private BigDecimal noteCreditPrice;
 
