@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-note-credit-price
+      author: bradmoulder
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: note_credit_price
+            columns:
+              - column:
+                  name: price_id
+                  type: INTEGER
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: price
+                  type: DOUBLE PRECISION
+  - changeSet:
+      id: init-note-credit-price
+      author: bradmoulder
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: note_credit_price
+            columns:
+              - column:
+                  name: price_id
+                  valueNumeric: 1
+              - column:
+                  name: price
+                  valueNumeric: 4.00
