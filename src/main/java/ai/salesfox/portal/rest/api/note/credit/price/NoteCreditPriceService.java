@@ -31,8 +31,13 @@ public class NoteCreditPriceService {
         if (null == requestedPrice) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Note Credit Price must not be NULL");
         } else {
-            foundNoteCreditPrice.setNoteCreditPrice(requestedPrice);
-            noteCreditPriceRepository.save(foundNoteCreditPrice);
+            if (null == foundNoteCreditPrice) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to find Note Credit Price to update");
+            } else {
+                foundNoteCreditPrice.setNoteCreditPrice(requestedPrice);
+                noteCreditPriceRepository.save(foundNoteCreditPrice);
+            }
+
         }
     }
 
