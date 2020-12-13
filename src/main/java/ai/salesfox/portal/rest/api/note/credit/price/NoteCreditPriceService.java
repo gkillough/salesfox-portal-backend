@@ -29,18 +29,15 @@ public class NoteCreditPriceService {
     @Transactional
     public void updateNoteCreditPrice(NoteCreditPriceRequestModel requestModel) {
         BigDecimal requestedPrice = requestModel.getNoteCreditPrice();
-        if (null == requestedPrice || requestedPrice.compareTo(BigDecimal.ZERO) == -1 || requestedPrice.compareTo(BigDecimal.ZERO) == 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Note Credit Price must not be NULL");
-        } else {
-            NoteCreditPriceEntity foundNoteCreditPrice = findNoteCreditPrice();
-            if (null == foundNoteCreditPrice) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unable to find Note Credit Price to update");
-            } else {
-                foundNoteCreditPrice.setNoteCreditPrice(requestedPrice);
-                noteCreditPriceRepository.save(foundNoteCreditPrice);
-            }
-
+        if (null == requestedPrice) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Note Credit Price cannot be null");
+        } else if (requestedPrice.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Note Credit Price must be greater than zero");
         }
+
+        NoteCreditPriceEntity foundNoteCreditPrice = findNoteCreditPrice();
+        foundNoteCreditPrice.setNoteCreditPrice(requestedPrice);
+        noteCreditPriceRepository.save(foundNoteCreditPrice);
     }
 
     private NoteCreditPriceEntity findNoteCreditPrice() {
