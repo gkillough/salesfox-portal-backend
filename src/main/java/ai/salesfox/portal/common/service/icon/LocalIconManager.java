@@ -24,7 +24,7 @@ public class LocalIconManager {
         try {
             return writeInputStreamToFile(imageFileInputStream, imageFileExtension);
         } catch (IOException e) {
-            throw new PortalFileSystemException("Could not read file as image", e);
+            throw new PortalFileSystemException("Could not read file as icon", e);
         }
     }
 
@@ -59,7 +59,7 @@ public class LocalIconManager {
         if (iconDir.exists() && iconDir.isDirectory()) {
             return iconDir;
         }
-        throw new PortalFileSystemException("The image directory could not be loaded");
+        throw new PortalFileSystemException("The icon directory could not be loaded");
     }
 
     private File writeInputStreamToFile(InputStream imageFileInputStream, String imageExtension) throws IOException, PortalFileSystemException {
@@ -68,7 +68,7 @@ public class LocalIconManager {
         ByteArrayOutputStream imageByteArrayOutputStream = new ByteArrayOutputStream();
         boolean hadAppropriateWriter = ImageIO.write(bufferedImage, imageExtension, imageByteArrayOutputStream);
         if (!hadAppropriateWriter) {
-            throw new PortalFileSystemException("No appropriate image writer");
+            throw new PortalFileSystemException("No appropriate icon writer");
         }
 
         byte[] imageBytes = imageByteArrayOutputStream.toByteArray();

@@ -1,0 +1,81 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-note-images-1
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: note_custom_icons
+            columns:
+              - column:
+                  name: note_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: custom_icon_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: add-note-images-2
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: note_custom_icons_note_id_fk
+            baseTableSchemaName: portal
+            baseTableName: note_custom_icons
+            baseColumnNames: note_id
+            referencedTableSchemaName: portal
+            referencedTableName: notes
+            referencedColumnNames: note_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true
+        - addForeignKeyConstraint:
+            constraintName: note_custom_icons_custom_icon_id_fk
+            baseTableSchemaName: portal
+            baseTableName: note_custom_icons
+            baseColumnNames: custom_icon_id
+            referencedTableSchemaName: portal
+            referencedTableName: custom_icons
+            referencedColumnNames: custom_icon_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+            validate: true
+
+  - changeSet:
+      id: add-gift-mockup-images-1
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: gift_mockup_images
+            columns:
+              - column:
+                  name: gift_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: image_url
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: add-gift-mockup-images-2
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: gift_mockup_images_gift_id_fk
+            baseTableSchemaName: portal
+            baseTableName: gift_mockup_images
+            baseColumnNames: gift_id
+            referencedTableSchemaName: portal
+            referencedTableName: gifts
+            referencedColumnNames: gift_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true

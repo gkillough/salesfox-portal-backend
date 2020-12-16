@@ -38,7 +38,7 @@ public class CustomIconImageService {
         customIconAccessService.validateImageAccess(foundCustomIconEntity);
         customIconGiftStatusValidator.validateCustomIconGiftStatus(customIconId);
 
-        // FIXME validate things about the image
+        // FIXME validate things about the icon
         if (null == iconFile) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'iconFile' is required");
         }
@@ -49,8 +49,8 @@ public class CustomIconImageService {
         try {
             iconUrl = externalImageStorageService.storeImageAndRetrieveUrl(PortalImageStorageDestination.USER_IMAGES, iconFile, true);
         } catch (PortalException e) {
-            log.error("There was a problem uploading an image", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload the image. If this problem persists, please contact support.");
+            log.error("There was a problem uploading an icon", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload the icon. If this problem persists, please contact support.");
         }
 
         foundCustomIconEntity.setIconUrl(iconUrl);
