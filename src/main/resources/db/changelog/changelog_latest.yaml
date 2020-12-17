@@ -1,9 +1,5 @@
 databaseChangeLog:
   - include:
-      file: changes/0.2.0/0.2.0_changelog.yaml
-      relativeToChangelogFile: true
-
-  - include:
       file: changes/2020_11/2020_11_changelog.yaml
       relativeToChangelogFile: true
 

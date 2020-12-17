@@ -1,0 +1,3634 @@
+Database snapshot for jdbc:postgresql://localhost:5432/salesfox
+-----------------------------------------------------------------
+Database type: PostgreSQL
+Database version: 12.3 (Ubuntu 12.3-1.pgdg20.04+1)
+Database user: portaladmin
+Included types:
+    liquibase.structure.core.Catalog
+    liquibase.structure.core.Column
+    liquibase.structure.core.ForeignKey
+    liquibase.structure.core.Index
+    liquibase.structure.core.PrimaryKey
+    liquibase.structure.core.Schema
+    liquibase.structure.core.Sequence
+    liquibase.structure.core.Table
+    liquibase.structure.core.UniqueConstraint
+    liquibase.structure.core.View
+
+Catalog & Schema: salesfox / portal
+    liquibase.structure.core.ForeignKey:
+        catalogue_item_external_details_item_id_fk
+            backingIndex: catalogue_item_external_details_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                item_id
+            foreignKeyTable: catalogue_item_external_details
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                item_id
+            primaryKeyTable: catalogue_items
+            updateRule: importedKeyCascade
+        catalog_item_org_acct_restrictions_item_id_fk
+            backingIndex: catalogue_item_organization_account_restrictions_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                item_id
+            foreignKeyTable: catalogue_item_organization_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                item_id
+            primaryKeyTable: catalogue_items
+            updateRule: importedKeyCascade
+        catalog_item_org_acct_restrictions_org_account_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                organization_account_id
+            foreignKeyTable: catalogue_item_organization_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                organization_account_id
+            primaryKeyTable: organization_accounts
+            updateRule: importedKeyCascade
+        catalogue_item_user_restrictions_item_id_fk
+            backingIndex: catalogue_item_user_restrictions_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                item_id
+            foreignKeyTable: catalogue_item_user_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                item_id
+            primaryKeyTable: catalogue_items
+            updateRule: importedKeyCascade
+        catalogue_item_user_restrictions_user_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                user_id
+            foreignKeyTable: catalogue_item_user_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        contact_interactions_contact_id_fk
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                contact_id
+            foreignKeyTable: contact_interactions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                contact_id
+            primaryKeyTable: organization_account_contacts
+            updateRule: importedKeyCascade
+        contact_interactions_interacting_user_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                interacting_user_id
+            foreignKeyTable: contact_interactions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        contact_organization_account_restrictions_contact_id_fk
+            backingIndex: contact_organization_account_restrictions_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                contact_id
+            foreignKeyTable: contact_organization_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                contact_id
+            primaryKeyTable: organization_account_contacts
+            updateRule: importedKeyNoAction
+        contact_org_acct_restrictions_organization_account_id_fk
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                organization_account_id
+            foreignKeyTable: contact_organization_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                organization_account_id
+            primaryKeyTable: organization_accounts
+            updateRule: importedKeyNoAction
+        cust_brand_txt_org_acct_restrition_cust_brand_txt_id_fk
+            backingIndex: custom_branding_text_org_account_restrictions_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                custom_branding_text_id
+            foreignKeyTable: custom_branding_text_org_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                custom_branding_text_id
+            primaryKeyTable: custom_branding_texts
+            updateRule: importedKeyCascade
+        cust_brand_txts_org_acct_restrictions_org_acct_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                organization_account_id
+            foreignKeyTable: custom_branding_text_org_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                organization_account_id
+            primaryKeyTable: organization_accounts
+            updateRule: importedKeyCascade
+        cust_brand_txts_uploader_id_fk
+            deferrable: false
+            deleteRule: importedKeySetNull
+            foreignKeyColumns: 
+                uploader_id
+            foreignKeyTable: custom_branding_texts
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        custom_icon_org_acct_restrictions_custom_icon_id_fk
+            backingIndex: custom_icon_organization_account_restrictions_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                custom_icon_id
+            foreignKeyTable: custom_icon_organization_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                custom_icon_id
+            primaryKeyTable: custom_icons
+            updateRule: importedKeyCascade
+        custom_icon_org_acct_restrictions_org_acct_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                organization_account_id
+            foreignKeyTable: custom_icon_organization_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                organization_account_id
+            primaryKeyTable: organization_accounts
+            updateRule: importedKeyCascade
+        custom_icons_uploader_id_fk
+            deferrable: false
+            deleteRule: importedKeySetNull
+            foreignKeyColumns: 
+                uploader_id
+            foreignKeyTable: custom_icons
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        gift_custom_icon_details_custom_icon_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                custom_icon_id
+            foreignKeyTable: gift_custom_icon_details
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                custom_icon_id
+            primaryKeyTable: custom_icons
+            updateRule: importedKeyCascade
+        gift_custom_icon_details_gift_id_fk
+            backingIndex: gift_custom_icon_details_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                gift_id
+            foreignKeyTable: gift_custom_icon_details
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                gift_id
+            primaryKeyTable: gifts
+            updateRule: importedKeyCascade
+        gift_custom_text_details_custom_text_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                custom_text_id
+            foreignKeyTable: gift_custom_text_details
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                custom_branding_text_id
+            primaryKeyTable: custom_branding_texts
+            updateRule: importedKeyCascade
+        gift_custom_text_details_gift_id_fk
+            backingIndex: gift_custom_text_details_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                gift_id
+            foreignKeyTable: gift_custom_text_details
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                gift_id
+            primaryKeyTable: gifts
+            updateRule: importedKeyCascade
+        gift_item_detail_gift_id_fk
+            backingIndex: gift_item_details_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                gift_id
+            foreignKeyTable: gift_item_details
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                gift_id
+            primaryKeyTable: gifts
+            updateRule: importedKeyCascade
+        gift_item_detail_item_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                item_id
+            foreignKeyTable: gift_item_details
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                item_id
+            primaryKeyTable: catalogue_items
+            updateRule: importedKeyCascade
+        gift_note_detail_gift_id_fk
+            backingIndex: gift_note_details_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                gift_id
+            foreignKeyTable: gift_note_details
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                gift_id
+            primaryKeyTable: gifts
+            updateRule: importedKeyCascade
+        gift_note_detail_note_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                note_id
+            foreignKeyTable: gift_note_details
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                note_id
+            primaryKeyTable: notes
+            updateRule: importedKeyCascade
+        gift_org_acct_restrictions_gift_id_fk
+            backingIndex: gift_org_account_restrictions_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                gift_id
+            foreignKeyTable: gift_org_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                gift_id
+            primaryKeyTable: gifts
+            updateRule: importedKeyCascade
+        gift_org_acct_restrictions_org_account_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                organization_account_id
+            foreignKeyTable: gift_org_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                organization_account_id
+            primaryKeyTable: organization_accounts
+            updateRule: importedKeyCascade
+        gift_recipients_contact_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                contact_id
+            foreignKeyTable: gift_recipients
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                contact_id
+            primaryKeyTable: organization_account_contacts
+            updateRule: importedKeyCascade
+        gift_recipients_gift_id_fk
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                gift_id
+            foreignKeyTable: gift_recipients
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                gift_id
+            primaryKeyTable: gifts
+            updateRule: importedKeyCascade
+        gift_schedules_gift_id_fk
+            backingIndex: gift_schedules_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                gift_id
+            foreignKeyTable: gift_schedules
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                gift_id
+            primaryKeyTable: gifts
+            updateRule: importedKeyCascade
+        gift_schedules_scheduling_user_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                scheduling_user_id
+            foreignKeyTable: gift_schedules
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        gift_scribeless_status_gift_id_fk
+            backingIndex: gift_scribeless_status_pkey
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                gift_id
+            foreignKeyTable: gift_scribeless_status
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                gift_id
+            primaryKeyTable: gifts
+            updateRule: importedKeyCascade
+        gift_tracking_gift_id_fk
+            backingIndex: gift_tracking_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                gift_id
+            foreignKeyTable: gift_tracking
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                gift_id
+            primaryKeyTable: gifts
+            updateRule: importedKeyCascade
+        gift_tracking_updated_by_user_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                updated_by_user_id
+            foreignKeyTable: gift_tracking
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        gift_tracking_details_gift_id_fk
+            backingIndex: gift_tracking_details_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                gift_id
+            foreignKeyTable: gift_tracking_details
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                gift_id
+            primaryKeyTable: gifts
+            updateRule: importedKeyCascade
+        gift_user_restrictions_gift_id_fk
+            backingIndex: gift_user_restrictions_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                gift_id
+            foreignKeyTable: gift_user_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                gift_id
+            primaryKeyTable: gifts
+            updateRule: importedKeyCascade
+        gift_user_restrictions_user_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                user_id
+            foreignKeyTable: gift_user_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        gifts_requesting_user_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                requesting_user_id
+            foreignKeyTable: gifts
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        inventory_items_catalogue_item_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                catalogue_item_id
+            foreignKeyTable: inventory_items
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                item_id
+            primaryKeyTable: catalogue_items
+            updateRule: importedKeyCascade
+        inventory_items_inventory_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                inventory_id
+            foreignKeyTable: inventory_items
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                inventory_id
+            primaryKeyTable: inventories
+            updateRule: importedKeyCascade
+        inventory_org_acct_restrictions_inventory_id_fk
+            backingIndex: inventory_organization_account_restrictions_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                inventory_id
+            foreignKeyTable: inventory_organization_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                inventory_id
+            primaryKeyTable: inventories
+            updateRule: importedKeyCascade
+        inventory_org_acct_restrictions_org_acct_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                organization_account_id
+            foreignKeyTable: inventory_organization_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                organization_account_id
+            primaryKeyTable: organization_accounts
+            updateRule: importedKeyCascade
+        logins_user_id_fk
+            backingIndex: logins_pkey
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                user_id
+            foreignKeyTable: logins
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        memberships_organization_account_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                organization_account_id
+            foreignKeyTable: memberships
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                organization_account_id
+            primaryKeyTable: organization_accounts
+            updateRule: importedKeyCascade
+        memberships_role_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                role_id
+            foreignKeyTable: memberships
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                role_id
+            primaryKeyTable: roles
+            updateRule: importedKeyCascade
+        memberships_user_id_fk
+            backingIndex: memberships_pkey
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                user_id
+            foreignKeyTable: memberships
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        note_credit_org_acct_restrictions_note_credit_id_fk
+            backingIndex: note_credit_organization_account_restrictions_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                note_credit_id
+            foreignKeyTable: note_credit_organization_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                note_credit_id
+            primaryKeyTable: note_credits
+            updateRule: importedKeyCascade
+        note_credit_org_acct_restrictions_org_acct_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                organization_account_id
+            foreignKeyTable: note_credit_organization_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                organization_account_id
+            primaryKeyTable: organization_accounts
+            updateRule: importedKeyCascade
+        note_credit_user_restrictions_note_credit_id_fk
+            backingIndex: note_credit_user_restrictions_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                note_credit_id
+            foreignKeyTable: note_credit_user_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                note_credit_id
+            primaryKeyTable: note_credits
+            updateRule: importedKeyCascade
+        note_credit_user_restrictions_user_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                user_id
+            foreignKeyTable: note_credit_user_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        note_org_acct_restrictions_note_id_fk
+            backingIndex: note_organization_account_restrictions_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                note_id
+            foreignKeyTable: note_organization_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                note_id
+            primaryKeyTable: notes
+            updateRule: importedKeyCascade
+        note_org_acct_restrictions_org_acct_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                organization_account_id
+            foreignKeyTable: note_organization_account_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                organization_account_id
+            primaryKeyTable: organization_accounts
+            updateRule: importedKeyCascade
+        note_user_restrictions_note_id_fk
+            backingIndex: note_user_restrictions_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                note_id
+            foreignKeyTable: note_user_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                note_id
+            primaryKeyTable: notes
+            updateRule: importedKeyCascade
+        note_user_restrictions_user_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                user_id
+            foreignKeyTable: note_user_restrictions
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        notes_updated_by_user_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                updated_by_user_id
+            foreignKeyTable: notes
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        order_requests_catalogue_item_id_fk
+            deferrable: false
+            deleteRule: importedKeySetNull
+            foreignKeyColumns: 
+                catalogue_item_id
+            foreignKeyTable: order_requests
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                item_id
+            primaryKeyTable: catalogue_items
+            updateRule: importedKeyCascade
+        order_requests_inventory_id_fk
+            deferrable: false
+            deleteRule: importedKeySetNull
+            foreignKeyColumns: 
+                inventory_id
+            foreignKeyTable: order_requests
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                inventory_id
+            primaryKeyTable: inventories
+            updateRule: importedKeyCascade
+        order_requests_org_account_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                organization_account_id
+            foreignKeyTable: order_requests
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                organization_account_id
+            primaryKeyTable: organization_accounts
+            updateRule: importedKeyCascade
+        order_requests_requesting_user_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                requesting_user_id
+            foreignKeyTable: order_requests
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        order_requests_user_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                user_id
+            foreignKeyTable: order_requests
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        org_acct_licenses_license_type_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                license_type_id
+            foreignKeyTable: org_acct_licenses
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                license_type_id
+            primaryKeyTable: license_types
+            updateRule: importedKeyCascade
+        org_acct_licenses_org_acct_id_fk
+            backingIndex: org_acct_licenses_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                organization_account_id
+            foreignKeyTable: org_acct_licenses
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                organization_account_id
+            primaryKeyTable: organization_accounts
+            updateRule: importedKeyCascade
+        org_acct_addresses_org_acct_id_fk
+            backingIndex: organization_account_addresses_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                organization_account_id
+            foreignKeyTable: organization_account_addresses
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                organization_account_id
+            primaryKeyTable: organization_accounts
+            updateRule: importedKeyCascade
+        org_acct_contact_addresses_contact_id_fk
+            backingIndex: organization_account_contact_addresses_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                contact_id
+            foreignKeyTable: organization_account_contact_addresses
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                contact_id
+            primaryKeyTable: organization_account_contacts
+            updateRule: importedKeyCascade
+        org_acct_contact_profiles_contact_id_fk
+            backingIndex: organization_account_contact_profiles_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                contact_id
+            foreignKeyTable: organization_account_contact_profiles
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                contact_id
+            primaryKeyTable: organization_account_contacts
+            updateRule: importedKeyCascade
+        org_acct_contact_profiles_org_point_of_contact_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                organization_point_of_contact_user_id
+            foreignKeyTable: organization_account_contact_profiles
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        org_acct_invite_tokens_org_acct_id_fk
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                organization_account_id
+            foreignKeyTable: organization_account_invite_tokens
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                organization_account_id
+            primaryKeyTable: organization_accounts
+            updateRule: importedKeyCascade
+        org_acct_profiles_org_acct_id_fk
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                organization_account_id
+            foreignKeyTable: organization_account_profiles
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                organization_account_id
+            primaryKeyTable: organization_accounts
+            updateRule: importedKeyCascade
+        organization_accounts_organization_id_fk
+            deferrable: false
+            deleteRule: importedKeyRestrict
+            foreignKeyColumns: 
+                organization_id
+            foreignKeyTable: organization_accounts
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                organization_id
+            primaryKeyTable: organizations
+            updateRule: importedKeyCascade
+        user_acct_addresses_user_id_fk
+            backingIndex: user_addresses_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                user_id
+            foreignKeyTable: user_addresses
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        user_campaign_summaries_user_id_fk
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                user_id
+            foreignKeyTable: user_campaign_summaries
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        user_profiles_user_id_fk
+            backingIndex: profiles_pkey
+            deferrable: false
+            deleteRule: importedKeyCascade
+            foreignKeyColumns: 
+                user_id
+            foreignKeyTable: user_profiles
+            initiallyDeferred: false
+            primaryKeyColumns: 
+                user_id
+            primaryKeyTable: users
+            updateRule: importedKeyCascade
+        
+    liquibase.structure.core.Index:
+        catalogue_item_external_details_pkey
+            columns: 
+                item_id
+            table: catalogue_item_external_details
+            unique: true
+        catalogue_item_organization_account_restrictions_pkey
+            columns: 
+                item_id
+            table: catalogue_item_organization_account_restrictions
+            unique: true
+        catalogue_item_user_restrictions_pkey
+            columns: 
+                item_id
+            table: catalogue_item_user_restrictions
+            unique: true
+        catalogue_items_pkey
+            columns: 
+                item_id
+            table: catalogue_items
+            unique: true
+        contact_interactions_pkey
+            columns: 
+                interaction_id
+            table: contact_interactions
+            unique: true
+        contact_organization_account_restrictions_pkey
+            columns: 
+                contact_id
+            table: contact_organization_account_restrictions
+            unique: true
+        custom_branding_text_org_account_restrictions_pkey
+            columns: 
+                custom_branding_text_id
+            table: custom_branding_text_org_account_restrictions
+            unique: true
+        custom_branding_texts_pkey
+            columns: 
+                custom_branding_text_id
+            table: custom_branding_texts
+            unique: true
+        custom_icon_organization_account_restrictions_pkey
+            columns: 
+                custom_icon_id
+            table: custom_icon_organization_account_restrictions
+            unique: true
+        custom_icons_pkey
+            columns: 
+                custom_icon_id
+            table: custom_icons
+            unique: true
+        gift_custom_icon_details_pkey
+            columns: 
+                gift_id
+            table: gift_custom_icon_details
+            unique: true
+        gift_custom_text_details_pkey
+            columns: 
+                gift_id
+            table: gift_custom_text_details
+            unique: true
+        gift_item_details_pkey
+            columns: 
+                gift_id
+            table: gift_item_details
+            unique: true
+        gift_note_details_pkey
+            columns: 
+                gift_id
+            table: gift_note_details
+            unique: true
+        gift_org_account_restrictions_pkey
+            columns: 
+                gift_id
+            table: gift_org_account_restrictions
+            unique: true
+        gift_recipients_pkey
+            columns: 
+                contact_id
+                gift_id
+            table: gift_recipients
+            unique: true
+        gift_schedules_pkey
+            columns: 
+                gift_id
+            table: gift_schedules
+            unique: true
+        gift_scribeless_status_gift_id_campaign_id_key
+            columns: 
+                campaign_id
+                gift_id
+            table: gift_scribeless_status
+            unique: true
+        gift_scribeless_status_pkey
+            columns: 
+                gift_id
+            table: gift_scribeless_status
+            unique: true
+        gift_tracking_pkey
+            columns: 
+                gift_id
+            table: gift_tracking
+            unique: true
+        gift_tracking_details_pkey
+            columns: 
+                gift_id
+            table: gift_tracking_details
+            unique: true
+        gift_user_restrictions_pkey
+            columns: 
+                gift_id
+            table: gift_user_restrictions
+            unique: true
+        gifts_pkey
+            columns: 
+                gift_id
+            table: gifts
+            unique: true
+        inventories_pkey
+            columns: 
+                inventory_id
+            table: inventories
+            unique: true
+        inventory_items_pkey
+            columns: 
+                catalogue_item_id
+                inventory_id
+            table: inventory_items
+            unique: true
+        inventory_organization_account_restrictions_pkey
+            columns: 
+                inventory_id
+            table: inventory_organization_account_restrictions
+            unique: true
+        license_types_name_key
+            columns: 
+                name
+            table: license_types
+            unique: true
+        license_types_pkey
+            columns: 
+                license_type_id
+            table: license_types
+            unique: true
+        logins_pkey
+            columns: 
+                user_id
+            table: logins
+            unique: true
+        memberships_pkey
+            columns: 
+                user_id
+            table: memberships
+            unique: true
+        note_credit_organization_account_restrictions_pkey
+            columns: 
+                note_credit_id
+            table: note_credit_organization_account_restrictions
+            unique: true
+        note_credit_user_restrictions_pkey
+            columns: 
+                note_credit_id
+            table: note_credit_user_restrictions
+            unique: true
+        note_credits_pkey
+            columns: 
+                note_credit_id
+            table: note_credits
+            unique: true
+        note_organization_account_restrictions_pkey
+            columns: 
+                note_id
+            table: note_organization_account_restrictions
+            unique: true
+        note_user_restrictions_pkey
+            columns: 
+                note_id
+            table: note_user_restrictions
+            unique: true
+        notes_pkey
+            columns: 
+                note_id
+            table: notes
+            unique: true
+        order_requests_pkey
+            columns: 
+                order_id
+            table: order_requests
+            unique: true
+        org_acct_licenses_pkey
+            columns: 
+                organization_account_id
+            table: org_acct_licenses
+            unique: true
+        organization_account_addresses_pkey
+            columns: 
+                organization_account_id
+            table: organization_account_addresses
+            unique: true
+        organization_account_contact_addresses_pkey
+            columns: 
+                contact_id
+            table: organization_account_contact_addresses
+            unique: true
+        organization_account_contact_profiles_pkey
+            columns: 
+                contact_id
+            table: organization_account_contact_profiles
+            unique: true
+        organization_account_contacts_pkey
+            columns: 
+                contact_id
+            table: organization_account_contacts
+            unique: true
+        organization_account_invite_tokens_pkey
+            columns: 
+                email
+                token
+            table: organization_account_invite_tokens
+            unique: true
+        organization_account_profiles_pkey
+            columns: 
+                profile_id
+            table: organization_account_profiles
+            unique: true
+        organization_accounts_organization_account_name_with_id_key
+            columns: 
+                organization_account_name
+                organization_id
+            table: organization_accounts
+            unique: true
+        organization_accounts_pkey
+            columns: 
+                organization_account_id
+            table: organization_accounts
+            unique: true
+        organizations_pkey
+            columns: 
+                organization_id
+            table: organizations
+            unique: true
+        password_reset_tokens_pkey
+            columns: 
+                email
+                token
+            table: password_reset_tokens
+            unique: true
+        roles_pkey
+            columns: 
+                role_id
+            table: roles
+            unique: true
+        roles_role_level_key
+            columns: 
+                role_level
+            table: roles
+            unique: true
+        user_addresses_pkey
+            columns: 
+                user_id
+            table: user_addresses
+            unique: true
+        user_campaign_summaries_pkey
+            columns: 
+                user_campaign_id
+            table: user_campaign_summaries
+            unique: true
+        profiles_pkey
+            columns: 
+                user_id
+            table: user_profiles
+            unique: true
+        users_email_key
+            columns: 
+                email
+            table: users
+            unique: true
+        users_pkey
+            columns: 
+                user_id
+            table: users
+            unique: true
+        
+    liquibase.structure.core.PrimaryKey:
+        catalogue_item_external_details_pkey
+            backingIndex: catalogue_item_external_details_pkey
+            columns: 
+                item_id
+            table: catalogue_item_external_details
+        catalogue_item_organization_account_restrictions_pkey
+            backingIndex: catalogue_item_organization_account_restrictions_pkey
+            columns: 
+                item_id
+            table: catalogue_item_organization_account_restrictions
+        catalogue_item_user_restrictions_pkey
+            backingIndex: catalogue_item_user_restrictions_pkey
+            columns: 
+                item_id
+            table: catalogue_item_user_restrictions
+        catalogue_items_pkey
+            backingIndex: catalogue_items_pkey
+            columns: 
+                item_id
+            table: catalogue_items
+        contact_interactions_pkey
+            backingIndex: contact_interactions_pkey
+            columns: 
+                interaction_id
+            table: contact_interactions
+        contact_organization_account_restrictions_pkey
+            backingIndex: contact_organization_account_restrictions_pkey
+            columns: 
+                contact_id
+            table: contact_organization_account_restrictions
+        custom_branding_text_org_account_restrictions_pkey
+            backingIndex: custom_branding_text_org_account_restrictions_pkey
+            columns: 
+                custom_branding_text_id
+            table: custom_branding_text_org_account_restrictions
+        custom_branding_texts_pkey
+            backingIndex: custom_branding_texts_pkey
+            columns: 
+                custom_branding_text_id
+            table: custom_branding_texts
+        custom_icon_organization_account_restrictions_pkey
+            backingIndex: custom_icon_organization_account_restrictions_pkey
+            columns: 
+                custom_icon_id
+            table: custom_icon_organization_account_restrictions
+        custom_icons_pkey
+            backingIndex: custom_icons_pkey
+            columns: 
+                custom_icon_id
+            table: custom_icons
+        gift_custom_icon_details_pkey
+            backingIndex: gift_custom_icon_details_pkey
+            columns: 
+                gift_id
+            table: gift_custom_icon_details
+        gift_custom_text_details_pkey
+            backingIndex: gift_custom_text_details_pkey
+            columns: 
+                gift_id
+            table: gift_custom_text_details
+        gift_item_details_pkey
+            backingIndex: gift_item_details_pkey
+            columns: 
+                gift_id
+            table: gift_item_details
+        gift_note_details_pkey
+            backingIndex: gift_note_details_pkey
+            columns: 
+                gift_id
+            table: gift_note_details
+        gift_org_account_restrictions_pkey
+            backingIndex: gift_org_account_restrictions_pkey
+            columns: 
+                gift_id
+            table: gift_org_account_restrictions
+        gift_recipients_pkey
+            backingIndex: gift_recipients_pkey
+            columns: 
+                contact_id
+                gift_id
+            table: gift_recipients
+        gift_schedules_pkey
+            backingIndex: gift_schedules_pkey
+            columns: 
+                gift_id
+            table: gift_schedules
+        gift_scribeless_status_pkey
+            backingIndex: gift_scribeless_status_pkey
+            columns: 
+                gift_id
+            table: gift_scribeless_status
+        gift_tracking_pkey
+            backingIndex: gift_tracking_pkey
+            columns: 
+                gift_id
+            table: gift_tracking
+        gift_tracking_details_pkey
+            backingIndex: gift_tracking_details_pkey
+            columns: 
+                gift_id
+            table: gift_tracking_details
+        gift_user_restrictions_pkey
+            backingIndex: gift_user_restrictions_pkey
+            columns: 
+                gift_id
+            table: gift_user_restrictions
+        gifts_pkey
+            backingIndex: gifts_pkey
+            columns: 
+                gift_id
+            table: gifts
+        inventories_pkey
+            backingIndex: inventories_pkey
+            columns: 
+                inventory_id
+            table: inventories
+        inventory_items_pkey
+            backingIndex: inventory_items_pkey
+            columns: 
+                catalogue_item_id
+                inventory_id
+            table: inventory_items
+        inventory_organization_account_restrictions_pkey
+            backingIndex: inventory_organization_account_restrictions_pkey
+            columns: 
+                inventory_id
+            table: inventory_organization_account_restrictions
+        license_types_pkey
+            backingIndex: license_types_pkey
+            columns: 
+                license_type_id
+            table: license_types
+        logins_pkey
+            backingIndex: logins_pkey
+            columns: 
+                user_id
+            table: logins
+        memberships_pkey
+            backingIndex: memberships_pkey
+            columns: 
+                user_id
+            table: memberships
+        note_credit_organization_account_restrictions_pkey
+            backingIndex: note_credit_organization_account_restrictions_pkey
+            columns: 
+                note_credit_id
+            table: note_credit_organization_account_restrictions
+        note_credit_user_restrictions_pkey
+            backingIndex: note_credit_user_restrictions_pkey
+            columns: 
+                note_credit_id
+            table: note_credit_user_restrictions
+        note_credits_pkey
+            backingIndex: note_credits_pkey
+            columns: 
+                note_credit_id
+            table: note_credits
+        note_organization_account_restrictions_pkey
+            backingIndex: note_organization_account_restrictions_pkey
+            columns: 
+                note_id
+            table: note_organization_account_restrictions
+        note_user_restrictions_pkey
+            backingIndex: note_user_restrictions_pkey
+            columns: 
+                note_id
+            table: note_user_restrictions
+        notes_pkey
+            backingIndex: notes_pkey
+            columns: 
+                note_id
+            table: notes
+        order_requests_pkey
+            backingIndex: order_requests_pkey
+            columns: 
+                order_id
+            table: order_requests
+        org_acct_licenses_pkey
+            backingIndex: org_acct_licenses_pkey
+            columns: 
+                organization_account_id
+            table: org_acct_licenses
+        organization_account_addresses_pkey
+            backingIndex: organization_account_addresses_pkey
+            columns: 
+                organization_account_id
+            table: organization_account_addresses
+        organization_account_contact_addresses_pkey
+            backingIndex: organization_account_contact_addresses_pkey
+            columns: 
+                contact_id
+            table: organization_account_contact_addresses
+        organization_account_contact_profiles_pkey
+            backingIndex: organization_account_contact_profiles_pkey
+            columns: 
+                contact_id
+            table: organization_account_contact_profiles
+        organization_account_contacts_pkey
+            backingIndex: organization_account_contacts_pkey
+            columns: 
+                contact_id
+            table: organization_account_contacts
+        organization_account_invite_tokens_pkey
+            backingIndex: organization_account_invite_tokens_pkey
+            columns: 
+                email
+                token
+            table: organization_account_invite_tokens
+        organization_account_profiles_pkey
+            backingIndex: organization_account_profiles_pkey
+            columns: 
+                profile_id
+            table: organization_account_profiles
+        organization_accounts_pkey
+            backingIndex: organization_accounts_pkey
+            columns: 
+                organization_account_id
+            table: organization_accounts
+        organizations_pkey
+            backingIndex: organizations_pkey
+            columns: 
+                organization_id
+            table: organizations
+        password_reset_tokens_pkey
+            backingIndex: password_reset_tokens_pkey
+            columns: 
+                email
+                token
+            table: password_reset_tokens
+        roles_pkey
+            backingIndex: roles_pkey
+            columns: 
+                role_id
+            table: roles
+        user_addresses_pkey
+            backingIndex: user_addresses_pkey
+            columns: 
+                user_id
+            table: user_addresses
+        user_campaign_summaries_pkey
+            backingIndex: user_campaign_summaries_pkey
+            columns: 
+                user_campaign_id
+            table: user_campaign_summaries
+        profiles_pkey
+            backingIndex: profiles_pkey
+            columns: 
+                user_id
+            table: user_profiles
+        users_pkey
+            backingIndex: users_pkey
+            columns: 
+                user_id
+            table: users
+        
+    liquibase.structure.core.Table:
+        catalogue_item_external_details
+            columns: 
+                distributor
+                    nullable: false
+                    order: 2
+                    type: varchar
+                external_id
+                    nullable: false
+                    order: 3
+                    type: varchar
+                item_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                catalogue_item_external_details_pkey
+                    columns: 
+                        item_id
+                    unique: true
+            outgoingForeignKeys: 
+                catalogue_item_external_details_item_id_fk
+                    backingIndex: catalogue_item_external_details_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        item_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        item_id
+                    primaryKeyTable: catalogue_items
+                    updateRule: importedKeyCascade
+            primaryKey: catalogue_item_external_details_pkey
+                backingIndex: catalogue_item_external_details_pkey
+                columns: 
+                    item_id
+        catalogue_item_organization_account_restrictions
+            columns: 
+                item_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                organization_account_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                catalogue_item_organization_account_restrictions_pkey
+                    columns: 
+                        item_id
+                    unique: true
+            outgoingForeignKeys: 
+                catalog_item_org_acct_restrictions_item_id_fk
+                    backingIndex: catalogue_item_organization_account_restrictions_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        item_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        item_id
+                    primaryKeyTable: catalogue_items
+                    updateRule: importedKeyCascade
+                catalog_item_org_acct_restrictions_org_account_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        organization_account_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        organization_account_id
+                    primaryKeyTable: organization_accounts
+                    updateRule: importedKeyCascade
+            primaryKey: catalogue_item_organization_account_restrictions_pkey
+                backingIndex: catalogue_item_organization_account_restrictions_pkey
+                columns: 
+                    item_id
+        catalogue_item_user_restrictions
+            columns: 
+                item_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                user_id
+                    nullable: true
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                catalogue_item_user_restrictions_pkey
+                    columns: 
+                        item_id
+                    unique: true
+            outgoingForeignKeys: 
+                catalogue_item_user_restrictions_item_id_fk
+                    backingIndex: catalogue_item_user_restrictions_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        item_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        item_id
+                    primaryKeyTable: catalogue_items
+                    updateRule: importedKeyCascade
+                catalogue_item_user_restrictions_user_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: catalogue_item_user_restrictions_pkey
+                backingIndex: catalogue_item_user_restrictions_pkey
+                columns: 
+                    item_id
+        catalogue_items
+            columns: 
+                icon_url
+                    nullable: true
+                    order: 6
+                    type: varchar
+                is_active
+                    nullable: true
+                    order: 4
+                    type: bool
+                item_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+                name
+                    nullable: true
+                    order: 2
+                    type: varchar
+                price
+                    nullable: true
+                    order: 3
+                    type: float8
+                shipping_cost
+                    defaultValue: 1.0
+                    nullable: false
+                    order: 5
+                    type: float8
+            default_tablespace: false
+            indexes: 
+                catalogue_items_pkey
+                    columns: 
+                        item_id
+                    unique: true
+            primaryKey: catalogue_items_pkey
+                backingIndex: catalogue_items_pkey
+                columns: 
+                    item_id
+        contact_interactions
+            columns: 
+                classification
+                    nullable: true
+                    order: 5
+                    type: varchar
+                contact_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+                date
+                    nullable: true
+                    order: 6
+                    type: date
+                interacting_user_id
+                    nullable: false
+                    order: 3
+                    type: uuid
+                interaction_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+                medium
+                    nullable: true
+                    order: 4
+                    type: varchar
+                note
+                    nullable: true
+                    order: 7
+                    type: varchar
+            default_tablespace: false
+            indexes: 
+                contact_interactions_pkey
+                    columns: 
+                        interaction_id
+                    unique: true
+            outgoingForeignKeys: 
+                contact_interactions_contact_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        contact_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        contact_id
+                    primaryKeyTable: organization_account_contacts
+                    updateRule: importedKeyCascade
+                contact_interactions_interacting_user_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        interacting_user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: contact_interactions_pkey
+                backingIndex: contact_interactions_pkey
+                columns: 
+                    interaction_id
+        contact_organization_account_restrictions
+            columns: 
+                contact_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                organization_account_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                contact_organization_account_restrictions_pkey
+                    columns: 
+                        contact_id
+                    unique: true
+            outgoingForeignKeys: 
+                contact_organization_account_restrictions_contact_id_fk
+                    backingIndex: contact_organization_account_restrictions_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        contact_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        contact_id
+                    primaryKeyTable: organization_account_contacts
+                    updateRule: importedKeyNoAction
+                contact_org_acct_restrictions_organization_account_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        organization_account_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        organization_account_id
+                    primaryKeyTable: organization_accounts
+                    updateRule: importedKeyNoAction
+            primaryKey: contact_organization_account_restrictions_pkey
+                backingIndex: contact_organization_account_restrictions_pkey
+                columns: 
+                    contact_id
+        custom_branding_text_org_account_restrictions
+            columns: 
+                custom_branding_text_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                organization_account_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                custom_branding_text_org_account_restrictions_pkey
+                    columns: 
+                        custom_branding_text_id
+                    unique: true
+            outgoingForeignKeys: 
+                cust_brand_txt_org_acct_restrition_cust_brand_txt_id_fk
+                    backingIndex: custom_branding_text_org_account_restrictions_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        custom_branding_text_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        custom_branding_text_id
+                    primaryKeyTable: custom_branding_texts
+                    updateRule: importedKeyCascade
+                cust_brand_txts_org_acct_restrictions_org_acct_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        organization_account_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        organization_account_id
+                    primaryKeyTable: organization_accounts
+                    updateRule: importedKeyCascade
+            primaryKey: custom_branding_text_org_account_restrictions_pkey
+                backingIndex: custom_branding_text_org_account_restrictions_pkey
+                columns: 
+                    custom_branding_text_id
+        custom_branding_texts
+            columns: 
+                custom_branding_text
+                    nullable: true
+                    order: 2
+                    type: varchar(50 BYTE)
+                custom_branding_text_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+                is_active
+                    nullable: true
+                    order: 4
+                    type: bool
+                uploader_id
+                    nullable: true
+                    order: 3
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                custom_branding_texts_pkey
+                    columns: 
+                        custom_branding_text_id
+                    unique: true
+            outgoingForeignKeys: 
+                cust_brand_txts_uploader_id_fk
+                    deferrable: false
+                    deleteRule: importedKeySetNull
+                    foreignKeyColumns: 
+                        uploader_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: custom_branding_texts_pkey
+                backingIndex: custom_branding_texts_pkey
+                columns: 
+                    custom_branding_text_id
+        custom_icon_organization_account_restrictions
+            columns: 
+                custom_icon_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                organization_account_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                custom_icon_organization_account_restrictions_pkey
+                    columns: 
+                        custom_icon_id
+                    unique: true
+            outgoingForeignKeys: 
+                custom_icon_org_acct_restrictions_custom_icon_id_fk
+                    backingIndex: custom_icon_organization_account_restrictions_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        custom_icon_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        custom_icon_id
+                    primaryKeyTable: custom_icons
+                    updateRule: importedKeyCascade
+                custom_icon_org_acct_restrictions_org_acct_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        organization_account_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        organization_account_id
+                    primaryKeyTable: organization_accounts
+                    updateRule: importedKeyCascade
+            primaryKey: custom_icon_organization_account_restrictions_pkey
+                backingIndex: custom_icon_organization_account_restrictions_pkey
+                columns: 
+                    custom_icon_id
+        custom_icons
+            columns: 
+                custom_icon_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+                icon_url
+                    nullable: true
+                    order: 5
+                    type: varchar
+                is_active
+                    nullable: true
+                    order: 4
+                    type: bool
+                label
+                    nullable: true
+                    order: 2
+                    type: varchar
+                uploader_id
+                    nullable: true
+                    order: 3
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                custom_icons_pkey
+                    columns: 
+                        custom_icon_id
+                    unique: true
+            outgoingForeignKeys: 
+                custom_icons_uploader_id_fk
+                    deferrable: false
+                    deleteRule: importedKeySetNull
+                    foreignKeyColumns: 
+                        uploader_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: custom_icons_pkey
+                backingIndex: custom_icons_pkey
+                columns: 
+                    custom_icon_id
+        gift_custom_icon_details
+            columns: 
+                custom_icon_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+                gift_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                gift_custom_icon_details_pkey
+                    columns: 
+                        gift_id
+                    unique: true
+            outgoingForeignKeys: 
+                gift_custom_icon_details_custom_icon_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        custom_icon_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        custom_icon_id
+                    primaryKeyTable: custom_icons
+                    updateRule: importedKeyCascade
+                gift_custom_icon_details_gift_id_fk
+                    backingIndex: gift_custom_icon_details_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        gift_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        gift_id
+                    primaryKeyTable: gifts
+                    updateRule: importedKeyCascade
+            primaryKey: gift_custom_icon_details_pkey
+                backingIndex: gift_custom_icon_details_pkey
+                columns: 
+                    gift_id
+        gift_custom_text_details
+            columns: 
+                custom_text_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+                gift_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                gift_custom_text_details_pkey
+                    columns: 
+                        gift_id
+                    unique: true
+            outgoingForeignKeys: 
+                gift_custom_text_details_custom_text_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        custom_text_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        custom_branding_text_id
+                    primaryKeyTable: custom_branding_texts
+                    updateRule: importedKeyCascade
+                gift_custom_text_details_gift_id_fk
+                    backingIndex: gift_custom_text_details_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        gift_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        gift_id
+                    primaryKeyTable: gifts
+                    updateRule: importedKeyCascade
+            primaryKey: gift_custom_text_details_pkey
+                backingIndex: gift_custom_text_details_pkey
+                columns: 
+                    gift_id
+        gift_item_details
+            columns: 
+                gift_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                item_id
+                    nullable: true
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                gift_item_details_pkey
+                    columns: 
+                        gift_id
+                    unique: true
+            outgoingForeignKeys: 
+                gift_item_detail_gift_id_fk
+                    backingIndex: gift_item_details_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        gift_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        gift_id
+                    primaryKeyTable: gifts
+                    updateRule: importedKeyCascade
+                gift_item_detail_item_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        item_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        item_id
+                    primaryKeyTable: catalogue_items
+                    updateRule: importedKeyCascade
+            primaryKey: gift_item_details_pkey
+                backingIndex: gift_item_details_pkey
+                columns: 
+                    gift_id
+        gift_note_details
+            columns: 
+                gift_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                note_id
+                    nullable: true
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                gift_note_details_pkey
+                    columns: 
+                        gift_id
+                    unique: true
+            outgoingForeignKeys: 
+                gift_note_detail_gift_id_fk
+                    backingIndex: gift_note_details_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        gift_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        gift_id
+                    primaryKeyTable: gifts
+                    updateRule: importedKeyCascade
+                gift_note_detail_note_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        note_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        note_id
+                    primaryKeyTable: notes
+                    updateRule: importedKeyCascade
+            primaryKey: gift_note_details_pkey
+                backingIndex: gift_note_details_pkey
+                columns: 
+                    gift_id
+        gift_org_account_restrictions
+            columns: 
+                gift_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                organization_account_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                gift_org_account_restrictions_pkey
+                    columns: 
+                        gift_id
+                    unique: true
+            outgoingForeignKeys: 
+                gift_org_acct_restrictions_gift_id_fk
+                    backingIndex: gift_org_account_restrictions_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        gift_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        gift_id
+                    primaryKeyTable: gifts
+                    updateRule: importedKeyCascade
+                gift_org_acct_restrictions_org_account_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        organization_account_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        organization_account_id
+                    primaryKeyTable: organization_accounts
+                    updateRule: importedKeyCascade
+            primaryKey: gift_org_account_restrictions_pkey
+                backingIndex: gift_org_account_restrictions_pkey
+                columns: 
+                    gift_id
+        gift_recipients
+            columns: 
+                contact_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+                gift_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                gift_recipients_pkey
+                    columns: 
+                        contact_id
+                        gift_id
+                    unique: true
+            outgoingForeignKeys: 
+                gift_recipients_contact_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        contact_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        contact_id
+                    primaryKeyTable: organization_account_contacts
+                    updateRule: importedKeyCascade
+                gift_recipients_gift_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        gift_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        gift_id
+                    primaryKeyTable: gifts
+                    updateRule: importedKeyCascade
+            primaryKey: gift_recipients_pkey
+                backingIndex: gift_recipients_pkey
+                columns: 
+                    contact_id
+                    gift_id
+        gift_schedules
+            columns: 
+                gift_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                scheduling_user_id
+                    nullable: false
+                    order: 3
+                    type: uuid
+                send_date
+                    nullable: false
+                    order: 2
+                    type: date
+            default_tablespace: false
+            indexes: 
+                gift_schedules_pkey
+                    columns: 
+                        gift_id
+                    unique: true
+            outgoingForeignKeys: 
+                gift_schedules_gift_id_fk
+                    backingIndex: gift_schedules_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        gift_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        gift_id
+                    primaryKeyTable: gifts
+                    updateRule: importedKeyCascade
+                gift_schedules_scheduling_user_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        scheduling_user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: gift_schedules_pkey
+                backingIndex: gift_schedules_pkey
+                columns: 
+                    gift_id
+        gift_scribeless_status
+            columns: 
+                campaign_id
+                    nullable: true
+                    order: 2
+                    type: varchar
+                date_created
+                    nullable: false
+                    order: 4
+                    type: timestamptz
+                date_updated
+                    nullable: false
+                    order: 5
+                    type: timestamptz
+                gift_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                status
+                    nullable: false
+                    order: 3
+                    type: varchar
+            default_tablespace: false
+            indexes: 
+                gift_scribeless_status_gift_id_campaign_id_key
+                    columns: 
+                        campaign_id
+                        gift_id
+                    unique: true
+                gift_scribeless_status_pkey
+                    columns: 
+                        gift_id
+                    unique: true
+            outgoingForeignKeys: 
+                gift_scribeless_status_gift_id_fk
+                    backingIndex: gift_scribeless_status_pkey
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        gift_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        gift_id
+                    primaryKeyTable: gifts
+                    updateRule: importedKeyCascade
+            primaryKey: gift_scribeless_status_pkey
+                backingIndex: gift_scribeless_status_pkey
+                columns: 
+                    gift_id
+            uniqueConstraints: 
+                gift_scribeless_status_gift_id_campaign_id_key
+                    backingIndex: gift_scribeless_status_gift_id_campaign_id_key
+                    clustered: false
+                    columns: 
+                        campaign_id
+                        gift_id
+                    deferrable: false
+                    disabled: false
+                    initiallyDeferred: false
+                    validate: true
+        gift_tracking
+            columns: 
+                date_created
+                    nullable: true
+                    order: 3
+                    type: timestamptz
+                date_updated
+                    nullable: true
+                    order: 4
+                    type: timestamptz
+                gift_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                status
+                    nullable: true
+                    order: 2
+                    type: varchar
+                updated_by_user_id
+                    nullable: false
+                    order: 5
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                gift_tracking_pkey
+                    columns: 
+                        gift_id
+                    unique: true
+            outgoingForeignKeys: 
+                gift_tracking_gift_id_fk
+                    backingIndex: gift_tracking_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        gift_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        gift_id
+                    primaryKeyTable: gifts
+                    updateRule: importedKeyCascade
+                gift_tracking_updated_by_user_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        updated_by_user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: gift_tracking_pkey
+                backingIndex: gift_tracking_pkey
+                columns: 
+                    gift_id
+        gift_tracking_details
+            columns: 
+                distributor
+                    nullable: true
+                    order: 2
+                    type: varchar
+                gift_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                tracking_number
+                    nullable: true
+                    order: 3
+                    type: varchar
+            default_tablespace: false
+            indexes: 
+                gift_tracking_details_pkey
+                    columns: 
+                        gift_id
+                    unique: true
+            outgoingForeignKeys: 
+                gift_tracking_details_gift_id_fk
+                    backingIndex: gift_tracking_details_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        gift_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        gift_id
+                    primaryKeyTable: gifts
+                    updateRule: importedKeyCascade
+            primaryKey: gift_tracking_details_pkey
+                backingIndex: gift_tracking_details_pkey
+                columns: 
+                    gift_id
+        gift_user_restrictions
+            columns: 
+                gift_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                user_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                gift_user_restrictions_pkey
+                    columns: 
+                        gift_id
+                    unique: true
+            outgoingForeignKeys: 
+                gift_user_restrictions_gift_id_fk
+                    backingIndex: gift_user_restrictions_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        gift_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        gift_id
+                    primaryKeyTable: gifts
+                    updateRule: importedKeyCascade
+                gift_user_restrictions_user_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: gift_user_restrictions_pkey
+                backingIndex: gift_user_restrictions_pkey
+                columns: 
+                    gift_id
+        gifts
+            columns: 
+                gift_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+                requesting_user_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                gifts_pkey
+                    columns: 
+                        gift_id
+                    unique: true
+            outgoingForeignKeys: 
+                gifts_requesting_user_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        requesting_user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: gifts_pkey
+                backingIndex: gifts_pkey
+                columns: 
+                    gift_id
+        inventories
+            columns: 
+                inventory_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                inventories_pkey
+                    columns: 
+                        inventory_id
+                    unique: true
+            primaryKey: inventories_pkey
+                backingIndex: inventories_pkey
+                columns: 
+                    inventory_id
+        inventory_items
+            columns: 
+                catalogue_item_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                inventory_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+                quantity
+                    nullable: true
+                    order: 3
+                    type: int8
+            default_tablespace: false
+            indexes: 
+                inventory_items_pkey
+                    columns: 
+                        catalogue_item_id
+                        inventory_id
+                    unique: true
+            outgoingForeignKeys: 
+                inventory_items_catalogue_item_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        catalogue_item_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        item_id
+                    primaryKeyTable: catalogue_items
+                    updateRule: importedKeyCascade
+                inventory_items_inventory_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        inventory_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        inventory_id
+                    primaryKeyTable: inventories
+                    updateRule: importedKeyCascade
+            primaryKey: inventory_items_pkey
+                backingIndex: inventory_items_pkey
+                columns: 
+                    catalogue_item_id
+                    inventory_id
+        inventory_organization_account_restrictions
+            columns: 
+                inventory_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                organization_account_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                inventory_organization_account_restrictions_pkey
+                    columns: 
+                        inventory_id
+                    unique: true
+            outgoingForeignKeys: 
+                inventory_org_acct_restrictions_inventory_id_fk
+                    backingIndex: inventory_organization_account_restrictions_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        inventory_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        inventory_id
+                    primaryKeyTable: inventories
+                    updateRule: importedKeyCascade
+                inventory_org_acct_restrictions_org_acct_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        organization_account_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        organization_account_id
+                    primaryKeyTable: organization_accounts
+                    updateRule: importedKeyCascade
+            primaryKey: inventory_organization_account_restrictions_pkey
+                backingIndex: inventory_organization_account_restrictions_pkey
+                columns: 
+                    inventory_id
+        license_types
+            columns: 
+                campaigns_per_user_per_month
+                    nullable: false
+                    order: 5
+                    type: int4
+                contacts_per_campaign
+                    nullable: false
+                    order: 6
+                    type: int4
+                cost_per_additional_user
+                    nullable: false
+                    order: 8
+                    type: float8
+                license_type_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+                monthly_cost
+                    nullable: false
+                    order: 4
+                    type: float8
+                name
+                    nullable: false
+                    order: 2
+                    type: varchar
+                public
+                    defaultValue: false
+                    nullable: false
+                    order: 3
+                    type: bool
+                users_included
+                    nullable: false
+                    order: 7
+                    type: int4
+            default_tablespace: false
+            indexes: 
+                license_types_name_key
+                    columns: 
+                        name
+                    unique: true
+                license_types_pkey
+                    columns: 
+                        license_type_id
+                    unique: true
+            primaryKey: license_types_pkey
+                backingIndex: license_types_pkey
+                columns: 
+                    license_type_id
+            uniqueConstraints: 
+                license_types_name_key
+                    backingIndex: license_types_name_key
+                    clustered: false
+                    columns: 
+                        name
+                    deferrable: false
+                    disabled: false
+                    initiallyDeferred: false
+                    validate: true
+        logins
+            columns: 
+                last_locked
+                    nullable: true
+                    order: 4
+                    type: timestamptz
+                last_successful_login
+                    nullable: true
+                    order: 3
+                    type: timestamptz
+                num_failed_logins
+                    nullable: true
+                    order: 5
+                    type: int4
+                password_hash
+                    nullable: true
+                    order: 2
+                    type: varchar
+                user_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                logins_pkey
+                    columns: 
+                        user_id
+                    unique: true
+            outgoingForeignKeys: 
+                logins_user_id_fk
+                    backingIndex: logins_pkey
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: logins_pkey
+                backingIndex: logins_pkey
+                columns: 
+                    user_id
+        memberships
+            columns: 
+                organization_account_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+                role_id
+                    nullable: false
+                    order: 3
+                    type: uuid
+                user_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                memberships_pkey
+                    columns: 
+                        user_id
+                    unique: true
+            outgoingForeignKeys: 
+                memberships_organization_account_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        organization_account_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        organization_account_id
+                    primaryKeyTable: organization_accounts
+                    updateRule: importedKeyCascade
+                memberships_role_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        role_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        role_id
+                    primaryKeyTable: roles
+                    updateRule: importedKeyCascade
+                memberships_user_id_fk
+                    backingIndex: memberships_pkey
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: memberships_pkey
+                backingIndex: memberships_pkey
+                columns: 
+                    user_id
+        note_credit_organization_account_restrictions
+            columns: 
+                note_credit_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                organization_account_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                note_credit_organization_account_restrictions_pkey
+                    columns: 
+                        note_credit_id
+                    unique: true
+            outgoingForeignKeys: 
+                note_credit_org_acct_restrictions_note_credit_id_fk
+                    backingIndex: note_credit_organization_account_restrictions_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        note_credit_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        note_credit_id
+                    primaryKeyTable: note_credits
+                    updateRule: importedKeyCascade
+                note_credit_org_acct_restrictions_org_acct_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        organization_account_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        organization_account_id
+                    primaryKeyTable: organization_accounts
+                    updateRule: importedKeyCascade
+            primaryKey: note_credit_organization_account_restrictions_pkey
+                backingIndex: note_credit_organization_account_restrictions_pkey
+                columns: 
+                    note_credit_id
+        note_credit_user_restrictions
+            columns: 
+                note_credit_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                user_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                note_credit_user_restrictions_pkey
+                    columns: 
+                        note_credit_id
+                    unique: true
+            outgoingForeignKeys: 
+                note_credit_user_restrictions_note_credit_id_fk
+                    backingIndex: note_credit_user_restrictions_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        note_credit_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        note_credit_id
+                    primaryKeyTable: note_credits
+                    updateRule: importedKeyCascade
+                note_credit_user_restrictions_user_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: note_credit_user_restrictions_pkey
+                backingIndex: note_credit_user_restrictions_pkey
+                columns: 
+                    note_credit_id
+        note_credits
+            columns: 
+                available_credits
+                    defaultValue: 0
+                    nullable: false
+                    order: 2
+                    type: int4
+                note_credit_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                note_credits_pkey
+                    columns: 
+                        note_credit_id
+                    unique: true
+            primaryKey: note_credits_pkey
+                backingIndex: note_credits_pkey
+                columns: 
+                    note_credit_id
+        note_organization_account_restrictions
+            columns: 
+                note_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                organization_account_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                note_organization_account_restrictions_pkey
+                    columns: 
+                        note_id
+                    unique: true
+            outgoingForeignKeys: 
+                note_org_acct_restrictions_note_id_fk
+                    backingIndex: note_organization_account_restrictions_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        note_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        note_id
+                    primaryKeyTable: notes
+                    updateRule: importedKeyCascade
+                note_org_acct_restrictions_org_acct_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        organization_account_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        organization_account_id
+                    primaryKeyTable: organization_accounts
+                    updateRule: importedKeyCascade
+            primaryKey: note_organization_account_restrictions_pkey
+                backingIndex: note_organization_account_restrictions_pkey
+                columns: 
+                    note_id
+        note_user_restrictions
+            columns: 
+                note_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                user_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                note_user_restrictions_pkey
+                    columns: 
+                        note_id
+                    unique: true
+            outgoingForeignKeys: 
+                note_user_restrictions_note_id_fk
+                    backingIndex: note_user_restrictions_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        note_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        note_id
+                    primaryKeyTable: notes
+                    updateRule: importedKeyCascade
+                note_user_restrictions_user_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: note_user_restrictions_pkey
+                backingIndex: note_user_restrictions_pkey
+                columns: 
+                    note_id
+        notes
+            columns: 
+                date_modified
+                    nullable: false
+                    order: 3
+                    type: timestamptz
+                font_color
+                    nullable: false
+                    order: 5
+                    type: varchar
+                font_size
+                    nullable: false
+                    order: 7
+                    type: varchar
+                handwriting_style
+                    nullable: false
+                    order: 6
+                    type: varchar
+                message
+                    nullable: false
+                    order: 4
+                    type: varchar
+                note_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+                updated_by_user_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                notes_pkey
+                    columns: 
+                        note_id
+                    unique: true
+            outgoingForeignKeys: 
+                notes_updated_by_user_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        updated_by_user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: notes_pkey
+                backingIndex: notes_pkey
+                columns: 
+                    note_id
+        order_requests
+            columns: 
+                catalogue_item_id
+                    nullable: true
+                    order: 2
+                    type: uuid
+                inventory_id
+                    nullable: true
+                    order: 3
+                    type: uuid
+                item_price
+                    nullable: true
+                    order: 8
+                    type: float8
+                order_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+                organization_account_id
+                    nullable: false
+                    order: 4
+                    type: uuid
+                quantity
+                    nullable: true
+                    order: 7
+                    type: int4
+                requesting_user_id
+                    nullable: true
+                    order: 6
+                    type: uuid
+                user_id
+                    nullable: true
+                    order: 5
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                order_requests_pkey
+                    columns: 
+                        order_id
+                    unique: true
+            outgoingForeignKeys: 
+                order_requests_catalogue_item_id_fk
+                    deferrable: false
+                    deleteRule: importedKeySetNull
+                    foreignKeyColumns: 
+                        catalogue_item_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        item_id
+                    primaryKeyTable: catalogue_items
+                    updateRule: importedKeyCascade
+                order_requests_inventory_id_fk
+                    deferrable: false
+                    deleteRule: importedKeySetNull
+                    foreignKeyColumns: 
+                        inventory_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        inventory_id
+                    primaryKeyTable: inventories
+                    updateRule: importedKeyCascade
+                order_requests_org_account_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        organization_account_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        organization_account_id
+                    primaryKeyTable: organization_accounts
+                    updateRule: importedKeyCascade
+                order_requests_requesting_user_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        requesting_user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+                order_requests_user_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: order_requests_pkey
+                backingIndex: order_requests_pkey
+                columns: 
+                    order_id
+        org_acct_licenses
+            columns: 
+                active_users
+                    defaultValue: 0
+                    nullable: false
+                    order: 3
+                    type: int4
+                billing_day_of_month
+                    defaultValue: 1
+                    nullable: false
+                    order: 4
+                    type: int4
+                is_active
+                    defaultValue: true
+                    nullable: false
+                    order: 5
+                    type: bool
+                license_type_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+                organization_account_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                org_acct_licenses_pkey
+                    columns: 
+                        organization_account_id
+                    unique: true
+            outgoingForeignKeys: 
+                org_acct_licenses_license_type_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        license_type_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        license_type_id
+                    primaryKeyTable: license_types
+                    updateRule: importedKeyCascade
+                org_acct_licenses_org_acct_id_fk
+                    backingIndex: org_acct_licenses_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        organization_account_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        organization_account_id
+                    primaryKeyTable: organization_accounts
+                    updateRule: importedKeyCascade
+            primaryKey: org_acct_licenses_pkey
+                backingIndex: org_acct_licenses_pkey
+                columns: 
+                    organization_account_id
+        organization_account_addresses
+            columns: 
+                address_line_1
+                    nullable: true
+                    order: 7
+                    type: varchar
+                address_line_2
+                    nullable: true
+                    order: 2
+                    type: varchar
+                city
+                    nullable: true
+                    order: 3
+                    type: varchar
+                is_business
+                    nullable: true
+                    order: 6
+                    type: bool
+                organization_account_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                state
+                    nullable: true
+                    order: 4
+                    type: varchar(2 BYTE)
+                zip_code
+                    nullable: true
+                    order: 5
+                    type: varchar(10 BYTE)
+            default_tablespace: false
+            indexes: 
+                organization_account_addresses_pkey
+                    columns: 
+                        organization_account_id
+                    unique: true
+            outgoingForeignKeys: 
+                org_acct_addresses_org_acct_id_fk
+                    backingIndex: organization_account_addresses_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        organization_account_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        organization_account_id
+                    primaryKeyTable: organization_accounts
+                    updateRule: importedKeyCascade
+            primaryKey: organization_account_addresses_pkey
+                backingIndex: organization_account_addresses_pkey
+                columns: 
+                    organization_account_id
+        organization_account_contact_addresses
+            columns: 
+                address_line_1
+                    nullable: true
+                    order: 7
+                    type: varchar
+                address_line_2
+                    nullable: true
+                    order: 2
+                    type: varchar
+                city
+                    nullable: true
+                    order: 3
+                    type: varchar
+                contact_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                is_business
+                    nullable: true
+                    order: 6
+                    type: bool
+                state
+                    nullable: true
+                    order: 4
+                    type: varchar(2 BYTE)
+                zip_code
+                    nullable: true
+                    order: 5
+                    type: varchar(10 BYTE)
+            default_tablespace: false
+            indexes: 
+                organization_account_contact_addresses_pkey
+                    columns: 
+                        contact_id
+                    unique: true
+            outgoingForeignKeys: 
+                org_acct_contact_addresses_contact_id_fk
+                    backingIndex: organization_account_contact_addresses_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        contact_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        contact_id
+                    primaryKeyTable: organization_account_contacts
+                    updateRule: importedKeyCascade
+            primaryKey: organization_account_contact_addresses_pkey
+                backingIndex: organization_account_contact_addresses_pkey
+                columns: 
+                    contact_id
+        organization_account_contact_profiles
+            columns: 
+                business_number
+                    nullable: true
+                    order: 5
+                    type: varchar
+                contact_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                contact_organization_name
+                    nullable: true
+                    order: 3
+                    type: varchar
+                mobile_number
+                    nullable: true
+                    order: 6
+                    type: varchar
+                organization_point_of_contact_user_id
+                    nullable: true
+                    order: 2
+                    type: uuid
+                title
+                    nullable: true
+                    order: 4
+                    type: varchar
+            default_tablespace: false
+            indexes: 
+                organization_account_contact_profiles_pkey
+                    columns: 
+                        contact_id
+                    unique: true
+            outgoingForeignKeys: 
+                org_acct_contact_profiles_contact_id_fk
+                    backingIndex: organization_account_contact_profiles_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        contact_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        contact_id
+                    primaryKeyTable: organization_account_contacts
+                    updateRule: importedKeyCascade
+                org_acct_contact_profiles_org_point_of_contact_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        organization_point_of_contact_user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: organization_account_contact_profiles_pkey
+                backingIndex: organization_account_contact_profiles_pkey
+                columns: 
+                    contact_id
+        organization_account_contacts
+            columns: 
+                contact_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+                email
+                    nullable: true
+                    order: 4
+                    type: varchar
+                first_name
+                    nullable: true
+                    order: 2
+                    type: varchar
+                is_active
+                    defaultValue: true
+                    nullable: true
+                    order: 5
+                    type: bool
+                last_name
+                    nullable: true
+                    order: 3
+                    type: varchar
+            default_tablespace: false
+            indexes: 
+                organization_account_contacts_pkey
+                    columns: 
+                        contact_id
+                    unique: true
+            primaryKey: organization_account_contacts_pkey
+                backingIndex: organization_account_contacts_pkey
+                columns: 
+                    contact_id
+        organization_account_invite_tokens
+            columns: 
+                date_generated
+                    nullable: true
+                    order: 5
+                    type: timestamp
+                email
+                    nullable: false
+                    order: 1
+                    type: varchar
+                organization_account_id
+                    nullable: true
+                    order: 3
+                    type: uuid
+                role_level
+                    nullable: true
+                    order: 4
+                    type: varchar
+                token
+                    nullable: false
+                    order: 2
+                    type: varchar
+            default_tablespace: false
+            indexes: 
+                organization_account_invite_tokens_pkey
+                    columns: 
+                        email
+                        token
+                    unique: true
+            outgoingForeignKeys: 
+                org_acct_invite_tokens_org_acct_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        organization_account_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        organization_account_id
+                    primaryKeyTable: organization_accounts
+                    updateRule: importedKeyCascade
+            primaryKey: organization_account_invite_tokens_pkey
+                backingIndex: organization_account_invite_tokens_pkey
+                columns: 
+                    email
+                    token
+        organization_account_profiles
+            columns: 
+                business_number
+                    nullable: true
+                    order: 3
+                    type: varchar
+                organization_account_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+                profile_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                organization_account_profiles_pkey
+                    columns: 
+                        profile_id
+                    unique: true
+            outgoingForeignKeys: 
+                org_acct_profiles_org_acct_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        organization_account_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        organization_account_id
+                    primaryKeyTable: organization_accounts
+                    updateRule: importedKeyCascade
+            primaryKey: organization_account_profiles_pkey
+                backingIndex: organization_account_profiles_pkey
+                columns: 
+                    profile_id
+        organization_accounts
+            columns: 
+                is_active
+                    defaultValue: true
+                    nullable: true
+                    order: 4
+                    type: bool
+                organization_account_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+                organization_account_name
+                    nullable: true
+                    order: 2
+                    type: varchar
+                organization_id
+                    nullable: true
+                    order: 3
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                organization_accounts_organization_account_name_with_id_key
+                    columns: 
+                        organization_account_name
+                        organization_id
+                    unique: true
+                organization_accounts_pkey
+                    columns: 
+                        organization_account_id
+                    unique: true
+            outgoingForeignKeys: 
+                organization_accounts_organization_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyRestrict
+                    foreignKeyColumns: 
+                        organization_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        organization_id
+                    primaryKeyTable: organizations
+                    updateRule: importedKeyCascade
+            primaryKey: organization_accounts_pkey
+                backingIndex: organization_accounts_pkey
+                columns: 
+                    organization_account_id
+            uniqueConstraints: 
+                organization_accounts_organization_account_name_with_id_key
+                    backingIndex: organization_accounts_organization_account_name_with_id_key
+                    clustered: false
+                    columns: 
+                        organization_account_name
+                        organization_id
+                    deferrable: false
+                    disabled: false
+                    initiallyDeferred: false
+                    validate: true
+        organizations
+            columns: 
+                is_active
+                    defaultValue: true
+                    nullable: true
+                    order: 3
+                    type: bool
+                organization_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+                organization_name
+                    nullable: true
+                    order: 2
+                    type: varchar
+            default_tablespace: false
+            indexes: 
+                organizations_pkey
+                    columns: 
+                        organization_id
+                    unique: true
+            primaryKey: organizations_pkey
+                backingIndex: organizations_pkey
+                columns: 
+                    organization_id
+        password_reset_tokens
+            columns: 
+                date_generated
+                    nullable: false
+                    order: 3
+                    type: timestamptz
+                email
+                    nullable: false
+                    order: 1
+                    type: varchar
+                token
+                    nullable: false
+                    order: 2
+                    type: varchar
+            default_tablespace: false
+            indexes: 
+                password_reset_tokens_pkey
+                    columns: 
+                        email
+                        token
+                    unique: true
+            primaryKey: password_reset_tokens_pkey
+                backingIndex: password_reset_tokens_pkey
+                columns: 
+                    email
+                    token
+        roles
+            columns: 
+                is_role_restricted
+                    nullable: true
+                    order: 4
+                    type: bool
+                role_description
+                    nullable: true
+                    order: 3
+                    type: varchar
+                role_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+                role_level
+                    nullable: true
+                    order: 2
+                    type: varchar
+            default_tablespace: false
+            indexes: 
+                roles_pkey
+                    columns: 
+                        role_id
+                    unique: true
+                roles_role_level_key
+                    columns: 
+                        role_level
+                    unique: true
+            primaryKey: roles_pkey
+                backingIndex: roles_pkey
+                columns: 
+                    role_id
+            uniqueConstraints: 
+                roles_role_level_key
+                    backingIndex: roles_role_level_key
+                    clustered: false
+                    columns: 
+                        role_level
+                    deferrable: false
+                    disabled: false
+                    initiallyDeferred: false
+                    validate: true
+        user_addresses
+            columns: 
+                address_line_1
+                    nullable: true
+                    order: 7
+                    type: varchar
+                address_line_2
+                    nullable: true
+                    order: 2
+                    type: varchar
+                city
+                    nullable: true
+                    order: 3
+                    type: varchar
+                is_business
+                    nullable: true
+                    order: 6
+                    type: bool
+                state
+                    nullable: true
+                    order: 4
+                    type: varchar(2 BYTE)
+                user_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+                zip_code
+                    nullable: true
+                    order: 5
+                    type: varchar(10 BYTE)
+            default_tablespace: false
+            indexes: 
+                user_addresses_pkey
+                    columns: 
+                        user_id
+                    unique: true
+            outgoingForeignKeys: 
+                user_acct_addresses_user_id_fk
+                    backingIndex: user_addresses_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: user_addresses_pkey
+                backingIndex: user_addresses_pkey
+                columns: 
+                    user_id
+        user_campaign_summaries
+            columns: 
+                date
+                    nullable: false
+                    order: 3
+                    type: date
+                recipient_count
+                    nullable: false
+                    order: 4
+                    type: int4
+                user_campaign_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+                user_id
+                    nullable: false
+                    order: 2
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                user_campaign_summaries_pkey
+                    columns: 
+                        user_campaign_id
+                    unique: true
+            outgoingForeignKeys: 
+                user_campaign_summaries_user_id_fk
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: user_campaign_summaries_pkey
+                backingIndex: user_campaign_summaries_pkey
+                columns: 
+                    user_campaign_id
+        user_profiles
+            columns: 
+                business_number
+                    nullable: true
+                    order: 3
+                    type: varchar
+                mobile_number
+                    nullable: true
+                    order: 2
+                    type: varchar
+                user_id
+                    nullable: false
+                    order: 1
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                profiles_pkey
+                    columns: 
+                        user_id
+                    unique: true
+            outgoingForeignKeys: 
+                user_profiles_user_id_fk
+                    backingIndex: profiles_pkey
+                    deferrable: false
+                    deleteRule: importedKeyCascade
+                    foreignKeyColumns: 
+                        user_id
+                    initiallyDeferred: false
+                    primaryKeyColumns: 
+                        user_id
+                    primaryKeyTable: users
+                    updateRule: importedKeyCascade
+            primaryKey: profiles_pkey
+                backingIndex: profiles_pkey
+                columns: 
+                    user_id
+        users
+            columns: 
+                email
+                    nullable: false
+                    order: 2
+                    type: varchar
+                first_name
+                    nullable: true
+                    order: 3
+                    type: varchar
+                is_active
+                    defaultValue: true
+                    nullable: true
+                    order: 5
+                    type: bool
+                last_name
+                    nullable: true
+                    order: 4
+                    type: varchar
+                user_id
+                    defaultValue: uuid_generate_v4()
+                    nullable: false
+                    order: 1
+                    type: uuid
+            default_tablespace: false
+            indexes: 
+                users_email_key
+                    columns: 
+                        email
+                    unique: true
+                users_pkey
+                    columns: 
+                        user_id
+                    unique: true
+            primaryKey: users_pkey
+                backingIndex: users_pkey
+                columns: 
+                    user_id
+            uniqueConstraints: 
+                users_email_key
+                    backingIndex: users_email_key
+                    clustered: false
+                    columns: 
+                        email
+                    deferrable: false
+                    disabled: false
+                    initiallyDeferred: false
+                    validate: true
+        
+    liquibase.structure.core.UniqueConstraint:
+        gift_scribeless_status_gift_id_campaign_id_key
+            backingIndex: gift_scribeless_status_gift_id_campaign_id_key
+            clustered: false
+            columns: 
+                campaign_id
+                gift_id
+            deferrable: false
+            disabled: false
+            initiallyDeferred: false
+            table: gift_scribeless_status
+            validate: true
+        license_types_name_key
+            backingIndex: license_types_name_key
+            clustered: false
+            columns: 
+                name
+            deferrable: false
+            disabled: false
+            initiallyDeferred: false
+            table: license_types
+            validate: true
+        organization_accounts_organization_account_name_with_id_key
+            backingIndex: organization_accounts_organization_account_name_with_id_key
+            clustered: false
+            columns: 
+                organization_account_name
+                organization_id
+            deferrable: false
+            disabled: false
+            initiallyDeferred: false
+            table: organization_accounts
+            validate: true
+        roles_role_level_key
+            backingIndex: roles_role_level_key
+            clustered: false
+            columns: 
+                role_level
+            deferrable: false
+            disabled: false
+            initiallyDeferred: false
+            table: roles
+            validate: true
+        users_email_key
+            backingIndex: users_email_key
+            clustered: false
+            columns: 
+                email
+            deferrable: false
+            disabled: false
+            initiallyDeferred: false
+            table: users
+            validate: true
+        
+    
