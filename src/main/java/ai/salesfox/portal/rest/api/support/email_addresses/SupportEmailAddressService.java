@@ -73,7 +73,7 @@ public class SupportEmailAddressService {
 
     private Page<SupportEmailAddressEntity> getAllSupportEmailAddresses(Integer pageOffset, Integer pageLimit) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
-        return supportEmailAddressRepository.getSupportEmailAddresses(pageRequest);
+        return supportEmailAddressRepository.findAll(pageRequest);
     }
 
     private void validateSupportEmailAddressesRequestModel(SupportEmailAddressesRequestModel supportEmailAddressesRequestModel) {
