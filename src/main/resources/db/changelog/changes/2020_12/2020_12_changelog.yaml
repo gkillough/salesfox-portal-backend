@@ -8,3 +8,6 @@ databaseChangeLog:
   - include:
       file: add_note_credit_price.yaml
       relativeToChangelogFile: true
+  - include:
+      file: add_support_email_addresses.yaml
+      relativeToChangeLogFile: true
