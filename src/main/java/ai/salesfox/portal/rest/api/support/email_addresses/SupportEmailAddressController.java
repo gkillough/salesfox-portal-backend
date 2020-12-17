@@ -13,38 +13,38 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(SupportEmailAddressesController.BASE_ENDPOINT)
-public class SupportEmailAddressesController {
+@RequestMapping(SupportEmailAddressController.BASE_ENDPOINT)
+@PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
+public class SupportEmailAddressController {
     public static final String BASE_ENDPOINT = "/support/email_addresses";
 
-    private final SupportEmailAddressesService supportEmailAddressesService;
+    private final SupportEmailAddressService supportEmailAddressService;
 
     @Autowired
-    public SupportEmailAddressController(SupportEmailAddressesService supportEmailAddressesService) {
-        this.supportEmailAddressesService = supportEmailAddressesService;
+    public SupportEmailAddressController(SupportEmailAddressService supportEmailAddressService) {
+        this.supportEmailAddressService = supportEmailAddressService;
     }
 
     @GetMapping
     public MultiSupportEmailAddressModel getSupportEmailAddresses(@RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset, @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit) {
-        return supportEmailAddressesService.getSupportEmailAddresses(offset, limit);
+        return supportEmailAddressService.getSupportEmailAddresses(offset, limit);
     }
 
     @GetMapping("/{supportEmailId}")
     public SupportEmailAddressesResponseModel getSupportEmailAddressesById(@PathVariable UUID supportEmailId) {
-        return supportEmailAddressesService.getSupportEmailAddressesById(supportEmailId);
+        return supportEmailAddressService.getSupportEmailAddressesById(supportEmailId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public SupportEmailAddressesResponseModel createSupportEmailAddress(@PathVariable UUID supportEmailId, @RequestBody SupportEmailAddressesRequestModel requestModel) {
-        return supportEmailAddressesService.createSupportEmailAddress(requestModel);
+    public SupportEmailAddressesResponseModel createSupportEmailAddress(@RequestBody SupportEmailAddressesRequestModel requestModel) {
+        return supportEmailAddressService.createSupportEmailAddress(requestModel);
     }
 
-    @PutMapping
+    @PutMapping("/{supportEmailId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_AUTH_CHECK)
     public void updateSupportEmailAddresses(@PathVariable UUID supportEmailId, @RequestBody SupportEmailAddressesRequestModel requestModel) {
-        supportEmailAddressesService.updateSupportEmailAddresses(supportEmailId, requestModel);
+        supportEmailAddressService.updateSupportEmailAddresses(supportEmailId, requestModel);
     }
 
 }

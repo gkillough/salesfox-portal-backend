@@ -1,5 +1,6 @@
 package ai.salesfox.portal.database.support.email_addresses;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,9 +13,10 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "support_email_addresses")
-public class SupportEmailAddressesEntity implements Serializable {
+public class SupportEmailAddressEntity implements Serializable {
     @Id
     @Column(name = "id")
     private UUID supportEmailId;
@@ -24,11 +26,5 @@ public class SupportEmailAddressesEntity implements Serializable {
 
     @Column(name = "email_address")
     private String supportEmailAddress;
-
-    public SupportEmailAddressesEntity(UUID supportEmailId, String supportEmailCategory, String supportEmailAddress) {
-        this.supportEmailId = supportEmailId;
-        this.supportEmailCategory = supportEmailCategory;
-        this.supportEmailAddress = supportEmailAddress;
-    }
 
 }

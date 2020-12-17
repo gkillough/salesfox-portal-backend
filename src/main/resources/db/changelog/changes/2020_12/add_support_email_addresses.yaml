@@ -16,6 +16,10 @@ databaseChangeLog:
               - column:
                   name: category
                   type: VARCHAR
+                  constraints:
+                    unique: true
               - column:
                   name: email_address
                   type: VARCHAR
+                  constraints:
+                    unique: true
