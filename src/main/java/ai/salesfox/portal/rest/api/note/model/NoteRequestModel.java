@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,5 +14,6 @@ public class NoteRequestModel {
     private String fontSize;
     private String fontColor;
     private String handwritingStyle;
+    private UUID headerCustomIconId;
 
 }
