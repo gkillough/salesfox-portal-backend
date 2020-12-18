@@ -10,4 +10,4 @@ databaseChangeLog:
       relativeToChangelogFile: true
   - include:
       file: add_support_email_addresses.yaml
-      relativeToChangeLogFile: true
+      relativeToChangelogFile: true
