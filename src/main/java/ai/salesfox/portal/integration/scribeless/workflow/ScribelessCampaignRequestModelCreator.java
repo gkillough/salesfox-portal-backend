@@ -12,10 +12,12 @@ import ai.salesfox.portal.database.common.AbstractAddressEntity;
 import ai.salesfox.portal.database.contact.OrganizationAccountContactEntity;
 import ai.salesfox.portal.database.contact.profile.OrganizationAccountContactProfileEntity;
 import ai.salesfox.portal.database.customization.branding_text.CustomBrandingTextEntity;
+import ai.salesfox.portal.database.customization.icon.CustomIconEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.note.GiftNoteDetailEntity;
 import ai.salesfox.portal.database.note.NoteEntity;
 import ai.salesfox.portal.database.note.NoteRepository;
+import ai.salesfox.portal.database.note.icon.NoteCustomIconEntity;
 import ai.salesfox.portal.integration.scribeless.workflow.model.CampaignCreationRequestHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Streamable;
@@ -53,7 +55,7 @@ public class ScribelessCampaignRequestModelCreator {
 
         String headerImageUrl = null;
         String headerType = null;
-        Optional<String> optionalIcon = giftDetailsService.retrieveCustomIconUrl(gift);
+        Optional<String> optionalIcon = retrieveCustomIconUrl(giftNote);
         if (optionalIcon.isPresent()) {
             headerImageUrl = optionalIcon.get();
             headerType = ScribelessCampaignDefaults.DEFAULT_HEADER_TYPE;
@@ -135,6 +137,12 @@ public class ScribelessCampaignRequestModelCreator {
 
         return noteRepository.findById(giftNoteDetail.getNoteId())
                 .orElseThrow(() -> new SalesfoxException(String.format("The requested gift with id=[%s] has a note attachment, but none existed in the database", gift.getGiftId())));
+    }
+
+    private Optional<String> retrieveCustomIconUrl(NoteEntity note) {
+        return Optional.ofNullable(note.getNoteCustomIconEntity())
+                .map(NoteCustomIconEntity::getCustomIconEntity)
+                .map(CustomIconEntity::getIconUrl);
     }
 
 }

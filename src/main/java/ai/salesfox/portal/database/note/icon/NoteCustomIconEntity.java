@@ -1,6 +1,6 @@
 package ai.salesfox.portal.database.note.icon;
 
-import lombok.AllArgsConstructor;
+import ai.salesfox.portal.database.customization.icon.CustomIconEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,7 +9,6 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(schema = "portal", name = "note_custom_icons")
 public class NoteCustomIconEntity {
@@ -20,5 +19,14 @@ public class NoteCustomIconEntity {
     @PrimaryKeyJoinColumn
     @Column(name = "custom_icon_id")
     private UUID customIconId;
+
+    @OneToOne
+    @JoinColumn(name = "custom_icon_id", referencedColumnName = "custom_icon_id", insertable = false, updatable = false)
+    private CustomIconEntity customIconEntity;
+
+    public NoteCustomIconEntity(UUID noteId, UUID customIconId) {
+        this.noteId = noteId;
+        this.customIconId = customIconId;
+    }
 
 }
