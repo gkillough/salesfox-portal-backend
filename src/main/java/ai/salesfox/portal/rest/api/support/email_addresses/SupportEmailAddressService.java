@@ -19,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -68,6 +69,12 @@ public class SupportEmailAddressService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         validateSupportEmailAddressesRequestModel(requestModel);
 
+        String newSupportEmailCategory = defaultIfBlank(requestModel.getCategory(), foundSupportEmailAddress.getSupportEmailCategory());
+        foundSupportEmailAddress.setSupportEmailCategory(newSupportEmailCategory);
+
+        String newSupportEmailAddress = defaultIfBlank(requestModel.getEmailAddress(), foundSupportEmailAddress.getSupportEmailCategory());
+        foundSupportEmailAddress.setSupportEmailAddress(newSupportEmailAddress);
+
         supportEmailAddressRepository.save(foundSupportEmailAddress);
     }
 
@@ -98,6 +105,10 @@ public class SupportEmailAddressService {
 
     private SupportEmailAddressesResponseModel convertToResponseModel(SupportEmailAddressEntity entity) {
         return new SupportEmailAddressesResponseModel(entity.getSupportEmailId(), entity.getSupportEmailAddress(), entity.getSupportEmailCategory());
+    }
+
+    private String defaultIfBlank(String str, String defaultValue) {
+        return Optional.ofNullable(str).filter(StringUtils::isNotBlank).orElse(defaultValue);
     }
 
 }

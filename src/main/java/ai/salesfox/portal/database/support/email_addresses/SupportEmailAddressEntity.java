@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -18,7 +15,8 @@ import java.util.UUID;
 @Table(schema = "portal", name = "support_email_addresses")
 public class SupportEmailAddressEntity implements Serializable {
     @Id
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "support_email_id")
     private UUID supportEmailId;
 
     @Column(name = "category")
