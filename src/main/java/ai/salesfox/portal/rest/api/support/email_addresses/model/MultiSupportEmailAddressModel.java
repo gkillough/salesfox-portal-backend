@@ -12,13 +12,13 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class MultiSupportEmailAddressModel extends PagedResponseModel {
-    private List<SupportEmailAddressesResponseModel> supportEmailAddresses;
+    private List<SupportEmailAddressResponseModel> supportEmailAddresses;
 
     public static MultiSupportEmailAddressModel empty() {
         return new MultiSupportEmailAddressModel(List.of(), Page.empty());
     }
 
-    public MultiSupportEmailAddressModel(List<SupportEmailAddressesResponseModel> supportEmailAddresses, Page<?> page) {
+    public MultiSupportEmailAddressModel(List<SupportEmailAddressResponseModel> supportEmailAddresses, Page<?> page) {
         super(page);
         this.supportEmailAddresses = supportEmailAddresses;
     }

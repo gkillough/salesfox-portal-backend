@@ -2,8 +2,8 @@ package ai.salesfox.portal.rest.api.support.email_addresses;
 
 import ai.salesfox.portal.rest.api.common.page.PageMetadata;
 import ai.salesfox.portal.rest.api.support.email_addresses.model.MultiSupportEmailAddressModel;
-import ai.salesfox.portal.rest.api.support.email_addresses.model.SupportEmailAddressesRequestModel;
-import ai.salesfox.portal.rest.api.support.email_addresses.model.SupportEmailAddressesResponseModel;
+import ai.salesfox.portal.rest.api.support.email_addresses.model.SupportEmailAddressRequestModel;
+import ai.salesfox.portal.rest.api.support.email_addresses.model.SupportEmailAddressResponseModel;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,19 +31,19 @@ public class SupportEmailAddressController {
     }
 
     @GetMapping("/{supportEmailId}")
-    public SupportEmailAddressesResponseModel getSupportEmailAddressesById(@PathVariable UUID supportEmailId) {
+    public SupportEmailAddressResponseModel getSupportEmailAddressesById(@PathVariable UUID supportEmailId) {
         return supportEmailAddressService.getSupportEmailAddressesById(supportEmailId);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public SupportEmailAddressesResponseModel createSupportEmailAddress(@RequestBody SupportEmailAddressesRequestModel requestModel) {
+    public SupportEmailAddressResponseModel createSupportEmailAddress(@RequestBody SupportEmailAddressRequestModel requestModel) {
         return supportEmailAddressService.createSupportEmailAddress(requestModel);
     }
 
     @PutMapping("/{supportEmailId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateSupportEmailAddresses(@PathVariable UUID supportEmailId, @RequestBody SupportEmailAddressesRequestModel requestModel) {
+    public void updateSupportEmailAddresses(@PathVariable UUID supportEmailId, @RequestBody SupportEmailAddressRequestModel requestModel) {
         supportEmailAddressService.updateSupportEmailAddresses(supportEmailId, requestModel);
     }
 

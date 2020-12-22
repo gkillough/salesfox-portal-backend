@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SupportEmailAddressesRequestModel {
+public class SupportEmailAddressRequestModel {
     private String category;
     private String emailAddress;
 

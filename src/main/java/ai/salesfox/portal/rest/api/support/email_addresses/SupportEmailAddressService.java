@@ -6,8 +6,8 @@ import ai.salesfox.portal.database.support.email_addresses.SupportEmailAddressEn
 import ai.salesfox.portal.database.support.email_addresses.SupportEmailAddressRepository;
 import ai.salesfox.portal.rest.api.common.page.PageRequestValidationUtils;
 import ai.salesfox.portal.rest.api.support.email_addresses.model.MultiSupportEmailAddressModel;
-import ai.salesfox.portal.rest.api.support.email_addresses.model.SupportEmailAddressesRequestModel;
-import ai.salesfox.portal.rest.api.support.email_addresses.model.SupportEmailAddressesResponseModel;
+import ai.salesfox.portal.rest.api.support.email_addresses.model.SupportEmailAddressRequestModel;
+import ai.salesfox.portal.rest.api.support.email_addresses.model.SupportEmailAddressResponseModel;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -40,21 +40,21 @@ public class SupportEmailAddressService {
             return MultiSupportEmailAddressModel.empty();
         }
 
-        List<SupportEmailAddressesResponseModel> supportEmailAddressesModels = supportEmailAddresses
+        List<SupportEmailAddressResponseModel> supportEmailAddressesModels = supportEmailAddresses
                 .stream()
                 .map(this::convertToResponseModel)
                 .collect(Collectors.toList());
         return new MultiSupportEmailAddressModel(supportEmailAddressesModels, supportEmailAddresses);
     }
 
-    public SupportEmailAddressesResponseModel getSupportEmailAddressesById(UUID supportEmailId) {
+    public SupportEmailAddressResponseModel getSupportEmailAddressesById(UUID supportEmailId) {
         SupportEmailAddressEntity foundSupportEmailAddress = supportEmailAddressRepository.findById(supportEmailId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return convertToResponseModel(foundSupportEmailAddress);
     }
 
     @Transactional
-    public SupportEmailAddressesResponseModel createSupportEmailAddress(SupportEmailAddressesRequestModel requestModel) {
+    public SupportEmailAddressResponseModel createSupportEmailAddress(SupportEmailAddressRequestModel requestModel) {
         validateSupportEmailAddressesRequestModel(requestModel);
 
         SupportEmailAddressEntity supportEmailAddressToSave = new SupportEmailAddressEntity(null, requestModel.getCategory(), requestModel.getEmailAddress());
@@ -64,7 +64,7 @@ public class SupportEmailAddressService {
     }
 
     @Transactional
-    public void updateSupportEmailAddresses(UUID supportEmailAddressId, SupportEmailAddressesRequestModel requestModel) {
+    public void updateSupportEmailAddresses(UUID supportEmailAddressId, SupportEmailAddressRequestModel requestModel) {
         SupportEmailAddressEntity foundSupportEmailAddress = supportEmailAddressRepository.findById(supportEmailAddressId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         validateSupportEmailAddressesRequestModel(requestModel);
@@ -83,17 +83,17 @@ public class SupportEmailAddressService {
         return supportEmailAddressRepository.findAll(pageRequest);
     }
 
-    private void validateSupportEmailAddressesRequestModel(SupportEmailAddressesRequestModel supportEmailAddressesRequestModel) {
+    private void validateSupportEmailAddressesRequestModel(SupportEmailAddressRequestModel supportEmailAddressRequestModel) {
         List<String> errors = new ArrayList<>();
-        if (StringUtils.isBlank(supportEmailAddressesRequestModel.getCategory())) {
+        if (StringUtils.isBlank(supportEmailAddressRequestModel.getCategory())) {
             errors.add("The request field 'category' cannot be null");
-        } else if (!SupportEmailAddressesValidationUtils.isValidCategory(supportEmailAddressesRequestModel.getCategory())) {
+        } else if (!SupportEmailAddressesValidationUtils.isValidCategory(supportEmailAddressRequestModel.getCategory())) {
             errors.add(String.format("This is not an approved category. Valid categories: %s", SupportEmailAddressesValidationUtils.ALLOWED_CATEGORIES));
         }
 
-        if (StringUtils.isBlank(supportEmailAddressesRequestModel.getEmailAddress())) {
+        if (StringUtils.isBlank(supportEmailAddressRequestModel.getEmailAddress())) {
             errors.add("The request field 'category' cannot be null");
-        } else if (!FieldValidationUtils.isValidEmailAddress(supportEmailAddressesRequestModel.getEmailAddress(), false)) {
+        } else if (!FieldValidationUtils.isValidEmailAddress(supportEmailAddressRequestModel.getEmailAddress(), false)) {
             errors.add("Must be valid email");
         }
 
@@ -103,8 +103,8 @@ public class SupportEmailAddressService {
         }
     }
 
-    private SupportEmailAddressesResponseModel convertToResponseModel(SupportEmailAddressEntity entity) {
-        return new SupportEmailAddressesResponseModel(entity.getSupportEmailId(), entity.getSupportEmailAddress(), entity.getSupportEmailCategory());
+    private SupportEmailAddressResponseModel convertToResponseModel(SupportEmailAddressEntity entity) {
+        return new SupportEmailAddressResponseModel(entity.getSupportEmailId(), entity.getSupportEmailAddress(), entity.getSupportEmailCategory());
     }
 
     private String defaultIfBlank(String str, String defaultValue) {
