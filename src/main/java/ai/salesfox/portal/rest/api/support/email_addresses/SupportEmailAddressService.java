@@ -47,6 +47,21 @@ public class SupportEmailAddressService {
         return new MultiSupportEmailAddressModel(supportEmailAddressesModels, supportEmailAddresses);
     }
 
+    public MultiSupportEmailAddressModel getSupportEmailAddressesByCategory(String supportEmailCategory, Integer pageOffset, Integer pageLimit) {
+        PageRequestValidationUtils.validatePagingParams(pageOffset, pageLimit);
+
+        Page<SupportEmailAddressEntity> supportEmailAddressesByCategory = getAllSupportEmailAddressesByCategory(supportEmailCategory, pageOffset, pageLimit);
+        if (supportEmailAddressesByCategory.isEmpty()) {
+            return MultiSupportEmailAddressModel.empty();
+        }
+
+        List<SupportEmailAddressResponseModel> supportEmailAddressesModels = supportEmailAddressesByCategory
+                .stream()
+                .map(this::convertToResponseModel)
+                .collect(Collectors.toList());
+        return new MultiSupportEmailAddressModel(supportEmailAddressesModels, supportEmailAddressesByCategory);
+    }
+
     public SupportEmailAddressResponseModel getSupportEmailAddressesById(UUID supportEmailId) {
         SupportEmailAddressEntity foundSupportEmailAddress = supportEmailAddressRepository.findById(supportEmailId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -81,6 +96,19 @@ public class SupportEmailAddressService {
     private Page<SupportEmailAddressEntity> getAllSupportEmailAddresses(Integer pageOffset, Integer pageLimit) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
         return supportEmailAddressRepository.findAll(pageRequest);
+    }
+
+    private Page<SupportEmailAddressEntity> getAllSupportEmailAddressesByCategory(String supportEmailCategory, Integer pageOffset, Integer pageLimit) {
+        PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
+        List<String> errors = new ArrayList<>();
+        if (!SupportEmailAddressesValidationUtils.isValidCategory(supportEmailCategory)) {
+            errors.add(String.format("This is not an approved category. Valid categories: %s", SupportEmailAddressesValidationUtils.ALLOWED_CATEGORIES));
+        }
+        if (!errors.isEmpty()) {
+            String combinedErrors = String.join(", ", errors);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, combinedErrors);
+        }
+        return supportEmailAddressRepository.getSupportEmailAddressesByCategory(supportEmailCategory, pageRequest);
     }
 
     private void validateSupportEmailAddressesRequestModel(SupportEmailAddressRequestModel supportEmailAddressRequestModel) {

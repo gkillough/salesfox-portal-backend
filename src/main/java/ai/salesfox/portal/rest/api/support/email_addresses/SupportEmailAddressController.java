@@ -30,6 +30,11 @@ public class SupportEmailAddressController {
         return supportEmailAddressService.getSupportEmailAddresses(offset, limit);
     }
 
+    @GetMapping("/category/{supportEmailCategory}")
+    public MultiSupportEmailAddressModel getSupportEmailAddressesByCategory(@PathVariable String supportEmailCategory, @RequestParam(defaultValue = PageMetadata.DEFAULT_OFFSET_STRING) Integer offset, @RequestParam(defaultValue = PageMetadata.DEFAULT_LIMIT_STRING) Integer limit) {
+        return supportEmailAddressService.getSupportEmailAddressesByCategory(supportEmailCategory, offset, limit);
+    }
+
     @GetMapping("/{supportEmailId}")
     public SupportEmailAddressResponseModel getSupportEmailAddressesById(@PathVariable UUID supportEmailId) {
         return supportEmailAddressService.getSupportEmailAddressesById(supportEmailId);
