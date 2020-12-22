@@ -41,7 +41,7 @@ public class CustomIconController {
         return customIconService.getCustomIcon(customIconId);
     }
 
-    @PostMapping("/{customIconId}/icon")
+    @PostMapping("/{customIconId}/image")
     @PreAuthorize(PortalAuthorityConstants.PORTAL_ADMIN_OR_ORG_ACCT_OWNER_OR_ORG_ACCT_MANAGER_AUTH_CHECK)
     public void uploadCustomIconImage(@PathVariable UUID customIconId, @RequestParam MultipartFile customIconFile) {
         customIconImageService.setCustomIconImage(customIconId, customIconFile);

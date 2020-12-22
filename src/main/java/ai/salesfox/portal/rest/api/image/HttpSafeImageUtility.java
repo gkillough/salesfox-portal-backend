@@ -57,11 +57,11 @@ public class HttpSafeImageUtility {
 
             return localIconManager.saveIcon(fileInputStream, iconFileExtension);
         } catch (PortalFileSystemException fileSystemException) {
-            log.debug("Failed to upload icon file", fileSystemException);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The provided file was an invalid icon");
+            log.debug("Failed to upload image file", fileSystemException);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The provided file was an invalid image");
         } catch (IOException ioException) {
-            log.debug("Failed to save icon file", ioException);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while saving the icon");
+            log.debug("Failed to save image file", ioException);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while saving the image");
         }
     }
 
@@ -69,7 +69,7 @@ public class HttpSafeImageUtility {
         try {
             return localIconManager.deleteIcon(fileName);
         } catch (PortalFileSystemException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete existing icon");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to delete existing image");
         }
     }
 

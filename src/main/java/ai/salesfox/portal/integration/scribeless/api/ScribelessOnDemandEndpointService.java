@@ -37,8 +37,8 @@ public class ScribelessOnDemandEndpointService {
             BufferedImage previewImage = onDemandPreviewService.getPreviewImage(text, previewParams);
             return new ImageResponseModel(previewImage, MediaType.IMAGE_PNG);
         } catch (SalesfoxException e) {
-            log.error("Error with request to generate a Scribeless preview icon", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not generate preview icon");
+            log.error("Error with request to generate a Scribeless preview image", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not generate preview image");
         }
     }
 
