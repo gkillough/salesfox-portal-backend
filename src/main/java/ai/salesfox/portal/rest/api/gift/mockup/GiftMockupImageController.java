@@ -18,7 +18,7 @@ public class GiftMockupImageController {
     }
 
     @PostMapping("/{giftId}/mockup")
-    public void uploadMockupImage(@PathVariable UUID giftId, @RequestBody GiftMockupImageRequestModel requestModel) {
+    public void setMockupImage(@PathVariable UUID giftId, @RequestBody GiftMockupImageRequestModel requestModel) {
         giftMockupImageService.setMockupImage(giftId, requestModel);
     }
 

@@ -22,11 +22,11 @@ public class GiftResponseModelUtils {
     public static GiftResponseModel convertToResponseModel(GiftEntity gift) {
         UserSummaryModel requestingUserModel = UserSummaryModel.fromEntity(gift.getRequestingUserEntity());
 
-        UUID noteId = extractDetailIdOrNull(gift.getGiftNoteDetailEntity(), GiftNoteDetailEntity::getNoteId);
-        UUID itemId = extractDetailIdOrNull(gift.getGiftItemDetailEntity(), GiftItemDetailEntity::getItemId);
-        UUID customIconId = extractDetailIdOrNull(gift.getGiftCustomIconDetailEntity(), GiftCustomIconDetailEntity::getCustomIconId);
-        UUID customTextId = extractDetailIdOrNull(gift.getGiftCustomTextDetailEntity(), GiftCustomTextDetailEntity::getCustomTextId);
-        String mockupImageUrl = extractDetailIdOrNull(gift.getGiftMockupImageEntity(), GiftMockupImageEntity::getImageUrl);
+        UUID noteId = extractAttributeOrNull(gift.getGiftNoteDetailEntity(), GiftNoteDetailEntity::getNoteId);
+        UUID itemId = extractAttributeOrNull(gift.getGiftItemDetailEntity(), GiftItemDetailEntity::getItemId);
+        UUID customIconId = extractAttributeOrNull(gift.getGiftCustomIconDetailEntity(), GiftCustomIconDetailEntity::getCustomIconId);
+        UUID customTextId = extractAttributeOrNull(gift.getGiftCustomTextDetailEntity(), GiftCustomTextDetailEntity::getCustomTextId);
+        String mockupImageUrl = extractAttributeOrNull(gift.getGiftMockupImageEntity(), GiftMockupImageEntity::getImageUrl);
 
         GiftTrackingModel trackingModel = createTrackingModel(gift.getGiftTrackingEntity());
 
@@ -51,8 +51,8 @@ public class GiftResponseModelUtils {
         return new GiftTrackingModel(giftTracking.getStatus(), distributor, trackingNumber, updatedByUser, giftTracking.getDateCreated(), giftTracking.getDateUpdated());
     }
 
-    private static <E, T> T extractDetailIdOrNull(E detailEntity, Function<E, T> getter) {
-        return Optional.ofNullable(detailEntity).map(getter).orElse(null);
+    private static <T, U> U extractAttributeOrNull(T container, Function<T, U> extractor) {
+        return Optional.ofNullable(container).map(extractor).orElse(null);
     }
 
 }
