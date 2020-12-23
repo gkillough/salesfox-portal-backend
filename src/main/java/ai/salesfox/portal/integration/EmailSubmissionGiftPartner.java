@@ -17,6 +17,7 @@ import ai.salesfox.portal.database.customization.icon.CustomIconEntity;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomIconDetailEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
+import ai.salesfox.portal.database.gift.mockup.GiftMockupImageEntity;
 import ai.salesfox.portal.integration.scribeless.workflow.ScribelessCampaignRequestModelCreator;
 import ai.salesfox.portal.integration.scribeless.workflow.model.CampaignCreationRequestHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -130,6 +131,13 @@ public abstract class EmailSubmissionGiftPartner implements GiftPartner {
             orderBodyBuilder.append(ORDER_MESSAGE_LINE_BREAK);
             orderBodyBuilder.append("Custom Image URL: ");
             orderBodyBuilder.append(customIcon.getIconUrl());
+        }
+
+        GiftMockupImageEntity giftMockupImage = gift.getGiftMockupImageEntity();
+        if (null != giftMockupImage) {
+            orderBodyBuilder.append(ORDER_MESSAGE_LINE_BREAK);
+            orderBodyBuilder.append("Mockup Image URL: ");
+            orderBodyBuilder.append(giftMockupImage.getImageUrl());
         }
 
         orderBodyBuilder.append(ORDER_MESSAGE_LINE_BREAK);

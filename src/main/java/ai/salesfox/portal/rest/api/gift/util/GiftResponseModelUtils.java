@@ -4,6 +4,7 @@ import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomIconDetailEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomTextDetailEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
+import ai.salesfox.portal.database.gift.mockup.GiftMockupImageEntity;
 import ai.salesfox.portal.database.gift.note.GiftNoteDetailEntity;
 import ai.salesfox.portal.database.gift.restriction.GiftOrgAccountRestrictionEntity;
 import ai.salesfox.portal.database.gift.restriction.GiftUserRestrictionEntity;
@@ -21,17 +22,18 @@ public class GiftResponseModelUtils {
     public static GiftResponseModel convertToResponseModel(GiftEntity gift) {
         UserSummaryModel requestingUserModel = UserSummaryModel.fromEntity(gift.getRequestingUserEntity());
 
-        UUID noteId = extractDetailIdOrNull(gift.getGiftNoteDetailEntity(), GiftNoteDetailEntity::getNoteId);
-        UUID itemId = extractDetailIdOrNull(gift.getGiftItemDetailEntity(), GiftItemDetailEntity::getItemId);
-        UUID customIconId = extractDetailIdOrNull(gift.getGiftCustomIconDetailEntity(), GiftCustomIconDetailEntity::getCustomIconId);
-        UUID customTextId = extractDetailIdOrNull(gift.getGiftCustomTextDetailEntity(), GiftCustomTextDetailEntity::getCustomTextId);
+        UUID noteId = extractAttributeOrNull(gift.getGiftNoteDetailEntity(), GiftNoteDetailEntity::getNoteId);
+        UUID itemId = extractAttributeOrNull(gift.getGiftItemDetailEntity(), GiftItemDetailEntity::getItemId);
+        UUID customIconId = extractAttributeOrNull(gift.getGiftCustomIconDetailEntity(), GiftCustomIconDetailEntity::getCustomIconId);
+        UUID customTextId = extractAttributeOrNull(gift.getGiftCustomTextDetailEntity(), GiftCustomTextDetailEntity::getCustomTextId);
+        String mockupImageUrl = extractAttributeOrNull(gift.getGiftMockupImageEntity(), GiftMockupImageEntity::getImageUrl);
 
         GiftTrackingModel trackingModel = createTrackingModel(gift.getGiftTrackingEntity());
 
         RestrictionModel restrictionModel = new RestrictionModel();
         Optional.ofNullable(gift.getGiftOrgAccountRestrictionEntity()).map(GiftOrgAccountRestrictionEntity::getOrgAccountId).ifPresent(restrictionModel::setOrganizationAccountId);
         Optional.ofNullable(gift.getGiftUserRestrictionEntity()).map(GiftUserRestrictionEntity::getUserId).ifPresent(restrictionModel::setUserId);
-        return new GiftResponseModel(gift.getGiftId(), requestingUserModel, noteId, itemId, customTextId, customIconId, trackingModel, restrictionModel);
+        return new GiftResponseModel(gift.getGiftId(), requestingUserModel, noteId, itemId, customTextId, customIconId, mockupImageUrl, trackingModel, restrictionModel);
     }
 
     public static GiftTrackingModel createTrackingModel(GiftTrackingEntity giftTracking) {
@@ -49,8 +51,8 @@ public class GiftResponseModelUtils {
         return new GiftTrackingModel(giftTracking.getStatus(), distributor, trackingNumber, updatedByUser, giftTracking.getDateCreated(), giftTracking.getDateUpdated());
     }
 
-    private static <E> UUID extractDetailIdOrNull(E detailEntity, Function<E, UUID> getter) {
-        return Optional.ofNullable(detailEntity).map(getter).orElse(null);
+    private static <T, U> U extractAttributeOrNull(T container, Function<T, U> extractor) {
+        return Optional.ofNullable(container).map(extractor).orElse(null);
     }
 
 }

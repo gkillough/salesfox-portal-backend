@@ -18,6 +18,7 @@ public class NoteResponseModel {
     private String fontSize;
     private String fontColor;
     private String handwritingStyle;
+    private UUID headerCustomIconId;
     private OffsetDateTime dateModified;
     private UserSummaryModel updatedByUser;
     private RestrictionModel restriction;

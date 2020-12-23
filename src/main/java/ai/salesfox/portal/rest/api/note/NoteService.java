@@ -4,12 +4,15 @@ import ai.salesfox.portal.common.service.note.NoteValidationUtils;
 import ai.salesfox.portal.common.time.PortalDateTimeUtils;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
+import ai.salesfox.portal.database.customization.icon.CustomIconRepository;
 import ai.salesfox.portal.database.gift.note.GiftNoteDetailEntity;
 import ai.salesfox.portal.database.gift.note.GiftNoteDetailRepository;
 import ai.salesfox.portal.database.gift.tracking.GiftTrackingEntity;
 import ai.salesfox.portal.database.gift.tracking.GiftTrackingRepository;
 import ai.salesfox.portal.database.note.NoteEntity;
 import ai.salesfox.portal.database.note.NoteRepository;
+import ai.salesfox.portal.database.note.icon.NoteCustomIconEntity;
+import ai.salesfox.portal.database.note.icon.NoteCustomIconRepository;
 import ai.salesfox.portal.database.note.restriction.NoteOrganizationAccountRestrictionEntity;
 import ai.salesfox.portal.database.note.restriction.NoteOrganizationAccountRestrictionRepository;
 import ai.salesfox.portal.database.note.restriction.NoteUserRestrictionEntity;
@@ -42,16 +45,28 @@ public class NoteService {
     private final NoteRepository noteRepository;
     private final NoteOrganizationAccountRestrictionRepository noteOrgAcctRestrictionRepository;
     private final NoteUserRestrictionRepository noteUserRestrictionRepository;
+    private final NoteCustomIconRepository noteCustomIconRepository;
+    private final CustomIconRepository customIconRepository;
     private final GiftTrackingRepository giftTrackingRepository;
     private final GiftNoteDetailRepository giftNoteDetailRepository;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
 
     @Autowired
-    public NoteService(NoteRepository noteRepository, NoteOrganizationAccountRestrictionRepository noteOrgAcctRestrictionRepository, NoteUserRestrictionRepository noteUserRestrictionRepository,
-                       GiftTrackingRepository giftTrackingRepository, GiftNoteDetailRepository giftNoteDetailRepository, HttpSafeUserMembershipRetrievalService membershipRetrievalService) {
+    public NoteService(
+            NoteRepository noteRepository,
+            NoteOrganizationAccountRestrictionRepository noteOrgAcctRestrictionRepository,
+            NoteUserRestrictionRepository noteUserRestrictionRepository,
+            NoteCustomIconRepository noteCustomIconRepository,
+            CustomIconRepository customIconRepository,
+            GiftTrackingRepository giftTrackingRepository,
+            GiftNoteDetailRepository giftNoteDetailRepository,
+            HttpSafeUserMembershipRetrievalService membershipRetrievalService
+    ) {
         this.noteRepository = noteRepository;
         this.noteOrgAcctRestrictionRepository = noteOrgAcctRestrictionRepository;
         this.noteUserRestrictionRepository = noteUserRestrictionRepository;
+        this.noteCustomIconRepository = noteCustomIconRepository;
+        this.customIconRepository = customIconRepository;
         this.giftTrackingRepository = giftTrackingRepository;
         this.giftNoteDetailRepository = giftNoteDetailRepository;
         this.membershipRetrievalService = membershipRetrievalService;
@@ -89,6 +104,13 @@ public class NoteService {
         String noteHandwritingStyle = defaultIfBlank(requestModel.getHandwritingStyle(), DEFAULT_HANDWRITING_STYLE);
         NoteEntity noteToSave = new NoteEntity(null, loggedInUser.getUserId(), PortalDateTimeUtils.getCurrentDateTime(), requestModel.getMessage(), noteFontSize, noteFontColor, noteHandwritingStyle);
         NoteEntity savedNote = noteRepository.save(noteToSave);
+
+        UUID headerCustomIconId = requestModel.getHeaderCustomIconId();
+        if (null != headerCustomIconId) {
+            NoteCustomIconEntity noteCustomIconToSave = new NoteCustomIconEntity(savedNote.getNoteId(), headerCustomIconId);
+            NoteCustomIconEntity savedNoteCustomIcon = noteCustomIconRepository.save(noteCustomIconToSave);
+            savedNote.setNoteCustomIconEntity(savedNoteCustomIcon);
+        }
 
         // FIXME determine if notes should be restricted to a specific user
         boolean restrictToUser = false;
@@ -128,6 +150,15 @@ public class NoteService {
 
         String newHandwritingStyle = defaultIfBlank(requestModel.getHandwritingStyle(), foundNote.getHandwritingStyle());
         foundNote.setHandwritingStyle(newHandwritingStyle);
+
+        UUID headerCustomIconId = requestModel.getHeaderCustomIconId();
+        NoteCustomIconEntity existingNoteCustomIcon = foundNote.getNoteCustomIconEntity();
+        if (null != existingNoteCustomIcon && null == headerCustomIconId) {
+            noteCustomIconRepository.deleteById(noteId);
+        } else {
+            NoteCustomIconEntity newNoteCustomIcon = new NoteCustomIconEntity(noteId, headerCustomIconId);
+            noteCustomIconRepository.save(newNoteCustomIcon);
+        }
 
         noteRepository.save(foundNote);
     }
@@ -184,6 +215,11 @@ public class NoteService {
             errors.add(String.format("Invalid handwriting style. Available styles: %s", Arrays.toString(NoteValidationUtils.ALLOWED_HANDWRITING_STYLES)));
         }
 
+        UUID headerCustomIconId = noteRequestModel.getHeaderCustomIconId();
+        if (null != headerCustomIconId && !customIconRepository.existsById(headerCustomIconId)) {
+            errors.add("Invalid header custom icon id. An icon with that id does not exist.");
+        }
+
         if (!errors.isEmpty()) {
             String combinedErrors = String.join(", ", errors);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, combinedErrors);
@@ -208,6 +244,9 @@ public class NoteService {
     private NoteResponseModel convertToResponseModel(NoteEntity entity) {
         UserSummaryModel updatedByUser = UserSummaryModel.fromEntity(entity.getUpdatedByUserEntity());
 
+        NoteCustomIconEntity noteCustomIcon = entity.getNoteCustomIconEntity();
+        UUID headerCustomIconId = null != noteCustomIcon ? noteCustomIcon.getCustomIconId() : null;
+
         NoteOrganizationAccountRestrictionEntity orgAcctRestriction = entity.getNoteOrganizationAccountRestrictionEntity();
         NoteUserRestrictionEntity userRestriction = entity.getNoteUserRestrictionEntity();
 
@@ -215,7 +254,7 @@ public class NoteService {
         UUID restrictedUserId = null != userRestriction ? userRestriction.getUserId() : null;
         RestrictionModel restrictionModel = new RestrictionModel(restrictedOrgAcctId, restrictedUserId);
 
-        return new NoteResponseModel(entity.getNoteId(), entity.getMessage(), entity.getFontSize(), entity.getFontColor(), entity.getHandwritingStyle(), entity.getDateModified(), updatedByUser, restrictionModel);
+        return new NoteResponseModel(entity.getNoteId(), entity.getMessage(), entity.getFontSize(), entity.getFontColor(), entity.getHandwritingStyle(), headerCustomIconId, entity.getDateModified(), updatedByUser, restrictionModel);
     }
 
     private String defaultIfBlank(String str, String defaultValue) {
