@@ -79,7 +79,6 @@ public class SupportEmailAddressService {
     private Page<SupportEmailAddressEntity> getSupportEmailAddress(String supportEmailCategory, Integer pageOffset, Integer pageLimit) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
         List<String> errors = new ArrayList<>();
-        System.out.println("FIND BRAD: " + supportEmailCategory);
         if (StringUtils.isNotEmpty(supportEmailCategory) && (!SupportEmailAddressesValidationUtils.isValidCategory(supportEmailCategory))) {
             errors.add(String.format("This is not an approved category. Valid categories: %s", SupportEmailAddressesValidationUtils.ALLOWED_CATEGORIES));
         }
