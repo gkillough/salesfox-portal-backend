@@ -1,6 +1,7 @@
 package ai.salesfox.portal.database.note;
 
 import ai.salesfox.portal.database.account.entity.UserEntity;
+import ai.salesfox.portal.database.note.icon.NoteCustomIconEntity;
 import ai.salesfox.portal.database.note.restriction.NoteOrganizationAccountRestrictionEntity;
 import ai.salesfox.portal.database.note.restriction.NoteUserRestrictionEntity;
 import lombok.Data;
@@ -47,6 +48,10 @@ public class NoteEntity implements Serializable {
     @OneToOne
     @JoinColumn(name = "note_id", referencedColumnName = "note_id", insertable = false, updatable = false)
     private NoteUserRestrictionEntity noteUserRestrictionEntity;
+
+    @OneToOne
+    @JoinColumn(name = "note_id", referencedColumnName = "note_id", insertable = false, updatable = false)
+    private NoteCustomIconEntity noteCustomIconEntity;
 
     @ManyToOne
     @JoinColumn(name = "updated_by_user_id", referencedColumnName = "user_id", insertable = false, updatable = false)

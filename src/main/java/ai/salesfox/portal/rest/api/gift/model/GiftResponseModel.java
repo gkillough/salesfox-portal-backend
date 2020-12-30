@@ -18,6 +18,7 @@ public class GiftResponseModel {
     private UUID itemId;
     private UUID customTextId;
     private UUID customIconId;
+    private String mockupImageUrl;
     private GiftTrackingModel tracking;
     private RestrictionModel restriction;
 
