@@ -45,12 +45,6 @@ public class SupportEmailAddressService {
         return new MultiSupportEmailAddressModel(supportEmailAddressesModels, supportEmailAddresses);
     }
 
-    //public SupportEmailAddressResponseModel getSupportEmailAddressesById(UUID supportEmailId) {
-    //    SupportEmailAddressEntity foundSupportEmailAddress = supportEmailAddressRepository.findById(supportEmailId)
-    //            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-    //    return convertToResponseModel(foundSupportEmailAddress);
-    //}
-
     @Transactional
     public SupportEmailAddressResponseModel createSupportEmailAddress(SupportEmailAddressRequestModel requestModel) {
         validateSupportEmailAddressesRequestModel(requestModel);
@@ -79,13 +73,7 @@ public class SupportEmailAddressService {
     private Page<SupportEmailAddressEntity> getSupportEmailAddress(String supportEmailCategory, Integer pageOffset, Integer pageLimit) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
         List<String> errors = new ArrayList<>();
-        if (StringUtils.isNotEmpty(supportEmailCategory) && (!SupportEmailAddressesValidationUtils.isValidCategory(supportEmailCategory))) {
-            errors.add(String.format("This is not an approved category. Valid categories: %s", SupportEmailAddressesValidationUtils.ALLOWED_CATEGORIES));
-        }
-        if (!errors.isEmpty()) {
-            String combinedErrors = String.join(", ", errors);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, combinedErrors);
-        }
+        
         if (StringUtils.isEmpty(supportEmailCategory)) {
             return supportEmailAddressRepository.findAll(pageRequest);
         } else {

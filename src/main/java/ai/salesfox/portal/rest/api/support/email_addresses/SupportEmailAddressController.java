@@ -34,11 +34,6 @@ public class SupportEmailAddressController {
         return supportEmailAddressService.getAllSupportEmailAddresses(category, offset, limit);
     }
 
-    //@GetMapping("/{supportEmailId}")
-    //public SupportEmailAddressResponseModel getSupportEmailAddressesById(@PathVariable UUID supportEmailId) {
-    //    return supportEmailAddressService.getSupportEmailAddressesById(supportEmailId);
-    //}
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public SupportEmailAddressResponseModel createSupportEmailAddress(@RequestBody SupportEmailAddressRequestModel requestModel) {

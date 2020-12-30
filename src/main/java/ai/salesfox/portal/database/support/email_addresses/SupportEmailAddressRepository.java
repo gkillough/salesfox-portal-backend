@@ -15,7 +15,7 @@ public interface SupportEmailAddressRepository extends JpaRepository<SupportEmai
     @Query("SELECT supportEmailAddress" +
             " FROM SupportEmailAddressEntity supportEmailAddress" +
             " WHERE (" +
-            "   (supportEmailCategory!= NULL AND supportEmailAddress.supportEmailCategory = :supportEmailCategory)" +
+            "   supportEmailCategory!= NULL AND supportEmailAddress.supportEmailCategory = :supportEmailCategory" +
             " )"
     )
     Page<SupportEmailAddressEntity> getSupportEmailAddressesByCategory(@Param("supportEmailCategory") String supportEmailCategory, Pageable pageable);
