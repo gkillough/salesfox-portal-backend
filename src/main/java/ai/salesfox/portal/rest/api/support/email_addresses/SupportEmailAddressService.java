@@ -72,8 +72,7 @@ public class SupportEmailAddressService {
 
     private Page<SupportEmailAddressEntity> getSupportEmailAddress(String supportEmailCategory, Integer pageOffset, Integer pageLimit) {
         PageRequest pageRequest = PageRequest.of(pageOffset, pageLimit);
-        List<String> errors = new ArrayList<>();
-        
+
         if (StringUtils.isEmpty(supportEmailCategory)) {
             return supportEmailAddressRepository.findAll(pageRequest);
         } else {
