@@ -1,13 +1,17 @@
 package ai.salesfox.portal.common.service.gift;
 
+import ai.salesfox.portal.common.FieldValidationUtils;
 import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
 import ai.salesfox.portal.common.enumeration.InteractionClassification;
 import ai.salesfox.portal.common.enumeration.InteractionMedium;
+import ai.salesfox.portal.common.model.PortalAddressModel;
 import ai.salesfox.portal.common.service.contact.ContactInteractionsService;
 import ai.salesfox.portal.common.service.license.UserLicenseLimitManager;
 import ai.salesfox.portal.common.service.note.NoteCreditAvailabilityService;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
+import ai.salesfox.portal.database.account.entity.UserAddressEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
+import ai.salesfox.portal.database.account.repository.UserAddressRepository;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.gift.note.GiftNoteDetailEntity;
@@ -35,6 +39,7 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
     private final NoteCreditAvailabilityService noteCreditAvailabilityService;
     private final ContactInteractionsService contactInteractionsService;
     private final GiftSubmittedEventPublisher giftSubmittedEventPublisher;
+    private final UserAddressRepository userAddressRepository;
 
     public GiftSubmissionUtility(
             GiftTrackingService giftTrackingService,
@@ -45,7 +50,8 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
             NoteCreditAvailabilityService noteCreditAvailabilityService,
             ContactInteractionsService
                     contactInteractionsService,
-            GiftSubmittedEventPublisher giftSubmittedEventPublisher
+            GiftSubmittedEventPublisher giftSubmittedEventPublisher,
+            UserAddressRepository userAddressRepository
     ) {
         this.giftItemService = giftItemService;
         this.userLicenseLimitManager = userLicenseLimitManager;
@@ -55,12 +61,21 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
         this.contactInteractionsService = contactInteractionsService;
         this.giftTrackingService = giftTrackingService;
         this.giftSubmittedEventPublisher = giftSubmittedEventPublisher;
+        this.userAddressRepository = userAddressRepository;
     }
 
     @Transactional
     public Optional<GiftEntity> submitGift(GiftEntity gift, UserEntity submittingUser) throws E {
         if (!gift.isSubmittable()) {
             handleGiftNotSubmittable(gift, submittingUser);
+            return Optional.empty();
+        }
+
+        UUID submittingUserId = submittingUser.getUserId();
+        UserAddressEntity submittingUserAddressEntity = userAddressRepository.getOne(submittingUserId);
+        PortalAddressModel submittingUserAddress = PortalAddressModel.fromEntity(submittingUserAddressEntity);
+        if (!FieldValidationUtils.isValidUSAddress(submittingUserAddress, false)) {
+            handleNoReturnAddress(submittingUser);
             return Optional.empty();
         }
 
@@ -143,5 +158,7 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
     protected abstract void handleMissingNoteCredits(GiftEntity foundGift, UserEntity submittingUser) throws E;
 
     protected abstract void handleNotEnoughNoteCredits(GiftEntity foundGift, NoteCreditsEntity noteCredits, UserEntity submittingUser) throws E;
+
+    protected abstract void handleNoReturnAddress(UserEntity submittingUser) throws E;
 
 }

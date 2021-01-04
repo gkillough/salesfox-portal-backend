@@ -77,4 +77,9 @@ public class EndpointGiftSubmissionService extends GiftSubmissionUtility<Respons
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There were not enough note-credits available to attach a note to the gift");
     }
 
+    @Override
+    protected void handleNoReturnAddress(UserEntity submittingUser) throws ResponseStatusException {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Submitting User must have a return address. Please save an address to your user account.");
+    }
+
 }
