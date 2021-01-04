@@ -11,6 +11,7 @@ import ai.salesfox.portal.common.service.gift.GiftTrackingService;
 import ai.salesfox.portal.common.service.license.UserLicenseLimitManager;
 import ai.salesfox.portal.common.service.note.NoteCreditAvailabilityService;
 import ai.salesfox.portal.database.account.entity.UserEntity;
+import ai.salesfox.portal.database.account.repository.UserAddressRepository;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.gift.recipient.GiftRecipientRepository;
@@ -20,7 +21,9 @@ import ai.salesfox.portal.database.note.credit.NoteCreditsRepository;
 import ai.salesfox.portal.event.gift.GiftSubmittedEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -44,9 +47,10 @@ public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<Salesf
             NoteCreditAvailabilityService noteCreditAvailabilityService,
             ContactInteractionsService contactInteractionsService,
             EmailMessagingService emailMessagingService,
-            GiftSubmittedEventPublisher giftSubmittedEventPublisher
+            GiftSubmittedEventPublisher giftSubmittedEventPublisher,
+            UserAddressRepository userAddressRepository
     ) {
-        super(giftTrackingService, giftItemService, userLicenseLimitManager, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService, giftSubmittedEventPublisher);
+        super(giftTrackingService, giftItemService, userLicenseLimitManager, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService, giftSubmittedEventPublisher, userAddressRepository);
         this.giftTrackingService = giftTrackingService;
         this.emailMessagingService = emailMessagingService;
     }
@@ -97,6 +101,11 @@ public class ScheduledGiftSubmissionService extends GiftSubmissionUtility<Salesf
     protected void handleNotEnoughNoteCredits(GiftEntity foundGift, NoteCreditsEntity noteCredits, UserEntity submittingUser) throws SalesfoxException {
         unscheduleGift(foundGift, submittingUser);
         notifyUserOfFailure(foundGift.getGiftId(), submittingUser.getEmail(), "A gift was scheduled to be submitted, but the there were not enough note-credits.");
+    }
+
+    @Override
+    protected void handleNoReturnAddress(UserEntity submittingUser) throws ResponseStatusException {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Submitting User must have a return address. Please save an address to your user account.");
     }
 
     private void notifyUserOfFailure(UUID giftId, String userEmail, String failureMessage) throws SalesfoxException {

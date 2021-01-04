@@ -7,6 +7,7 @@ import ai.salesfox.portal.common.service.gift.GiftTrackingService;
 import ai.salesfox.portal.common.service.license.UserLicenseLimitManager;
 import ai.salesfox.portal.common.service.note.NoteCreditAvailabilityService;
 import ai.salesfox.portal.database.account.entity.UserEntity;
+import ai.salesfox.portal.database.account.repository.UserAddressRepository;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.gift.recipient.GiftRecipientRepository;
@@ -32,9 +33,10 @@ public class EndpointGiftSubmissionService extends GiftSubmissionUtility<Respons
             NoteCreditsRepository noteCreditsRepository,
             NoteCreditAvailabilityService noteCreditAvailabilityService,
             ContactInteractionsService contactInteractionsService,
-            GiftSubmittedEventPublisher giftSubmittedEventPublisher
+            GiftSubmittedEventPublisher giftSubmittedEventPublisher,
+            UserAddressRepository userAddressRepository
     ) {
-        super(giftTrackingService, giftItemService, userLicenseLimitManager, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService, giftSubmittedEventPublisher);
+        super(giftTrackingService, giftItemService, userLicenseLimitManager, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService, giftSubmittedEventPublisher, userAddressRepository);
     }
 
     @Override
