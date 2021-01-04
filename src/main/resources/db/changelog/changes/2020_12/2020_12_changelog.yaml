@@ -14,3 +14,7 @@ databaseChangeLog:
   - include:
       file: separate_gift_and_note_images.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: add_support_email_addresses.yaml
+      relativeToChangelogFile: true
