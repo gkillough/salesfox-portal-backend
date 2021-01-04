@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-support-email-addresses
+      author: bradmoulder
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: support_email_addresses
+            columns:
+              - column:
+                  name: support_email_id
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: category
+                  type: VARCHAR
+              - column:
+                  name: email_address
+                  type: VARCHAR
+                  constraints:
+                    unique: true
