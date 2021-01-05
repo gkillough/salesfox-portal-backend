@@ -9,7 +9,6 @@ import ai.salesfox.portal.common.service.contact.ContactInteractionsService;
 import ai.salesfox.portal.common.service.license.UserLicenseLimitManager;
 import ai.salesfox.portal.common.service.note.NoteCreditAvailabilityService;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
-import ai.salesfox.portal.database.account.entity.UserAddressEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserAddressRepository;
 import ai.salesfox.portal.database.gift.GiftEntity;
@@ -71,10 +70,10 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
             return Optional.empty();
         }
 
-        UUID submittingUserId = submittingUser.getUserId();
-        UserAddressEntity submittingUserAddressEntity = userAddressRepository.getOne(submittingUserId);
-        PortalAddressModel submittingUserAddress = PortalAddressModel.fromEntity(submittingUserAddressEntity);
-        if (!FieldValidationUtils.isValidUSAddress(submittingUserAddress, false)) {
+        Optional<PortalAddressModel> optionalSubmittingUserAddress = userAddressRepository.findById(submittingUser.getUserId())
+                .map(PortalAddressModel::fromEntity)
+                .filter(address -> FieldValidationUtils.isValidUSAddress(address, false));
+        if (optionalSubmittingUserAddress.isEmpty()) {
             handleNoReturnAddress(submittingUser);
             return Optional.empty();
         }
