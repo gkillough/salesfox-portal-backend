@@ -74,7 +74,7 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
                 .map(PortalAddressModel::fromEntity)
                 .filter(address -> FieldValidationUtils.isValidUSAddress(address, false));
         if (optionalSubmittingUserAddress.isEmpty()) {
-            handleNoReturnAddress(submittingUser);
+            handleNoReturnAddress(gift, submittingUser);
             return Optional.empty();
         }
 
@@ -158,6 +158,6 @@ public abstract class GiftSubmissionUtility<E extends Throwable> {
 
     protected abstract void handleNotEnoughNoteCredits(GiftEntity foundGift, NoteCreditsEntity noteCredits, UserEntity submittingUser) throws E;
 
-    protected abstract void handleNoReturnAddress(UserEntity submittingUser) throws E;
+    protected abstract void handleNoReturnAddress(GiftEntity foundGift, UserEntity submittingUser) throws E;
 
 }

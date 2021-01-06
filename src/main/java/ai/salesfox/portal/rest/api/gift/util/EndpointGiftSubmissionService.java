@@ -80,7 +80,7 @@ public class EndpointGiftSubmissionService extends GiftSubmissionUtility<Respons
     }
 
     @Override
-    protected void handleNoReturnAddress(UserEntity submittingUser) throws ResponseStatusException {
+    protected void handleNoReturnAddress(GiftEntity foundGift, UserEntity submittingUser) throws ResponseStatusException {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Submitting User must have a return address. Please save an address to your user account.");
     }
 
