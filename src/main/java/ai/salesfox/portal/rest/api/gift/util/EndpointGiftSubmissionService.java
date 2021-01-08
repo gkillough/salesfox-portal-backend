@@ -7,6 +7,7 @@ import ai.salesfox.portal.common.service.gift.GiftTrackingService;
 import ai.salesfox.portal.common.service.license.UserLicenseLimitManager;
 import ai.salesfox.portal.common.service.note.NoteCreditAvailabilityService;
 import ai.salesfox.portal.database.account.entity.UserEntity;
+import ai.salesfox.portal.database.account.repository.UserAddressRepository;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
 import ai.salesfox.portal.database.gift.recipient.GiftRecipientRepository;
@@ -32,9 +33,10 @@ public class EndpointGiftSubmissionService extends GiftSubmissionUtility<Respons
             NoteCreditsRepository noteCreditsRepository,
             NoteCreditAvailabilityService noteCreditAvailabilityService,
             ContactInteractionsService contactInteractionsService,
-            GiftSubmittedEventPublisher giftSubmittedEventPublisher
+            GiftSubmittedEventPublisher giftSubmittedEventPublisher,
+            UserAddressRepository userAddressRepository
     ) {
-        super(giftTrackingService, giftItemService, userLicenseLimitManager, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService, giftSubmittedEventPublisher);
+        super(giftTrackingService, giftItemService, userLicenseLimitManager, giftRecipientRepository, noteCreditsRepository, noteCreditAvailabilityService, contactInteractionsService, giftSubmittedEventPublisher, userAddressRepository);
     }
 
     @Override
@@ -75,6 +77,11 @@ public class EndpointGiftSubmissionService extends GiftSubmissionUtility<Respons
     @Override
     protected void handleNotEnoughNoteCredits(GiftEntity foundGift, NoteCreditsEntity noteCredits, UserEntity submittingUser) throws ResponseStatusException {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There were not enough note-credits available to attach a note to the gift");
+    }
+
+    @Override
+    protected void handleNoReturnAddress(GiftEntity foundGift, UserEntity submittingUser) throws ResponseStatusException {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Submitting User must have a return address. Please save an address to your user account.");
     }
 
 }
