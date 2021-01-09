@@ -9,6 +9,7 @@ import ai.salesfox.integration.scribeless.service.on_demand.model.OnDemandPrevie
 import ai.salesfox.portal.rest.api.image.model.ImageResponseModel;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,8 +20,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
-@Deprecated(forRemoval = true)
 @Slf4j
 @Component
 public class ScribelessOnDemandEndpointService {
@@ -46,19 +47,23 @@ public class ScribelessOnDemandEndpointService {
         OnDemandPreviewParams previewParams = OnDemandPreviewParams.testing();
 
         List<String> errors = new ArrayList<>(5);
-        createIntegerErrorString(previewParams, widthInMM, "widthInMM").ifPresent(errors::add);
-        createIntegerErrorString(previewParams, heightInMM, "heightInMM").ifPresent(errors::add);
-        createIntegerErrorString(previewParams, sizeInMM, "sizeInMM").ifPresent(errors::add);
+        setIntegerOrCreateErrorString(previewParams::setWidthInMillimeters, widthInMM, "widthInMM", 40).ifPresent(errors::add);
+        setIntegerOrCreateErrorString(previewParams::setHeightInMillimeters, heightInMM, "heightInMM", 25).ifPresent(errors::add);
+        setIntegerOrCreateErrorString(previewParams::setSizeInMillimeters, sizeInMM, "sizeInMM", 3).ifPresent(errors::add);
 
         if (null != fontColor) {
             if (!EnumUtils.isValidEnumIgnoreCase(ScribelessHandwritingColors.class, fontColor)) {
-                errors.add(String.format("The field 'fontColor' is invalid. Options: %s", SalesfoxEnumUtils.lowercaseValuesString(ScribelessHandwritingColors.values())));
+                errors.add(String.format("The field 'fontColor' is invalid. Options: %s", SalesfoxEnumUtils.capitalizeValuesString(ScribelessHandwritingColors.values())));
+            } else {
+                previewParams.setFontColor(formatRequestStringOrDefault(fontColor, ScribelessHandwritingColors.BLACK.name()));
             }
         }
 
         if (null != handwritingStyle) {
             if (!EnumUtils.isValidEnumIgnoreCase(ScribelessHandwritingStyles.class, handwritingStyle)) {
-                errors.add(String.format("The field 'handwritingStyle' is invalid. Options: %s", SalesfoxEnumUtils.lowercaseValuesString(ScribelessHandwritingStyles.values())));
+                errors.add(String.format("The field 'handwritingStyle' is invalid. Options: %s", SalesfoxEnumUtils.capitalizeValuesString(ScribelessHandwritingStyles.values())));
+            } else {
+                previewParams.setHandwritingStyle(formatRequestStringOrDefault(handwritingStyle, ScribelessHandwritingStyles.STAFFORD.name()));
             }
         }
 
@@ -69,15 +74,24 @@ public class ScribelessOnDemandEndpointService {
         return previewParams;
     }
 
-    private Optional<String> createIntegerErrorString(OnDemandPreviewParams previewParams, Integer param, String paramName) {
+    private Optional<String> setIntegerOrCreateErrorString(Consumer<Integer> previewParamsSetter, Integer param, String paramName, int defaultValue) {
         if (null != param) {
             if (param > 0) {
-                previewParams.setWidthInMillimeters(param);
+                previewParamsSetter.accept(param);
             } else {
                 return Optional.of(String.format("The field '%s' must be greater than zero", paramName));
             }
+        } else {
+            previewParamsSetter.accept(defaultValue);
         }
         return Optional.empty();
+    }
+
+    private String formatRequestStringOrDefault(String requestString, String defaultString) {
+        if (StringUtils.isBlank(requestString)) {
+            requestString = defaultString;
+        }
+        return StringUtils.capitalize(StringUtils.lowerCase(requestString));
     }
 
 }

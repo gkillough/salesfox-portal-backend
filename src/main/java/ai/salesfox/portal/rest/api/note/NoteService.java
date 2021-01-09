@@ -39,8 +39,8 @@ import java.util.stream.Collectors;
 @Component
 public class NoteService {
     public static final String DEFAULT_FONT_SIZE = "Medium";
-    public static final String DEFAULT_FONT_COLOR = "black";
-    public static final String DEFAULT_HANDWRITING_STYLE = "stafford";
+    public static final String DEFAULT_FONT_COLOR = "Black";
+    public static final String DEFAULT_HANDWRITING_STYLE = "Stafford";
 
     private final NoteRepository noteRepository;
     private final NoteOrganizationAccountRestrictionRepository noteOrgAcctRestrictionRepository;
@@ -99,9 +99,9 @@ public class NoteService {
         validateNoteRequestModel(requestModel);
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
 
-        String noteFontSize = defaultIfBlank(requestModel.getFontSize(), DEFAULT_FONT_SIZE);
-        String noteFontColor = defaultIfBlank(requestModel.getFontColor(), DEFAULT_FONT_COLOR);
-        String noteHandwritingStyle = defaultIfBlank(requestModel.getHandwritingStyle(), DEFAULT_HANDWRITING_STYLE);
+        String noteFontSize = capitalizeOrDefaultIfBlank(requestModel.getFontSize(), DEFAULT_FONT_SIZE);
+        String noteFontColor = capitalizeOrDefaultIfBlank(requestModel.getFontColor(), DEFAULT_FONT_COLOR);
+        String noteHandwritingStyle = capitalizeOrDefaultIfBlank(requestModel.getHandwritingStyle(), DEFAULT_HANDWRITING_STYLE);
         NoteEntity noteToSave = new NoteEntity(null, loggedInUser.getUserId(), PortalDateTimeUtils.getCurrentDateTime(), requestModel.getMessage(), noteFontSize, noteFontColor, noteHandwritingStyle);
         NoteEntity savedNote = noteRepository.save(noteToSave);
 
@@ -142,13 +142,13 @@ public class NoteService {
         foundNote.setDateModified(PortalDateTimeUtils.getCurrentDateTime());
         foundNote.setMessage(requestModel.getMessage());
 
-        String newFontSize = defaultIfBlank(requestModel.getFontSize(), foundNote.getFontSize());
+        String newFontSize = capitalizeOrDefaultIfBlank(requestModel.getFontSize(), foundNote.getFontSize());
         foundNote.setFontSize(newFontSize);
 
-        String newFontColor = defaultIfBlank(requestModel.getFontColor(), foundNote.getFontColor());
+        String newFontColor = capitalizeOrDefaultIfBlank(requestModel.getFontColor(), foundNote.getFontColor());
         foundNote.setFontColor(newFontColor);
 
-        String newHandwritingStyle = defaultIfBlank(requestModel.getHandwritingStyle(), foundNote.getHandwritingStyle());
+        String newHandwritingStyle = capitalizeOrDefaultIfBlank(requestModel.getHandwritingStyle(), foundNote.getHandwritingStyle());
         foundNote.setHandwritingStyle(newHandwritingStyle);
 
         UUID headerCustomIconId = requestModel.getHeaderCustomIconId();
@@ -257,8 +257,12 @@ public class NoteService {
         return new NoteResponseModel(entity.getNoteId(), entity.getMessage(), entity.getFontSize(), entity.getFontColor(), entity.getHandwritingStyle(), headerCustomIconId, entity.getDateModified(), updatedByUser, restrictionModel);
     }
 
-    private String defaultIfBlank(String str, String defaultValue) {
-        return Optional.ofNullable(str).filter(StringUtils::isNotBlank).orElse(defaultValue);
+    private String capitalizeOrDefaultIfBlank(String str, String defaultValue) {
+        return Optional.ofNullable(str)
+                .filter(StringUtils::isNotBlank)
+                .map(StringUtils::lowerCase)
+                .map(StringUtils::capitalize)
+                .orElse(defaultValue);
     }
 
 }
