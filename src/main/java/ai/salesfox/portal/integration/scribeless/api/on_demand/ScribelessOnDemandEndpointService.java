@@ -1,8 +1,8 @@
-package ai.salesfox.portal.integration.scribeless.api;
+package ai.salesfox.portal.integration.scribeless.api.on_demand;
 
 import ai.salesfox.integration.common.exception.SalesfoxException;
 import ai.salesfox.integration.common.util.SalesfoxEnumUtils;
-import ai.salesfox.integration.scribeless.enumeration.ScribelessHandwritingColors;
+import ai.salesfox.integration.scribeless.enumeration.ScribelessFontColor;
 import ai.salesfox.integration.scribeless.enumeration.ScribelessHandwritingStyles;
 import ai.salesfox.integration.scribeless.service.on_demand.OnDemandPreviewService;
 import ai.salesfox.integration.scribeless.service.on_demand.model.OnDemandPreviewParams;
@@ -52,10 +52,10 @@ public class ScribelessOnDemandEndpointService {
         setIntegerOrCreateErrorString(previewParams::setSizeInMillimeters, sizeInMM, "sizeInMM", 3).ifPresent(errors::add);
 
         if (null != fontColor) {
-            if (!EnumUtils.isValidEnumIgnoreCase(ScribelessHandwritingColors.class, fontColor)) {
-                errors.add(String.format("The field 'fontColor' is invalid. Options: %s", SalesfoxEnumUtils.capitalizeValuesString(ScribelessHandwritingColors.values())));
+            if (!EnumUtils.isValidEnumIgnoreCase(ScribelessFontColor.class, fontColor)) {
+                errors.add(String.format("The field 'fontColor' is invalid. Options: %s", SalesfoxEnumUtils.capitalizeValuesString(ScribelessFontColor.values())));
             } else {
-                previewParams.setFontColor(formatRequestStringOrDefault(fontColor, ScribelessHandwritingColors.BLACK.name()));
+                previewParams.setFontColor(formatRequestStringOrDefault(fontColor, ScribelessFontColor.BLACK.name()));
             }
         }
 

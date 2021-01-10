@@ -1,6 +1,6 @@
-package ai.salesfox.portal.integration.scribeless.api;
+package ai.salesfox.portal.integration.scribeless.api.on_demand;
 
-import ai.salesfox.portal.integration.IntegrationControllerConstants;
+import ai.salesfox.portal.integration.scribeless.api.ScribelessEndpointConstants;
 import ai.salesfox.portal.rest.api.image.model.ImageResponseModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -10,10 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(ScribelessOnDemandController.BASE_ENDPOINT)
+@RequestMapping(ScribelessEndpointConstants.BASE_ENDPOINT)
 public class ScribelessOnDemandController {
-    public static final String BASE_ENDPOINT = IntegrationControllerConstants.BASE_INTEGRATIONS_ENDPOINT + "/scribeless";
-
     private final ScribelessOnDemandEndpointService onDemandEndpointService;
 
     @Autowired

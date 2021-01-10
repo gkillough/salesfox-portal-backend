@@ -15,14 +15,14 @@ public enum ScribelessPaperSize {
     POSTCARD_LANDSCAPE("postcard_landscape");
 
     @Getter
-    private final String text;
+    private final String value;
 
     ScribelessPaperSize() {
-        this.text = name();
+        this.value = name();
     }
 
-    ScribelessPaperSize(String text) {
-        this.text = text;
+    ScribelessPaperSize(String value) {
+        this.value = value;
     }
 
 }
