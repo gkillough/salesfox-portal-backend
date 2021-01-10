@@ -16,9 +16,9 @@ import java.io.IOException;
 
 @AllArgsConstructor
 public class OnDemandPreviewService {
-    public static final String ON_DEMAND_TEXT_ENDPOINT = "/on-demand/text";
+    public static final String ON_DEMAND_TEXT_ENDPOINT = "/api/v2/on-demand/text";
     public static final HttpRequestConfig GET_PREVIEW_IMAGE_CONFIG = new HttpRequestConfig(
-            10,
+            5000,
             ContentType.APPLICATION_OCTET_STREAM.getMimeType(),
             ContentType.APPLICATION_OCTET_STREAM.getMimeType()
     );
@@ -26,10 +26,6 @@ public class OnDemandPreviewService {
     private final boolean testing;
     private final ApiKeyHolder apiKeyHolder;
     private final HttpServiceWrapper httpServiceWrapper;
-
-    // https://us-central1-hc-application-interface-prod.cloudfunctions.net/
-
-    // TODO delete this and create a similar service to OnDemandService
 
     public BufferedImage getPreviewImage(String text, OnDemandPreviewParams params) throws SalesfoxException {
         QueryParamBuilder queryParamBuilder = new QueryParamBuilder(ApiKeyHolder.PARAM_NAME_API_KEY, apiKeyHolder.getApiKey());
@@ -43,6 +39,7 @@ public class OnDemandPreviewService {
         params.getHandwritingStyle().ifPresent(style -> queryParamBuilder.appendAdditionalParam("style", style));
 
         String requestSpec = ON_DEMAND_TEXT_ENDPOINT + queryParamBuilder.build();
+        // TODO improve error handling
         HttpResponse response = httpServiceWrapper.executeGet(GET_PREVIEW_IMAGE_CONFIG, requestSpec);
         try {
             return ImageIO.read(response.getContent());

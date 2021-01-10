@@ -39,9 +39,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.*;
 
 @Component
@@ -158,13 +159,13 @@ public class OrganizationAccountRegistrationService {
     }
 
     private void createOrganizationAccountLicense(OrganizationAccountEntity organizationAccount, LicenseTypeEntity licenseType) {
-        int currentDayOfMonth = PortalDateTimeUtils.getCurrentDate().getDayOfMonth();
-        // TODO extract this into a common interface
-        //  7-day free trial period before first bill adjusted for valid billing days (days 1-28 of any month)
-        int billingDayOfMonth = ((currentDayOfMonth + 6) % 27) + 1;
+        LocalDate currentDate = PortalDateTimeUtils.getCurrentDate();
+        int currentDayOfMonth = currentDate.getDayOfMonth();
+        // Adjusted for valid billing days (days 1-28 of any month)
+        int billingDayOfMonth = ((currentDayOfMonth + licenseType.getFreeTrialDays()) % 27) + 1;
 
         OrganizationAccountLicenseEntity orgAcctLicenseToSave = new OrganizationAccountLicenseEntity(
-                organizationAccount.getOrganizationAccountId(), licenseType.getLicenseTypeId(), 0, billingDayOfMonth, true);
+                organizationAccount.getOrganizationAccountId(), licenseType.getLicenseTypeId(), 0, billingDayOfMonth, currentDate, true);
         OrganizationAccountLicenseEntity savedOrgAcctLicense = organizationAccountLicenseRepository.save(orgAcctLicenseToSave);
         organizationAccount.setOrganizationAccountLicenseEntity(savedOrgAcctLicense);
     }

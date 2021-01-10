@@ -17,5 +17,6 @@ public class AbstractLicenseTypeModel {
     private Integer contactsPerCampaign;
     private Integer usersIncluded;
     private BigDecimal costPerAdditionalUser;
+    private Integer freeTrialDays;
 
 }

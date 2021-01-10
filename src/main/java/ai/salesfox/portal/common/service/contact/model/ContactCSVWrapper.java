@@ -4,6 +4,7 @@ import ai.salesfox.portal.common.model.PortalAddressModel;
 import ai.salesfox.portal.rest.api.contact.model.ContactUploadModel;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.util.Pair;
 
@@ -12,6 +13,8 @@ import java.io.IOException;
 import java.util.*;
 
 public class ContactCSVWrapper implements Closeable {
+    public static final int MINIMUM_REQUIRED_HEADERS = 3;
+
     public static final String HEADER_SINGLE_COLUMN_NAME = "Name";
     public static final String HEADER_FIRST_NAME = "First Name";
     public static final String HEADER_LAST_NAME = "Last Name";
@@ -23,6 +26,7 @@ public class ContactCSVWrapper implements Closeable {
     public static final String HEADER_STREET_ADDRESS_1 = "Street Address 1";
     public static final String HEADER_ADDRESS_LINE_2 = "Address Line 2";
     public static final String HEADER_STREET_ADDRESS_2 = "Street Address 2";
+    public static final String HEADER_STREET_ADDRESS_APT_SUITE = "Apt Suite";
     public static final String HEADER_ADDRESS_CITY = "City";
     public static final String HEADER_ADDRESS_STATE = "State";
     public static final String HEADER_ADDRESS_ZIP = "Zip";
@@ -44,7 +48,7 @@ public class ContactCSVWrapper implements Closeable {
 
     public ContactCSVWrapper(CSVParser contactCSVParser) {
         this.contactCSVParser = contactCSVParser;
-        this.headerMap = contactCSVParser.getHeaderMap();
+        this.headerMap = sanitizeHeaders(contactCSVParser.getHeaderMap());
     }
 
     public List<String> extractHeaderNames() {
@@ -62,6 +66,10 @@ public class ContactCSVWrapper implements Closeable {
     }
 
     private ContactUploadModel parseRecord(CSVRecord csvRecord) {
+        if (extractHeaderNames().size() < MINIMUM_REQUIRED_HEADERS) {
+            return new ContactUploadModel();
+        }
+
         String firstName;
         String lastName;
         if (headerMap.containsKey(HEADER_SINGLE_COLUMN_NAME)) {
@@ -96,8 +104,11 @@ public class ContactCSVWrapper implements Closeable {
 
     private String extractTrimmedField(CSVRecord csvRecord, String fieldName) {
         Integer fieldIndex = headerMap.get(fieldName);
-        String fieldValue = csvRecord.get(fieldIndex);
-        return StringUtils.trimToNull(fieldValue);
+        if (null != fieldIndex && csvRecord.isSet(fieldIndex)) {
+            String fieldValue = csvRecord.get(fieldIndex);
+            return StringUtils.trimToNull(fieldValue);
+        }
+        return null;
     }
 
     private Pair<String, String> extractFirstAndLastName(CSVRecord csvRecord) {
@@ -153,7 +164,7 @@ public class ContactCSVWrapper implements Closeable {
         }
 
         String addressLine1 = extractFirstMatchingTrimmedField(csvRecord, HEADER_ADDRESS_LINE_1, HEADER_STREET_ADDRESS_1);
-        String addressLine2 = extractFirstMatchingTrimmedField(csvRecord, HEADER_ADDRESS_LINE_2, HEADER_STREET_ADDRESS_2);
+        String addressLine2 = extractFirstMatchingTrimmedField(csvRecord, HEADER_ADDRESS_LINE_2, HEADER_STREET_ADDRESS_2, HEADER_STREET_ADDRESS_APT_SUITE);
         String city = extractTrimmedField(csvRecord, HEADER_ADDRESS_CITY);
         String state = extractTrimmedField(csvRecord, HEADER_ADDRESS_STATE);
         String zip = extractFirstMatchingTrimmedField(csvRecord, HEADER_ADDRESS_ZIP, HEADER_ADDRESS_ZIP_CODE, HEADER_ADDRESS_POSTAL_CODE);
@@ -164,6 +175,29 @@ public class ContactCSVWrapper implements Closeable {
     @Override
     public void close() throws IOException {
         contactCSVParser.close();
+    }
+
+    private Map<String, Integer> sanitizeHeaders(Map<String, Integer> originalHeaders) {
+        Map<String, Integer> sanitizedHeaders = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> headerEntry : originalHeaders.entrySet()) {
+            String sanitizedKey = sanitizeInput(headerEntry.getKey());
+            if (null != sanitizedKey) {
+                sanitizedHeaders.put(sanitizedKey, headerEntry.getValue());
+            }
+        }
+        return sanitizedHeaders;
+    }
+
+    private String sanitizeInput(String input) {
+        input = StringUtils.trimToEmpty(input);
+
+        StringBuilder sanitizedInput = new StringBuilder();
+        for (char inputChar : input.toCharArray()) {
+            if (CharUtils.isAsciiAlphanumeric(inputChar) || inputChar == ' ') {
+                sanitizedInput.append(inputChar);
+            }
+        }
+        return StringUtils.trimToNull(sanitizedInput.toString());
     }
 
 }

@@ -1,7 +1,7 @@
 package ai.salesfox.portal.rest.api.gift.recipient;
 
 import ai.salesfox.portal.rest.api.common.page.PageMetadata;
-import ai.salesfox.portal.rest.api.gift.GiftController;
+import ai.salesfox.portal.rest.api.gift.GiftEndpointConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +11,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping(GiftRecipientController.BASE_ENDPOINT)
 public class GiftRecipientController {
-    public static final String BASE_ENDPOINT = GiftController.BASE_ENDPOINT + "/{giftId}/recipients";
+    public static final String BASE_ENDPOINT = GiftEndpointConstants.BASE_ENDPOINT + "/{giftId}/recipients";
 
     private final GiftRecipientEndpointService giftRecipientEndpointService;
 

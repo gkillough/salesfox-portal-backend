@@ -14,7 +14,7 @@ public class OnDemandPreviewParams {
     private String handwritingStyle;
 
     public static OnDemandPreviewParams testing() {
-        return new OnDemandPreviewParams(true, null, null, null, "blue", "usther");
+        return new OnDemandPreviewParams(true, 40, 25, 3, "Blue", "Stafford");
     }
 
     public Optional<Boolean> getTesting() {

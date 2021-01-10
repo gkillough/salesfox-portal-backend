@@ -20,7 +20,7 @@ plugins {
     id 'application'
     id 'org.springframework.boot' version '2.2.3.RELEASE'
     id 'io.spring.dependency-management' version '1.0.9.RELEASE'
-    id 'org.liquibase.gradle' version '2.0.1'
+    id 'org.liquibase.gradle' version '2.0.3'
 }
 
 ext {
@@ -28,6 +28,7 @@ ext {
     targetCompatibility = JavaVersion.VERSION_11
 
     postgresContainerVersion = '12.3-alpine'
+    rabbitMQContainerVersion = '3-alpine'
 }
 
 allprojects {
@@ -58,6 +59,12 @@ group = 'ai.salesfox'
 version = 'latest'
 mainClassName = 'ai.salesfox.portal.PortalApplication'
 
+startScripts.enabled = false
+distZip.enabled = false
+bootDistZip.enabled = false
+distTar.enabled = false
+bootDistTar.enabled = false
+
 apply from: 'buildSrc/tasks.gradle'
 
 dependencies {
@@ -66,33 +73,56 @@ dependencies {
     implementation project(':integration-shipstation')
 
     // Spring
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework:spring-context'
+    implementation 'org.springframework:spring-jms'
+    implementation 'org.springframework:spring-webmvc'
+    implementation 'org.springframework.amqp:spring-rabbit'
 
-    // Utilities & Integrations
+    // Spring Boot
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation 'org.springframework.data:spring-data-jpa'
+    implementation 'org.springframework.batch:spring-batch-core'
+
+    // Spring Security
+    implementation 'org.springframework.security:spring-security-core'
+    implementation 'org.springframework.security:spring-security-web'
+    implementation 'org.springframework.security:spring-security-config'
+
+    // External Integrations
     implementation platform('software.amazon.awssdk:bom:2.15.2')
     implementation 'software.amazon.awssdk:s3'
+    implementation 'com.stripe:stripe-java:20.14.0'
 
-    implementation "com.stripe:stripe-java:20.14.0"
-
+    // Tools & Services
+    implementation 'org.apache.tomcat.embed:tomcat-embed-core'
     implementation 'org.freemarker:freemarker:2.3.30'
     implementation 'javax.mail:javax.mail-api:1.6.2'
+    runtimeOnly 'org.aspectj:aspectjweaver'
     runtimeOnly 'com.sun.mail:javax.mail:1.6.2'
-
-    // Extras TODO determine which of these can be removed
-    implementation 'io.springfox:springfox-swagger2:2.8.0'
-    implementation 'io.springfox:springfox-swagger-ui:2.8.0'
+    runtimeOnly 'org.yaml:snakeyaml:1.25'
 
     // Database
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.liquibase:liquibase-core'
+    implementation 'org.hibernate:hibernate-entitymanager:5.4.10.Final'
+    implementation 'jakarta.persistence:jakarta.persistence-api'
+    implementation 'com.zaxxer:HikariCP'
+
+    // Documentation
+    implementation 'io.springfox:springfox-swagger2:2.8.0'
+    implementation 'io.springfox:springfox-swagger-ui:2.8.0'
 
     if (getGradle().getStartParameter().taskNames.contains('runServer')) {
-        runtimeClasspath 'org.testcontainers:postgresql:1.15.0-rc2'
         runtimeClasspath 'org.springframework.cloud:spring-cloud-starter:2.2.3.RELEASE'
-        runtimeClasspath "com.playtika.testcontainers:embedded-postgresql:1.78"
         runtimeClasspath 'org.springframework.boot:spring-boot-devtools'
+
+        // Database
+        runtimeClasspath 'org.testcontainers:postgresql:1.15.0-rc2'
+        runtimeClasspath "com.playtika.testcontainers:embedded-postgresql:1.78"
+
+        // Message Queue
+        runtimeClasspath 'org.testcontainers:rabbitmq:1.15.0'
+        runtimeClasspath "com.playtika.testcontainers:embedded-rabbitmq:1.78"
     }
 }
 

@@ -63,6 +63,9 @@ databaseChangeLog:
                   name: billing_day_of_month
                   valueNumeric: 15
               - column:
+                  name: free_trial_start_date
+                  valueDate: CURRENT_DATE
+              - column:
                   name: is_active
                   valueBoolean: true
 

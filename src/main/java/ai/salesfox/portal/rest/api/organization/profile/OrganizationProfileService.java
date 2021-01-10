@@ -1,7 +1,5 @@
 package ai.salesfox.portal.rest.api.organization.profile;
 
-import ai.salesfox.portal.rest.api.organization.profile.model.OrganizationAccountProfileModel;
-import ai.salesfox.portal.rest.api.organization.profile.model.OrganizationAccountProfileUpdateModel;
 import ai.salesfox.portal.common.FieldValidationUtils;
 import ai.salesfox.portal.common.enumeration.AccessOperation;
 import ai.salesfox.portal.common.model.PortalAddressModel;
@@ -15,15 +13,17 @@ import ai.salesfox.portal.database.organization.account.profile.OrganizationAcco
 import ai.salesfox.portal.database.organization.account.profile.OrganizationAccountProfileRepository;
 import ai.salesfox.portal.rest.api.organization.common.OrganizationAccessService;
 import ai.salesfox.portal.rest.api.organization.common.OrganizationValidationService;
+import ai.salesfox.portal.rest.api.organization.profile.model.OrganizationAccountProfileModel;
+import ai.salesfox.portal.rest.api.organization.profile.model.OrganizationAccountProfileUpdateModel;
 import ai.salesfox.portal.rest.util.HttpSafeUserMembershipRetrievalService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;

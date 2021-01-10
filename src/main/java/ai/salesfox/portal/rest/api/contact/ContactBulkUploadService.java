@@ -73,8 +73,16 @@ public class ContactBulkUploadService {
         Resource csvFileResource = csvFile.getResource();
         try (
                 InputStream csvFileInputStream = csvFileResource.getInputStream();
-                ContactCSVWrapper csvWrapper = ContactCSVFileUtils.createCSVWrapper(csvFileInputStream, ContactCSVFileUtils.portalCSVFormat())
+                ContactCSVWrapper csvWrapper = ContactCSVFileUtils.createCSVWrapper(csvFileInputStream, ContactCSVFileUtils.PORTAL_CSV_FORMAT)
         ) {
+            List<String> headerNames = csvWrapper.extractHeaderNames();
+            if (headerNames.size() < ContactCSVWrapper.MINIMUM_REQUIRED_HEADERS) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        String.format("The supplied headers were not sufficient to extract contact data. Minimum number of headers required: %d. Headers supplied: %d", ContactCSVWrapper.MINIMUM_REQUIRED_HEADERS, headerNames.size())
+                );
+            }
+
             List<ContactUploadModel> parsedContactRecords = csvWrapper.parseRecords();
             return createContactsInBulk(parsedContactRecords, UPLOAD_INPUT_TYPE_CSV);
         } catch (IOException e) {
@@ -134,8 +142,8 @@ public class ContactBulkUploadService {
         try {
             ContactFieldValidationUtils.validateContactUploadModel(contactUploadCandidate);
         } catch (ResponseStatusException e) {
-            log.warn("A contact failed validation during bulk upload: {} ", e.getMessage());
-            errorMessage = e.getMessage();
+            errorMessage = e.getReason();
+            log.warn("A contact failed validation during bulk upload: {} ", errorMessage);
         }
         return new ContactBulkUploadFieldStatus(fieldNumber, errorMessage);
     }

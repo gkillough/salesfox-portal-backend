@@ -93,7 +93,7 @@ public class CatalogueService {
 
         RestrictionModel restrictionRequestModel = itemRequestModel.getRestriction();
         boolean isRestricted = restrictionRequestModel != null;
-        CatalogueItemEntity newItem = new CatalogueItemEntity(null, itemRequestModel.getName(), itemRequestModel.getPrice(), itemRequestModel.getShippingCost(), itemRequestModel.getIconUrl(), true);
+        CatalogueItemEntity newItem = new CatalogueItemEntity(null, itemRequestModel.getName(), itemRequestModel.getDescription(), itemRequestModel.getPrice(), itemRequestModel.getShippingCost(), itemRequestModel.getIconUrl(), true);
 
         CatalogueItemEntity savedItem = catalogueItemRepository.save(newItem);
 
@@ -148,6 +148,7 @@ public class CatalogueService {
         boolean isRestricted = restrictionRequestModel != null;
 
         existingItem.setName(itemRequestModel.getName());
+        existingItem.setDescription(itemRequestModel.getDescription());
         existingItem.setPrice(itemRequestModel.getPrice());
         existingItem.setShippingCost(itemRequestModel.getShippingCost());
         existingItem.setIconUrl(itemRequestModel.getIconUrl());
@@ -224,6 +225,10 @@ public class CatalogueService {
         if (StringUtils.isBlank(requestModel.getName())) {
             errors.add("The field 'Item Name' cannot be blank");
         }
+        // TODO Description verification null check
+        //if (StringUtils.isBlank(requestModel.getDescription())) {
+        //    errors.add("The field 'Description' cannot be blank");
+        //}
 
         if (null == requestModel.getPrice()) {
             errors.add("The field 'Price' is required");
@@ -294,9 +299,9 @@ public class CatalogueService {
         CatalogueItemExternalDetailsEntity externalDetailsEntity = entity.getCatalogueItemExternalDetailsEntity();
         if (null != externalDetailsEntity && membershipRetrievalService.isAuthenticatedUserPortalAdmin()) {
             CatalogueItemExternalDetailsModel externalDetailsModel = new CatalogueItemExternalDetailsModel(externalDetailsEntity.getDistributor(), externalDetailsEntity.getExternalId());
-            return new AdminCatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getPrice(), entity.getShippingCost(), entity.getIconUrl(), entity.getIsActive(), organizationAccountId, userId, externalDetailsModel);
+            return new AdminCatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getDescription(), entity.getPrice(), entity.getShippingCost(), entity.getIconUrl(), entity.getIsActive(), organizationAccountId, userId, externalDetailsModel);
         }
-        return new CatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getPrice(), entity.getShippingCost(), entity.getIconUrl(), entity.getIsActive(), organizationAccountId, userId);
+        return new CatalogueItemResponseModel(entity.getItemId(), entity.getName(), entity.getDescription(), entity.getPrice(), entity.getShippingCost(), entity.getIconUrl(), entity.getIsActive(), organizationAccountId, userId);
     }
 
 }

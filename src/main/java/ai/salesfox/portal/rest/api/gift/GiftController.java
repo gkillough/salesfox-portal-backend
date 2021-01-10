@@ -15,10 +15,8 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(GiftController.BASE_ENDPOINT)
+@RequestMapping(GiftEndpointConstants.BASE_ENDPOINT)
 public class GiftController {
-    public static final String BASE_ENDPOINT = "/gifts";
-
     private final GiftService giftService;
     private final GiftProcessingService giftProcessingService;
     private final GiftSchedulingEndpointService giftSchedulingEndpointService;

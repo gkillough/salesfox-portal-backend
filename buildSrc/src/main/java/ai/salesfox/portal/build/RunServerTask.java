@@ -11,8 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 public class RunServerTask extends Exec {
+    private static final int CONTAINER_TIMEOUT_SECONDS = 30;
+
     private boolean suspend = false;
     private String postgresVersion;
+    private String rabbitMQVersion;
     private boolean reuseContainer = false;
 
     @Option(option = "suspend", description = "Suspends the server until a debug connection is made")
@@ -29,11 +32,14 @@ public class RunServerTask extends Exec {
         this.postgresVersion = postgresVersion;
     }
 
+    public void setRabbitMQVersion(String rabbitMQVersion) {
+        this.rabbitMQVersion = rabbitMQVersion;
+    }
+
     @Override
     protected void exec() {
-        if (null == postgresVersion || postgresVersion.trim().length() == 0) {
-            throw new RuntimeException("You must specify a Postgres version to run with.");
-        }
+        validateVersionStringParam(postgresVersion, "Postgres");
+        validateVersionStringParam(rabbitMQVersion, "RabbitMQ");
 
         Project project = getProject();
         String projectPath = project.getProjectDir().getAbsolutePath();
@@ -72,6 +78,11 @@ public class RunServerTask extends Exec {
         commandArray.add("-jar");
         commandArray.add(jarFile.getAbsolutePath());
         commandArray.addAll(getSSLVariables());
+
+        if (!envVars.containsKey("PORTAL_AMQP_ADDRESSES")) {
+            commandArray.addAll(getRabbitMQVariables());
+        }
+
         commandArray.addAll(getApplicationVariables());
         commandLine(commandArray);
         super.exec();
@@ -106,6 +117,22 @@ public class RunServerTask extends Exec {
         );
     }
 
+    // https://github.com/Playtika/testcontainers-spring-boot/tree/develop/embedded-rabbitmq
+    public List<String> getRabbitMQVariables() {
+        return List.of(
+                "--embedded.rabbitmq.enabled=true",
+                "--embedded.rabbitmq.reuseContainer=" + reuseContainer,
+                "--embedded.rabbitmq.password=rabbitmq",
+                "--embedded.rabbitmq.dockerImage=rabbitmq:" + rabbitMQVersion,
+                "--embedded.rabbitmq.waitTimeoutInSeconds=" + CONTAINER_TIMEOUT_SECONDS,
+
+                "--spring.rabbitmq.host=${embedded.rabbitmq.host}",
+                "--spring.rabbitmq.port=${embedded.rabbitmq.port}",
+                "--spring.rabbitmq.username=${embedded.rabbitmq.user}",
+                "--spring.rabbitmq.password=${embedded.rabbitmq.password}"
+        );
+    }
+
     public List<String> getApplicationVariables() {
         return List.of(
                 "--logging.level.org.springframework.security=DEBUG",
@@ -115,10 +142,11 @@ public class RunServerTask extends Exec {
                 "--spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect",
 
                 // https://github.com/testcontainers/testcontainers-spring-boot
+                // https://github.com/Playtika/testcontainers-spring-boot
                 "--embedded.postgresql.enabled=true",
                 "--embedded.postgresql.dockerImage=postgres:" + postgresVersion,
                 "--embedded.postgresql.reuseContainer=" + reuseContainer,
-                "--embedded.postgresql.waitTimeoutInSeconds=30",
+                "--embedded.postgresql.waitTimeoutInSeconds=" + CONTAINER_TIMEOUT_SECONDS,
                 "--embedded.containers.forceShutdown=true",
 
                 "--embedded.postgresql.schema=portal",
@@ -135,6 +163,12 @@ public class RunServerTask extends Exec {
                 "--spring.datasource.password=Port@l!23",
                 "--spring.datasource.url=jdbc:postgresql://${embedded.postgresql.host}:${embedded.postgresql.port}/salesfox"
         );
+    }
+
+    private void validateVersionStringParam(String param, String paramName) {
+        if (null == param || param.trim().length() == 0) {
+            throw new RuntimeException(String.format("You must specify a %s version to run with.", paramName));
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package ai.salesfox.portal.event.license.organization;
 
 import ai.salesfox.portal.common.service.billing.LicenseBillingService;
 import ai.salesfox.portal.common.service.email.EmailMessagingService;
+import ai.salesfox.portal.common.service.email.PortalEmailAddressConfiguration;
 import ai.salesfox.portal.common.service.email.PortalEmailException;
 import ai.salesfox.portal.common.service.email.model.EmailMessageModel;
 import ai.salesfox.portal.database.license.LicenseTypeEntity;
@@ -9,14 +10,14 @@ import ai.salesfox.portal.database.license.OrganizationAccountLicenseEntity;
 import ai.salesfox.portal.database.license.OrganizationAccountLicenseRepository;
 import ai.salesfox.portal.database.organization.OrganizationEntity;
 import ai.salesfox.portal.database.organization.account.OrganizationAccountEntity;
+import ai.salesfox.portal.event.DefaultDLQHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,25 +25,22 @@ import java.util.UUID;
 @Component
 // TODO consider splitting this event handling up
 public class OrganizationAccountLicenseChangedEventListener {
-    // FIXME add an endpoint and service for this
-    private static final String[] ADMIN_NOTIFICATION_EMAIL_ADDRESSES = {
-            "sales@salesfox.ai",
-            "john.simion@salesfox.ai"
-    };
-
     private final OrganizationAccountLicenseRepository organizationAccountLicenseRepository;
     private final LicenseBillingService licenseBillingService;
     private final EmailMessagingService emailMessagingService;
+    private final PortalEmailAddressConfiguration portalEmailAddressConfiguration;
+    private final DefaultDLQHandler defaultDLQHandler;
 
     @Autowired
-    public OrganizationAccountLicenseChangedEventListener(OrganizationAccountLicenseRepository organizationAccountLicenseRepository, LicenseBillingService licenseBillingService, EmailMessagingService emailMessagingService) {
+    public OrganizationAccountLicenseChangedEventListener(OrganizationAccountLicenseRepository organizationAccountLicenseRepository, LicenseBillingService licenseBillingService, EmailMessagingService emailMessagingService, PortalEmailAddressConfiguration portalEmailAddressConfiguration, DefaultDLQHandler defaultDLQHandler) {
         this.organizationAccountLicenseRepository = organizationAccountLicenseRepository;
         this.licenseBillingService = licenseBillingService;
         this.emailMessagingService = emailMessagingService;
+        this.portalEmailAddressConfiguration = portalEmailAddressConfiguration;
+        this.defaultDLQHandler = defaultDLQHandler;
     }
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMPLETION, fallbackExecution = true)
+    @RabbitListener(queues = OrganizationAccountLicenseChangedEventQueueConfiguration.LICENSE_CHANGED_QUEUE)
     public void onOrgAccountLicenseChanged(OrganizationAccountLicenseChangedEvent event) {
         UUID orgAccountLicenseId = event.getOrgAccountId();
         Optional<OrganizationAccountLicenseEntity> optionalOrgAccountLicense = organizationAccountLicenseRepository.findById(orgAccountLicenseId);
@@ -82,12 +80,18 @@ public class OrganizationAccountLicenseChangedEventListener {
         }
     }
 
+    @RabbitListener(queues = OrganizationAccountLicenseChangedEventQueueConfiguration.LICENSE_CHANGED_DLQ)
+    public void onLicenseChangedProcessingFailure(Message message) {
+        defaultDLQHandler.handleQueuedMessageFailure(OrganizationAccountLicenseChangedEventQueueConfiguration.LICENSE_CHANGED_QUEUE, message);
+    }
+
     private void notifyAdminOfLicenseSeatUsed(OrganizationAccountLicenseEntity updatedOrgAcctLicense, LicenseTypeEntity licenseType) {
         OrganizationAccountEntity orgAcct = updatedOrgAcctLicense.getOrganizationAccountEntity();
         OrganizationEntity org = orgAcct.getOrganizationEntity();
 
+        String portalSupportEmail = portalEmailAddressConfiguration.getSupportEmailAddress();
         EmailMessageModel message = new EmailMessageModel(
-                Arrays.asList(ADMIN_NOTIFICATION_EMAIL_ADDRESSES),
+                List.of(portalSupportEmail),
                 "[Salesfox Portal] New User Added To License",
                 String.format("A new user was added to the organization account [%s > %s]", org.getOrganizationName(), orgAcct.getOrganizationAccountName()),
                 String.format(

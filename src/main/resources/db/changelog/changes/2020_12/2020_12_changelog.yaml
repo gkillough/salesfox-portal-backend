@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - include:
+      file: fix_billing_day_of_month.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: add_description_to_catalogue_item.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: add_note_credit_price.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: separate_gift_and_note_images.yaml
+      relativeToChangelogFile: true
+
+  - include:
+      file: add_support_email_addresses.yaml
+      relativeToChangelogFile: true

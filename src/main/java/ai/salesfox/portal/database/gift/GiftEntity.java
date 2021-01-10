@@ -5,6 +5,7 @@ import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomIconDetailEntity;
 import ai.salesfox.portal.database.gift.customization.GiftCustomTextDetailEntity;
 import ai.salesfox.portal.database.gift.item.GiftItemDetailEntity;
+import ai.salesfox.portal.database.gift.mockup.GiftMockupImageEntity;
 import ai.salesfox.portal.database.gift.note.GiftNoteDetailEntity;
 import ai.salesfox.portal.database.gift.restriction.GiftOrgAccountRestrictionEntity;
 import ai.salesfox.portal.database.gift.restriction.GiftUserRestrictionEntity;
@@ -60,6 +61,10 @@ public class GiftEntity implements Serializable {
     @OneToOne
     @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
     private GiftCustomTextDetailEntity giftCustomTextDetailEntity;
+
+    @OneToOne
+    @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)
+    private GiftMockupImageEntity giftMockupImageEntity;
 
     @OneToOne
     @JoinColumn(name = "gift_id", referencedColumnName = "gift_id", updatable = false, insertable = false)

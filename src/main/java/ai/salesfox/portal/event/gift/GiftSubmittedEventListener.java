@@ -10,13 +10,12 @@ import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.account.repository.UserRepository;
 import ai.salesfox.portal.database.gift.GiftEntity;
 import ai.salesfox.portal.database.gift.GiftRepository;
+import ai.salesfox.portal.event.DefaultDLQHandler;
 import ai.salesfox.portal.integration.GiftPartnerSubmissionService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.List;
 
@@ -28,19 +27,25 @@ public class GiftSubmittedEventListener {
     private final GiftPartnerSubmissionService giftPartnerSubmissionService;
     private final GiftTrackingService giftTrackingService;
     private final EmailMessagingService emailMessagingService;
+    private final DefaultDLQHandler defaultDLQHandler;
 
-    @Autowired
-    public GiftSubmittedEventListener(UserRepository userRepository, GiftRepository giftRepository,
-                                      GiftPartnerSubmissionService giftPartnerSubmissionService, GiftTrackingService giftTrackingService, EmailMessagingService emailMessagingService) {
+    public GiftSubmittedEventListener(
+            UserRepository userRepository,
+            GiftRepository giftRepository,
+            GiftPartnerSubmissionService giftPartnerSubmissionService,
+            GiftTrackingService giftTrackingService,
+            EmailMessagingService emailMessagingService,
+            DefaultDLQHandler defaultDLQHandler
+    ) {
         this.userRepository = userRepository;
         this.giftRepository = giftRepository;
         this.giftPartnerSubmissionService = giftPartnerSubmissionService;
         this.giftTrackingService = giftTrackingService;
         this.emailMessagingService = emailMessagingService;
+        this.defaultDLQHandler = defaultDLQHandler;
     }
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMPLETION, fallbackExecution = true)
+    @RabbitListener(queues = GiftSubmittedEventQueueConfiguration.GIFT_SUBMITTED_QUEUE)
     public void onGiftSubmitted(GiftSubmittedEvent event) {
         UserEntity submittingUser = userRepository.findById(event.getSubmittingUserId())
                 .orElseThrow(() -> new PortalRuntimeException("Unable to find a submittingUser for the gift event. This is a bug."));
@@ -54,6 +59,11 @@ public class GiftSubmittedEventListener {
             giftTrackingService.updateGiftTrackingInfo(gift, submittingUser, GiftTrackingStatus.NOT_FULFILLABLE);
             sendEmailForException(submittingUser, gift, salesfoxException.getMessage());
         }
+    }
+
+    @RabbitListener(queues = GiftSubmittedEventQueueConfiguration.GIFT_SUBMITTED_DLQ)
+    public void onGiftSubmittedProcessingFailure(Message message) {
+        defaultDLQHandler.handleQueuedMessageFailure(GiftSubmittedEventQueueConfiguration.GIFT_SUBMITTED_QUEUE, message);
     }
 
     private void sendEmailForException(UserEntity submittingUser, GiftEntity gift, String exceptionMessage) {

@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-note-credit-price
+      author: bradmoulder
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: note_credit_price
+            columns:
+              - column:
+                  name: price_id
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: price
+                  type: DOUBLE PRECISION
+  - changeSet:
+      id: init-note-credit-price
+      author: bradmoulder
+      changes:
+        - insert:
+            schemaName: portal
+            tableName: note_credit_price
+            columns:
+              - column:
+                  name: price
+                  valueNumeric: 4.00

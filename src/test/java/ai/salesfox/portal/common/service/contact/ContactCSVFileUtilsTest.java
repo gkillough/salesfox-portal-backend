@@ -23,7 +23,7 @@ public class ContactCSVFileUtilsTest {
 
     @Test
     public void createCSVWrapperTest() {
-        CSVFormat csvFormat = ContactCSVFileUtils.portalCSVFormat();
+        CSVFormat csvFormat = ContactCSVFileUtils.PORTAL_CSV_FORMAT;
         File testCSVFile = getTestCSVFile(getClass().getClassLoader());
         try (FileInputStream testCsvFileInputStream = new FileInputStream(testCSVFile)) {
             ContactCSVFileUtils.createCSVWrapper(testCsvFileInputStream, csvFormat);
