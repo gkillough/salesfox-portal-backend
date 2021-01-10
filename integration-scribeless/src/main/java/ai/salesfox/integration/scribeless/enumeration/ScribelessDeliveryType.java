@@ -13,10 +13,10 @@ public enum ScribelessDeliveryType {
     SHIP_TO_SELF("Ship to self");
 
     @Getter
-    private final String text;
+    private final String value;
 
-    ScribelessDeliveryType(String text) {
-        this.text = text;
+    ScribelessDeliveryType(String value) {
+        this.value = value;
     }
 
 }

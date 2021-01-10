@@ -69,7 +69,7 @@ public class ScribelessCampaignRequestModelCreator {
                 giftNote.getFontColor(),
                 giftNote.getFontSize(),
                 "Salesfox Gift Id: " + giftId,
-                ScribelessProductType.FULL_SERVICE.getText(),
+                ScribelessProductType.FULL_SERVICE.getValue(),
                 giftNote.getMessage(),
                 null,
                 null,

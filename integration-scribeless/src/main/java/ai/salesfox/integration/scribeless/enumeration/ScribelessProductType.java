@@ -13,10 +13,10 @@ public enum ScribelessProductType {
     ON_DEMAND("On Demand");
 
     @Getter
-    private final String text;
+    private final String value;
 
-    ScribelessProductType(String text) {
-        this.text = text;
+    ScribelessProductType(String value) {
+        this.value = value;
     }
 
 }

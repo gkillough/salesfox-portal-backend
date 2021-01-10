@@ -8,10 +8,10 @@ public enum ScribelessCampaignStatus {
     READY_FOR_PRINT_QUEUE("Ready for Print Queue");
 
     @Getter
-    private final String text;
+    private final String value;
 
-    ScribelessCampaignStatus(String text) {
-        this.text = text;
+    ScribelessCampaignStatus(String value) {
+        this.value = value;
     }
 
 }
