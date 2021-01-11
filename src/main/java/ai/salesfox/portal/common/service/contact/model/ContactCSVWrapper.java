@@ -4,6 +4,7 @@ import ai.salesfox.portal.common.model.PortalAddressModel;
 import ai.salesfox.portal.rest.api.contact.model.ContactUploadModel;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.util.Pair;
@@ -11,6 +12,7 @@ import org.springframework.data.util.Pair;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class ContactCSVWrapper implements Closeable {
     public static final int MINIMUM_REQUIRED_HEADERS = 3;
@@ -23,6 +25,7 @@ public class ContactCSVWrapper implements Closeable {
 
     public static final String HEADER_SINGLE_COLUMN_ADDRESS = "Address";
     public static final String HEADER_ADDRESS_LINE_1 = "Address Line 1";
+    public static final String HEADER_STREET_ADDRESS = "Street Address";
     public static final String HEADER_STREET_ADDRESS_1 = "Street Address 1";
     public static final String HEADER_ADDRESS_LINE_2 = "Address Line 2";
     public static final String HEADER_STREET_ADDRESS_2 = "Street Address 2";
@@ -65,6 +68,11 @@ public class ContactCSVWrapper implements Closeable {
         return parsedRecords;
     }
 
+    @Override
+    public void close() throws IOException {
+        contactCSVParser.close();
+    }
+
     private ContactUploadModel parseRecord(CSVRecord csvRecord) {
         if (extractHeaderNames().size() < MINIMUM_REQUIRED_HEADERS) {
             return new ContactUploadModel();
@@ -85,9 +93,11 @@ public class ContactCSVWrapper implements Closeable {
         PortalAddressModel address = extractAddress(csvRecord);
         String organization = extractTrimmedField(csvRecord, HEADER_ORGANIZATION);
         String title = extractTrimmedField(csvRecord, HEADER_TITLE);
-        String mobileNumber = extractFirstMatchingTrimmedField(csvRecord, HEADER_MOBILE_NUMBER, HEADER_CELL, HEADER_CELL_PHONE);
-        String businessNumber = extractFirstMatchingTrimmedField(csvRecord, HEADER_BUSINESS_NUMBER, HEADER_WORK_NUMBER, HEADER_WORK_PHONE);
+        String extractedMobileNumber = extractFirstMatchingTrimmedField(csvRecord, HEADER_MOBILE_NUMBER, HEADER_CELL, HEADER_CELL_PHONE);
+        String extractedBusinessNumber = extractFirstMatchingTrimmedField(csvRecord, HEADER_BUSINESS_NUMBER, HEADER_WORK_NUMBER, HEADER_WORK_PHONE);
 
+        String mobileNumber = sanitizePhoneNumber(extractedMobileNumber);
+        String businessNumber = sanitizePhoneNumber(extractedBusinessNumber);
         return new ContactUploadModel(firstName, lastName, email, address, null, organization, title, mobileNumber, businessNumber);
     }
 
@@ -152,7 +162,7 @@ public class ContactCSVWrapper implements Closeable {
 
     private PortalAddressModel extractAddress(CSVRecord csvRecord) {
         Boolean isBusiness = Optional.ofNullable(extractTrimmedField(csvRecord, HEADER_ADDRESS_IS_BUSINESS))
-                .map(Boolean::parseBoolean)
+                .map(BooleanUtils::toBoolean)
                 .orElse(true);
 
         if (headerMap.containsKey(HEADER_SINGLE_COLUMN_ADDRESS) && !headerMap.containsKey(HEADER_ADDRESS_LINE_1)) {
@@ -163,7 +173,7 @@ public class ContactCSVWrapper implements Closeable {
             return extractedAddress.orElse(null);
         }
 
-        String addressLine1 = extractFirstMatchingTrimmedField(csvRecord, HEADER_ADDRESS_LINE_1, HEADER_STREET_ADDRESS_1);
+        String addressLine1 = extractFirstMatchingTrimmedField(csvRecord, HEADER_ADDRESS_LINE_1, HEADER_STREET_ADDRESS_1, HEADER_STREET_ADDRESS, HEADER_STREET_ADDRESS_1);
         String addressLine2 = extractFirstMatchingTrimmedField(csvRecord, HEADER_ADDRESS_LINE_2, HEADER_STREET_ADDRESS_2, HEADER_STREET_ADDRESS_APT_SUITE);
         String city = extractTrimmedField(csvRecord, HEADER_ADDRESS_CITY);
         String state = extractTrimmedField(csvRecord, HEADER_ADDRESS_STATE);
@@ -172,15 +182,10 @@ public class ContactCSVWrapper implements Closeable {
         return new PortalAddressModel(addressLine1, addressLine2, city, state, zip, isBusiness);
     }
 
-    @Override
-    public void close() throws IOException {
-        contactCSVParser.close();
-    }
-
     private Map<String, Integer> sanitizeHeaders(Map<String, Integer> originalHeaders) {
         Map<String, Integer> sanitizedHeaders = new LinkedHashMap<>();
         for (Map.Entry<String, Integer> headerEntry : originalHeaders.entrySet()) {
-            String sanitizedKey = sanitizeInput(headerEntry.getKey());
+            String sanitizedKey = sanitizeHeader(headerEntry.getKey());
             if (null != sanitizedKey) {
                 sanitizedHeaders.put(sanitizedKey, headerEntry.getValue());
             }
@@ -188,12 +193,20 @@ public class ContactCSVWrapper implements Closeable {
         return sanitizedHeaders;
     }
 
-    private String sanitizeInput(String input) {
-        input = StringUtils.trimToEmpty(input);
+    private String sanitizeHeader(String header) {
+        return sanitize(header, ch -> CharUtils.isAsciiAlphanumeric(ch) || ch == ' ');
+    }
+
+    private String sanitizePhoneNumber(String phoneNumberCandidate) {
+        return sanitize(phoneNumberCandidate, CharUtils::isAsciiNumeric);
+    }
+
+    private String sanitize(String str, Predicate<Character> acceptChar) {
+        str = StringUtils.trimToEmpty(str);
 
         StringBuilder sanitizedInput = new StringBuilder();
-        for (char inputChar : input.toCharArray()) {
-            if (CharUtils.isAsciiAlphanumeric(inputChar) || inputChar == ' ') {
+        for (char inputChar : str.toCharArray()) {
+            if (acceptChar.test(inputChar)) {
                 sanitizedInput.append(inputChar);
             }
         }
