@@ -1,9 +1,10 @@
 package ai.salesfox.portal.rest.api.note.credit;
 
+import ai.salesfox.portal.common.exception.PortalException;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.note.credit.*;
-import ai.salesfox.portal.integration.stripe.StripeService;
+import ai.salesfox.portal.integration.stripe.StripeChargeService;
 import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
 import ai.salesfox.portal.rest.api.note.credit.model.NoteCreditsRequestModel;
 import ai.salesfox.portal.rest.api.note.credit.model.NoteCreditsResponseModel;
@@ -16,40 +17,44 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
 @Component
 public class NoteCreditService {
-    // FIXME determine how to set this programmatically at runtime
-    public static final double NOTE_CREDIT_PRICE = 4.00;
-
     private final NoteCreditsRepository noteCreditsRepository;
+    private final NoteCreditPriceRepository noteCreditPriceRepository;
     private final NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private final StripeService stripeService;
+    private final StripeChargeService stripeChargeService;
 
     @Autowired
     public NoteCreditService(
             NoteCreditsRepository noteCreditsRepository,
+            NoteCreditPriceRepository noteCreditPriceRepository,
             NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository,
             HttpSafeUserMembershipRetrievalService membershipRetrievalService,
-            StripeService stripeService
+            StripeChargeService stripeChargeService
     ) {
         this.noteCreditsRepository = noteCreditsRepository;
+        this.noteCreditPriceRepository = noteCreditPriceRepository;
         this.noteCreditsOrgAccountRestrictionRepository = noteCreditsOrgAccountRestrictionRepository;
         this.membershipRetrievalService = membershipRetrievalService;
-        this.stripeService = stripeService;
+        this.stripeChargeService = stripeChargeService;
     }
 
     public NoteCreditsResponseModel getCredits() {
-        NoteCreditsEntity foundNoteCredits = findNoteCredits();
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        NoteCreditsEntity foundNoteCredits = findNoteCredits(loggedInUser);
         return createResponseModel(foundNoteCredits);
     }
 
     @Transactional
     public void orderCredits(NoteCreditsRequestModel requestModel) {
-        NoteCreditsEntity foundNoteCredits = findNoteCredits();
+        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
+        NoteCreditsEntity foundNoteCredits = findNoteCredits(loggedInUser);
+
         Integer requestedQuantity = requestModel.getQuantity();
         if (null == requestedQuantity) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'quantity' is required");
@@ -62,11 +67,20 @@ public class NoteCreditService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'stripeChargeToken' is required");
         }
 
+        NoteCreditPriceEntity noteCreditPriceEntity = findNoteCreditPrice();
+        BigDecimal noteCreditPrice = noteCreditPriceEntity.getNoteCreditPrice();
+
+        BigDecimal bigDecimalQuantity = BigDecimal.valueOf(requestedQuantity);
+        BigDecimal noteCreditTotalPrice = noteCreditPrice.multiply(bigDecimalQuantity);
+        double noteCreditTotalPriceDouble = noteCreditTotalPrice.doubleValue();
+
+        String chargeDescription = String.format("Note Credits Order. Quantity: %d, Unit Price: %f, Total: %f", requestedQuantity, noteCreditPrice.doubleValue(), noteCreditTotalPriceDouble);
+
         Charge charge;
         try {
-            charge = stripeService.chargeNewCard(stripeChargeToken, requestedQuantity * NOTE_CREDIT_PRICE);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid card or insufficient funds");
+            charge = stripeChargeService.chargeNewCard(stripeChargeToken, noteCreditTotalPriceDouble, chargeDescription, loggedInUser.getEmail());
+        } catch (PortalException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There was a problem processing the payment: " + e.getMessage());
         }
 
         if (charge == null) {
@@ -78,14 +92,20 @@ public class NoteCreditService {
         }
     }
 
-    private NoteCreditsEntity findNoteCredits() {
-        UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
-        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
-        return noteCreditsRepository.findAccessibleNoteCredits(userMembership.getOrganizationAccountId(), loggedInUser.getUserId())
-                .orElseGet(() -> initializeNoteCredits(loggedInUser, userMembership));
+    private NoteCreditPriceEntity findNoteCreditPrice() {
+        return noteCreditPriceRepository.findAll()
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "The Note Credit Price could not be retrieved"));
     }
 
-    private NoteCreditsEntity initializeNoteCredits(UserEntity loggedInUser, MembershipEntity userMembership) {
+    private NoteCreditsEntity findNoteCredits(UserEntity loggedInUser) {
+        MembershipEntity userMembership = loggedInUser.getMembershipEntity();
+        return noteCreditsRepository.findAccessibleNoteCredits(userMembership.getOrganizationAccountId(), loggedInUser.getUserId())
+                .orElseGet(() -> initializeNoteCredits(userMembership));
+    }
+
+    private NoteCreditsEntity initializeNoteCredits(MembershipEntity userMembership) {
         NoteCreditsEntity noteCreditsToSave = new NoteCreditsEntity(null, 0);
         NoteCreditsEntity savedNoteCredits = noteCreditsRepository.save(noteCreditsToSave);
 

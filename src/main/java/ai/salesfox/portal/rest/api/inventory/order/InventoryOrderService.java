@@ -11,7 +11,7 @@ import ai.salesfox.portal.database.inventory.InventoryRepository;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
 import ai.salesfox.portal.database.inventory.item.InventoryItemPK;
 import ai.salesfox.portal.database.inventory.item.InventoryItemRepository;
-import ai.salesfox.portal.integration.stripe.StripeService;
+import ai.salesfox.portal.integration.stripe.StripeChargeService;
 import ai.salesfox.portal.rest.api.inventory.InventoryAccessService;
 import ai.salesfox.portal.rest.api.inventory.order.model.InventoryOrderRequestModel;
 import ai.salesfox.portal.rest.api.inventory.order.model.ItemOrderModel;
@@ -39,7 +39,7 @@ public class InventoryOrderService {
     private final InventoryItemRepository inventoryItemRepository;
     private final InventoryAccessService inventoryAccessService;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private final StripeService stripeService;
+    private final StripeChargeService stripeChargeService;
 
     @Autowired
     public InventoryOrderService(
@@ -48,14 +48,14 @@ public class InventoryOrderService {
             InventoryItemRepository inventoryItemRepository,
             InventoryAccessService inventoryAccessService,
             HttpSafeUserMembershipRetrievalService membershipRetrievalService,
-            StripeService stripeService
+            StripeChargeService stripeChargeService
     ) {
         this.catalogueItemRepository = catalogueItemRepository;
         this.inventoryRepository = inventoryRepository;
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryAccessService = inventoryAccessService;
         this.membershipRetrievalService = membershipRetrievalService;
-        this.stripeService = stripeService;
+        this.stripeChargeService = stripeChargeService;
     }
 
     @Transactional
@@ -71,6 +71,8 @@ public class InventoryOrderService {
         List<CatalogueItemEntity> orderedCatalogItems = catalogueItemRepository.findAllById(itemOrderMap.keySet());
 
         BigDecimal totalPrice = new BigDecimal(0);
+        StringBuilder descriptionBuilder = new StringBuilder();
+
         for (CatalogueItemEntity item : orderedCatalogItems) {
             if (item.getIsActive()) {
                 validateItemAccess(loggedInUser, item);
@@ -88,13 +90,23 @@ public class InventoryOrderService {
             BigDecimal unitQuantity = BigDecimal.valueOf(orderedQuantity);
             BigDecimal priceForUnitQuantity = unitPrice.multiply(unitQuantity);
             totalPrice = totalPrice.add(priceForUnitQuantity);
+
+            descriptionBuilder.append("Item: ");
+            descriptionBuilder.append(item.getName());
+            descriptionBuilder.append(", Price: ");
+            descriptionBuilder.append(item.getPrice());
+            descriptionBuilder.append(", Quantity: ");
+            descriptionBuilder.append(orderedQuantity);
+            descriptionBuilder.append(", Cost: ");
+            descriptionBuilder.append(priceForUnitQuantity);
+            descriptionBuilder.append(" | ");
         }
 
         Charge charge;
         try {
-            charge = stripeService.chargeNewCard(stripeChargeToken, totalPrice.doubleValue());
+            charge = stripeChargeService.chargeNewCard(stripeChargeToken, totalPrice.doubleValue(), descriptionBuilder.toString(), loggedInUser.getEmail());
         } catch (PortalException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid card or insufficient funds");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There was a problem processing the payment: " + e.getMessage());
         }
 
         if (null == charge) {
