@@ -2,3 +2,7 @@ First Name,Last Name,Email,Address Line 1,Address Line 2,City,State,Zip,Is Busin
 Test,User,test.user@awebsite.com,1 Main Street,Suite A,New York,NY,12345-6789,true,Test Org,Some Title,5551234567,
 Test,User2,test.user2@awebsite.com,2 Main Street,Suite B,New York,NY,12345-6789,false,Test Org 2,Some Title,5551234567,5551234567
 Test,User3,test.user3@awebsite.com,3 Main Street,Suite C,New York,NY,12345,true,Test Org 3,Some Title,,5551234567
+Test,User4,test.user4@awebsite.com,4 Main St,,New York,NY,12345,,,,,555-123-4567
+Test,User5,test.user5@awebsite.com,5 Main St.,,New York,NY,12345,,,,,(555) 123 4567
+Test,User6,test.user6@awebsite.com,6 Main Street,Suite F,New York,NY,12345,Yes,Test Org 3,Some Title,,5551234567
+Test,User7,test.user7@awebsite.com,7 Main Street,Suite G,New York,NY,12345,y,Test Org 3,Some Title,,5551234567
