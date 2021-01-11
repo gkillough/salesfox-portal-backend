@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InventoryOrderRequestModel {
-    private List<ItemOrderModel> orders;
     private String stripeChargeToken;
+    private List<ItemOrderModel> orders;
 
 }

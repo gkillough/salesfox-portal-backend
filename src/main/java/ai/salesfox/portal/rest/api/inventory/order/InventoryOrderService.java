@@ -1,5 +1,6 @@
 package ai.salesfox.portal.rest.api.inventory.order;
 
+import ai.salesfox.portal.common.exception.PortalException;
 import ai.salesfox.portal.common.service.catalogue.CatalogueItemAccessUtils;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
@@ -10,7 +11,7 @@ import ai.salesfox.portal.database.inventory.InventoryRepository;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
 import ai.salesfox.portal.database.inventory.item.InventoryItemPK;
 import ai.salesfox.portal.database.inventory.item.InventoryItemRepository;
-import ai.salesfox.portal.integration.stripe.StripeService;
+import ai.salesfox.portal.integration.stripe.StripeChargeService;
 import ai.salesfox.portal.rest.api.inventory.InventoryAccessService;
 import ai.salesfox.portal.rest.api.inventory.order.model.InventoryOrderRequestModel;
 import ai.salesfox.portal.rest.api.inventory.order.model.ItemOrderModel;
@@ -38,64 +39,90 @@ public class InventoryOrderService {
     private final InventoryItemRepository inventoryItemRepository;
     private final InventoryAccessService inventoryAccessService;
     private final HttpSafeUserMembershipRetrievalService membershipRetrievalService;
-    private final StripeService stripeService;
+    private final StripeChargeService stripeChargeService;
 
     @Autowired
-    public InventoryOrderService(CatalogueItemRepository catalogueItemRepository, InventoryRepository inventoryRepository, InventoryItemRepository inventoryItemRepository,
-                                 InventoryAccessService inventoryAccessService, HttpSafeUserMembershipRetrievalService membershipRetrievalService, StripeService stripeService) {
+    public InventoryOrderService(
+            CatalogueItemRepository catalogueItemRepository,
+            InventoryRepository inventoryRepository,
+            InventoryItemRepository inventoryItemRepository,
+            InventoryAccessService inventoryAccessService,
+            HttpSafeUserMembershipRetrievalService membershipRetrievalService,
+            StripeChargeService stripeChargeService
+    ) {
         this.catalogueItemRepository = catalogueItemRepository;
         this.inventoryRepository = inventoryRepository;
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryAccessService = inventoryAccessService;
         this.membershipRetrievalService = membershipRetrievalService;
-        this.stripeService = stripeService;
+        this.stripeChargeService = stripeChargeService;
     }
 
     @Transactional
-    public void submitOrder(UUID inventoryID, InventoryOrderRequestModel requestModel) {
+    public void submitOrder(UUID inventoryId, InventoryOrderRequestModel requestModel) {
+        UserEntity loggedInUser = findAuthenticatedUserAndValidateAccess();
+        InventoryEntity foundInventory = findInventoryAndValidateAccess(inventoryId);
+        validateRequestModel(requestModel);
+
         String stripeChargeToken = requestModel.getStripeChargeToken();
-        if (StringUtils.isBlank(stripeChargeToken)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'stripeChargeToken' is required");
-        }
-        InventoryEntity foundInventory = findInventoryAndValidateAccess(inventoryID);
-        BigDecimal totalPrice = new BigDecimal(0);
         List<ItemOrderModel> itemOrders = requestModel.getOrders();
-        Map<UUID, ItemOrderModel> itemOrderMap = itemOrders.stream().collect(Collectors.toMap(ItemOrderModel::getCatalogueItemId, Function.identity()));
-        List<CatalogueItemEntity> catalogueItemEntities = catalogueItemRepository.findAllById(itemOrderMap.keySet());
+
+        Map<UUID, ItemOrderModel> itemOrderMap = mapItemIdsToOrders(itemOrders);
+        List<CatalogueItemEntity> orderedCatalogItems = catalogueItemRepository.findAllById(itemOrderMap.keySet());
+
+        BigDecimal totalPrice = new BigDecimal(0);
+        StringBuilder descriptionBuilder = new StringBuilder();
+
+        for (CatalogueItemEntity item : orderedCatalogItems) {
+            if (item.getIsActive()) {
+                validateItemAccess(loggedInUser, item);
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Catalogue item with the id [%s] unavailable", item.getItemId()));
+            }
+
+            ItemOrderModel itemOrder = itemOrderMap.get(item.getItemId());
+            validateOrderRequest(itemOrder);
+
+            Integer orderedQuantity = itemOrder.getQuantity();
+            updateInventoryQuantity(foundInventory, item, orderedQuantity);
+
+            BigDecimal unitPrice = item.getPrice().add(item.getShippingCost());
+            BigDecimal unitQuantity = BigDecimal.valueOf(orderedQuantity);
+            BigDecimal priceForUnitQuantity = unitPrice.multiply(unitQuantity);
+            totalPrice = totalPrice.add(priceForUnitQuantity);
+
+            descriptionBuilder.append("Item: ");
+            descriptionBuilder.append(item.getName());
+            descriptionBuilder.append(", Price: $");
+            descriptionBuilder.append(String.format("%1$,.2f", item.getPrice().doubleValue()));
+            descriptionBuilder.append(", Quantity: ");
+            descriptionBuilder.append(orderedQuantity);
+            descriptionBuilder.append(", Cost: $");
+            descriptionBuilder.append(String.format("%1$,.2f", priceForUnitQuantity));
+            descriptionBuilder.append(" | ");
+        }
+
+        descriptionBuilder.append(" Order Total: $");
+        descriptionBuilder.append(String.format("%1$,.2f", totalPrice));
+
+        Charge charge;
+        try {
+            charge = stripeChargeService.chargeNewCard(stripeChargeToken, totalPrice.doubleValue(), descriptionBuilder.toString(), loggedInUser.getEmail());
+        } catch (PortalException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There was a problem processing the payment: " + e.getMessage());
+        }
+
+        if (null == charge) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There was a problem processing the payment");
+        }
+    }
+
+    private UserEntity findAuthenticatedUserAndValidateAccess() {
         UserEntity loggedInUser = membershipRetrievalService.getAuthenticatedUserEntity();
         MembershipEntity userMembership = loggedInUser.getMembershipEntity();
         String userRoleLevel = userMembership.getRoleEntity().getRoleLevel();
         validateSubmitOrderAccess(userRoleLevel);
-
-        for (CatalogueItemEntity item : catalogueItemEntities) {
-            ItemOrderModel itemOrder = itemOrderMap.get(item.getItemId());
-            validateOrderRequest(itemOrder);
-            if (!item.getIsActive()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("Catalogue item with the id [%s] unavailable", itemOrder.getCatalogueItemId()));
-            } else if (item.getItemId().equals(itemOrder.getCatalogueItemId())) {
-                validateItemAccess(loggedInUser, item);
-                Integer requestedQuantity = itemOrder.getQuantity();
-                InventoryItemEntity itemToSave = findOrCreateInventoryItemEntity(foundInventory, item);
-                Long newInventoryItemQuantity = Math.addExact(itemToSave.getQuantity(), requestedQuantity);
-                itemToSave.setQuantity(newInventoryItemQuantity);
-                inventoryItemRepository.save(itemToSave);
-                totalPrice.add(item.getPrice());
-                totalPrice.add(item.getShippingCost());
-            } else {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("No catalogue item with the id [%s] exists", itemOrder.getCatalogueItemId()));
-            }
-        }
-
-        Charge charge;
-        try {
-            charge = stripeService.chargeNewCard(stripeChargeToken, totalPrice.doubleValue());
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid card or insufficient funds");
-        }
-
-        if (charge == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There was a problem processing the payment");
-        }
+        return loggedInUser;
     }
 
     private InventoryEntity findInventoryAndValidateAccess(UUID inventoryId) {
@@ -103,6 +130,25 @@ public class InventoryOrderService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         inventoryAccessService.validateInventoryAccess(foundInventory);
         return foundInventory;
+    }
+
+    private void validateRequestModel(InventoryOrderRequestModel requestModel) {
+        if (StringUtils.isBlank(requestModel.getStripeChargeToken())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'stripeChargeToken' is required");
+        }
+
+        List<ItemOrderModel> orders = requestModel.getOrders();
+        if (null == orders) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The field 'orders' is required");
+        } else if (orders.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "There must be at least one item ordered");
+        }
+    }
+
+    private Map<UUID, ItemOrderModel> mapItemIdsToOrders(List<ItemOrderModel> itemOrders) {
+        return itemOrders
+                .stream()
+                .collect(Collectors.toMap(ItemOrderModel::getCatalogueItemId, Function.identity()));
     }
 
     private void validateSubmitOrderAccess(String loggedInUserRoleLevel) {
@@ -140,6 +186,13 @@ public class InventoryOrderService {
             String combinedErrors = String.join(", ", errors);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("There were errors with the request: %s", combinedErrors));
         }
+    }
+
+    private void updateInventoryQuantity(InventoryEntity inventory, CatalogueItemEntity catalogItem, int orderedQuantity) {
+        InventoryItemEntity inventoryEntryToSave = findOrCreateInventoryItemEntity(inventory, catalogItem);
+        Long newInventoryItemQuantity = Math.addExact(inventoryEntryToSave.getQuantity(), orderedQuantity);
+        inventoryEntryToSave.setQuantity(newInventoryItemQuantity);
+        inventoryItemRepository.save(inventoryEntryToSave);
     }
 
     private InventoryItemEntity findOrCreateInventoryItemEntity(InventoryEntity inventory, CatalogueItemEntity catalogItem) {
