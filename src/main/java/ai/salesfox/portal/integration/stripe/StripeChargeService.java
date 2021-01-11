@@ -20,7 +20,7 @@ public class StripeChargeService {
 
     public Charge chargeNewCard(String chargeToken, double amount, String description, String receiptEmailAddress) throws PortalException {
         try {
-            long amountInCents = (long) amount * 100;
+            long amountInCents = (long) (amount * 100);
             ChargeCreateParams chargeParams = ChargeCreateParams.builder()
                     .setAmount(amountInCents)
                     .setCurrency("USD")

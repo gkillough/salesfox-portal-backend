@@ -74,7 +74,7 @@ public class NoteCreditService {
         BigDecimal noteCreditTotalPrice = noteCreditPrice.multiply(bigDecimalQuantity);
         double noteCreditTotalPriceDouble = noteCreditTotalPrice.doubleValue();
 
-        String chargeDescription = String.format("Note Credits Order. Quantity: %d, Unit Price: %f, Total: %f", requestedQuantity, noteCreditPrice.doubleValue(), noteCreditTotalPriceDouble);
+        String chargeDescription = String.format("Note Credits Order. Quantity: %d, Unit Price: $%2$,.2f, Total: $%3$,.2f", requestedQuantity, noteCreditPrice.doubleValue(), noteCreditTotalPriceDouble);
 
         Charge charge;
         try {

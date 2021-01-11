@@ -93,17 +93,17 @@ public class InventoryOrderService {
 
             descriptionBuilder.append("Item: ");
             descriptionBuilder.append(item.getName());
-            descriptionBuilder.append(", Price: ");
-            descriptionBuilder.append(item.getPrice());
+            descriptionBuilder.append(", Price: $");
+            descriptionBuilder.append(String.format("%1$,.2f", item.getPrice().doubleValue()));
             descriptionBuilder.append(", Quantity: ");
             descriptionBuilder.append(orderedQuantity);
-            descriptionBuilder.append(", Cost: ");
-            descriptionBuilder.append(priceForUnitQuantity);
+            descriptionBuilder.append(", Cost: $");
+            descriptionBuilder.append(String.format("%1$,.2f", priceForUnitQuantity));
             descriptionBuilder.append(" | ");
         }
 
-        descriptionBuilder.append(" Order Total: ");
-        descriptionBuilder.append(totalPrice);
+        descriptionBuilder.append(" Order Total: $");
+        descriptionBuilder.append(String.format("%1$,.2f", totalPrice));
 
         Charge charge;
         try {
