@@ -102,6 +102,9 @@ public class InventoryOrderService {
             descriptionBuilder.append(" | ");
         }
 
+        descriptionBuilder.append(" Order Total: ");
+        descriptionBuilder.append(totalPrice);
+
         Charge charge;
         try {
             charge = stripeChargeService.chargeNewCard(stripeChargeToken, totalPrice.doubleValue(), descriptionBuilder.toString(), loggedInUser.getEmail());
