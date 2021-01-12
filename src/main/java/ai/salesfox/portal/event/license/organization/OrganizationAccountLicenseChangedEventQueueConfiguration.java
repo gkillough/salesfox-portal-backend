@@ -20,6 +20,7 @@ public class OrganizationAccountLicenseChangedEventQueueConfiguration {
                 .durable(LICENSE_CHANGED_QUEUE)
                 .withArgument(EventQueueConstants.KEY_DEAD_LETTER_EXCHANGE, LICENSE_CHANGED_DLQ_EXCHANGE)
                 .withArgument(EventQueueConstants.KEY_DEAD_LETTER_EXCHANGE_ROUTING_KEY, LICENSE_CHANGED_DLQ)
+                .withArgument(EventQueueConstants.KEY_SINGLE_ACTIVE_CONSUMER, true)
                 .build();
     }
 
