@@ -19,7 +19,11 @@ public class GiftSubmittedEventPublisher {
 
     public void fireGiftSubmittedEvent(UUID giftId, UUID submittingUserId) {
         log.debug("Submitting gift event with giftId=[{}], submittingUserId=[{}]", giftId, submittingUserId);
-        rabbitTemplate.convertAndSend(GiftSubmittedEventQueueConfiguration.GIFT_SUBMITTED_QUEUE, new GiftSubmittedEvent(giftId, submittingUserId));
+        rabbitTemplate.convertAndSend(
+                GiftSubmittedEventQueueConfiguration.GIFT_SUBMITTED_EXCHANGE,
+                GiftSubmittedEventQueueConfiguration.GIFT_SUBMITTED_QUEUE,
+                new GiftSubmittedEvent(giftId, submittingUserId)
+        );
     }
 
 }
