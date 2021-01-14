@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-@EnableAsync
+@EnableAsync(proxyTargetClass = true)
 @EnableScheduling
 @EnableTransactionManagement
 @EnableJpaRepositories(basePackages = {"ai.salesfox.portal.database", "ai.salesfox.portal.integration.*.database"})

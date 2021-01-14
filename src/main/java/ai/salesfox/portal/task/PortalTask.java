@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
-public abstract class SalesfoxTask {
+public abstract class PortalTask {
     @Getter
     private final String key;
 

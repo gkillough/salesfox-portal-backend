@@ -1,4 +1,4 @@
-package ai.salesfox.portal.task;
+package ai.salesfox.portal.task.gift;
 
 import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
 import ai.salesfox.portal.common.thread.ExecutorConfiguration;
@@ -19,7 +19,7 @@ import java.util.concurrent.*;
 
 @Slf4j
 @Component
-public class SubmitScheduledGiftsTask {
+public class SubmitScheduledGiftsTaskRunner {
     public static final String CRON_DAILY_MIDNIGHT = "0 0 0 * * *";
     private static final int DEFAULT_PAGE_SIZE = 500;
 
@@ -28,7 +28,7 @@ public class SubmitScheduledGiftsTask {
     private final ExecutorService maxThreadPoolExecutorService;
 
     @Autowired
-    public SubmitScheduledGiftsTask(GiftRepository giftRepository, ScheduledGiftSubmissionService giftSubmissionService, ExecutorService maxThreadPoolExecutorService) {
+    public SubmitScheduledGiftsTaskRunner(GiftRepository giftRepository, ScheduledGiftSubmissionService giftSubmissionService, ExecutorService maxThreadPoolExecutorService) {
         this.giftRepository = giftRepository;
         this.giftSubmissionService = giftSubmissionService;
         this.maxThreadPoolExecutorService = maxThreadPoolExecutorService;
