@@ -38,6 +38,7 @@ databaseChangeLog:
                   type: VARCHAR
                   constraints:
                     nullable: false
+                    unique: true
 
   - changeSet:
       id: add-scheduled-task-access-token-fks
