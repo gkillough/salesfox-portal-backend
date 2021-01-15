@@ -18,6 +18,11 @@ databaseChangeLog:
                   type: VARCHAR
                   constraints:
                     nullable: false
+              - column:
+                  name: last_run
+                  type: TIMESTAMP WITH TIMEZONE
+                  constraints:
+                    nullable: true
 
   - changeSet:
       id: create-scheduled-task-access-token-table

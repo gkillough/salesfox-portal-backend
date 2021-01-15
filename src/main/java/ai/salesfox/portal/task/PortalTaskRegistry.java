@@ -1,5 +1,6 @@
 package ai.salesfox.portal.task;
 
+import ai.salesfox.portal.common.time.PortalDateTimeUtils;
 import ai.salesfox.portal.database.scheduled.ScheduledTaskEntity;
 import ai.salesfox.portal.database.scheduled.ScheduledTaskRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -8,9 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,10 +38,32 @@ public class PortalTaskRegistry {
             String taskKey = task.getKey();
             if (!trackedTaskKeys.contains(taskKey)) {
                 log.info("Adding task to database: key=[{}]", taskKey);
-                tasksToAdd.add(new ScheduledTaskEntity(null, taskKey));
+                tasksToAdd.add(new ScheduledTaskEntity(null, taskKey, null));
             }
         }
         scheduledTaskRepository.saveAll(tasksToAdd);
+    }
+
+    @Transactional
+    public boolean runAsyncTask(UUID taskId) {
+        Optional<ScheduledTaskEntity> optionalTaskEntity = scheduledTaskRepository.findById(taskId);
+        if (optionalTaskEntity.isPresent()) {
+            ScheduledTaskEntity foundTaskEntity = optionalTaskEntity.get();
+            Optional<PortalTask> optionalTask = tasks
+                    .stream()
+                    .filter(task -> task.getKey().equals(foundTaskEntity.getKey()))
+                    .findFirst();
+            if (optionalTask.isPresent()) {
+                PortalTask portalTask = optionalTask.get();
+                // TODO thread this somehow: Thread taskThread = new Thread(portalTask::runTask);
+                portalTask.runTask();
+                // TODO update last run time
+                foundTaskEntity.setLastRun(PortalDateTimeUtils.getCurrentDateTime());
+                scheduledTaskRepository.save(foundTaskEntity);
+                return true;
+            }
+        }
+        return false;
     }
 
 }

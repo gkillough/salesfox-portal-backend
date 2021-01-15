@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface ScheduledTaskRepository extends JpaRepository<ScheduledTaskEntity, UUID> {
     Optional<ScheduledTaskEntity> findByKey(String key);
 
+    Optional<ScheduledTaskEntity> findByTaskIdOrKey(String taskIdOrKey);
+
 }

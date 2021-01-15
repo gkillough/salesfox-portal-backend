@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
@@ -20,5 +21,8 @@ public class ScheduledTaskEntity {
 
     @Column(name = "key")
     private String key;
+
+    @Column(name = "last_run")
+    private OffsetDateTime lastRun;
 
 }
