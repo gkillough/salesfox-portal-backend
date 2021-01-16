@@ -48,20 +48,25 @@ public class PortalTaskRegistry {
     public boolean runAsyncTask(UUID taskId) {
         Optional<ScheduledTaskEntity> optionalTaskEntity = scheduledTaskRepository.findById(taskId);
         if (optionalTaskEntity.isPresent()) {
-            ScheduledTaskEntity foundTaskEntity = optionalTaskEntity.get();
-            Optional<PortalTask> optionalTask = tasks
-                    .stream()
-                    .filter(task -> task.getKey().equals(foundTaskEntity.getKey()))
-                    .findFirst();
-            if (optionalTask.isPresent()) {
-                PortalTask portalTask = optionalTask.get();
-                // TODO thread this somehow: Thread taskThread = new Thread(portalTask::runTask);
-                portalTask.runTask();
-                // TODO update last run time
-                foundTaskEntity.setLastRun(PortalDateTimeUtils.getCurrentDateTime());
-                scheduledTaskRepository.save(foundTaskEntity);
-                return true;
-            }
+            return runAsyncTask(optionalTaskEntity.get());
+        }
+        return false;
+    }
+
+    @Transactional
+    public boolean runAsyncTask(ScheduledTaskEntity taskEntity) {
+        Optional<PortalTask> optionalTask = tasks
+                .stream()
+                .filter(task -> task.getKey().equals(taskEntity.getKey()))
+                .findFirst();
+        if (optionalTask.isPresent()) {
+            PortalTask portalTask = optionalTask.get();
+            // TODO thread this somehow: Thread taskThread = new Thread(portalTask::runTask);
+            portalTask.runTask();
+
+            taskEntity.setLastRun(PortalDateTimeUtils.getCurrentDateTime());
+            scheduledTaskRepository.save(taskEntity);
+            return true;
         }
         return false;
     }
