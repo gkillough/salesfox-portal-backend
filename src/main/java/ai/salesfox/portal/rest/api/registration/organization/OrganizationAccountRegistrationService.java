@@ -2,6 +2,9 @@ package ai.salesfox.portal.rest.api.registration.organization;
 
 import ai.salesfox.portal.common.FieldValidationUtils;
 import ai.salesfox.portal.common.model.PortalAddressModel;
+import ai.salesfox.portal.common.service.email.EmailMessagingService;
+import ai.salesfox.portal.common.service.email.PortalEmailException;
+import ai.salesfox.portal.common.service.email.model.EmailMessageModel;
 import ai.salesfox.portal.common.time.PortalDateTimeUtils;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.inventory.InventoryEntity;
@@ -35,6 +38,7 @@ import ai.salesfox.portal.rest.api.registration.user.UserRegistrationService;
 import ai.salesfox.portal.rest.api.user.profile.UserProfileService;
 import ai.salesfox.portal.rest.api.user.profile.model.UserProfileUpdateModel;
 import ai.salesfox.portal.rest.security.authorization.PortalAuthorityConstants;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,6 +49,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.util.*;
 
+@Slf4j
 @Component
 public class OrganizationAccountRegistrationService {
     private final LicenseTypeRepository licenseTypeRepository;
@@ -60,6 +65,7 @@ public class OrganizationAccountRegistrationService {
     private final OrganizationValidationService organizationValidationService;
     private final UserRegistrationService userRegistrationService;
     private final UserProfileService userProfileService;
+    private final EmailMessagingService emailMessagingService;
 
     @Autowired
     public OrganizationAccountRegistrationService(LicenseTypeRepository licenseTypeRepository,
@@ -74,7 +80,8 @@ public class OrganizationAccountRegistrationService {
                                                   NoteCreditsOrgAccountRestrictionRepository noteCreditsOrgAccountRestrictionRepository,
                                                   OrganizationValidationService organizationValidationService,
                                                   UserRegistrationService userRegistrationService,
-                                                  UserProfileService userProfileService
+                                                  UserProfileService userProfileService,
+                                                  EmailMessagingService emailMessagingService
     ) {
         this.licenseTypeRepository = licenseTypeRepository;
         this.organizationAccountLicenseRepository = organizationAccountLicenseRepository;
@@ -89,6 +96,7 @@ public class OrganizationAccountRegistrationService {
         this.organizationValidationService = organizationValidationService;
         this.userRegistrationService = userRegistrationService;
         this.userProfileService = userProfileService;
+        this.emailMessagingService = emailMessagingService;
     }
 
     public ValidationResponseModel isAccountOwnerEmailValid(EmailToValidateModel model) {
@@ -127,10 +135,12 @@ public class OrganizationAccountRegistrationService {
         createOrganizationAccountLicense(orgAccountEntity, licenseType);
         createOrganizationAccountAddress(registrationModel.getOrganizationAddress(), orgAccountEntity);
 
-        registerOrganizationAccountOwner(registrationModel.getAccountOwner(), orgAccountEntity);
+        OrganizationAccountUserRegistrationModel accountOwnerModel = registrationModel.getAccountOwner();
+        registerOrganizationAccountOwner(accountOwnerModel, orgAccountEntity);
         createOrganizationAccountProfile(orgAccountEntity, registrationModel.getBusinessPhoneNumber());
         createInventory(orgAccountEntity);
         createNoteCredits(orgAccountEntity);
+        sendConfirmationEmail(accountOwnerModel.getEmail(), accountOwnerModel.getFirstName());
     }
 
     private LicenseTypeEntity getAndValidateLicenseByHash(UUID licenseTypeId) {
@@ -204,6 +214,21 @@ public class OrganizationAccountRegistrationService {
         NoteCreditsEntity savedNoteCredits = noteCreditsRepository.save(noteCreditsToSave);
         NoteCreditOrgAccountRestrictionEntity restrictionToSave = new NoteCreditOrgAccountRestrictionEntity(savedNoteCredits.getNoteCreditId(), orgAccountEntity.getOrganizationAccountId());
         noteCreditsOrgAccountRestrictionRepository.save(restrictionToSave);
+    }
+
+    private void sendConfirmationEmail(String emailAddress, String firstName) {
+        EmailMessageModel confirmationMessageModel = new EmailMessageModel(
+                List.of(emailAddress),
+                "Welcome to Salesfox!",
+                "Registration Confirmation",
+                String.format("Welcome to Salesfox, %s! <br />This email confirms that your account was successfully created." +
+                        " To add more people to your team, please login to use the \"Invite users\" feature.", firstName)
+        );
+        try {
+            emailMessagingService.sendMessage(confirmationMessageModel);
+        } catch (PortalEmailException e) {
+            log.debug("Failed to send confirmation email", e);
+        }
     }
 
     private void validateRegistrationFields(OrganizationAccountRegistrationModel registrationModel) {
