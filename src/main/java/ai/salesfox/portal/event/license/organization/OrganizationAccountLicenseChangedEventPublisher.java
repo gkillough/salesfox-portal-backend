@@ -19,7 +19,11 @@ public class OrganizationAccountLicenseChangedEventPublisher {
 
     public void fireOrgAccountLicenseChangedEvent(UUID orgAccountId, UUID previousLicenseTypeId, Integer previousActiveUsers, Boolean previousActiveStatus) {
         log.debug("Submitting org account license changed event with orgAcctId=[{}]", orgAccountId);
-        rabbitTemplate.convertAndSend(OrganizationAccountLicenseChangedEventQueueConfiguration.LICENSE_CHANGED_QUEUE, new OrganizationAccountLicenseChangedEvent(orgAccountId, previousLicenseTypeId, previousActiveUsers, previousActiveStatus));
+        rabbitTemplate.convertAndSend(
+                OrganizationAccountLicenseChangedEventQueueConfiguration.LICENSE_CHANGED_EXCHANGE,
+                OrganizationAccountLicenseChangedEventQueueConfiguration.LICENSE_CHANGED_QUEUE,
+                new OrganizationAccountLicenseChangedEvent(orgAccountId, previousLicenseTypeId, previousActiveUsers, previousActiveStatus)
+        );
     }
 
 }

@@ -20,7 +20,11 @@ public class LicenseTypeChangedEventPublisher {
 
     public void fireLicenseTypeChangedEvent(UUID licenseTypeId, BigDecimal monthlyCost, Integer usersIncluded, BigDecimal costPerAdditionalUser) {
         log.debug("Submitting license type changed event with licenseTypeId=[{}]", licenseTypeId);
-        rabbitTemplate.convertAndSend(LicenseTypeChangedEventQueueConfiguration.LICENSE_TYPE_CHANGED_QUEUE, new LicenseTypeChangedEvent(licenseTypeId, monthlyCost, usersIncluded, costPerAdditionalUser));
+        rabbitTemplate.convertAndSend(
+                LicenseTypeChangedEventQueueConfiguration.LICENSE_TYPE_CHANGED_EXCHANGE,
+                LicenseTypeChangedEventQueueConfiguration.LICENSE_TYPE_CHANGED_QUEUE,
+                new LicenseTypeChangedEvent(licenseTypeId, monthlyCost, usersIncluded, costPerAdditionalUser)
+        );
     }
 
 }

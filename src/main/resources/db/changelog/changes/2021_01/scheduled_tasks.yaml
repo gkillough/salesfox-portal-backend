@@ -1,0 +1,62 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-scheduled-task-table
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: scheduled_tasks
+            columns:
+              - column:
+                  name: task_id
+                  type: UUID
+                  defaultValueComputed: uuid_generate_v4()
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: key
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_run
+                  type: TIMESTAMP WITH TIMEZONE
+                  constraints:
+                    nullable: true
+
+  - changeSet:
+      id: create-scheduled-task-access-token-table
+      author: gavinkillough
+      changes:
+        - createTable:
+            schemaName: portal
+            tableName: scheduled_task_access_tokens
+            columns:
+              - column:
+                  name: task_id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: access_token
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+                    unique: true
+
+  - changeSet:
+      id: add-scheduled-task-access-token-fks
+      author: gavinkillough
+      changes:
+        - addForeignKeyConstraint:
+            constraintName: scheduled_task_access_token_task_id_fk
+            baseTableSchemaName: portal
+            baseTableName: scheduled_task_access_tokens
+            baseColumnNames: task_id
+            referencedTableSchemaName: portal
+            referencedTableName: scheduled_tasks
+            referencedColumnNames: task_id
+            onDelete: CASCADE
+            onUpdate: CASCADE
+            validate: true

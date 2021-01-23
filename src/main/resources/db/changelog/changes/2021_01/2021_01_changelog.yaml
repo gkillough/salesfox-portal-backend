@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: scheduled_tasks.yaml
+      relativeToChangelogFile: true

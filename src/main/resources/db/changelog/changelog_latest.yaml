@@ -6,3 +6,7 @@ databaseChangeLog:
   - include:
       file: changes/2020_12/2020_12_changelog.yaml
       relativeToChangelogFile: true
+
+  - include:
+      file: changes/2021_01/2021_01_changelog.yaml
+      relativeToChangelogFile: true

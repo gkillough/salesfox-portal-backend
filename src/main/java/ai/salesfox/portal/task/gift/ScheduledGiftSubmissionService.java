@@ -1,4 +1,4 @@
-package ai.salesfox.portal.task;
+package ai.salesfox.portal.task.gift;
 
 import ai.salesfox.integration.common.exception.SalesfoxException;
 import ai.salesfox.portal.common.enumeration.GiftTrackingStatus;
