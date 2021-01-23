@@ -36,11 +36,9 @@ public interface GiftRepository extends JpaRepository<GiftEntity, UUID> {
             " FROM GiftEntity gift" +
             " LEFT JOIN gift.giftTrackingEntity tracking" +
             " INNER JOIN gift.giftScheduleEntity schedule" +
-            " WHERE (" +
-            "   tracking.status = :scheduledStatusName" +
-            "   AND :sendDate = schedule.sendDate" +
-            " )"
+            " WHERE tracking.status = :scheduledStatusName" +
+            " AND schedule.sendDate <= :sendDate"
     )
-    Slice<GiftEntity> findScheduledGiftsBySendDate(@Param("scheduledStatusName") String scheduledStatusName, @Param("sendDate") LocalDate sendDate, Pageable pageable);
+    Slice<GiftEntity> findScheduledGiftsBySendDateOnOrBefore(@Param("scheduledStatusName") String scheduledStatusName, @Param("sendDate") LocalDate sendDate, Pageable pageable);
 
 }
