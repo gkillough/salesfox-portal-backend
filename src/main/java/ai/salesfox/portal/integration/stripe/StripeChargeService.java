@@ -15,10 +15,10 @@ public class StripeChargeService {
     @Autowired
     public StripeChargeService(StripeConfiguration stripConfiguration) {
         this.stripeConfiguration = stripConfiguration;
-        Stripe.apiKey = stripeConfiguration.getStripeSecretKey();
     }
 
     public Charge chargeNewCard(String chargeToken, double amount, String description, String receiptEmailAddress) throws PortalException {
+        Stripe.apiKey = stripeConfiguration.getStripeSecretKey();
         try {
             long amountInCents = (long) (amount * 100);
             ChargeCreateParams chargeParams = ChargeCreateParams.builder()
