@@ -91,7 +91,7 @@ dependencies {
     // External Integrations
     implementation platform('software.amazon.awssdk:bom:2.15.2')
     implementation 'software.amazon.awssdk:s3'
-    implementation 'com.stripe:stripe-java:20.14.0'
+    implementation 'com.stripe:stripe-java:20.35.0'
 
     // Tools & Services
     implementation 'org.apache.tomcat.embed:tomcat-embed-core'
