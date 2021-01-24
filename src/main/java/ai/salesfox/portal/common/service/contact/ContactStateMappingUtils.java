@@ -1,6 +1,8 @@
 package ai.salesfox.portal.common.service.contact;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -76,7 +78,7 @@ public class ContactStateMappingUtils {
     public static String verifyState(String state) {
         Set<String> errors = new LinkedHashSet<>();
         if (StringUtils.isBlank(state)) {
-            return "State must not be null";
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("State Field must not be blank"));
         }
         if (state.length() == 2) {
             return StringUtils.upperCase(state);
