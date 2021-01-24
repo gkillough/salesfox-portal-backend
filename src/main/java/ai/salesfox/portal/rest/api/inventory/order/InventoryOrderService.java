@@ -11,7 +11,7 @@ import ai.salesfox.portal.database.inventory.InventoryRepository;
 import ai.salesfox.portal.database.inventory.item.InventoryItemEntity;
 import ai.salesfox.portal.database.inventory.item.InventoryItemPK;
 import ai.salesfox.portal.database.inventory.item.InventoryItemRepository;
-import ai.salesfox.portal.integration.stripe.StripeChargeService;
+import ai.salesfox.portal.integration.stripe.service.StripeChargeService;
 import ai.salesfox.portal.rest.api.inventory.InventoryAccessService;
 import ai.salesfox.portal.rest.api.inventory.order.model.InventoryOrderRequestModel;
 import ai.salesfox.portal.rest.api.inventory.order.model.ItemOrderModel;
