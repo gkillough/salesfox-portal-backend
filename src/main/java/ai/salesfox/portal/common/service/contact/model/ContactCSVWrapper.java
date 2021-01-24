@@ -128,8 +128,6 @@ public class ContactCSVWrapper implements Closeable {
             return ContactStateMappingUtils.verifyState(trimmedState);
         }
         return null;
-        // null check
-        // return call statemappingutils
     }
 
     private Pair<String, String> extractFirstAndLastName(CSVRecord csvRecord) {
