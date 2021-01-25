@@ -25,6 +25,10 @@ public class DigitalOceanConfiguration {
     private String bucketQualifyingPrefix;
 
     @Getter
+    @Value("${ai.salesfox.portal.integration.digitalocean.bucket.qualifying.suffix:}")
+    private String bucketQualifyingSuffix;
+
+    @Getter
     @Value("${ai.salesfox.portal.integration.digitalocean.catalog.unqualified.bucket.name:}")
     private String catalogBucketName;
 
