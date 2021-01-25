@@ -1,6 +1,7 @@
 package ai.salesfox.portal.common.service.contact.model;
 
 import ai.salesfox.portal.common.model.PortalAddressModel;
+import ai.salesfox.portal.common.service.contact.StateMappingUtils;
 import ai.salesfox.portal.rest.api.contact.model.ContactUploadModel;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -121,6 +122,14 @@ public class ContactCSVWrapper implements Closeable {
         return null;
     }
 
+    private String extractStateField(CSVRecord csvRecord, String fieldName) {
+        String trimmedState = extractTrimmedField(csvRecord, fieldName);
+        if (null != trimmedState) {
+            return StateMappingUtils.replaceWithStateCodeIfPossible(trimmedState);
+        }
+        return null;
+    }
+
     private Pair<String, String> extractFirstAndLastName(CSVRecord csvRecord) {
         String fullName = extractTrimmedField(csvRecord, HEADER_SINGLE_COLUMN_NAME);
 
@@ -176,7 +185,7 @@ public class ContactCSVWrapper implements Closeable {
         String addressLine1 = extractFirstMatchingTrimmedField(csvRecord, HEADER_ADDRESS_LINE_1, HEADER_STREET_ADDRESS_1, HEADER_STREET_ADDRESS, HEADER_STREET_ADDRESS_1);
         String addressLine2 = extractFirstMatchingTrimmedField(csvRecord, HEADER_ADDRESS_LINE_2, HEADER_STREET_ADDRESS_2, HEADER_STREET_ADDRESS_APT_SUITE);
         String city = extractTrimmedField(csvRecord, HEADER_ADDRESS_CITY);
-        String state = extractTrimmedField(csvRecord, HEADER_ADDRESS_STATE);
+        String state = extractStateField(csvRecord, HEADER_ADDRESS_STATE);
         String zip = extractFirstMatchingTrimmedField(csvRecord, HEADER_ADDRESS_ZIP, HEADER_ADDRESS_ZIP_CODE, HEADER_ADDRESS_POSTAL_CODE);
 
         return new PortalAddressModel(addressLine1, addressLine2, city, state, zip, isBusiness);
