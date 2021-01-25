@@ -3,9 +3,7 @@ package ai.salesfox.portal.common.service.contact;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class StateMappingUtils {
     private static final Map<String, String> STATEMAP = new HashMap<>();
@@ -74,7 +72,6 @@ public class StateMappingUtils {
     }
 
     public static String replaceWithStateCodeIfPossible(String state) {
-        Set<String> errors = new LinkedHashSet<>();
         if (StringUtils.isBlank(state)) {
             return state;
         }
