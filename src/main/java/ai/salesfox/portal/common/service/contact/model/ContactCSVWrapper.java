@@ -1,7 +1,7 @@
 package ai.salesfox.portal.common.service.contact.model;
 
 import ai.salesfox.portal.common.model.PortalAddressModel;
-import ai.salesfox.portal.common.service.contact.ContactStateMappingUtils;
+import ai.salesfox.portal.common.service.contact.StateMappingUtils;
 import ai.salesfox.portal.rest.api.contact.model.ContactUploadModel;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -125,7 +125,7 @@ public class ContactCSVWrapper implements Closeable {
     private String extractStateField(CSVRecord csvRecord, String fieldName) {
         String trimmedState = extractTrimmedField(csvRecord, fieldName);
         if (null != trimmedState) {
-            return ContactStateMappingUtils.verifyState(trimmedState);
+            return StateMappingUtils.replaceWithStateCodeIfPossible(trimmedState);
         }
         return null;
     }

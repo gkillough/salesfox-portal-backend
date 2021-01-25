@@ -1,15 +1,13 @@
 package ai.salesfox.portal.common.service.contact;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ContactStateMappingUtils {
+public class StateMappingUtils {
     private static final Map<String, String> STATEMAP = new HashMap<>();
 
     static {
@@ -75,16 +73,16 @@ public class ContactStateMappingUtils {
         STATEMAP.put("wyoming", "WY");
     }
 
-    public static String verifyState(String state) {
+    public static String replaceWithStateCodeIfPossible(String state) {
         Set<String> errors = new LinkedHashSet<>();
         if (StringUtils.isBlank(state)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, String.format("State Field must not be blank"));
+            return state;
         }
         if (state.length() == 2) {
             return StringUtils.upperCase(state);
         } else {
             String lowerState = StringUtils.lowerCase(state);
-            String foundStateCode = STATEMAP.get("lowerState");
+            String foundStateCode = STATEMAP.get(lowerState);
             if (StringUtils.isBlank(foundStateCode)) {
                 return state;
             } else {
