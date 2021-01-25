@@ -4,7 +4,7 @@ import ai.salesfox.portal.common.exception.PortalException;
 import ai.salesfox.portal.database.account.entity.MembershipEntity;
 import ai.salesfox.portal.database.account.entity.UserEntity;
 import ai.salesfox.portal.database.note.credit.*;
-import ai.salesfox.portal.integration.stripe.StripeChargeService;
+import ai.salesfox.portal.integration.stripe.service.StripeChargeService;
 import ai.salesfox.portal.rest.api.common.model.request.RestrictionModel;
 import ai.salesfox.portal.rest.api.note.credit.model.NoteCreditsRequestModel;
 import ai.salesfox.portal.rest.api.note.credit.model.NoteCreditsResponseModel;

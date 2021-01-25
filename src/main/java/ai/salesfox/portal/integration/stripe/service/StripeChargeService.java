@@ -1,4 +1,4 @@
-package ai.salesfox.portal.integration.stripe;
+package ai.salesfox.portal.integration.stripe.service;
 
 import ai.salesfox.portal.common.exception.PortalException;
 import ai.salesfox.portal.integration.stripe.configuration.StripeConfiguration;
