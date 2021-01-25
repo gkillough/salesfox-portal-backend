@@ -21,7 +21,7 @@ public class StripeProductService {
         this.stripeConfiguration = stripeConfiguration;
     }
 
-    public ProductCollection requestProducts(boolean active, ProductListParams.Type productType) throws PortalException {
+    public ProductCollection retrieveProducts(boolean active, ProductListParams.Type productType) throws PortalException {
         Stripe.apiKey = stripeConfiguration.getStripeSecretKey();
         ProductListParams params = ProductListParams.builder()
                 .setActive(active)
@@ -34,7 +34,7 @@ public class StripeProductService {
         }
     }
 
-    public Product requestProductById(String productId) throws PortalException {
+    public Product retrieveProductById(String productId) throws PortalException {
         Stripe.apiKey = stripeConfiguration.getStripeSecretKey();
         try {
             return Product.retrieve(productId);
@@ -54,7 +54,7 @@ public class StripeProductService {
 
     public void updateProductById(String productId, ProductUpdateParams productUpdateParams) throws PortalException {
         Stripe.apiKey = stripeConfiguration.getStripeSecretKey();
-        Product product = requestProductById(productId);
+        Product product = retrieveProductById(productId);
 
         try {
             product.update(productUpdateParams);
