@@ -36,7 +36,7 @@ public class DigitalOceanBucketService implements ExternalImageStorageService {
         byte[] multipartFileBytes = getMultipartFileBytes(multipartFile);
         String uploadKey = createUploadKey(multipartFileBytes, multipartFile.getOriginalFilename());
         String unqualifiedBucketName = getUnqualifiedBucketName(destination);
-        String fullyQualifiedBucketName = digitalOceanConfig.getBucketQualifyingPrefix() + unqualifiedBucketName;
+        String fullyQualifiedBucketName = digitalOceanConfig.getBucketQualifyingPrefix() + unqualifiedBucketName + digitalOceanConfig.getBucketQualifyingSuffix();
 
         CreateMultipartUploadRequest uploadRequest = createMultipartUploadRequest(fullyQualifiedBucketName, uploadKey, multipartFile.getContentType(), publiclyVisible);
         CreateMultipartUploadResponse uploadResponse = s3Client.createMultipartUpload(uploadRequest);
